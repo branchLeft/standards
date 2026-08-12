@@ -110,6 +110,30 @@ live ruleset state.
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
 has pinned a name rather than a revision.
 
+## Pulumi — `stacks/pulumi.md`
+
+| ID     | Rule                                                                                  | Gate     | Encoded by              |
+| ------ | ------------------------------------------------------------------------------------- | -------- | ----------------------- |
+| PUL-1  | One exported ComponentResource per unit, `<org>:<layer>:<Type>` URN, `super()` first  | `auto`   | `tools/check-pulumi.sh` |
+| PUL-2  | `registerOutputs()` closes the constructor                                            | `auto`   | `tools/check-pulumi.sh` |
+| PUL-3  | Every child resource takes `{ parent }`                                               | `auto`   | `tools/check-pulumi.sh` |
+| PUL-4  | An exported `Args` interface, with its fields documented                              | `auto`   | `tools/check-pulumi.sh` |
+| PUL-5  | A component never reads a `StackReference`                                            | `auto`   | `tools/check-pulumi.sh` |
+| PUL-6  | Security boundaries are constants, not stack config                                   | `review` | —                       |
+| PUL-7  | `Input<T>` by default; plain `string` only where needed synchronously                 | `review` | —                       |
+| PUL-8  | One file per concern; `create*` factories take `parent` first                         | `review` | —                       |
+| PUL-9  | Validate once, at construction                                                        | `review` | —                       |
+| PUL-10 | A stack with protected resources carries a three-mode delete guard                    | `review` | —                       |
+| PUL-11 | Resource naming: `<tenant>-<resource>` logical, `<product>-<scope>-<tenant>` physical | `review` | —                       |
+
+PUL-3 is scoped to files that declare a ComponentResource or export a factory
+taking a parent. A top-level stack program has no component to parent to, so
+running it everywhere would report most of the fleet — and a gate that reports
+everything teaches people it is noise.
+
+PUL-6 stays a review clause deliberately: telling a boundary from a knob needs
+judgement, and a gate that guessed would train people to suppress it.
+
 ## Documentation — `documentation.md`
 
 Thin by design. The org documentation standard and its mechanical rules
