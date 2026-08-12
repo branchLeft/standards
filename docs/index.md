@@ -134,6 +134,53 @@ everything teaches people it is noise.
 PUL-6 stays a review clause deliberately: telling a boundary from a knob needs
 judgement, and a gate that guessed would train people to suppress it.
 
+## Styling — `stacks/styling.md`
+
+| ID    | Rule                                                                      | Gate     | Encoded by |
+| ----- | ------------------------------------------------------------------------- | -------- | ---------- |
+| STY-1 | Tailwind apps: element default → component class → utility, in that order | `review` | —          |
+| STY-2 | No colour/size literals, no arbitrary values, two utilities owe a class   | `review` | —          |
+| STY-3 | Libraries: BEM under a package namespace is the public styling API        | `review` | —          |
+| STY-4 | A library's CSS ships on a separate entry point                           | `review` | —          |
+
+Two scopes, one principle: visual decisions live in one designated place, never
+inline in markup. STY-1/STY-2 apply to a Tailwind pipeline; STY-3/STY-4 to a
+published package, which deliberately has no Tailwind and no theme of its own.
+
+## React applications — `stacks/react-app.md`
+
+| ID    | Rule                                                                       | Gate     | Encoded by                  |
+| ----- | -------------------------------------------------------------------------- | -------- | --------------------------- |
+| APP-1 | No default exports, except framework-mandated route and root modules       | `auto`   | `@branchleft/eslint-config` |
+| APP-2 | Imports are absolute from the application root                             | `auto`   | `@branchleft/eslint-config` |
+| APP-3 | One file per route, with metadata; shared loaders move to a library module | `review` | —                           |
+| APP-4 | Every route has a browser axe assertion; failures are build-blocking       | `review` | —                           |
+| APP-5 | Reduced motion is honoured, and the browser suite runs with it forced      | `review` | —                           |
+| APP-6 | Progressive enhancement is tested, not asserted                            | `review` | —                           |
+| APP-7 | Security headers built in one unit-tested module                           | `review` | —                           |
+| APP-8 | Derived data has a single source and a drift test                          | `review` | —                           |
+
+APP-1's exception is a `files` override in the ESLint config scoped to the route
+directory, so it is visible where it is enforced and a file that moves out loses
+the exemption automatically.
+
+## Component libraries — `stacks/component-library.md`
+
+| ID    | Rule                                                                  | Gate     | Encoded by                  |
+| ----- | --------------------------------------------------------------------- | -------- | --------------------------- |
+| LIB-1 | The colocated quartet: component, test, story, and CSS where it ships | `review` | —                           |
+| LIB-2 | An explicit barrel, no `export *`                                     | `review` | —                           |
+| LIB-3 | Props are an exported, named, `readonly` interface                    | `review` | —                           |
+| LIB-4 | No default exports — absolute, no framework exception                 | `auto`   | `@branchleft/eslint-config` |
+| LIB-5 | Native semantics first; ARIA only where semantics are insufficient    | `review` | —                           |
+| LIB-6 | Every component carries an SSR-safe axe assertion                     | `review` | `@branchleft/test-utils`    |
+| LIB-7 | Storybook is a development environment until it runs headlessly in CI | `review` | —                           |
+| LIB-8 | Tests import through the package entry point, not by deep path        | `review` | —                           |
+
+LIB-6's rule disables live in one central config with a written reason each,
+never as per-test workarounds: two disables with reasons can be reviewed, twenty
+scattered across test files cannot.
+
 ## Documentation — `documentation.md`
 
 Thin by design. The org documentation standard and its mechanical rules
@@ -153,9 +200,7 @@ These families are declared so the index is the single place to look, and so
 nothing else invents a competing ID scheme in the meantime. Each is written in
 dialogue with the platform owner.
 
-| Family                    | Doc                                           | Covers                                                                                                                                  |
-| ------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `PUL-*`                   | `stacks/pulumi.md`                            | ComponentResource shape, URN scheme, Args interfaces, `Input<T>` vs `string`, no `StackReference` in components, parent-first factories |
-| `APP-*`, `LIB-*`, `STY-*` | `stacks/*.md`                                 | React SSR conventions, component authorship, the three-level styling hierarchy                                                          |
-| `SEC-*`, `NAM-*`, `DEP-*` | `security.md`, `naming.md`, `dependencies.md` | Boundaries as constants, resource naming and length budgets, pinning policy                                                             |
-| `CON-*`, `SH-*`, `PY-*`   | `containers.md`, `shell-and-python.md`        | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script                                     |
+| Family                    | Doc                                           | Covers                                                                                              |
+| ------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `SEC-*`, `NAM-*`, `DEP-*` | `security.md`, `naming.md`, `dependencies.md` | Boundaries as constants, resource naming and length budgets, pinning policy                         |
+| `CON-*`, `SH-*`, `PY-*`   | `containers.md`, `shell-and-python.md`        | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script |

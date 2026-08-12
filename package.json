@@ -15,14 +15,20 @@
     "format": "prettier --write . --ignore-path .gitignore --ignore-path packages/prettier-config/prettierignore",
     "format:check": "prettier --check . --ignore-path .gitignore --ignore-path packages/prettier-config/prettierignore",
     "selftest": "./tools/tests/run.sh",
-    "prepare": "[ \"$CI\" = \"true\" ] || pre-commit install"
+    "prepare": "[ \"$CI\" = \"true\" ] || pre-commit install",
+    "build": "pnpm -r --filter \"./packages/*\" run build",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint ."
   },
   "devDependencies": {
+    "@branchleft/eslint-config": "workspace:*",
     "@branchleft/prettier-config": "workspace:*",
     "@branchleft/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^9.39.5",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
-  }
+  },
+  "type": "module"
 }
