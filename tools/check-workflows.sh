@@ -128,7 +128,7 @@ self_test() {
   tmp=$(mktemp -d) || return 2
   (
     cd "$tmp" || exit 2
-    git init -q -b main . && git config user.email t@t && git config user.name t
+    ratchet_scratch_repo_init || exit 2
     mkdir -p .github/workflows
 
     cat > .github/workflows/bad.yml <<'EOF'
