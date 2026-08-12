@@ -1,0 +1,511 @@
+{
+  "communities": {
+    "0": [
+      "tools_check_pulumi",
+      "tools_check_pulumi_is_component_file",
+      "tools_check_pulumi_main",
+      "tools_check_pulumi_scan_args",
+      "tools_check_pulumi_scan_component",
+      "tools_check_pulumi_scan_parenting",
+      "tools_check_pulumi_self_test",
+      "tools_check_pulumi_sh__entry",
+      "tools_check_pulumi_takes_parent",
+      "tools_check_tsconfig",
+      "tools_check_tsconfig_analyse_tsconfig",
+      "tools_check_tsconfig_check_ts5",
+      "tools_check_tsconfig_main",
+      "tools_check_tsconfig_self_test",
+      "tools_check_tsconfig_sh__entry",
+      "tools_check_tsconfig_tier_rank",
+      "tools_check_workflows",
+      "tools_check_workflows_main",
+      "tools_check_workflows_scan_workflow",
+      "tools_check_workflows_self_test",
+      "tools_check_workflows_sh__entry",
+      "tools_lib_ratchet",
+      "tools_lib_ratchet_ratchet_finding",
+      "tools_lib_ratchet_ratchet_init",
+      "tools_lib_ratchet_ratchet_is_allowed",
+      "tools_lib_ratchet_ratchet_is_enforced",
+      "tools_lib_ratchet_ratchet_is_exempt",
+      "tools_lib_ratchet_ratchet_json",
+      "tools_lib_ratchet_ratchet_scope_files",
+      "tools_lib_ratchet_ratchet_self_test",
+      "tools_lib_ratchet_ratchet_summary",
+      "tools_lib_ratchet_sh__entry"
+    ],
+    "1": [
+      "packages_eslint_config_tsconfig_build",
+      "packages_eslint_config_tsconfig_build_extends",
+      "packages_eslint_config_tsconfig_build_include",
+      "packages_eslint_config_tsconfig_build_json_ref_src_ts",
+      "packages_vitest_config_tsconfig_build",
+      "packages_vitest_config_tsconfig_build_compileroptions",
+      "packages_vitest_config_tsconfig_build_compileroptions_declaration",
+      "packages_vitest_config_tsconfig_build_compileroptions_declarationmap",
+      "packages_vitest_config_tsconfig_build_compileroptions_lib",
+      "packages_vitest_config_tsconfig_build_compileroptions_module",
+      "packages_vitest_config_tsconfig_build_compileroptions_moduleresolution",
+      "packages_vitest_config_tsconfig_build_compileroptions_noemit",
+      "packages_vitest_config_tsconfig_build_compileroptions_outdir",
+      "packages_vitest_config_tsconfig_build_compileroptions_rootdir",
+      "packages_vitest_config_tsconfig_build_extends",
+      "packages_vitest_config_tsconfig_build_include",
+      "packages_vitest_config_tsconfig_build_json_ref_es2022",
+      "packages_vitest_config_tsconfig_build_json_ref_src_ts",
+      "ref_branchleft_tsconfig_react_app_json",
+      "ref_node_modules",
+      "ref_packages_src_ts",
+      "tsconfig",
+      "tsconfig_exclude",
+      "tsconfig_extends",
+      "tsconfig_include",
+      "tsconfig_json_ref_branchleft_tsconfig_strict_2_json",
+      "tsconfig_json_ref_dist"
+    ],
+    "2": [
+      "package_devdependencies_branchleft_tsconfig",
+      "package_json_branchleft_tsconfig",
+      "packages_eslint_config_package_devdependencies",
+      "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
+      "packages_vitest_config_package",
+      "packages_vitest_config_package_description",
+      "packages_vitest_config_package_devdependencies",
+      "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
+      "packages_vitest_config_package_exports",
+      "packages_vitest_config_package_license",
+      "packages_vitest_config_package_main",
+      "packages_vitest_config_package_name",
+      "packages_vitest_config_package_publishconfig",
+      "packages_vitest_config_package_publishconfig_registry",
+      "packages_vitest_config_package_repository",
+      "packages_vitest_config_package_repository_directory",
+      "packages_vitest_config_package_repository_type",
+      "packages_vitest_config_package_repository_url",
+      "packages_vitest_config_package_scripts",
+      "packages_vitest_config_package_scripts_build",
+      "packages_vitest_config_package_scripts_prepublishonly",
+      "packages_vitest_config_package_type",
+      "packages_vitest_config_package_types",
+      "packages_vitest_config_package_version"
+    ],
+    "3": [
+      "packages_eslint_config_package_files",
+      "packages_eslint_config_package_json_ref_dist",
+      "packages_prettier_config_package",
+      "packages_prettier_config_package_description",
+      "packages_prettier_config_package_exports",
+      "packages_prettier_config_package_exports_prettierignore",
+      "packages_prettier_config_package_files",
+      "packages_prettier_config_package_license",
+      "packages_prettier_config_package_main",
+      "packages_prettier_config_package_name",
+      "packages_prettier_config_package_publishconfig",
+      "packages_prettier_config_package_publishconfig_registry",
+      "packages_prettier_config_package_repository",
+      "packages_prettier_config_package_repository_directory",
+      "packages_prettier_config_package_repository_type",
+      "packages_prettier_config_package_repository_url",
+      "packages_prettier_config_package_version",
+      "packages_tsconfig_package_files",
+      "packages_tsconfig_package_json_ref_readme_md",
+      "packages_vitest_config_package_files",
+      "packages_vitest_config_package_json_ref_dist",
+      "ref_index_json",
+      "ref_json",
+      "ref_prettierignore"
+    ],
+    "4": [
+      "branchleft_eslint_config",
+      "branchleft_prettier_config",
+      "package_devdependencies",
+      "package_devdependencies_branchleft_eslint_config",
+      "package_devdependencies_branchleft_prettier_config",
+      "package_devdependencies_eslint",
+      "package_devdependencies_prettier",
+      "package_devdependencies_typescript",
+      "package_devdependencies_vitest",
+      "package_devdependencies_vitest_coverage_v8",
+      "package_json_eslint",
+      "package_json_vitest",
+      "package_json_vitest_coverage_v8",
+      "packages_eslint_config_package_peerdependencies",
+      "packages_eslint_config_package_peerdependencies_eslint",
+      "packages_vitest_config_package_json_vitest",
+      "packages_vitest_config_package_peerdependencies",
+      "packages_vitest_config_package_peerdependencies_vitest",
+      "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
+      "prettier",
+      "typescript"
+    ],
+    "5": [
+      "package",
+      "package_description",
+      "package_license",
+      "package_name",
+      "package_packagemanager",
+      "package_prettier",
+      "package_private",
+      "package_repository",
+      "package_repository_type",
+      "package_repository_url",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_format",
+      "package_scripts_format_check",
+      "package_scripts_lint",
+      "package_scripts_lint_check",
+      "package_scripts_prepare",
+      "package_scripts_selftest",
+      "package_scripts_typecheck",
+      "package_type",
+      "package_version"
+    ],
+    "6": [
+      "packages_eslint_config_src_base",
+      "packages_eslint_config_src_base_base",
+      "packages_eslint_config_src_index",
+      "packages_eslint_config_src_library",
+      "packages_eslint_config_src_library_library",
+      "packages_eslint_config_src_pulumi",
+      "packages_eslint_config_src_pulumi_pulumi",
+      "packages_eslint_config_src_pulumi_scripts",
+      "packages_eslint_config_src_react",
+      "packages_eslint_config_src_react_react",
+      "packages_eslint_config_src_react_recommendedrules",
+      "packages_eslint_config_src_reactapp",
+      "packages_eslint_config_src_reactapp_default_framework_modules",
+      "packages_eslint_config_src_reactapp_reactapp",
+      "packages_eslint_config_src_reactapp_reactappoptions",
+      "packages_eslint_config_src_tests",
+      "packages_eslint_config_src_tests_tests",
+      "packages_eslint_config_src_typechecked",
+      "packages_eslint_config_src_typechecked_typechecked"
+    ],
+    "7": [
+      "packages_eslint_config_package",
+      "packages_eslint_config_package_description",
+      "packages_eslint_config_package_exports",
+      "packages_eslint_config_package_license",
+      "packages_eslint_config_package_main",
+      "packages_eslint_config_package_name",
+      "packages_eslint_config_package_publishconfig",
+      "packages_eslint_config_package_publishconfig_registry",
+      "packages_eslint_config_package_repository",
+      "packages_eslint_config_package_repository_directory",
+      "packages_eslint_config_package_repository_type",
+      "packages_eslint_config_package_repository_url",
+      "packages_eslint_config_package_scripts",
+      "packages_eslint_config_package_scripts_build",
+      "packages_eslint_config_package_scripts_prepublishonly",
+      "packages_eslint_config_package_type",
+      "packages_eslint_config_package_types",
+      "packages_eslint_config_package_version"
+    ],
+    "8": [
+      "packages_tsconfig_package",
+      "packages_tsconfig_package_description",
+      "packages_tsconfig_package_exports",
+      "packages_tsconfig_package_exports_base_json",
+      "packages_tsconfig_package_exports_pulumi_json",
+      "packages_tsconfig_package_exports_react_app_json",
+      "packages_tsconfig_package_exports_react_lib_json",
+      "packages_tsconfig_package_exports_strict_1_json",
+      "packages_tsconfig_package_exports_strict_2_json",
+      "packages_tsconfig_package_license",
+      "packages_tsconfig_package_name",
+      "packages_tsconfig_package_publishconfig",
+      "packages_tsconfig_package_publishconfig_registry",
+      "packages_tsconfig_package_repository",
+      "packages_tsconfig_package_repository_directory",
+      "packages_tsconfig_package_repository_type",
+      "packages_tsconfig_package_repository_url",
+      "packages_tsconfig_package_version"
+    ],
+    "9": [
+      "packages_tsconfig_react_app",
+      "packages_tsconfig_react_app_comment",
+      "packages_tsconfig_react_app_compileroptions",
+      "packages_tsconfig_react_app_compileroptions_allowjs",
+      "packages_tsconfig_react_app_compileroptions_isolatedmodules",
+      "packages_tsconfig_react_app_compileroptions_jsx",
+      "packages_tsconfig_react_app_compileroptions_lib",
+      "packages_tsconfig_react_app_compileroptions_module",
+      "packages_tsconfig_react_app_compileroptions_moduleresolution",
+      "packages_tsconfig_react_app_compileroptions_verbatimmodulesyntax",
+      "packages_tsconfig_react_app_json_ref_es2022",
+      "packages_tsconfig_react_app_schema",
+      "ref_dom",
+      "ref_dom_iterable"
+    ],
+    "10": [
+      "eslint_config_prettier",
+      "eslint_js",
+      "eslint_plugin_jsx_a11y",
+      "eslint_plugin_react_hooks",
+      "globals",
+      "packages_eslint_config_package_dependencies",
+      "packages_eslint_config_package_dependencies_eslint_config_prettier",
+      "packages_eslint_config_package_dependencies_eslint_js",
+      "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
+      "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
+      "packages_eslint_config_package_dependencies_globals",
+      "packages_eslint_config_package_dependencies_typescript_eslint",
+      "typescript_eslint"
+    ],
+    "11": [
+      "packages_tsconfig_pulumi",
+      "packages_tsconfig_pulumi_comment",
+      "packages_tsconfig_pulumi_compileroptions",
+      "packages_tsconfig_pulumi_compileroptions_experimentaldecorators",
+      "packages_tsconfig_pulumi_compileroptions_lib",
+      "packages_tsconfig_pulumi_compileroptions_module",
+      "packages_tsconfig_pulumi_compileroptions_moduleresolution",
+      "packages_tsconfig_pulumi_compileroptions_sourcemap",
+      "packages_tsconfig_pulumi_compileroptions_types",
+      "packages_tsconfig_pulumi_json_ref_es2022",
+      "packages_tsconfig_pulumi_schema",
+      "ref_node"
+    ],
+    "12": [
+      "packages_tsconfig_base",
+      "packages_tsconfig_base_comment",
+      "packages_tsconfig_base_compileroptions",
+      "packages_tsconfig_base_compileroptions_esmoduleinterop",
+      "packages_tsconfig_base_compileroptions_forceconsistentcasinginfilenames",
+      "packages_tsconfig_base_compileroptions_noemit",
+      "packages_tsconfig_base_compileroptions_resolvejsonmodule",
+      "packages_tsconfig_base_compileroptions_skiplibcheck",
+      "packages_tsconfig_base_compileroptions_strict",
+      "packages_tsconfig_base_compileroptions_target",
+      "packages_tsconfig_base_schema"
+    ],
+    "13": [
+      "packages_eslint_config_tsconfig_build_compileroptions",
+      "packages_eslint_config_tsconfig_build_compileroptions_declaration",
+      "packages_eslint_config_tsconfig_build_compileroptions_declarationmap",
+      "packages_eslint_config_tsconfig_build_compileroptions_lib",
+      "packages_eslint_config_tsconfig_build_compileroptions_module",
+      "packages_eslint_config_tsconfig_build_compileroptions_moduleresolution",
+      "packages_eslint_config_tsconfig_build_compileroptions_noemit",
+      "packages_eslint_config_tsconfig_build_compileroptions_outdir",
+      "packages_eslint_config_tsconfig_build_compileroptions_rootdir",
+      "packages_eslint_config_tsconfig_build_json_ref_es2022"
+    ],
+    "14": [
+      "packages_tsconfig_react_lib",
+      "packages_tsconfig_react_lib_comment",
+      "packages_tsconfig_react_lib_compileroptions",
+      "packages_tsconfig_react_lib_compileroptions_declaration",
+      "packages_tsconfig_react_lib_compileroptions_declarationmap",
+      "packages_tsconfig_react_lib_compileroptions_noemit",
+      "packages_tsconfig_react_lib_compileroptions_sourcemap",
+      "packages_tsconfig_react_lib_extends",
+      "packages_tsconfig_react_lib_schema",
+      "ref_react_app_json"
+    ],
+    "15": [
+      "packages_tsconfig_strict_1",
+      "packages_tsconfig_strict_1_comment",
+      "packages_tsconfig_strict_1_compileroptions",
+      "packages_tsconfig_strict_1_compileroptions_nofallthroughcasesinswitch",
+      "packages_tsconfig_strict_1_compileroptions_noimplicitreturns",
+      "packages_tsconfig_strict_1_compileroptions_nounusedlocals",
+      "packages_tsconfig_strict_1_compileroptions_nounusedparameters",
+      "packages_tsconfig_strict_1_extends",
+      "packages_tsconfig_strict_1_schema",
+      "ref_base_json"
+    ],
+    "16": [
+      "packages_tsconfig_strict_2",
+      "packages_tsconfig_strict_2_comment",
+      "packages_tsconfig_strict_2_compileroptions",
+      "packages_tsconfig_strict_2_compileroptions_exactoptionalpropertytypes",
+      "packages_tsconfig_strict_2_compileroptions_noimplicitoverride",
+      "packages_tsconfig_strict_2_compileroptions_nouncheckedindexedaccess",
+      "packages_tsconfig_strict_2_extends",
+      "packages_tsconfig_strict_2_schema",
+      "ref_strict_1_json"
+    ],
+    "17": [
+      "packages_vitest_config_src_index",
+      "packages_vitest_config_src_index_default_coverage_exclude",
+      "packages_vitest_config_src_index_default_coverage_include",
+      "packages_vitest_config_src_index_default_test_exclude",
+      "packages_vitest_config_src_index_definestandardtest",
+      "packages_vitest_config_src_index_standardtestoptions",
+      "packages_vitest_config_src_index_testenvironment"
+    ],
+    "18": [
+      "packages_eslint_config_src_vendor_d",
+      "packages_eslint_config_src_vendor_d_eslint_config_prettier",
+      "packages_eslint_config_src_vendor_d_eslint_plugin_jsx_a11y",
+      "packages_eslint_config_src_vendor_d_eslint_plugin_react_hooks"
+    ],
+    "19": [
+      "tools_ruleset_normalize",
+      "tools_ruleset_normalize_canon",
+      "tools_ruleset_normalize_canon_rule"
+    ],
+    "20": [
+      "tools_tests_run",
+      "tools_tests_run_run",
+      "tools_tests_run_sh__entry"
+    ],
+    "21": [
+      "tools_check_clause_index",
+      "tools_check_clause_index_sh__entry"
+    ],
+    "22": [
+      "tools_ruleset_apply",
+      "tools_ruleset_apply_sh__entry"
+    ],
+    "23": [
+      "tools_ruleset_audit",
+      "tools_ruleset_audit_sh__entry"
+    ],
+    "24": [
+      "eslint_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1350806451612903,
+    "1": 0.07407407407407407,
+    "2": 0.08333333333333333,
+    "3": 0.08333333333333333,
+    "4": 0.09523809523809523,
+    "5": 0.09523809523809523,
+    "6": 0.15789473684210525,
+    "7": 0.1111111111111111,
+    "8": 0.1111111111111111,
+    "9": 0.14285714285714285,
+    "10": 0.15384615384615385,
+    "11": 0.16666666666666666,
+    "12": 0.18181818181818182,
+    "13": 0.2,
+    "14": 0.2,
+    "15": 0.2,
+    "16": 0.2222222222222222,
+    "17": 0.2857142857142857,
+    "18": 0.5,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0
+  },
+  "gods": [
+    {
+      "id": "tools_lib_ratchet_ratchet_finding",
+      "label": "ratchet_finding()",
+      "degree": 11
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 9
+    },
+    {
+      "id": "packages_eslint_config_tsconfig_build_compileroptions",
+      "label": "compilerOptions",
+      "degree": 9
+    },
+    {
+      "id": "packages_vitest_config_tsconfig_build_compileroptions",
+      "label": "compilerOptions",
+      "degree": 9
+    },
+    {
+      "id": "tools_check_pulumi_main",
+      "label": "main()",
+      "degree": 9
+    },
+    {
+      "id": "packages_tsconfig_base_compileroptions",
+      "label": "compilerOptions",
+      "degree": 8
+    },
+    {
+      "id": "packages_tsconfig_react_app_compileroptions",
+      "label": "compilerOptions",
+      "degree": 8
+    },
+    {
+      "id": "packages_tsconfig_package_exports",
+      "label": "exports",
+      "degree": 7
+    },
+    {
+      "id": "packages_tsconfig_pulumi_compileroptions",
+      "label": "compilerOptions",
+      "degree": 7
+    },
+    {
+      "id": "tools_check_tsconfig_main",
+      "label": "main()",
+      "degree": 6
+    }
+  ],
+  "surprises": [
+    {
+      "source": "extends",
+      "target": "@branchleft/tsconfig/strict-2.json",
+      "source_files": [
+        "packages/eslint-config/tsconfig.build.json",
+        "tsconfig.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "extends",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "extends",
+      "target": "@branchleft/tsconfig/strict-2.json",
+      "source_files": [
+        "packages/vitest-config/tsconfig.build.json",
+        "tsconfig.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "extends",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "files",
+      "target": "README.md",
+      "source_files": [
+        "packages/eslint-config/package.json",
+        "packages/tsconfig/package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "extends",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "files",
+      "target": "README.md",
+      "source_files": [
+        "packages/prettier-config/package.json",
+        "packages/tsconfig/package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "extends",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "files",
+      "target": "README.md",
+      "source_files": [
+        "packages/vitest-config/package.json",
+        "packages/tsconfig/package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "extends",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
