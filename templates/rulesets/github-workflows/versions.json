@@ -1,0 +1,26 @@
+{
+  "name": "versions",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": ["refs/tags/v*"]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    }
+  ],
+  "bypass_actors": [
+    {
+      "actor_id": 18812121,
+      "actor_type": "Team",
+      "bypass_mode": "always"
+    }
+  ]
+}

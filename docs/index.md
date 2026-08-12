@@ -79,6 +79,37 @@ half, and they are meaningless unless `coverage.include` is set: without it,
 coverage instruments only files a test already loads, so an untested file is
 absent from the report rather than present at zero.
 
+## CI and CD — `ci-cd.md`
+
+| ID   | Rule                                                                            | Gate     | Encoded by                 |
+| ---- | ------------------------------------------------------------------------------- | -------- | -------------------------- |
+| CI-1 | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment           | `auto`   | `tools/check-workflows.sh` |
+| CI-2 | Environment values bound, never interpolated into a `run:` body                 | `auto`   | `tools/check-workflows.sh` |
+| CI-3 | A gate that runs on `pull_request` also runs on push to `main`                  | `auto`   | `tools/check-workflows.sh` |
+| CI-4 | CI reports, it does not rewrite — no `--fix` or `--write` in a job              | `auto`   | `tools/check-workflows.sh` |
+| CI-5 | Reusable workflows pinned to an exact tag, never `@main`                        | `auto`   | `tools/check-workflows.sh` |
+| CI-6 | Required checks agree with the repo's mode and with the job names it emits      | `auto`   | `tools/ruleset-audit.sh`   |
+| CI-7 | A privileged job is gated twice, by mechanisms that do not share a failure mode | `review` | —                          |
+| CI-8 | A script whose pass is load-bearing carries a `--self-test`, run before it      | `review` | —                          |
+
+CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
+live ruleset state.
+
+## Repository settings — `repo-settings.md`
+
+| ID     | Rule                                                                            | Gate     | Encoded by               |
+| ------ | ------------------------------------------------------------------------------- | -------- | ------------------------ |
+| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR    | `auto`   | `templates/rulesets/`    |
+| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only             | `auto`   | `templates/rulesets/`    |
+| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures | `auto`   | `templates/rulesets/`    |
+| REPO-4 | Required checks: never before a real run, never for a `warn` gate, names match  | `review` | `tools/ruleset-audit.sh` |
+| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors         | `auto`   | `templates/codeowners`   |
+| REPO-6 | Every repo's ruleset payload is committed and audited                           | `auto`   | `tools/ruleset-audit.sh` |
+
+**`update` is the clause people leave out**, and leaving it out is the whole
+vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
+has pinned a name rather than a revision.
+
 ## Documentation — `documentation.md`
 
 Thin by design. The org documentation standard and its mechanical rules
@@ -100,8 +131,6 @@ dialogue with the platform owner.
 
 | Family                    | Doc                                           | Covers                                                                                                                                  |
 | ------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `CI-*`                    | `ci-cd.md`                                    | SHA pinning, env binding vs interpolation, the two-independent-halves gate, PR-and-main gate symmetry, required-check hygiene           |
-| `REPO-*`                  | `repo-settings.md`                            | Ruleset shape, CODEOWNERS, tag immutability, bypass actors                                                                              |
 | `PUL-*`                   | `stacks/pulumi.md`                            | ComponentResource shape, URN scheme, Args interfaces, `Input<T>` vs `string`, no `StackReference` in components, parent-first factories |
 | `APP-*`, `LIB-*`, `STY-*` | `stacks/*.md`                                 | React SSR conventions, component authorship, the three-level styling hierarchy                                                          |
 | `SEC-*`, `NAM-*`, `DEP-*` | `security.md`, `naming.md`, `dependencies.md` | Boundaries as constants, resource naming and length budgets, pinning policy                                                             |
