@@ -91,6 +91,7 @@ absent from the report rather than present at zero.
 | CI-6 | Required checks agree with the repo's mode and with the job names it emits      | `auto`   | `tools/ruleset-audit.sh`   |
 | CI-7 | A privileged job is gated twice, by mechanisms that do not share a failure mode | `review` | —                          |
 | CI-8 | A script whose pass is load-bearing carries a `--self-test`, run before it      | `review` | —                          |
+| CI-9 | No empty expression anywhere in a workflow file, comments included              | `auto`   | `tools/check-workflows.sh` |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state.

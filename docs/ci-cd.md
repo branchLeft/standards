@@ -62,6 +62,17 @@ Nothing watches this on its own — Dependabot's `github-actions` ecosystem
 updates action pins but not reusable-workflow refs — so caller drift is a
 standing audit item rather than something that fixes itself.
 
+## CI-9 — never write an empty expression, not even in a comment
+
+GitHub Actions parses `${{ … }}` **anywhere in a workflow file, comments
+included**. An empty one is a syntax error, and the failure mode is the worst
+kind: no jobs run, no log is produced, and the only signal is "this run likely
+failed because of a workflow file issue".
+
+The way this gets introduced is by documenting CI-2 — writing a comment that
+shows the empty-expression form while explaining why values must be bound rather
+than interpolated. Describe the rule in words instead.
+
 ## CI-6 — required checks agree with the repo's mode and job names
 
 `auto`, but at audit time rather than in-repo: it needs `gh api` to read live

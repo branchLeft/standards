@@ -54,8 +54,13 @@ jobs:
           MODE: ${{ inputs.mode }}
         run: |
           set -euo pipefail
-          # Bound, never interpolated: a ${{ }} inside run: is expanded before
-          # the shell sees it, so a value containing shell syntax becomes source.
+          # MODE is bound above rather than interpolated here. An expression
+          # inside a run: body is expanded before the shell sees it, so a value
+          # containing shell syntax becomes shell source.
+          #
+          # Do not write an empty expression in this file even inside a comment:
+          # Actions parses expressions anywhere in the workflow, comments
+          # included, and an empty one is a startup failure with no job log.
           args=()
           [ -n "$MODE" ] && args+=(--mode "$MODE")
           .standards/tools/check-tsconfig.sh "${args[@]+"${args[@]}"}"

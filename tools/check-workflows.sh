@@ -26,10 +26,24 @@ scan_workflow() {
     ln=$((ln + 1))
     trimmed="${line#"${line%%[![:space:]]*}"}"
 
+    # CI-9 — an empty expression is a startup failure: no jobs run, no log is
+    # produced, and the only signal is "this run likely failed because of a
+    # workflow file issue". Checked before the comment skip below, because
+    # Actions parses expressions anywhere in the file, comments included — which
+    # is exactly how this gets introduced, by documenting the CI-2 rule.
+    if printf '%s' "$line" | grep -qE '\$\{\{[[:space:]]*\}\}'; then
+      ratchet_finding "CI-9" "$f" "$ln" \
+        "empty \${{ }} expression — Actions parses these even in comments, and an empty one fails the run at startup with no log"
+    fi
+
     # A comment is never code. Skipping these is not cosmetic: a shell comment
-    # documenting this very rule contains both `${{ }}` and the text `run:`, so
-    # without this the gate fires on its own documentation — twice.
+    # documenting the CI-2 rule contains both an expression and the text `run:`,
+    # so without this the gate fires on its own documentation — twice.
     case "$trimmed" in \#*) continue ;; esac
+
+    # An empty expression is CI-9's finding, not CI-2's. Strip it so one defect
+    # is not reported under two clauses.
+    line=$(printf '%s' "$line" | sed 's/\${{[[:space:]]*}}//g')
 
     # CI-1 — SHA pin with a version comment.
     case "$line" in
@@ -130,15 +144,17 @@ jobs:
       - run: echo "${{ github.event.head_commit.message }}"
       - run: pnpm lint --fix
       - uses: other/repo/.github/workflows/x.yml@main
-      - name: A comment documenting the rule must not trip it
+      - name: A comment documenting the rule must not trip CI-2
         run: |
-          # Bound, never interpolated: a ${{ }} inside run: becomes shell source.
+          # Bound, never interpolated: an expression in run: becomes shell source.
           echo ok
+      - name: An empty expression is a startup failure
+        run: echo "${{ }}"
 EOF
     git add -A && git commit -qm init
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
 
-    for c in CI-1 CI-2 CI-3 CI-4 CI-5; do
+    for c in CI-1 CI-2 CI-3 CI-4 CI-5 CI-9; do
       printf '%s' "$out" | grep -q "$c" || { echo "FAIL: $c not caught"; echo "$out"; exit 1; }
     done
     # Two CI-1 findings: an unpinned tag, and a SHA with no version comment.
