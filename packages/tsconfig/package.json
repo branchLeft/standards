@@ -1,0 +1,26 @@
+{
+  "name": "@branchleft/tsconfig",
+  "version": "0.1.0",
+  "description": "Shared TypeScript compiler options for branchLeft repos. Strictness tiers compose with stack presets via an extends array.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/branchLeft/standards.git",
+    "directory": "packages/tsconfig"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "exports": {
+    "./base.json": "./base.json",
+    "./strict-1.json": "./strict-1.json",
+    "./strict-2.json": "./strict-2.json",
+    "./pulumi.json": "./pulumi.json",
+    "./react-app.json": "./react-app.json",
+    "./react-lib.json": "./react-lib.json"
+  },
+  "files": [
+    "*.json",
+    "README.md"
+  ]
+}

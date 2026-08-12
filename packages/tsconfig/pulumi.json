@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_comment": "Stack options only — no strictness tier. Compose: \"extends\": [\"@branchleft/tsconfig/strict-1.json\", \"@branchleft/tsconfig/pulumi.json\"]. experimentalDecorators is required by @pulumi/pulumi's generated resource classes.",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "sourceMap": true,
+    "experimentalDecorators": true
+  }
+}

@@ -1,0 +1,61 @@
+# The reusable gate. Every repo calls this; see templates/workflows/standards.yml.
+#
+# It checks out THIS repo at github.job_workflow_sha — the revision the caller
+# actually asked for — so the workflow and the scripts it runs can never skew.
+# A workflow here must never hardcode a tag of this repo internally: a literal
+# tag would pin callers to a revision unrelated to the one they requested.
+#
+# Uses only actions/checkout plus `run:` steps, deliberately, so it passes under
+# `allowed_actions: selected` with no per-repo allow-list change.
+name: Standards
+
+on:
+  workflow_call:
+    inputs:
+      mode:
+        description: Override the repo's .standards.mode. Leave empty to use the file.
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  standards:
+    name: Standards gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the caller
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The ratchet computes its changed-file set from merge-base against
+          # origin/main. Without full history that base does not exist and every
+          # file falls out of the enforced set — the gate would pass silently.
+          fetch-depth: 0
+
+      - name: Check out the standards at the revision the caller pinned
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: branchLeft/standards
+          ref: ${{ github.job_workflow_sha }}
+          path: .standards
+          persist-credentials: false
+
+      - name: Verify the gates before trusting them
+        run: |
+          set -euo pipefail
+          .standards/tools/lib/ratchet.sh --self-test
+          .standards/tools/check-tsconfig.sh --self-test
+
+      - name: Run the gates
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          # Bound, never interpolated: a ${{ }} inside run: is expanded before
+          # the shell sees it, so a value containing shell syntax becomes source.
+          args=()
+          [ -n "$MODE" ] && args+=(--mode "$MODE")
+          .standards/tools/check-tsconfig.sh "${args[@]+"${args[@]}"}"

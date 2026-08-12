@@ -1,0 +1,7 @@
+* @branchLeft/branchleft-admin
+
+# Exemptions and floors are review decisions, not implementation details.
+# Listing them explicitly means a PR cannot quietly widen an escape hatch.
+/tools/floors.tsv       @branchLeft/branchleft-admin
+/.standardsignore       @branchLeft/branchleft-admin
+/docs/                  @branchLeft/branchleft-admin

@@ -1,0 +1,46 @@
+# This repo's own gates. It is in enforce mode from commit one — a standards
+# repo running its own checks in advisory mode is not evidence of anything.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Lint, typecheck and self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # check-clause-index and the ratchet's merge-base both need history.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Format, lint and typecheck steps arrive with the first package that
+      # contains TypeScript. tsconfig.json is already here as the worked example
+      # of tier + stack composition, and the gates check it.
+      - name: Shell and gate self-tests
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          ./tools/tests/run.sh
+
+  self-check:
+    name: Dogfood the reusable workflow
+    # Relative path, not a tag: the tag for this commit does not exist yet, and
+    # pinning an older one would check this PR against superseded rules.
+    uses: ./.github/workflows/standards.yml

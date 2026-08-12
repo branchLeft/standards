@@ -1,0 +1,23 @@
+# Documentation licence
+
+The prose in `docs/` is licensed under the Creative Commons Attribution 4.0
+International Licence (CC BY 4.0).
+
+Copyright (c) 2026 branchLeft
+
+You are free to share and adapt this material for any purpose, including
+commercially, provided you give appropriate credit, link to the licence, and
+indicate if changes were made.
+
+Full licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary: https://creativecommons.org/licenses/by/4.0/
+
+## Why this is separate from LICENSE
+
+The code in this repository is MIT. MIT is a software licence: its attribution
+clause is written around distributing copies of a program, and it does not
+answer cleanly what "the above copyright notice" means when someone lifts three
+paragraphs of a standard into their own handbook.
+
+The point of publishing these standards is that other people take the prose.
+CC BY says how to credit it. Attribution is the only thing asked for.

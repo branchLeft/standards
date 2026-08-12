@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_comment": "compilerOptions only. Never add include/exclude/files here: they resolve relative to the config file that declares them, so an inherited include would resolve against node_modules/@branchleft/tsconfig and match nothing. Project scoping stays in the consumer and is gated by TS-2 and TS-5.",
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "noEmit": true
+  }
+}

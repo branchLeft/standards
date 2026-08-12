@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_comment": "Tier 1. What components/ already ran before there was a shared config, so adopting it is a no-op there and a small one-time batch elsewhere.",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}

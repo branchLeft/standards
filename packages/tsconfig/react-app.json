@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_comment": "Stack options only — no strictness tier. Compose with a strict-N base. verbatimModuleSyntax keeps type-only imports erasable, which matters for SSR bundling.",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "allowJs": false,
+    "isolatedModules": true
+  }
+}

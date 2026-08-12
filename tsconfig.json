@@ -1,0 +1,5 @@
+{
+  "extends": ["@branchleft/tsconfig/strict-2.json", "@branchleft/tsconfig/react-app.json"],
+  "include": ["packages/*/src/**/*.ts"],
+  "exclude": ["node_modules", "**/dist"]
+}

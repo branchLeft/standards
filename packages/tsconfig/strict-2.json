@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_comment": "Tier 2. noUncheckedIndexedAccess is the expensive one: every indexed read becomes T | undefined, which is a real batch of fixes and the reason this is a separate tier rather than part of the floor.",
+  "extends": "./strict-1.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true
+  }
+}

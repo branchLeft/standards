@@ -1,0 +1,24 @@
+{
+  "name": "@branchleft/standards",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Engineering standards for branchLeft repos: prose, shared config, and CI gates.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/branchLeft/standards.git"
+  },
+  "packageManager": "pnpm@11.17.0",
+  "prettier": "@branchleft/prettier-config",
+  "scripts": {
+    "format": "prettier --write . --ignore-path .gitignore --ignore-path packages/prettier-config/prettierignore",
+    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path packages/prettier-config/prettierignore",
+    "selftest": "./tools/tests/run.sh",
+    "prepare": "[ \"$CI\" = \"true\" ] || pre-commit install"
+  },
+  "devDependencies": {
+    "@branchleft/prettier-config": "workspace:*",
+    "@branchleft/tsconfig": "workspace:*",
+    "prettier": "^3.6.2"
+  }
+}

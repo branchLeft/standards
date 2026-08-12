@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_comment": "A published React library. Emits declarations, so noEmit from base is turned back off — the consumer's build config still decides where output lands.",
+  "extends": "./react-app.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}

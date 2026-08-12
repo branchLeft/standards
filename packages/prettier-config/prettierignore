@@ -1,0 +1,30 @@
+# Shared ignore set. Prettier 3 does not honour .gitignore by default, so
+# without this `prettier --write .` walks build output and generated reports.
+#
+# Consumed via a second --ignore-path; a repo keeps its own .prettierignore for
+# anything repo-specific:
+#
+#   prettier --check . \
+#     --ignore-path .gitignore \
+#     --ignore-path node_modules/@branchleft/prettier-config/prettierignore
+#
+# Only resolves correctly when the command runs from the repo root.
+
+node_modules/
+dist/
+build/
+coverage/
+*.min.js
+*.min.css
+pnpm-lock.yaml
+package-lock.json
+
+# Generated artefacts
+.react-router/
+storybook-static/
+graphify-out/
+
+# Sibling worktrees. Pre-commit hooks run prettier with pass_filenames: false,
+# so without this, committing in one worktree rewrites files inside another.
+.claude/
+.worktrees/

@@ -1,0 +1,18 @@
+# Copy into each repo as .github/workflows/standards.yml.
+#
+# One caller per repo runs every gate, so adding a gate later costs a version
+# bump rather than a new workflow file. Pin an exact tag — `main` is the dev
+# branch here and changes without warning.
+name: Standards
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  standards:
+    uses: branchLeft/standards/.github/workflows/standards.yml@v0.1.0

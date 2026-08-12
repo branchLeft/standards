@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=2000']
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck -x
+        language: system
+        files: \.sh$
+
+      - id: gate-self-tests
+        name: gate self-tests
+        entry: ./tools/tests/run.sh
+        language: system
+        pass_filenames: false
+        files: ^(tools|docs)/

@@ -1,0 +1,24 @@
+{
+  "name": "@branchleft/prettier-config",
+  "version": "0.1.0",
+  "description": "Shared Prettier configuration for branchLeft repos.",
+  "license": "MIT",
+  "main": "index.json",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/branchLeft/standards.git",
+    "directory": "packages/prettier-config"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "exports": {
+    ".": "./index.json",
+    "./prettierignore": "./prettierignore"
+  },
+  "files": [
+    "index.json",
+    "prettierignore",
+    "README.md"
+  ]
+}

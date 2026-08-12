@@ -1,0 +1,12 @@
+# Fleet floors. One clause per line: clause-id <TAB> required value.
+#
+# Raising a floor turns every repo below it amber at once; each then clears on
+# its own schedule. Never raise a floor and fix a repo in the same PR, and never
+# lower one to make a repo green. See docs/ratchet.md.
+#
+# clause	floor
+TS-4	strict-1
+COV-1	60
+COV-2	no-regression
+SH-2	set -euo pipefail
+CON-2	tag+digest
