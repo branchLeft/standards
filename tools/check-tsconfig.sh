@@ -108,7 +108,11 @@ for (const e of extendsList) {
       if (fs.existsSync(cand)) { p = cand; found = true; break; }
     }
     if (!found) {
-      console.log(`TS-0\t1\tcannot resolve ${e} — install @branchleft/tsconfig so TS-3 can compare against it`);
+      // A skip, not a violation. The reusable workflow deliberately installs
+      // nothing — three repos in the fleet have no package.json at all — so the
+      // base is often absent when the gate runs there. Reporting this as a
+      // failure would make every repo red for a check that did not run.
+      console.log(`__SKIP__\t1\tTS-3 not checked: cannot resolve ${e} (no node_modules)`);
       continue;
     }
   } else if (!path.isAbsolute(p)) {
@@ -152,6 +156,10 @@ main() {
     while IFS=$'\t' read -r clause ln msg; do
       [ -n "$clause" ] || continue
       if [ "$clause" = "__TIER__" ]; then tier="$msg"; continue; fi
+      if [ "$clause" = "__SKIP__" ]; then
+        printf '::warning file=%s,line=%s::%s\n' "$f" "$ln" "$msg"
+        continue
+      fi
       ratchet_finding "$clause" "$f" "$ln" "$msg"
     done < <(analyse_tsconfig "$f")
 
@@ -247,6 +255,15 @@ EOF
     git add -A && git commit -qm fix
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -qE 'TS-(2|3|4)' && { echo "FAIL: clean config reported"; echo "$out"; exit 1; }
+
+    # An unresolvable base is a check that did not run, not a violation. The
+    # reusable workflow installs nothing, so this is the normal case there —
+    # failing on it would make every repo red for a check that never executed.
+    rm node_modules/@branchleft/tsconfig
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1); rc=$?
+    printf '%s' "$out" | grep -q '::warning.*TS-3 not checked' || {
+      echo "FAIL: missing base should warn"; echo "$out"; exit 1; }
+    [ "$rc" -eq 0 ] || { echo "FAIL: missing base should not fail the run"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?
