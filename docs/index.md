@@ -61,6 +61,24 @@ writing a differently-shaped bad glob.
 | CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `auto`   | —                                         |
 | CMT-3 | A comment needing more than a line or two belongs in a README or doc, with at most a one-line pointer in code        | `review` | Files where comments exceed ~30% of lines |
 
+## Testing and coverage — `testing.md`
+
+| ID     | Rule                                                                                           | Gate     | Encoded by                  |
+| ------ | ---------------------------------------------------------------------------------------------- | -------- | --------------------------- |
+| TEST-1 | Application-like code ships with unit tests in the same PR. Logic vs declaration, not language | `review` | —                           |
+| TEST-2 | A ritual test does not count; nor does a ritual test on trivial glue                           | `review` | —                           |
+| TEST-3 | Integration tests complement unit tests. Substitution only for a11y and integrated rendering   | `review` | —                           |
+| TEST-4 | Security-sensitive paths require unit coverage regardless of any other clause. Non-exhaustive  | `review` | —                           |
+| COV-1  | Changed files meet the per-file floor. **Enforced even in `warn` mode**                        | `auto`   | `@branchleft/vitest-config` |
+| COV-2  | The repo total never drops against the merge base                                              | `auto`   | `@branchleft/vitest-config` |
+
+`TEST-*` are review clauses because none of them can be automated without making
+things worse — a minimum-assertions rule is gamed by three weak assertions, and a
+branch floor directs effort at the cheapest branches. `COV-*` are the mechanical
+half, and they are meaningless unless `coverage.include` is set: without it,
+coverage instruments only files a test already loads, so an untested file is
+absent from the report rather than present at zero.
+
 ## Documentation — `documentation.md`
 
 Thin by design. The org documentation standard and its mechanical rules
@@ -82,7 +100,6 @@ dialogue with the platform owner.
 
 | Family                    | Doc                                           | Covers                                                                                                                                  |
 | ------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `TEST-*`, `COV-*`         | `testing.md`                                  | The coverage bar, what a ritual test is, what counts as security-sensitive, when an e2e or Storybook substitute is legitimate           |
 | `CI-*`                    | `ci-cd.md`                                    | SHA pinning, env binding vs interpolation, the two-independent-halves gate, PR-and-main gate symmetry, required-check hygiene           |
 | `REPO-*`                  | `repo-settings.md`                            | Ruleset shape, CODEOWNERS, tag immutability, bypass actors                                                                              |
 | `PUL-*`                   | `stacks/pulumi.md`                            | ComponentResource shape, URN scheme, Args interfaces, `Input<T>` vs `string`, no `StackReference` in components, parent-first factories |

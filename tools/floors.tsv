@@ -6,7 +6,7 @@
 #
 # clause	floor
 TS-4	strict-1
-COV-1	60
+COV-1	80/70
 COV-2	no-regression
 SH-2	set -euo pipefail
 CON-2	tag+digest

@@ -30,9 +30,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Format, lint and typecheck steps arrive with the first package that
-      # contains TypeScript. tsconfig.json is already here as the worked example
-      # of tier + stack composition, and the gates check it.
+      - name: Format
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # The lint step arrives with @branchleft/eslint-config, which is blocked
+      # on the frontend standards that decide its react and library presets.
       - name: Shell and gate self-tests
         run: |
           set -euo pipefail
