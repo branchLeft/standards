@@ -106,8 +106,22 @@ ratchet_is_enforced() {
   grep -Fxq "$1" "$RATCHET_TMP/enforced" 2>/dev/null
 }
 
-# .standardsignore  —  glob<TAB>CLAUSE_IDS<TAB># reason
 # `*` matches across directory separators, so `templates/*` covers nested paths.
+#
+# Public because the audit judges the same globs for staleness. Two copies of
+# this would eventually disagree, and the disagreement would show up as an
+# exemption reported stale while it is still suppressing a finding.
+ratchet_glob_matches() {
+  local glob="$1" path="$2"
+  # Unquoted: inside double quotes the `\*` replacement is a literal backslash
+  # and the resulting pattern then matches only a literal asterisk.
+  glob=${glob//\*\*/\*}
+  # shellcheck disable=SC2254  # $glob is a pattern by design
+  case "$path" in $glob) return 0 ;; esac
+  return 1
+}
+
+# .standardsignore  —  glob<TAB>CLAUSE_IDS<TAB># reason
 # `ALL` in the clause column exempts every clause for that glob.
 ratchet_is_exempt() {
   [ -f "$RATCHET_IGNORE_FILE" ] || return 1
@@ -117,15 +131,11 @@ ratchet_is_exempt() {
     glob=$(printf '%s' "$line" | cut -f1)
     clauses=$(printf '%s' "$line" | cut -f2)
     [ -n "$glob" ] || continue
-    glob=${glob//\*\*/\*}
-    # shellcheck disable=SC2254  # $glob is a pattern by design
-    case "$path" in
-      $glob)
-        case ",$clauses," in
-          *",$clause,"*|*",ALL,"*) return 0 ;;
-        esac
-        ;;
-    esac
+    if ratchet_glob_matches "$glob" "$path"; then
+      case ",$clauses," in
+        *",$clause,"*|*",ALL,"*) return 0 ;;
+      esac
+    fi
   done < "$RATCHET_IGNORE_FILE"
   return 1
 }
@@ -183,6 +193,24 @@ ratchet_summary() {
   [ "$RATCHET_FAILURES" -eq 0 ]
 }
 
+# Builds the scratch repository a self-test runs against. Called from inside the
+# test's subshell, so the unsets are scoped to it.
+#
+# Git exports GIT_DIR and friends to every hook it runs. Inherited by a gate's
+# self-test, they point the fixture's commands at the repository being committed
+# to: `git init` re-initialises it and `git add -A` writes its index. Clearing
+# them is what makes the fixture a fixture. core.hooksPath is neutralised for the
+# same reason — a globally templated hook would otherwise run inside the fixture
+# and fail it for having no config of its own.
+ratchet_scratch_repo_init() {
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY \
+        GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_COMMON_DIR GIT_PREFIX
+  git init -q -b main . || return 1
+  git config core.hooksPath /dev/null
+  git config user.email t@t
+  git config user.name t
+}
+
 # --- self-test -------------------------------------------------------------
 # Proves the matcher still matches before any gate's pass is trusted. Same
 # rationale as the delete guards: a check that silently stops matching reports
@@ -192,7 +220,7 @@ ratchet_self_test() {
   tmp=$(mktemp -d) || return 2
   (
     cd "$tmp" || exit 2
-    git init -q -b main . && git config user.email t@t && git config user.name t
+    ratchet_scratch_repo_init || exit 2
 
     printf 'src/*\tTS-2\t# generated\nvendor/*\tALL\t# third party\n' > .standardsignore
     printf 'line one\n// %s TS-9 because the base has no equivalent\nline three\n' \
@@ -202,6 +230,10 @@ ratchet_self_test() {
     # shellcheck source=/dev/null
     . "$RATCHET_LIB_PATH" || { echo "FAIL: could not re-source the library"; exit 1; }
     ratchet_init >/dev/null || exit 3
+
+    ratchet_glob_matches "src/*" "src/deep/a.ts" || { echo "FAIL: glob across separators"; exit 1; }
+    ratchet_glob_matches "src/**" "src/deep/a.ts" || { echo "FAIL: ** normalisation"; exit 1; }
+    ratchet_glob_matches "src/*" "app/a.ts"      && { echo "FAIL: glob over-matched"; exit 1; }
 
     ratchet_is_exempt "src/a.ts" "TS-2"    || { echo "FAIL: glob exemption"; exit 1; }
     ratchet_is_exempt "src/a.ts" "TS-3"    && { echo "FAIL: clause not scoped"; exit 1; }
