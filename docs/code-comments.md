@@ -21,13 +21,17 @@ people's names, no "verified live on `<date>`" logs, no decision-history prose.
 That context belongs in the PR description, a RUNBOOK, or an architecture doc —
 never in an inline comment.
 
-Backlog IDs are a specific case of this and the one that recurs. `BACKLOG.md`
-and `ITERATIVE-IMPROVEMENT-BACKLOG.md` live at a workspace root that no repo
-tracks, so `B7` or `Q19` in shipped source is a dangling reference for every
-reader — including external contributors on the public repos. Explain the
-reasoning directly, so the comment stands alone with no access to any backlog.
-PR titles, PR bodies and commit messages are the right place for the ID: that is
-metadata, not shipped code, and it is genuinely useful for traceability.
+Backlog IDs are a specific case of this and the one that recurs. The backlogs
+live at a workspace root that no repo tracks, so a backlog reference in shipped
+source is dangling for every reader — including external contributors on the
+public repos. Explain the reasoning directly, so the comment stands alone with
+no access to any backlog. PR titles, PR bodies and commit messages are the right
+place for the ID: that is metadata, not shipped code, and it is genuinely useful
+for traceability.
+
+The rule is enforced mechanically by the documentation linter, which means this
+paragraph cannot name an example of the thing it forbids — it would report
+itself.
 
 ## CMT-3 — length is a signal about location
 

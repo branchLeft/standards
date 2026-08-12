@@ -23,7 +23,7 @@ schedule, and deletes the file. The gate reminds it when the tree is clean.
 
 ## What counts as changed
 
-```
+```text
 git merge-base origin/main HEAD    (falling back to local main)
   → git diff --name-only --diff-filter=d <base>...HEAD
   + git diff --name-only --diff-filter=d HEAD      (uncommitted)
@@ -40,7 +40,7 @@ mid-rebase, so every gate filters to files that exist on disk before scanning.
 
 **File-scoped** — `.standardsignore`, tab-separated:
 
-```
+```text
 glob<TAB>CLAUSE_IDS<TAB># reason
 ```
 

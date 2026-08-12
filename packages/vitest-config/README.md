@@ -21,7 +21,7 @@ than present at zero**.
 
 Two source files, one of them tested, run under Vitest 4:
 
-```
+```text
 without coverage.include            with coverage.include
 -----------|---------|              -------------|---------|
 File       | % Stmts |              File         | % Stmts |
