@@ -25,15 +25,28 @@ scan_workflow() {
   while IFS= read -r line; do
     ln=$((ln + 1))
     trimmed="${line#"${line%%[![:space:]]*}"}"
+    indent=$(printf '%s' "$line" | awk '{ match($0, /^[ ]*/); print RLENGTH }')
+
+    # Close the run: block before anything reads $in_run, so a comment sitting
+    # inside a body is still recognised as part of it.
+    if [ "$in_run" -eq 1 ] && [ -n "$trimmed" ] && [ "$indent" -le "$run_indent" ]; then
+      in_run=0
+    fi
 
     # CI-9 — an empty expression is a startup failure: no jobs run, no log is
     # produced, and the only signal is "this run likely failed because of a
-    # workflow file issue". Checked before the comment skip below, because
-    # Actions parses expressions anywhere in the file, comments included — which
-    # is exactly how this gets introduced, by documenting the CI-2 rule.
-    if printf '%s' "$line" | grep -qE '\$\{\{[[:space:]]*\}\}'; then
-      ratchet_finding "CI-9" "$f" "$ln" \
-        "empty \${{ }} expression — Actions parses these even in comments, and an empty one fails the run at startup with no log"
+    # workflow file issue".
+    #
+    # Scoped to the positions Actions evaluates. A run: block scalar is
+    # substituted whole, so a shell comment inside one counts. A YAML comment
+    # outside a scalar is removed by the parser before expressions are read, and
+    # an empty expression there is inert — reporting it fires the gate on
+    # documentation that breaks nothing, which is how a gate earns a suppression.
+    if [ "$in_run" -eq 1 ] || [ "${trimmed:0:1}" != "#" ]; then
+      if printf '%s' "$line" | grep -qE '\$\{\{[[:space:]]*\}\}'; then
+        ratchet_finding "CI-9" "$f" "$ln" \
+          "empty \${{ }} expression in an evaluated position — it fails the run at startup with no log"
+      fi
     fi
 
     # A comment is never code. Skipping these is not cosmetic: a shell comment
@@ -71,12 +84,8 @@ scan_workflow() {
     esac
 
     # CI-2 — a ${{ }} inside a run: body is expanded before the shell sees it.
-    # Track the run: block by indentation so an expression in `env:` or `if:`
-    # is not reported.
-    indent=$(printf '%s' "$line" | awk '{ match($0, /^[ ]*/); print RLENGTH }')
-    if [ "$in_run" -eq 1 ] && [ -n "$line" ] && [ "$indent" -le "$run_indent" ]; then
-      in_run=0
-    fi
+    # The block is tracked by indentation, closed above, so an expression in
+    # `env:` or `if:` is not reported.
     if [ "$in_run" -eq 1 ]; then
       case "$line" in
         *'${{'*) ratchet_finding "CI-2" "$f" "$ln" "\${{ }} interpolated into a run: body — bind it to an env var instead" ;;
@@ -150,6 +159,10 @@ jobs:
           echo ok
       - name: An empty expression is a startup failure
         run: echo "${{ }}"
+      - name: A run: body is substituted whole, shell comments included
+        run: |
+          # Even here, an empty ${{ }} is a syntax error.
+          echo ok
 EOF
     git add -A && git commit -qm init
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
@@ -163,6 +176,9 @@ EOF
     # Exactly one CI-2: the real interpolation, not the comment describing it.
     [ "$(printf '%s' "$out" | grep -c 'CI-2')" -eq 1 ] || {
       echo "FAIL: CI-2 fired on a comment"; echo "$out"; exit 1; }
+    # Two CI-9: the evaluated value, and the shell comment inside a run: body.
+    [ "$(printf '%s' "$out" | grep -c 'CI-9')" -eq 2 ] || {
+      echo "FAIL: CI-9 missed an empty expression inside a run: body"; echo "$out"; exit 1; }
 
     cat > .github/workflows/bad.yml <<'EOF'
 name: Good
@@ -174,6 +190,8 @@ jobs:
   a:
     runs-on: ubuntu-latest
     steps:
+      # A YAML comment is removed before expressions are read, so the ${{ }}
+      # written out here is inert and must not be reported.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Safe
         env:
