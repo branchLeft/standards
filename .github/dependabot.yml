@@ -1,0 +1,37 @@
+version: 2
+
+updates:
+  # One entry per manifest: pnpm workspaces do not make Dependabot discover the
+  # package directories, and a missed directory is a dependency nothing watches.
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    commit-message: { prefix: 'chore(deps)' }
+
+  - package-ecosystem: npm
+    directory: /packages/eslint-config
+    schedule: { interval: weekly }
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    commit-message: { prefix: 'chore(deps)' }
+
+  - package-ecosystem: npm
+    directory: /packages/vitest-config
+    schedule: { interval: weekly }
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    commit-message: { prefix: 'chore(deps)' }
+
+  # Keeps the SHA pins in .github/workflows current. Note it does not update
+  # reusable-workflow refs (`uses: owner/repo/.github/workflows/x.yml@tag`), so
+  # caller drift on those is watched by the standards audit instead.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    commit-message: { prefix: 'chore(ci)' }
