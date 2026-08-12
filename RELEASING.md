@@ -15,9 +15,17 @@ packages when one changes is trivial next to debugging a repo running
    git push origin v0.2.0
    ```
 
-   The tag ruleset requires signatures. A sibling repo already has two
-   lightweight, unsigned tags in service — one of them the most widely
-   referenced tag in the fleet — which is how easily this is forgotten.
+   The tag ruleset requires signatures, but it cannot enforce this on its own:
+   GitHub validates the signature of the **commit a tag points at**, not the tag
+   object, so a lightweight tag placed on a merge commit that GitHub's own
+   web-flow key signed satisfies the rule without anyone having signed a tag.
+   A sibling repo already has two lightweight, unsigned tags in service — one of
+   them the most widely referenced tag in the fleet — and this repo's own first
+   release is a third.
+
+   `publish.yml` therefore checks the tag object's own type and verification
+   before it builds anything. A lightweight or unverified tag fails the release
+   rather than publishing under it.
 
 4. `publish.yml` fires on `v*.*.*` and publishes all five to GitHub Packages.
    Never `npm publish` locally.
