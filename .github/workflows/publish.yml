@@ -36,6 +36,41 @@ jobs:
       - name: Build the packages that emit
         run: pnpm build
 
+      # A lightweight tag satisfies the release ruleset's `required_signatures`
+      # without anyone having signed anything: GitHub validates the signature on
+      # the commit a tag points at, not the tag object, so a tag placed on a
+      # merge commit that GitHub's own web-flow key signed passes the rule. The
+      # only check that tells the two apart is the tag object's own verification
+      # status, and a ruleset has no way to express it — so it lives here, ahead
+      # of the version assertion, because an unsigned release should fail before
+      # anything is built against it.
+      #
+      # Read from the API rather than the working copy: `git verify-tag` needs
+      # the signer's public key in the runner's keyring, which it has no reason
+      # to have, and `git cat-file` depends on the checkout having fetched the
+      # tag object rather than the commit under it.
+      - name: Assert the tag is annotated and signed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # gh's own -q expressions, not jq: one fewer thing that has to be
+          # present for the release gate to run.
+          type=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" -q '.object.type')
+          if [ "$type" != "tag" ]; then
+            echo "::error::$TAG is a lightweight tag. RELEASING.md requires a signed annotated tag (git tag -s)."
+            exit 1
+          fi
+
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" -q '.object.sha')
+          verified=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$sha" -q '.verification.verified')
+          if [ "$verified" != "true" ]; then
+            reason=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$sha" -q '.verification.reason')
+            echo "::error::$TAG's own signature did not verify ($reason)."
+            exit 1
+          fi
+
       - name: Assert every package is on the tag's version
         env:
           TAG: ${{ github.ref_name }}
