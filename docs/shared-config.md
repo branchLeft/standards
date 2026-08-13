@@ -15,7 +15,7 @@ copy, and the copies age apart with nothing watching.
 is the registry: which repo path each template owns, and how strictly the two
 are compared.
 
-### SYNC-1 — a shared config file matches its template
+## SYNC-1 — a shared config file matches its template
 
 `tools/standards-sync.sh`. Two comparison modes, chosen per template in the
 manifest:

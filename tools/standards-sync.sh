@@ -147,8 +147,11 @@ main() {
   local name path comparison rc=0
   while IFS=$'\t' read -r name path comparison _; do
     case "$name" in ''|\#*) continue ;; esac
-    [ -n "$path" ] && [ -n "$comparison" ] || {
-      echo "::error::malformed manifest row for '$name'" >&2; rc=2; continue; }
+    if [ -z "$path" ] || [ -z "$comparison" ]; then
+      echo "::error::malformed manifest row for '$name'" >&2
+      rc=2
+      continue
+    fi
     if [ "$APPLY" -eq 1 ]; then
       apply_entry "$name" "$path" "$comparison"
     else
