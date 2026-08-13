@@ -17,51 +17,46 @@
       "tools_check_tsconfig_self_test",
       "tools_check_tsconfig_sh__entry",
       "tools_check_tsconfig_tier_rank",
-      "tools_check_workflows",
-      "tools_check_workflows_main",
-      "tools_check_workflows_scan_workflow",
-      "tools_check_workflows_self_test",
-      "tools_check_workflows_sh__entry",
       "tools_lib_ratchet",
       "tools_lib_ratchet_ratchet_finding",
+      "tools_lib_ratchet_ratchet_glob_matches",
       "tools_lib_ratchet_ratchet_init",
       "tools_lib_ratchet_ratchet_is_allowed",
       "tools_lib_ratchet_ratchet_is_enforced",
       "tools_lib_ratchet_ratchet_is_exempt",
       "tools_lib_ratchet_ratchet_json",
       "tools_lib_ratchet_ratchet_scope_files",
+      "tools_lib_ratchet_ratchet_scratch_repo_init",
       "tools_lib_ratchet_ratchet_self_test",
       "tools_lib_ratchet_ratchet_summary",
       "tools_lib_ratchet_sh__entry"
     ],
     "1": [
-      "packages_eslint_config_tsconfig_build",
-      "packages_eslint_config_tsconfig_build_extends",
-      "packages_eslint_config_tsconfig_build_include",
-      "packages_eslint_config_tsconfig_build_json_ref_src_ts",
-      "packages_vitest_config_tsconfig_build",
-      "packages_vitest_config_tsconfig_build_compileroptions",
-      "packages_vitest_config_tsconfig_build_compileroptions_declaration",
-      "packages_vitest_config_tsconfig_build_compileroptions_declarationmap",
-      "packages_vitest_config_tsconfig_build_compileroptions_lib",
-      "packages_vitest_config_tsconfig_build_compileroptions_module",
-      "packages_vitest_config_tsconfig_build_compileroptions_moduleresolution",
-      "packages_vitest_config_tsconfig_build_compileroptions_noemit",
-      "packages_vitest_config_tsconfig_build_compileroptions_outdir",
-      "packages_vitest_config_tsconfig_build_compileroptions_rootdir",
-      "packages_vitest_config_tsconfig_build_extends",
-      "packages_vitest_config_tsconfig_build_include",
-      "packages_vitest_config_tsconfig_build_json_ref_es2022",
-      "packages_vitest_config_tsconfig_build_json_ref_src_ts",
-      "ref_branchleft_tsconfig_react_app_json",
-      "ref_node_modules",
-      "ref_packages_src_ts",
-      "tsconfig",
-      "tsconfig_exclude",
-      "tsconfig_extends",
-      "tsconfig_include",
-      "tsconfig_json_ref_branchleft_tsconfig_strict_2_json",
-      "tsconfig_json_ref_dist"
+      "packages_eslint_config_src_base",
+      "packages_eslint_config_src_base_base",
+      "packages_eslint_config_src_base_test",
+      "packages_eslint_config_src_base_test_effective",
+      "packages_eslint_config_src_index",
+      "packages_eslint_config_src_library",
+      "packages_eslint_config_src_library_library",
+      "packages_eslint_config_src_pulumi",
+      "packages_eslint_config_src_pulumi_pulumi",
+      "packages_eslint_config_src_pulumi_scripts",
+      "packages_eslint_config_src_react",
+      "packages_eslint_config_src_react_react",
+      "packages_eslint_config_src_react_recommendedrules",
+      "packages_eslint_config_src_reactapp",
+      "packages_eslint_config_src_reactapp_default_framework_modules",
+      "packages_eslint_config_src_reactapp_reactapp",
+      "packages_eslint_config_src_reactapp_reactappoptions",
+      "packages_eslint_config_src_reactapp_test",
+      "packages_eslint_config_src_reactapp_test_indexofrule",
+      "packages_eslint_config_src_tests",
+      "packages_eslint_config_src_tests_tests",
+      "packages_eslint_config_src_typechecked",
+      "packages_eslint_config_src_typechecked_test",
+      "packages_eslint_config_src_typechecked_test_alloweddefaultprojects",
+      "packages_eslint_config_src_typechecked_typechecked"
     ],
     "2": [
       "package_devdependencies_branchleft_tsconfig",
@@ -108,37 +103,14 @@
       "packages_prettier_config_package_repository_url",
       "packages_prettier_config_package_version",
       "packages_tsconfig_package_files",
-      "packages_tsconfig_package_json_ref_readme_md",
       "packages_vitest_config_package_files",
       "packages_vitest_config_package_json_ref_dist",
       "ref_index_json",
       "ref_json",
-      "ref_prettierignore"
+      "ref_prettierignore",
+      "ref_readme_md"
     ],
     "4": [
-      "branchleft_eslint_config",
-      "branchleft_prettier_config",
-      "package_devdependencies",
-      "package_devdependencies_branchleft_eslint_config",
-      "package_devdependencies_branchleft_prettier_config",
-      "package_devdependencies_eslint",
-      "package_devdependencies_prettier",
-      "package_devdependencies_typescript",
-      "package_devdependencies_vitest",
-      "package_devdependencies_vitest_coverage_v8",
-      "package_json_eslint",
-      "package_json_vitest",
-      "package_json_vitest_coverage_v8",
-      "packages_eslint_config_package_peerdependencies",
-      "packages_eslint_config_package_peerdependencies_eslint",
-      "packages_vitest_config_package_json_vitest",
-      "packages_vitest_config_package_peerdependencies",
-      "packages_vitest_config_package_peerdependencies_vitest",
-      "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
-      "prettier",
-      "typescript"
-    ],
-    "5": [
       "package",
       "package_description",
       "package_license",
@@ -157,38 +129,44 @@
       "package_scripts_lint_check",
       "package_scripts_prepare",
       "package_scripts_selftest",
+      "package_scripts_test_coverage",
+      "package_scripts_test_unit",
       "package_scripts_typecheck",
       "package_type",
       "package_version"
     ],
-    "6": [
-      "packages_eslint_config_src_base",
-      "packages_eslint_config_src_base_base",
-      "packages_eslint_config_src_index",
-      "packages_eslint_config_src_library",
-      "packages_eslint_config_src_library_library",
-      "packages_eslint_config_src_pulumi",
-      "packages_eslint_config_src_pulumi_pulumi",
-      "packages_eslint_config_src_pulumi_scripts",
-      "packages_eslint_config_src_react",
-      "packages_eslint_config_src_react_react",
-      "packages_eslint_config_src_react_recommendedrules",
-      "packages_eslint_config_src_reactapp",
-      "packages_eslint_config_src_reactapp_default_framework_modules",
-      "packages_eslint_config_src_reactapp_reactapp",
-      "packages_eslint_config_src_reactapp_reactappoptions",
-      "packages_eslint_config_src_tests",
-      "packages_eslint_config_src_tests_tests",
-      "packages_eslint_config_src_typechecked",
-      "packages_eslint_config_src_typechecked_typechecked"
+    "5": [
+      "branchleft_eslint_config",
+      "branchleft_prettier_config",
+      "branchleft_vitest_config",
+      "eslint",
+      "package_devdependencies",
+      "package_devdependencies_branchleft_eslint_config",
+      "package_devdependencies_branchleft_prettier_config",
+      "package_devdependencies_branchleft_vitest_config",
+      "package_devdependencies_eslint",
+      "package_devdependencies_prettier",
+      "package_devdependencies_typescript",
+      "package_devdependencies_vitest",
+      "package_devdependencies_vitest_coverage_v8",
+      "package_json_vitest",
+      "package_json_vitest_coverage_v8",
+      "packages_vitest_config_package_json_vitest",
+      "packages_vitest_config_package_peerdependencies",
+      "packages_vitest_config_package_peerdependencies_vitest",
+      "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
+      "prettier",
+      "typescript"
     ],
-    "7": [
+    "6": [
       "packages_eslint_config_package",
       "packages_eslint_config_package_description",
       "packages_eslint_config_package_exports",
       "packages_eslint_config_package_license",
       "packages_eslint_config_package_main",
       "packages_eslint_config_package_name",
+      "packages_eslint_config_package_peerdependencies",
+      "packages_eslint_config_package_peerdependencies_eslint",
       "packages_eslint_config_package_publishconfig",
       "packages_eslint_config_package_publishconfig_registry",
       "packages_eslint_config_package_repository",
@@ -202,7 +180,7 @@
       "packages_eslint_config_package_types",
       "packages_eslint_config_package_version"
     ],
-    "8": [
+    "7": [
       "packages_tsconfig_package",
       "packages_tsconfig_package_description",
       "packages_tsconfig_package_exports",
@@ -222,6 +200,22 @@
       "packages_tsconfig_package_repository_url",
       "packages_tsconfig_package_version"
     ],
+    "8": [
+      "packages_eslint_config_tsconfig_build",
+      "packages_eslint_config_tsconfig_build_compileroptions",
+      "packages_eslint_config_tsconfig_build_compileroptions_declaration",
+      "packages_eslint_config_tsconfig_build_compileroptions_declarationmap",
+      "packages_eslint_config_tsconfig_build_compileroptions_lib",
+      "packages_eslint_config_tsconfig_build_compileroptions_module",
+      "packages_eslint_config_tsconfig_build_compileroptions_moduleresolution",
+      "packages_eslint_config_tsconfig_build_compileroptions_noemit",
+      "packages_eslint_config_tsconfig_build_compileroptions_outdir",
+      "packages_eslint_config_tsconfig_build_compileroptions_rootdir",
+      "packages_eslint_config_tsconfig_build_extends",
+      "packages_eslint_config_tsconfig_build_include",
+      "packages_eslint_config_tsconfig_build_json_ref_es2022",
+      "packages_eslint_config_tsconfig_build_json_ref_src_ts"
+    ],
     "9": [
       "packages_tsconfig_react_app",
       "packages_tsconfig_react_app_comment",
@@ -239,6 +233,22 @@
       "ref_dom_iterable"
     ],
     "10": [
+      "packages_vitest_config_tsconfig_build",
+      "packages_vitest_config_tsconfig_build_compileroptions",
+      "packages_vitest_config_tsconfig_build_compileroptions_declaration",
+      "packages_vitest_config_tsconfig_build_compileroptions_declarationmap",
+      "packages_vitest_config_tsconfig_build_compileroptions_lib",
+      "packages_vitest_config_tsconfig_build_compileroptions_module",
+      "packages_vitest_config_tsconfig_build_compileroptions_moduleresolution",
+      "packages_vitest_config_tsconfig_build_compileroptions_noemit",
+      "packages_vitest_config_tsconfig_build_compileroptions_outdir",
+      "packages_vitest_config_tsconfig_build_compileroptions_rootdir",
+      "packages_vitest_config_tsconfig_build_extends",
+      "packages_vitest_config_tsconfig_build_include",
+      "packages_vitest_config_tsconfig_build_json_ref_es2022",
+      "packages_vitest_config_tsconfig_build_json_ref_src_ts"
+    ],
+    "11": [
       "eslint_config_prettier",
       "eslint_js",
       "eslint_plugin_jsx_a11y",
@@ -253,7 +263,7 @@
       "packages_eslint_config_package_dependencies_typescript_eslint",
       "typescript_eslint"
     ],
-    "11": [
+    "12": [
       "packages_tsconfig_pulumi",
       "packages_tsconfig_pulumi_comment",
       "packages_tsconfig_pulumi_compileroptions",
@@ -267,7 +277,7 @@
       "packages_tsconfig_pulumi_schema",
       "ref_node"
     ],
-    "12": [
+    "13": [
       "packages_tsconfig_base",
       "packages_tsconfig_base_comment",
       "packages_tsconfig_base_compileroptions",
@@ -280,19 +290,20 @@
       "packages_tsconfig_base_compileroptions_target",
       "packages_tsconfig_base_schema"
     ],
-    "13": [
-      "packages_eslint_config_tsconfig_build_compileroptions",
-      "packages_eslint_config_tsconfig_build_compileroptions_declaration",
-      "packages_eslint_config_tsconfig_build_compileroptions_declarationmap",
-      "packages_eslint_config_tsconfig_build_compileroptions_lib",
-      "packages_eslint_config_tsconfig_build_compileroptions_module",
-      "packages_eslint_config_tsconfig_build_compileroptions_moduleresolution",
-      "packages_eslint_config_tsconfig_build_compileroptions_noemit",
-      "packages_eslint_config_tsconfig_build_compileroptions_outdir",
-      "packages_eslint_config_tsconfig_build_compileroptions_rootdir",
-      "packages_eslint_config_tsconfig_build_json_ref_es2022"
-    ],
     "14": [
+      "tools_standards_audit",
+      "tools_standards_audit_audit_exemptions",
+      "tools_standards_audit_clause_is_covered",
+      "tools_standards_audit_clauses_all_covered",
+      "tools_standards_audit_grep_tracked",
+      "tools_standards_audit_json_to_tsv",
+      "tools_standards_audit_main",
+      "tools_standards_audit_native_suppressions",
+      "tools_standards_audit_render_table",
+      "tools_standards_audit_self_test",
+      "tools_standards_audit_sh__entry"
+    ],
+    "15": [
       "packages_tsconfig_react_lib",
       "packages_tsconfig_react_lib_comment",
       "packages_tsconfig_react_lib_compileroptions",
@@ -304,7 +315,7 @@
       "packages_tsconfig_react_lib_schema",
       "ref_react_app_json"
     ],
-    "15": [
+    "16": [
       "packages_tsconfig_strict_1",
       "packages_tsconfig_strict_1_comment",
       "packages_tsconfig_strict_1_compileroptions",
@@ -316,7 +327,31 @@
       "packages_tsconfig_strict_1_schema",
       "ref_base_json"
     ],
-    "16": [
+    "17": [
+      "ref_branchleft_tsconfig_react_app_json",
+      "ref_branchleft_tsconfig_strict_2_json",
+      "ref_node_modules",
+      "ref_packages_src_ts",
+      "ref_vitest_config_ts",
+      "tsconfig",
+      "tsconfig_exclude",
+      "tsconfig_extends",
+      "tsconfig_include",
+      "tsconfig_json_ref_dist"
+    ],
+    "18": [
+      "tools_standards_sync",
+      "tools_standards_sync_apply_entry",
+      "tools_standards_sync_assert_manifest_complete",
+      "tools_standards_sync_check_entry",
+      "tools_standards_sync_first_missing_line",
+      "tools_standards_sync_gate",
+      "tools_standards_sync_main",
+      "tools_standards_sync_parse_args",
+      "tools_standards_sync_self_test",
+      "tools_standards_sync_sh__entry"
+    ],
+    "19": [
       "packages_tsconfig_strict_2",
       "packages_tsconfig_strict_2_comment",
       "packages_tsconfig_strict_2_compileroptions",
@@ -327,84 +362,108 @@
       "packages_tsconfig_strict_2_schema",
       "ref_strict_1_json"
     ],
-    "17": [
+    "20": [
+      "tools_check_clause_index",
+      "tools_check_clause_index_check_index",
+      "tools_check_clause_index_clause_is_named",
+      "tools_check_clause_index_encoding_resolves",
+      "tools_check_clause_index_gate",
+      "tools_check_clause_index_index_rows",
+      "tools_check_clause_index_self_test",
+      "tools_check_clause_index_sh__entry",
+      "tools_check_clause_index_write_index"
+    ],
+    "21": [
       "packages_vitest_config_src_index",
       "packages_vitest_config_src_index_default_coverage_exclude",
       "packages_vitest_config_src_index_default_coverage_include",
       "packages_vitest_config_src_index_default_test_exclude",
       "packages_vitest_config_src_index_definestandardtest",
       "packages_vitest_config_src_index_standardtestoptions",
+      "packages_vitest_config_src_index_test",
       "packages_vitest_config_src_index_testenvironment"
     ],
-    "18": [
+    "22": [
+      "tools_check_workflows",
+      "tools_check_workflows_main",
+      "tools_check_workflows_scan_workflow",
+      "tools_check_workflows_self_test",
+      "tools_check_workflows_sh__entry"
+    ],
+    "23": [
       "packages_eslint_config_src_vendor_d",
       "packages_eslint_config_src_vendor_d_eslint_config_prettier",
       "packages_eslint_config_src_vendor_d_eslint_plugin_jsx_a11y",
       "packages_eslint_config_src_vendor_d_eslint_plugin_react_hooks"
     ],
-    "19": [
+    "24": [
+      "tools_tests_run",
+      "tools_tests_run_run",
+      "tools_tests_run_sh__entry",
+      "tools_tests_run_workflow_runs_every_gate"
+    ],
+    "25": [
       "tools_ruleset_normalize",
       "tools_ruleset_normalize_canon",
       "tools_ruleset_normalize_canon_rule"
     ],
-    "20": [
-      "tools_tests_run",
-      "tools_tests_run_run",
-      "tools_tests_run_sh__entry"
-    ],
-    "21": [
-      "tools_check_clause_index",
-      "tools_check_clause_index_sh__entry"
-    ],
-    "22": [
+    "26": [
       "tools_ruleset_apply",
       "tools_ruleset_apply_sh__entry"
     ],
-    "23": [
+    "27": [
       "tools_ruleset_audit",
       "tools_ruleset_audit_sh__entry"
     ],
-    "24": [
+    "28": [
       "eslint_config"
+    ],
+    "29": [
+      "vitest_config"
     ]
   },
   "cohesion": {
-    "0": 0.1350806451612903,
-    "1": 0.07407407407407407,
+    "0": 0.15517241379310345,
+    "1": 0.14,
     "2": 0.08333333333333333,
     "3": 0.08333333333333333,
-    "4": 0.09523809523809523,
+    "4": 0.08695652173913043,
     "5": 0.09523809523809523,
-    "6": 0.15789473684210525,
+    "6": 0.1,
     "7": 0.1111111111111111,
-    "8": 0.1111111111111111,
+    "8": 0.14285714285714285,
     "9": 0.14285714285714285,
-    "10": 0.15384615384615385,
-    "11": 0.16666666666666666,
-    "12": 0.18181818181818182,
-    "13": 0.2,
-    "14": 0.2,
+    "10": 0.14285714285714285,
+    "11": 0.15384615384615385,
+    "12": 0.16666666666666666,
+    "13": 0.18181818181818182,
+    "14": 0.34545454545454546,
     "15": 0.2,
-    "16": 0.2222222222222222,
-    "17": 0.2857142857142857,
-    "18": 0.5,
-    "19": 1.0,
-    "20": 1.0,
-    "21": 1.0,
-    "22": 1.0,
-    "23": 1.0,
-    "24": 1.0
+    "16": 0.2,
+    "17": 0.2,
+    "18": 0.3333333333333333,
+    "19": 0.2222222222222222,
+    "20": 0.3333333333333333,
+    "21": 0.2857142857142857,
+    "22": 0.7,
+    "23": 0.5,
+    "24": 0.6666666666666666,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0
   },
   "gods": [
     {
-      "id": "tools_lib_ratchet_ratchet_finding",
-      "label": "ratchet_finding()",
+      "id": "package_scripts",
+      "label": "scripts",
       "degree": 11
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
-      "degree": 9
+      "id": "tools_lib_ratchet_ratchet_finding",
+      "label": "ratchet_finding()",
+      "degree": 10
     },
     {
       "id": "packages_eslint_config_tsconfig_build_compileroptions",
@@ -432,6 +491,11 @@
       "degree": 8
     },
     {
+      "id": "tools_lib_ratchet_ratchet_self_test",
+      "label": "ratchet_self_test()",
+      "degree": 8
+    },
+    {
       "id": "packages_tsconfig_package_exports",
       "label": "exports",
       "degree": 7
@@ -440,42 +504,15 @@
       "id": "packages_tsconfig_pulumi_compileroptions",
       "label": "compilerOptions",
       "degree": 7
-    },
-    {
-      "id": "tools_check_tsconfig_main",
-      "label": "main()",
-      "degree": 6
     }
   ],
   "surprises": [
-    {
-      "source": "extends",
-      "target": "@branchleft/tsconfig/strict-2.json",
-      "source_files": [
-        "packages/eslint-config/tsconfig.build.json",
-        "tsconfig.json"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "extends",
-      "why": "connects across different repos/directories"
-    },
-    {
-      "source": "extends",
-      "target": "@branchleft/tsconfig/strict-2.json",
-      "source_files": [
-        "packages/vitest-config/tsconfig.build.json",
-        "tsconfig.json"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "extends",
-      "why": "connects across different repos/directories"
-    },
     {
       "source": "files",
       "target": "README.md",
       "source_files": [
         "packages/eslint-config/package.json",
-        "packages/tsconfig/package.json"
+        "packages/prettier-config/package.json"
       ],
       "confidence": "EXTRACTED",
       "relation": "extends",
@@ -485,22 +522,44 @@
       "source": "files",
       "target": "README.md",
       "source_files": [
-        "packages/prettier-config/package.json",
-        "packages/tsconfig/package.json"
+        "packages/tsconfig/package.json",
+        "packages/prettier-config/package.json"
       ],
       "confidence": "EXTRACTED",
       "relation": "extends",
       "why": "cross-file semantic connection"
     },
     {
-      "source": "files",
-      "target": "README.md",
+      "source": "scan_component()",
+      "target": "ratchet_finding()",
       "source_files": [
-        "packages/vitest-config/package.json",
-        "packages/tsconfig/package.json"
+        "tools/check-pulumi.sh",
+        "tools/lib/ratchet.sh"
       ],
       "confidence": "EXTRACTED",
-      "relation": "extends",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "scan_parenting()",
+      "target": "ratchet_finding()",
+      "source_files": [
+        "tools/check-pulumi.sh",
+        "tools/lib/ratchet.sh"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "scan_args()",
+      "target": "ratchet_finding()",
+      "source_files": [
+        "tools/check-pulumi.sh",
+        "tools/lib/ratchet.sh"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
       "why": "cross-file semantic connection"
     }
   ],

@@ -1,172 +1,207 @@
 {
   "eslint.config.js": {
-    "mtime": 1786540663.4015274,
+    "mtime": 1786648688.7522566,
     "ast_hash": "04712094daec8ee307391b11d2b9c3d4",
     "semantic_hash": "04712094daec8ee307391b11d2b9c3d4"
   },
   "package.json": {
-    "mtime": 1786540663.4015274,
-    "ast_hash": "e4096f4c3a0dbc777683faadc19920da",
-    "semantic_hash": "e4096f4c3a0dbc777683faadc19920da"
+    "mtime": 1786648688.752774,
+    "ast_hash": "03fa9b62fcba249781bde6a35e6f53bd",
+    "semantic_hash": "03fa9b62fcba249781bde6a35e6f53bd"
   },
   "packages/eslint-config/package.json": {
-    "mtime": 1786540663.4018137,
+    "mtime": 1786648688.7535942,
     "ast_hash": "e2077c5fdf89fb7ad9a5b2e8bac3d247",
     "semantic_hash": "e2077c5fdf89fb7ad9a5b2e8bac3d247"
   },
   "packages/eslint-config/src/base.ts": {
-    "mtime": 1786540663.4018137,
-    "ast_hash": "58c1f3713bd517a4b04d9eeb058fa190",
-    "semantic_hash": "58c1f3713bd517a4b04d9eeb058fa190"
+    "mtime": 1786648688.753658,
+    "ast_hash": "b1205afdac739d0c65b4b9eb34f60d03",
+    "semantic_hash": "b1205afdac739d0c65b4b9eb34f60d03"
   },
   "packages/eslint-config/src/index.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "0f20683f9ff90ba00d104c8a3d1f76db",
     "semantic_hash": "0f20683f9ff90ba00d104c8a3d1f76db"
   },
   "packages/eslint-config/src/library.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "2b5ec10b0a4c18a8fcab5c89c692d1f1",
     "semantic_hash": "2b5ec10b0a4c18a8fcab5c89c692d1f1"
   },
   "packages/eslint-config/src/pulumi.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "ba330b15965b73c3d8c1649eaee916b2",
     "semantic_hash": "ba330b15965b73c3d8c1649eaee916b2"
   },
   "packages/eslint-config/src/react.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "fe1b30d0c14944659f1ebde3d6c1d88a",
     "semantic_hash": "fe1b30d0c14944659f1ebde3d6c1d88a"
   },
   "packages/eslint-config/src/reactApp.ts": {
-    "mtime": 1786540663.4018755,
-    "ast_hash": "736d61376865a13d6e0e85e1056b9655",
-    "semantic_hash": "736d61376865a13d6e0e85e1056b9655"
+    "mtime": 1786648688.753658,
+    "ast_hash": "58e26b3f6245bbc66baef0a87dd43a0b",
+    "semantic_hash": "58e26b3f6245bbc66baef0a87dd43a0b"
   },
   "packages/eslint-config/src/tests.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "243e194716c6508f45aa454cb21e632d",
     "semantic_hash": "243e194716c6508f45aa454cb21e632d"
   },
   "packages/eslint-config/src/typeChecked.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "8cd2cc51d93639cdb91a467d159cdf98",
     "semantic_hash": "8cd2cc51d93639cdb91a467d159cdf98"
   },
   "packages/eslint-config/src/vendor.d.ts": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "ee5eed4684898d424259c4f1d14d98e1",
     "semantic_hash": "ee5eed4684898d424259c4f1d14d98e1"
   },
   "packages/eslint-config/tsconfig.build.json": {
-    "mtime": 1786540663.4018755,
+    "mtime": 1786648688.753658,
     "ast_hash": "44d73a70d0c7bdfcd87ab69da57139f7",
     "semantic_hash": "44d73a70d0c7bdfcd87ab69da57139f7"
   },
   "packages/prettier-config/package.json": {
-    "mtime": 1786540663.4021108,
-    "ast_hash": "d725710e81052cd74fbbdf6d039b1c7d",
-    "semantic_hash": "d725710e81052cd74fbbdf6d039b1c7d"
+    "mtime": 1786648688.7538714,
+    "ast_hash": "484710c3c7bee508b412f493af6d539b",
+    "semantic_hash": "484710c3c7bee508b412f493af6d539b"
   },
   "packages/tsconfig/base.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "0538e116646bf44146ed32d02c0cf730",
     "semantic_hash": "0538e116646bf44146ed32d02c0cf730"
   },
   "packages/tsconfig/package.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "dd1c23f0b481bc495ed6f5b156b97935",
     "semantic_hash": "dd1c23f0b481bc495ed6f5b156b97935"
   },
   "packages/tsconfig/pulumi.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "47026dbb356e8e956093e78a9205c81f",
     "semantic_hash": "47026dbb356e8e956093e78a9205c81f"
   },
   "packages/tsconfig/react-app.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "f39eea079ecbd55ac77395da5ae7ff72",
     "semantic_hash": "f39eea079ecbd55ac77395da5ae7ff72"
   },
   "packages/tsconfig/react-lib.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "e4e58c9e13827e0142bd170119536750",
     "semantic_hash": "e4e58c9e13827e0142bd170119536750"
   },
   "packages/tsconfig/strict-1.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "1ac2c42ab8357dea1bbe531f04bf30e5",
     "semantic_hash": "1ac2c42ab8357dea1bbe531f04bf30e5"
   },
   "packages/tsconfig/strict-2.json": {
-    "mtime": 1786540663.402197,
+    "mtime": 1786648688.7539523,
     "ast_hash": "ec5fcad0bec0c8d665ce8e7e23a18405",
     "semantic_hash": "ec5fcad0bec0c8d665ce8e7e23a18405"
   },
   "packages/vitest-config/package.json": {
-    "mtime": 1786540663.4023616,
-    "ast_hash": "0cc816818d795bddd3ae4b237022e885",
-    "semantic_hash": "0cc816818d795bddd3ae4b237022e885"
+    "mtime": 1786648688.7540638,
+    "ast_hash": "879d517fba4dea0855c751a8f1c9ec39",
+    "semantic_hash": "879d517fba4dea0855c751a8f1c9ec39"
   },
   "packages/vitest-config/src/index.ts": {
-    "mtime": 1786540663.4023616,
-    "ast_hash": "b835fdca1ea0e59ad13b5fc6771ed8a2",
-    "semantic_hash": "b835fdca1ea0e59ad13b5fc6771ed8a2"
+    "mtime": 1786648688.7541153,
+    "ast_hash": "c8d97a93787e25a5149fbc498f7e56d9",
+    "semantic_hash": "c8d97a93787e25a5149fbc498f7e56d9"
   },
   "packages/vitest-config/tsconfig.build.json": {
-    "mtime": 1786540663.4023616,
+    "mtime": 1786648688.7541153,
     "ast_hash": "44d73a70d0c7bdfcd87ab69da57139f7",
     "semantic_hash": "44d73a70d0c7bdfcd87ab69da57139f7"
   },
   "tools/check-clause-index.sh": {
-    "mtime": 1786540663.4033434,
-    "ast_hash": "1655ffc5c02de85887fe806acbc0a9aa",
-    "semantic_hash": "1655ffc5c02de85887fe806acbc0a9aa"
+    "mtime": 1786648688.7547982,
+    "ast_hash": "88f7a207bd4296101a9a00adced16b37",
+    "semantic_hash": "88f7a207bd4296101a9a00adced16b37"
   },
   "tools/check-pulumi.sh": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "1677cc3e4bcbe5bfc4e88443eac064ce",
-    "semantic_hash": "1677cc3e4bcbe5bfc4e88443eac064ce"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "0e9ec1c92835b87cf726c6077aaeffe7",
+    "semantic_hash": "0e9ec1c92835b87cf726c6077aaeffe7"
   },
   "tools/check-tsconfig.sh": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "87bd53eb05494f7f105a71d309e6b5da",
-    "semantic_hash": "87bd53eb05494f7f105a71d309e6b5da"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "9833e1619766d8ff8d14afdb2dd21db2",
+    "semantic_hash": "9833e1619766d8ff8d14afdb2dd21db2"
   },
   "tools/check-workflows.sh": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "93b39285248cb9c090cbaee3a721241e",
-    "semantic_hash": "93b39285248cb9c090cbaee3a721241e"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "391af1d2cbd08cc6ba5e5b4c453c35dd",
+    "semantic_hash": "391af1d2cbd08cc6ba5e5b4c453c35dd"
   },
   "tools/lib/ratchet.sh": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "27b283244f83176d9a323113471ade12",
-    "semantic_hash": "27b283244f83176d9a323113471ade12"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "24cc971b9fda3523b26ed1d649204461",
+    "semantic_hash": "24cc971b9fda3523b26ed1d649204461"
   },
   "tools/ruleset-apply.sh": {
-    "mtime": 1786540663.4034328,
+    "mtime": 1786648688.7548895,
     "ast_hash": "509644c0bc1549a3a5b82b63e6c7cc19",
     "semantic_hash": "509644c0bc1549a3a5b82b63e6c7cc19"
   },
   "tools/ruleset-audit.sh": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "de144fc7ba113b0ec7e73e6cc2d28ad4",
-    "semantic_hash": "de144fc7ba113b0ec7e73e6cc2d28ad4"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "82fc4497254091ee3b18abb32a1a3f4f",
+    "semantic_hash": "82fc4497254091ee3b18abb32a1a3f4f"
   },
   "tools/ruleset_normalize.py": {
-    "mtime": 1786540663.4034328,
+    "mtime": 1786648688.7548895,
     "ast_hash": "b9b370addc65a36e94e8dac5d14a0029",
     "semantic_hash": "b9b370addc65a36e94e8dac5d14a0029"
   },
   "tools/tests/run.sh": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "5f8760f2ab496565654b5c27d5161c8e",
-    "semantic_hash": "5f8760f2ab496565654b5c27d5161c8e"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "4a0ba696e6d3633a61eaaa2cc88b6579",
+    "semantic_hash": "4a0ba696e6d3633a61eaaa2cc88b6579"
   },
   "tsconfig.json": {
-    "mtime": 1786540663.4034328,
-    "ast_hash": "ec50a4b16a12724ca58db96399ef3f39",
-    "semantic_hash": "ec50a4b16a12724ca58db96399ef3f39"
+    "mtime": 1786648688.7548895,
+    "ast_hash": "761ec0e7319de0b093ca00fe3eeea1d2",
+    "semantic_hash": "761ec0e7319de0b093ca00fe3eeea1d2"
+  },
+  "tools/standards-audit.sh": {
+    "mtime": 1786648688.7548895,
+    "ast_hash": "7055d3245096cad9bd12c9115ba0ed52",
+    "semantic_hash": "7055d3245096cad9bd12c9115ba0ed52"
+  },
+  "tools/standards-sync.sh": {
+    "mtime": 1786648688.7548895,
+    "ast_hash": "db6aa1ba654646185775618645b4ebca",
+    "semantic_hash": "db6aa1ba654646185775618645b4ebca"
+  },
+  "packages/eslint-config/src/base.test.ts": {
+    "mtime": 1786648688.7535942,
+    "ast_hash": "8b669331d63c6f057bc666b8924ec79a",
+    "semantic_hash": "8b669331d63c6f057bc666b8924ec79a"
+  },
+  "packages/eslint-config/src/reactApp.test.ts": {
+    "mtime": 1786648688.753658,
+    "ast_hash": "ab0a40f3622ad3536d42b0a0f8ec3390",
+    "semantic_hash": "ab0a40f3622ad3536d42b0a0f8ec3390"
+  },
+  "packages/eslint-config/src/typeChecked.test.ts": {
+    "mtime": 1786648688.753658,
+    "ast_hash": "6751eab0926adcf593460f551a0590db",
+    "semantic_hash": "6751eab0926adcf593460f551a0590db"
+  },
+  "packages/vitest-config/src/index.test.ts": {
+    "mtime": 1786648688.7540638,
+    "ast_hash": "68ee9e4dd98e4c909be4ef912f24dfac",
+    "semantic_hash": "68ee9e4dd98e4c909be4ef912f24dfac"
+  },
+  "vitest.config.ts": {
+    "mtime": 1786648688.7548895,
+    "ast_hash": "1f01eddfb6cdf9fc294e16c35f3ae9d0",
+    "semantic_hash": "1f01eddfb6cdf9fc294e16c35f3ae9d0"
   }
 }
