@@ -1,6 +1,9 @@
+import { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 import { base } from './base.js';
 import { library } from './library.js';
+import { pulumi } from './pulumi.js';
+import { reactApp } from './reactApp.js';
 
 // Flat config is last-wins, so what a rule is set to somewhere says nothing
 // about what it ends up as. These assertions are on the effective value for an
@@ -69,5 +72,54 @@ describe('library', () => {
       namedFrom: true,
       namespaceFrom: true,
     });
+  });
+});
+
+describe('TS-7 composed with a stack preset', () => {
+  // A structural scan of the array is what got a predecessor's assertions on
+  // this package wrong on a first run — `js.configs.recommended` sets rules
+  // upstream of a hand-picked block, so the block a scan finds is not
+  // necessarily the one that wins. Running the real ESLint `Linter` against a
+  // real file sidesteps that: it resolves `files` matching and rule merging
+  // the same way a consuming repo's lint run would, so what these assert on is
+  // the effective value, not the shape of the config that produced it.
+  const linter = new Linter();
+  const reported = (config: Linter.Config[], filename: string, code: string): boolean =>
+    linter
+      .verify(code, config, filename)
+      .some((message) => message.ruleId === 'no-restricted-exports');
+
+  const defaultExport = 'export default function thing() {\n  return 1;\n}\n';
+
+  it('reports a default export in a plain module under [...base, ...pulumi]', () => {
+    // Pulumi carries no exception of its own, so this is the composition TS-7
+    // exists for: nothing but the floor in `base` covers it.
+    expect(reported([...base, ...pulumi], 'src/index.ts', defaultExport)).toBe(true);
+  });
+
+  it('still exempts a route module under [...base, ...reactApp()]', () => {
+    // `reactApp` composes after `base`, so its own ban (APP-1) and its
+    // framework exception both sit later in the array and win — the floor in
+    // `base` does not have to know the exception exists.
+    expect(reported([...base, ...reactApp()], 'app/routes/thing.ts', defaultExport)).toBe(false);
+  });
+
+  it('still bans a default export outside the route directory under [...base, ...reactApp()]', () => {
+    expect(reported([...base, ...reactApp()], 'app/lib/thing.ts', defaultExport)).toBe(true);
+  });
+
+  it('loses the route exemption if the exception block moves ahead of the ban', () => {
+    // Reproduces the failure the ordering exists to prevent. `reactApp()`
+    // returns [ban, exception, serverGlobals]; swapping the first two puts the
+    // exception before the rule it is meant to turn off, so last-wins
+    // resolves to the ban again and a legitimate route module starts failing
+    // TS-7. This is the mutation that would go unnoticed if these assertions
+    // only inspected block order rather than what ESLint actually reports.
+    const [ban, exception, ...rest] = reactApp();
+    // Non-null: `reactApp()` always returns [ban, exception, serverGlobals] —
+    // pinned by `reactApp.test.ts`'s ordering test — so both elements exist;
+    // `noUncheckedIndexedAccess` just can't see that from the destructure.
+    const mutated = [exception!, ban!, ...rest];
+    expect(reported([...base, ...mutated], 'app/routes/thing.ts', defaultExport)).toBe(true);
   });
 });

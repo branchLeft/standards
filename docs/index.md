@@ -44,15 +44,15 @@ and left advertised as unimplemented.
 
 ## TypeScript — `stacks/typescript.md`
 
-| ID   | Rule                                                                                             | Gate      | Encoded by             |
-| ---- | ------------------------------------------------------------------------------------------------ | --------- | ---------------------- |
-| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto`    | `@branchleft/tsconfig` |
-| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                      |
-| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                      |
-| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`     |
-| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                      |
-| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                      |
-| TS-7 | No default exports outside framework-mandated module shapes                                      | `pending` | —                      |
+| ID   | Rule                                                                                             | Gate      | Encoded by                  |
+| ---- | ------------------------------------------------------------------------------------------------ | --------- | --------------------------- |
+| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto`    | `@branchleft/tsconfig`      |
+| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                           |
+| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                           |
+| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`          |
+| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                           |
+| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                           |
+| TS-7 | No default exports outside framework-mandated module shapes                                      | `auto`    | `@branchleft/eslint-config` |
 
 **Why TS-2 and TS-5 are gates rather than inheritance.** `include`, `exclude` and
 `files` resolve relative to the config file that declares them, so an `include`
