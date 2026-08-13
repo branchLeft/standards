@@ -48,6 +48,8 @@ jobs:
           set -euo pipefail
           .standards/tools/lib/ratchet.sh --self-test
           .standards/tools/check-tsconfig.sh --self-test
+          .standards/tools/check-workflows.sh --self-test
+          .standards/tools/check-pulumi.sh --self-test
           .standards/tools/standards-sync.sh --self-test
 
       - name: Run the gates
@@ -64,7 +66,13 @@ jobs:
           # included, and an empty one is a startup failure with no job log.
           args=()
           [ -n "$MODE" ] && args+=(--mode "$MODE")
+          # Every gate runs and the exit codes are collected, rather than the
+          # chain stopping at the first failure. A caller that has to fix one
+          # clause, push, and only then discover the next would ratchet one
+          # finding per round trip.
           rc=0
           .standards/tools/check-tsconfig.sh  "${args[@]+"${args[@]}"}" || rc=1
+          .standards/tools/check-workflows.sh "${args[@]+"${args[@]}"}" || rc=1
+          .standards/tools/check-pulumi.sh    "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/standards-sync.sh  "${args[@]+"${args[@]}"}" || rc=1
           exit "$rc"
