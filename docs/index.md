@@ -158,9 +158,9 @@ judgement, and a gate that guessed would train people to suppress it.
 
 ## Infrastructure operations — `infrastructure.md`
 
-| ID    | Rule                                                                  | Gate     | Encoded by |
-| ----- | ---------------------------------------------------------------------- | -------- | ---------- |
-| IAC-1 | CI applies; a human applies only what CI's deploy identity cannot     | `review` | —          |
+| ID    | Rule                                                                       | Gate     | Encoded by |
+| ----- | -------------------------------------------------------------------------- | -------- | ---------- |
+| IAC-1 | CI applies; a human applies only what CI's deploy identity cannot          | `review` | —          |
 | IAC-2 | Broadening a deploy identity is never applied by CI — grant, import, merge | `review` | —          |
 
 `review` because whether a 403 is genuinely bootstrap-class or a role list
