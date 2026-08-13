@@ -1,0 +1,26 @@
+# Makes this repo a pre-commit remote, so a consumer names a tag instead of
+# copying scripts into its own tools/ and letting the copies age.
+#
+# `language: script` runs the file as it stands — no Python or Node environment
+# is built for it, which is what makes these usable in the three repos that have
+# neither.
+#
+# pass_filenames is false throughout: each gate derives its own scope from the
+# ratchet, and a filename list from pre-commit would silently narrow it to the
+# staged set while still reporting a clean run.
+
+- id: standards-audit
+  name: standards gates
+  description: Every file-based auto clause, plus the exemption inventory.
+  entry: tools/standards-audit.sh
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: standards-sync
+  name: shared config files match the templates
+  description: SYNC-1 — the files that cannot be shared through npm.
+  entry: tools/standards-sync.sh
+  language: script
+  pass_filenames: false
+  always_run: true

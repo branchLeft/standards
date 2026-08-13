@@ -1,0 +1,16 @@
+# Which repo path each template owns, and how strictly it is compared.
+#
+# comparison
+#   identical  byte-for-byte. The strictness is the point: a missing trailing
+#              newline is drift, and it is the half of this class that no diff
+#              view shows.
+#   contains   every non-blank, non-comment line of the template appears in the
+#              target. Repos legitimately add entries of their own to these
+#              files; they may not drop the shared ones.
+#
+# A template file that is not listed here is a hard error, not a finding — an
+# unregistered template is enforced by nothing and says so nowhere.
+#
+# template	path	comparison
+editorconfig	.editorconfig	identical
+nvmrc	.nvmrc	identical
