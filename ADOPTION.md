@@ -100,7 +100,7 @@ permissions:
   contents: read
 jobs:
   standards:
-    uses: branchLeft/standards/.github/workflows/standards.yml@v0.1.0
+    uses: branchLeft/standards/.github/workflows/standards.yml@v0.2.0
 ```
 
 ```bash
