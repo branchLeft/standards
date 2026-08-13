@@ -1,6 +1,6 @@
 {
   "name": "@branchleft/prettier-config",
-  "version": "0.1.0",
+  "version": "0.3.1",
   "description": "Shared Prettier configuration for branchLeft repos. Encodes FMT-1.",
   "license": "MIT",
   "main": "index.json",
