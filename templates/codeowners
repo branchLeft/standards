@@ -1,0 +1,11 @@
+# Target: .github/CODEOWNERS
+#
+# The catch-all is the only line every repo shares, and it is the one that makes
+# every other rule reviewable: without an owner on the whole tree, a PR can
+# change a gate's own configuration with nobody required to look.
+#
+# A repo adds a line per escape hatch it actually has — `.standardsignore`,
+# `.standards.mode`, `.docs-lint.mode`, `tools/floors.tsv`. Those are not in the
+# shared set because a rule naming a path the repo does not have reads as
+# coverage while matching nothing, and CODEOWNERS gives no warning for it.
+* @branchLeft/branchleft-admin

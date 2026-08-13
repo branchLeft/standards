@@ -14,3 +14,5 @@
 # template	path	comparison
 editorconfig	.editorconfig	identical
 nvmrc	.nvmrc	identical
+codeowners	.github/CODEOWNERS	contains
+pre-commit-config.yaml	.pre-commit-config.yaml	contains
