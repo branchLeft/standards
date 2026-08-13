@@ -37,7 +37,7 @@ ever published.
 ```bash
 source ~/.nvm/nvm.sh && nvm use && pnpm install
 pnpm build
-pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm selftest
+pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test:unit && pnpm selftest
 ```
 
 `pnpm build` is not optional and not first out of tidiness. The eslint flat
@@ -45,9 +45,18 @@ config imports `@branchleft/eslint-config` from its built `dist/`, so in a fresh
 clone or worktree `lint:check` fails to resolve the module until the packages
 are built.
 
-`pnpm selftest` runs `tools/tests/run.sh`, which drives every gate's
-`--self-test` plus the fixture matrix — this is the suite. Run it after touching
-anything in `tools/`.
+There are two suites, and they do not overlap. `pnpm selftest` runs
+`tools/tests/run.sh`, which drives every gate's `--self-test` plus the fixture
+matrix — run it after touching anything in `tools/`. `pnpm test:unit` runs
+Vitest over `packages/*/src/**/*.test.ts` — run it after touching anything in
+`packages/`.
+
+The package tests are about invariants that fail quietly. Flat ESLint config is
+last-wins, so the order of the blocks is the whole correctness of a rule and
+nothing in the type system says so; `coverage.include` is what makes a coverage
+number able to fall at all. Both would go on producing a green run while
+measuring or enforcing nothing, which is why they are asserted rather than left
+to review.
 
 **Never write `pnpm test` in a script or a document here.** `test` is a package
 manager builtin, and when no `test` script is defined it exits 0 having run

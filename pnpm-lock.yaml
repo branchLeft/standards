@@ -17,6 +17,9 @@ importers:
       '@branchleft/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
+      '@branchleft/vitest-config':
+        specifier: workspace:*
+        version: link:packages/vitest-config
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
