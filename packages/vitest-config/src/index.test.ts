@@ -16,19 +16,20 @@ describe('defineStandardTest', () => {
     }
   });
 
-  it('emits the json reporter the coverage gate parses', () => {
-    // COV-1 and COV-2 read coverage/coverage-final.json to intersect per-file
-    // numbers with the changed-file set. Without this reporter they have no
-    // input and report nothing, which reads as a pass.
+  it('emits the json reporter a coverage gate would parse', () => {
+    // The coverage clauses intersect per-file numbers from
+    // coverage/coverage-final.json with the changed-file set. Without this
+    // reporter they have no input and report nothing, which reads as a pass.
     const { coverage } = defineStandardTest().test!;
     expect(coverage!.reporter).toContain('json');
     expect(coverage!.reportsDirectory).toBe('coverage');
   });
 
   it('sets no thresholds', () => {
-    // Deliberate: COV-1 is a per-file floor over the changed-file set and COV-2
-    // a comparison against the merge base. A global threshold here would be a
-    // third, weaker rule that passes while either of those fails.
+    // Deliberate: the coverage clauses are a per-file floor over the
+    // changed-file set and a comparison against the merge base. A global
+    // threshold here would be a third, weaker rule that passes while either of
+    // those fails.
     expect(defineStandardTest().test!.coverage).not.toHaveProperty('thresholds');
   });
 

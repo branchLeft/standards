@@ -50,11 +50,13 @@ const DEFAULT_TEST_EXCLUDE = [
  * percentage is an average over the tested files — it cannot fall when
  * coverage is lost, which is the one thing a coverage floor is for.
  *
- * Deliberately sets no `thresholds`. COV-1 is a per-file floor over the
- * branch's changed-file set and COV-2 is a comparison against the merge base;
- * Vitest can express neither, so both are computed by the standards gate from
- * the `json` reporter's output. A global threshold here would be a third,
- * weaker rule competing with those two.
+ * Deliberately sets no `thresholds`. The two coverage clauses in
+ * `docs/testing.md` are a per-file floor over the branch's changed-file set and
+ * a comparison against the merge base; both need git, so Vitest can express
+ * neither, and a global threshold here would be a third, weaker rule competing
+ * with them. It emits the `json` reporter to a fixed directory so a gate has
+ * something to read — no such gate exists yet, so nothing currently enforces a
+ * coverage number anywhere.
  */
 export function defineStandardTest(options: StandardTestOptions = {}): ViteUserConfig {
   const {

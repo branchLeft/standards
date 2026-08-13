@@ -90,11 +90,20 @@ that look like configuration.
 
 ## COV-1 — changed files meet a floor
 
-`auto`. **Enforced even when the repo is in `warn` mode.**
+`pending`. **Specified below and computed by nothing.** Read the next paragraph
+before relying on any of this.
 
-Every source file a branch changes must meet the per-file floor in
-`tools/floors.tsv`. This is the whole point of the ratchet: the legacy tree is
-advisory, the code you actually wrote is not.
+No gate in `tools/` reads a coverage report. `@branchleft/vitest-config` produces
+the artefact this clause is defined against, and that is as far as it goes —
+there is no per-file floor being applied to any repo, and a repo can regress
+coverage to zero without a gate noticing. The specification below is what the
+clause will mean once it is implemented; it is not what happens today. Do not
+record work as meeting COV-1 while this line stands.
+
+Once implemented: every source file a branch changes must meet the per-file
+floor. This is the whole point of the ratchet — the legacy tree is advisory, the
+code you actually wrote is not — and it is intended to hold **even when the repo
+is in `warn` mode**, which is the one place a coverage clause cannot be deferred.
 
 Measured from `coverage/coverage-final.json` intersected with the branch's
 changed-file set. This requires `coverage.include` to be set — without it,
@@ -102,9 +111,15 @@ coverage instruments only files a test already loads, so an untested file is
 absent from the report rather than present at zero, and the average of the files
 that happen to be tested is not a coverage number.
 
-Trivial glue that genuinely warrants no test uses
-`standards-allow-next-line COV-1 <reason>`. The reason is mandatory and the
-exemption inventory reports it, so a repo cannot accumulate them silently.
+The intended floor is **80% statements / 70% branches**. It is deliberately not
+in `tools/floors.tsv`: that file is read by gates, and a floor sitting there for
+a clause nothing computes is a number that reads as enforced. It moves there in
+the same change that adds the gate.
+
+The intended exemption syntax for trivial glue is
+`standards-allow-next-line COV-1 <reason>`, with a mandatory reason. Note that
+the exemption inventory can only report a suppression for a clause the run
+actually covers, so this too arrives with the gate rather than before it.
 
 `@branchleft/vitest-config`'s default `coverageExclude` does not exclude
 `index.ts`. Vitest has no glob that means "re-export barrel" — only "this
@@ -116,7 +131,9 @@ fixable, which a silent exclusion is not.
 
 ## COV-2 — the repo total never drops
 
-`auto`. Compared against the merge base, not against a fixed target.
+`pending`, for the same reason as COV-1 and with the same warning. Compared
+against the merge base, not against a fixed target. Intended value:
+no-regression.
 
 There is deliberately no absolute global percentage. A fixed target blocks
 PRs for debt they did not create and is satisfiable by testing easy code; a
@@ -132,3 +149,7 @@ the lower number, and ratchet from there. Never weaken COV-1 to accommodate it.
 Current values live in `tools/floors.tsv` and are raised by a one-line PR there;
 see [`ratchet.md`](ratchet.md). They start where the better-tested repos already
 are, so adoption is not a cliff, and they are expected to move.
+
+The coverage floors above are stated in prose rather than in `floors.tsv`,
+because that file is read by gates and a line there for a clause nothing
+computes reads as enforced by anyone scanning it.
