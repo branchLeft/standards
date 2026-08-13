@@ -36,11 +36,24 @@ ever published.
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use && pnpm install
-pnpm lint:check && pnpm typecheck && pnpm test --run && ./tools/tests/run.sh
+pnpm build
+pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm selftest
 ```
 
-`tools/tests/run.sh` drives every gate's `--self-test` plus the fixture matrix.
-Run it after touching anything in `tools/`.
+`pnpm build` is not optional and not first out of tidiness. The eslint flat
+config imports `@branchleft/eslint-config` from its built `dist/`, so in a fresh
+clone or worktree `lint:check` fails to resolve the module until the packages
+are built.
+
+`pnpm selftest` runs `tools/tests/run.sh`, which drives every gate's
+`--self-test` plus the fixture matrix — this is the suite. Run it after touching
+anything in `tools/`.
+
+**Never write `pnpm test` in a script or a document here.** `test` is a package
+manager builtin, and when no `test` script is defined it exits 0 having run
+nothing, so an `&&` chain carries straight on. Every other name in the canonical
+vocabulary fails loudly when it is undefined; that one does not, which is why
+TS-6 names `test:unit`.
 
 ## graphify
 
