@@ -36,6 +36,18 @@
     },
     {
       "type": "required_linear_history"
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "docs-lint"
+          }
+        ]
+      }
     }
   ],
   "bypass_actors": [
