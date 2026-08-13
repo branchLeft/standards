@@ -29,7 +29,7 @@ GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh standards-sync.sh)
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
-COVERED="TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 SYNC-1"
+COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 SYNC-1"
 
 # ratchet__json emits a fixed field order, so this is a parse rather than a
 # JSON reader: the repo has three consumers with no Node and no jq.
@@ -108,6 +108,29 @@ audit_exemptions() {
   local f hit rest aln aclause
   while IFS= read -r hit; do
       f="${hit%%:*}"; rest="${hit#*:}"; aln="${rest%%:*}"
+
+      # A quoted token is the syntax being described, not used — prose
+      # documenting the suppression form, or the definition of the token
+      # itself. Without this the scan reports the documentation as a defect,
+      # which is how a gate teaches people to stop reading it.
+      case "$rest" in
+        *"\`${RATCHET_ALLOW_TOKEN}"*|*"'${RATCHET_ALLOW_TOKEN}"*|*"\"${RATCHET_ALLOW_TOKEN}"*)
+          continue ;;
+      esac
+
+      # STD-000 — the token alone suppresses nothing, because ratchet_is_allowed
+      # requires a clause and a reason before it will honour one. Enforced only
+      # by not working, it leaves no finding naming the line to fix, so the
+      # author sees an unrelated failure and no explanation of why their
+      # suppression was ignored.
+      if ! printf '%s' "${rest#*:}" | grep -qE \
+        "${RATCHET_ALLOW_TOKEN}[[:space:]]+[A-Z]{2,5}-[0-9]{1,3}[[:space:]]+[[:alnum:]]"; then
+        printf '    %s:%s\t—\tMALFORMED — suppresses nothing\n' "$f" "$aln" >> "$inv"
+        ratchet_finding "STD-000" "$f" "$aln" \
+          "a suppression must name a clause ID and give a reason, so this one suppresses nothing"
+        continue
+      fi
+
       aclause=$(printf '%s' "${rest#*:}" \
         | sed -n "s/.*${RATCHET_ALLOW_TOKEN}[[:space:]]\{1,\}\([A-Z][A-Z]*-[0-9][0-9]*\).*/\1/p")
       [ -n "$aclause" ] || continue
@@ -307,6 +330,22 @@ EOF
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q 'STALE — 1 files, no finding to suppress' \
       || { echo "FAIL: exemption over a clean file not flagged stale"; echo "$out"; exit 1; }
+
+    # STD-000 — a token with no clause and no reason, next to one that is
+    # merely quoted in prose. Only the first is a suppression.
+    # The quoted line is the shape this repo's own docs use to describe the
+    # syntax. It is malformed *as a suppression* — which is why only the
+    # quoting can tell the two apart.
+    printf "name: Doc\n# %s\n# write it as \`%s <CLAUSE-ID> <reason>\`\non:\n  pull_request:\n" \
+      "$RATCHET_ALLOW_TOKEN" "$RATCHET_ALLOW_TOKEN" > .github/workflows/allow.yml
+    git add -A && git commit -qm bare-allow
+    out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'STD-000' \
+      || { echo "FAIL: bare suppression not reported"; echo "$out"; exit 1; }
+    [ "$(printf '%s' "$out" | grep -c 'MALFORMED')" -eq 1 ] \
+      || { echo "FAIL: quoted mention counted as a suppression"; echo "$out"; exit 1; }
+    rm .github/workflows/allow.yml
+    git add -A && git commit -qm drop-allow
 
     # STD-002 is a clause like any other, so its own exemption must silence it.
     printf '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n' >  .standardsignore
