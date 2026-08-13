@@ -17,9 +17,10 @@ The narrow scope is what makes that 403 the design working: a compromised or
 malicious workflow run in a public repo can only reach what the deploy identity
 holds. `ghost-platform/infra/platform/serviceAccounts.ts` derives every role
 from what its program creates rather than a wider template;
-`website/infra/KNOWN_ISSUES.md` records four incidents of the same shape — a
-stack that has run under CI for months 403s the day it first creates a
-resource type outside its original role list.
+`website/infra/KNOWN_ISSUES.md` records the same shape twice — a stack that has
+run under CI for months 403s the day it first creates a resource type outside
+its original role list — alongside two bootstrap cases where the state bucket
+and KMS key had to exist before the identity that uses them.
 
 That is the day-2 gap this clause names rather than papers over: a genuinely
 new resource class needs one privileged apply before CI can take over the
