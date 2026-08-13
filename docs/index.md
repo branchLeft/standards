@@ -51,7 +51,12 @@ writing a differently-shaped bad glob.
 | ------ | ---------------------------------------------------------------------------------- | ------ | ----------------------------- |
 | LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `auto` | `@branchleft/eslint-config`   |
 | FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto` | `@branchleft/prettier-config` |
-| SYNC-1 | Files that cannot be shared through npm match `templates/`                         | `auto` | `tools/standards-sync.sh`     |
+
+## Shared config files — `shared-config.md`
+
+| ID     | Rule                                                | Gate   | Encoded by                |
+| ------ | --------------------------------------------------- | ------ | ------------------------- |
+| SYNC-1 | A shared config file matches its `templates/` entry | `auto` | `tools/standards-sync.sh` |
 
 ## Code comments — `code-comments.md`
 
