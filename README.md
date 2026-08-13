@@ -42,7 +42,7 @@ See [`ADOPTION.md`](ADOPTION.md) for the full ladder. The short version:
 # .github/workflows/standards.yml
 jobs:
   standards:
-    uses: branchLeft/standards/.github/workflows/standards.yml@v0.2.0
+    uses: branchLeft/standards/.github/workflows/standards.yml@v0.3.1
 ```
 
 Then write `warn` into `.standards.mode`, clear the tree at your own pace, and
