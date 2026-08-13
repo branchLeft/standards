@@ -24,10 +24,15 @@ const DEFAULT_COVERAGE_EXCLUDE = [
   '**/*.spec.{ts,tsx}',
   '**/*.stories.{ts,tsx}',
   '**/*.d.ts',
-  '**/index.ts',
   '**/node_modules/**',
   '**/dist/**',
 ];
+// Deliberately does not exclude `index.ts` as a barrel: in a single-file
+// package, index.ts is the whole implementation, and Vitest has no glob for
+// "re-exports only" that would tell the two apart. A barrel counted at 0% is
+// visible and fixable; a module silently dropped from the denominator is
+// neither. A repo whose index.ts genuinely is a re-export barrel excludes it
+// itself via `coverageExclude`.
 
 const DEFAULT_TEST_EXCLUDE = [
   '**/node_modules/**',
