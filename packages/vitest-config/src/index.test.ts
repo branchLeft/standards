@@ -64,4 +64,24 @@ describe('defineStandardTest', () => {
     first.coverage!.include!.push('mutated');
     expect(defineStandardTest().test!.coverage!.include).not.toContain('mutated');
   });
+
+  it('does not exclude a single-file package’s index.ts from coverage', () => {
+    // A package whose whole implementation lives in index.ts — this one
+    // included — must have that file counted, not dropped by a filename
+    // exclusion that cannot distinguish an implementation from a barrel.
+    // Matched against a real relative path, not the glob source, so this
+    // fails if any future pattern reintroduces the exclusion under a
+    // different spelling.
+    const globToRegExp = (glob: string): RegExp =>
+      new RegExp(
+        `^${glob
+          .replace(/[.+^$()]/g, '\\$&')
+          .replace(/\*\*\//g, '(?:.*/)?')
+          .replace(/\*\*/g, '.*')
+          .replace(/\*/g, '[^/]*')
+          .replace(/\{([^}]+)\}/g, (_match, opts: string) => `(?:${opts.split(',').join('|')})`)}$`
+      );
+    const { coverage } = defineStandardTest().test!;
+    expect(coverage!.exclude!.some((glob) => globToRegExp(glob).test('src/index.ts'))).toBe(false);
+  });
 });

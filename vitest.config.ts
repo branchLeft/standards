@@ -7,8 +7,4 @@ import { defineStandardTest } from '@branchleft/vitest-config';
 export default defineStandardTest({
   coverageInclude: ['packages/*/src/**/*.ts'],
   testInclude: ['packages/*/src/**/*.test.ts'],
-  // The shared default excludes `**/index.ts` as a barrel. Here index.ts is
-  // where vitest-config's whole implementation lives, so inheriting that would
-  // exclude the one file these tests exist to cover.
-  coverageExclude: ['**/*.test.ts', '**/*.d.ts', '**/dist/**', '**/node_modules/**'],
 });

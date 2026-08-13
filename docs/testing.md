@@ -106,6 +106,14 @@ Trivial glue that genuinely warrants no test uses
 `standards-allow-next-line COV-1 <reason>`. The reason is mandatory and the
 exemption inventory reports it, so a repo cannot accumulate them silently.
 
+`@branchleft/vitest-config`'s default `coverageExclude` does not exclude
+`index.ts`. Vitest has no glob that means "re-export barrel" — only "this
+filename" — and enough packages keep their entire implementation in
+`index.ts` that excluding the name would exclude the implementation. A repo
+whose `index.ts` genuinely is a barrel should add it to its own
+`coverageExclude`; a barrel left in and reported at 0% is visible and
+fixable, which a silent exclusion is not.
+
 ## COV-2 — the repo total never drops
 
 `auto`. Compared against the merge base, not against a fixed target.
