@@ -2,6 +2,11 @@
 # Report drift between the committed ruleset payloads and each repo's live state.
 # Private repos on GitHub Free return 403 for the rulesets endpoint — that's
 # reported as blocked, not as drift. Exits non-zero on missing or drifted.
+#
+# This is where REPO-1, REPO-2, REPO-3 and REPO-6 are decided, and where CI-6
+# reads the live required-check list. They are absent from standards-audit.sh
+# because they need `gh api` — a network call and a credential no pre-commit
+# run can assume.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -4,7 +4,8 @@ import prettier from 'eslint-config-prettier';
 import type { Linter } from 'eslint';
 
 /**
- * The floor every branchLeft repo shares. Composes with a stack preset:
+ * The floor every branchLeft repo shares, and what LINT-1 means in practice:
+ * the tree lints clean under this set. Composes with a stack preset:
  * `[...base, ...pulumi]`, `[...base, ...react, ...library, ...tests]`.
  *
  * `ignores` are deliberately not set here — they are genuinely repo-specific

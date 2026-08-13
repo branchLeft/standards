@@ -12,31 +12,47 @@ and vice versa, so a rule cannot be written without being indexed.
 
 - **Gate** — `auto` means a script decides and CI enforces it. `review` means it
   needs judgement; the **Evidence** column then names the bounded set of files a
-  reviewer reads, so nobody has to read the repo.
-- **Encoded by** — the package that makes the rule the default. `—` means the
-  rule is prose-only: it is still binding, it just cannot be made automatic.
+  reviewer reads, so nobody has to read the repo. `pending` means the rule is
+  binding prose and nothing checks it yet.
+- **Encoded by** — the package or gate that makes the rule the default. `—`
+  means nothing in this repo does: the rule is still binding, it is just carried
+  by prose.
 - **Floor** — the tier currently required fleet-wide, from `tools/floors.tsv`.
   Raising it is a one-line PR there; see `docs/ratchet.md`.
+
+`pending` exists because the alternative is worse than an absent rule. A row
+marked `auto` reads as mechanically enforced to everything downstream — the
+audit tool, a reviewer deciding whether to check something by hand, a repo
+adopting the standard. A row that claims it while nothing checks anything is
+not a gap, it is a false statement about coverage, and it is invisible because
+a clean run and an unimplemented rule look identical.
+
+`tools/check-clause-index.sh` therefore does more than match IDs between the
+index and `docs/`. It requires an `auto` clause to be named by some artefact
+under `tools/`, `packages/` or `templates/`, requires every `Encoded by` value
+to resolve, and — in the direction nobody remembers to check — fails a
+`pending` clause that an artefact does name, so a rule cannot be implemented
+and left advertised as unimplemented.
 
 ## Meta
 
 | ID      | Rule                                                                                                          | Gate     | Encoded by                 |
 | ------- | ------------------------------------------------------------------------------------------------------------- | -------- | -------------------------- |
-| STD-000 | A suppression must name a clause ID and give a reason. A bare `standards-allow-next-line` is itself a finding | `auto`   | `tools/lib/ratchet.sh`     |
+| STD-000 | A suppression must name a clause ID and give a reason. A bare `standards-allow-next-line` is itself a finding | `auto`   | `tools/standards-audit.sh` |
 | STD-001 | An exemption is a CODEOWNERS decision. A PR may not add one to make its own gate pass                         | `review` | —                          |
 | STD-002 | A stale exemption — one matching nothing — is reported and removed                                            | `auto`   | `tools/standards-audit.sh` |
 
 ## TypeScript — `stacks/typescript.md`
 
-| ID   | Rule                                                                                             | Gate   | Encoded by                  |
-| ---- | ------------------------------------------------------------------------------------------------ | ------ | --------------------------- |
-| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto` | `@branchleft/tsconfig`      |
-| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto` | —                           |
-| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto` | —                           |
-| TS-4 | The extended tier is at or above the floor                                                       | `auto` | `tools/floors.tsv`          |
-| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto` | —                           |
-| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `auto` | —                           |
-| TS-7 | No default exports outside framework-mandated module shapes                                      | `auto` | `@branchleft/eslint-config` |
+| ID   | Rule                                                                                             | Gate      | Encoded by             |
+| ---- | ------------------------------------------------------------------------------------------------ | --------- | ---------------------- |
+| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto`    | `@branchleft/tsconfig` |
+| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                      |
+| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                      |
+| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`     |
+| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                      |
+| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                      |
+| TS-7 | No default exports outside framework-mandated module shapes                                      | `pending` | —                      |
 
 **Why TS-2 and TS-5 are gates rather than inheritance.** `include`, `exclude` and
 `files` resolve relative to the config file that declares them, so an `include`
@@ -60,11 +76,11 @@ writing a differently-shaped bad glob.
 
 ## Code comments — `code-comments.md`
 
-| ID    | Rule                                                                                                                 | Gate     | Evidence                                  |
-| ----- | -------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------- |
-| CMT-1 | A comment states only what the code cannot                                                                           | `review` | The diff                                  |
-| CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `auto`   | —                                         |
-| CMT-3 | A comment needing more than a line or two belongs in a README or doc, with at most a one-line pointer in code        | `review` | Files where comments exceed ~30% of lines |
+| ID    | Rule                                                                                                                 | Gate      | Evidence                                  |
+| ----- | -------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------- |
+| CMT-1 | A comment states only what the code cannot                                                                           | `review`  | The diff                                  |
+| CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `pending` | —                                         |
+| CMT-3 | A comment needing more than a line or two belongs in a README or doc, with at most a one-line pointer in code        | `review`  | Files where comments exceed ~30% of lines |
 
 ## Testing and coverage — `testing.md`
 
@@ -103,14 +119,14 @@ live ruleset state.
 
 ## Repository settings — `repo-settings.md`
 
-| ID     | Rule                                                                            | Gate     | Encoded by               |
-| ------ | ------------------------------------------------------------------------------- | -------- | ------------------------ |
-| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR    | `auto`   | `templates/rulesets/`    |
-| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only             | `auto`   | `templates/rulesets/`    |
-| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures | `auto`   | `templates/rulesets/`    |
-| REPO-4 | Required checks: never before a real run, never for a `warn` gate, names match  | `review` | `tools/ruleset-audit.sh` |
-| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors         | `auto`   | `templates/codeowners`   |
-| REPO-6 | Every repo's ruleset payload is committed and audited                           | `auto`   | `tools/ruleset-audit.sh` |
+| ID     | Rule                                                                            | Gate      | Encoded by               |
+| ------ | ------------------------------------------------------------------------------- | --------- | ------------------------ |
+| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR    | `auto`    | `templates/rulesets/`    |
+| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only             | `auto`    | `templates/rulesets/`    |
+| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures | `auto`    | `templates/rulesets/`    |
+| REPO-4 | Required checks: never before a real run, never for a `warn` gate, names match  | `review`  | `tools/ruleset-audit.sh` |
+| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors         | `pending` | —                        |
+| REPO-6 | Every repo's ruleset payload is committed and audited                           | `auto`    | `tools/ruleset-audit.sh` |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
@@ -155,16 +171,16 @@ published package, which deliberately has no Tailwind and no theme of its own.
 
 ## React applications — `stacks/react-app.md`
 
-| ID    | Rule                                                                       | Gate     | Encoded by                  |
-| ----- | -------------------------------------------------------------------------- | -------- | --------------------------- |
-| APP-1 | No default exports, except framework-mandated route and root modules       | `auto`   | `@branchleft/eslint-config` |
-| APP-2 | Imports are absolute from the application root                             | `auto`   | `@branchleft/eslint-config` |
-| APP-3 | One file per route, with metadata; shared loaders move to a library module | `review` | —                           |
-| APP-4 | Every route has a browser axe assertion; failures are build-blocking       | `review` | —                           |
-| APP-5 | Reduced motion is honoured, and the browser suite runs with it forced      | `review` | —                           |
-| APP-6 | Progressive enhancement is tested, not asserted                            | `review` | —                           |
-| APP-7 | Security headers built in one unit-tested module                           | `review` | —                           |
-| APP-8 | Derived data has a single source and a drift test                          | `review` | —                           |
+| ID    | Rule                                                                       | Gate      | Encoded by                  |
+| ----- | -------------------------------------------------------------------------- | --------- | --------------------------- |
+| APP-1 | No default exports, except framework-mandated route and root modules       | `auto`    | `@branchleft/eslint-config` |
+| APP-2 | Imports are absolute from the application root                             | `pending` | —                           |
+| APP-3 | One file per route, with metadata; shared loaders move to a library module | `review`  | —                           |
+| APP-4 | Every route has a browser axe assertion; failures are build-blocking       | `review`  | —                           |
+| APP-5 | Reduced motion is honoured, and the browser suite runs with it forced      | `review`  | —                           |
+| APP-6 | Progressive enhancement is tested, not asserted                            | `review`  | —                           |
+| APP-7 | Security headers built in one unit-tested module                           | `review`  | —                           |
+| APP-8 | Derived data has a single source and a drift test                          | `review`  | —                           |
 
 APP-1's exception is a `files` override in the ESLint config scoped to the route
 directory, so it is visible where it is enforced and a file that moves out loses
@@ -179,7 +195,7 @@ the exemption automatically.
 | LIB-3 | Props are an exported, named, `readonly` interface                    | `review` | —                           |
 | LIB-4 | No default exports — absolute, no framework exception                 | `auto`   | `@branchleft/eslint-config` |
 | LIB-5 | Native semantics first; ARIA only where semantics are insufficient    | `review` | —                           |
-| LIB-6 | Every component carries an SSR-safe axe assertion                     | `review` | `@branchleft/test-utils`    |
+| LIB-6 | Every component carries an SSR-safe axe assertion                     | `review` | —                           |
 | LIB-7 | Storybook is a development environment until it runs headlessly in CI | `review` | —                           |
 | LIB-8 | Tests import through the package entry point, not by deep path        | `review` | —                           |
 
@@ -195,10 +211,10 @@ Thin by design. The org documentation standard and its mechanical rules
 - `branchLeft/.github` → `docs/DOCUMENTATION-STANDARD.md`
 - `branchLeft/github-workflows` → `tools/docs-lint-rules.md`
 
-| ID    | Rule                                                           | Gate     | Encoded by                          |
-| ----- | -------------------------------------------------------------- | -------- | ----------------------------------- |
-| DOC-1 | Every repo runs the `docs-lint` caller                         | `auto`   | `templates/workflows/docs-lint.yml` |
-| DOC-2 | A repo in docs-lint `warn` mode has a backlog item to leave it | `review` | `.docs-lint.mode`                   |
+| ID    | Rule                                                                      | Gate      | Encoded by |
+| ----- | ------------------------------------------------------------------------- | --------- | ---------- |
+| DOC-1 | Every repo runs the `docs-lint` caller                                    | `pending` | —          |
+| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it | `review`  | —          |
 
 ## Pending — blocked on authorship
 

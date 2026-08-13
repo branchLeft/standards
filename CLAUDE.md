@@ -25,7 +25,7 @@ internal-only shorthand.
 - **Every gate script carries a `--self-test`.** A matcher that silently stops
   matching reports a clean run, which is worse than reporting a failure. Prove
   the matcher still matches before trusting a pass.
-- **The five packages version in lockstep.** Do not let them drift apart — the
+- **The four packages version in lockstep.** Do not let them drift apart — the
   alternative is a compatibility matrix nobody maintains.
 
 ## Local development

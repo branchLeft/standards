@@ -29,6 +29,7 @@ run "check-workflows.sh"   bash "$TOOLS/check-workflows.sh" --self-test
 run "check-pulumi.sh"      bash "$TOOLS/check-pulumi.sh" --self-test
 run "standards-sync.sh"    bash "$TOOLS/standards-sync.sh" --self-test
 run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
+run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
