@@ -14,7 +14,11 @@ export interface ReactAppOptions {
 
 const DEFAULT_FRAMEWORK_MODULES = ['**/routes/**', '**/routes.ts', '**/root.tsx'];
 
-/** A React application — see `docs/stacks/react-app.md`. */
+/**
+ * A React application — see `docs/stacks/react-app.md`. The default-export ban
+ * is APP-1; `no-restricted-exports` is the rule that expresses it, and the
+ * `files` override below is the framework exception the clause allows.
+ */
 export function reactApp(options: ReactAppOptions = {}): Linter.Config[] {
   const { frameworkModules = DEFAULT_FRAMEWORK_MODULES } = options;
 

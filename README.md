@@ -57,9 +57,8 @@ delete the file. That is the whole ratchet — see
 | `@branchleft/eslint-config`   | Composable flat-config presets: base, react, react-app, library, pulumi, tests                 |
 | `@branchleft/prettier-config` | The formatting config, plus a shared ignore file                                               |
 | `@branchleft/vitest-config`   | Test defaults, including the `coverage.include` that coverage reporting is meaningless without |
-| `@branchleft/test-utils`      | SSR-safe axe assertions and the drift-detecting data-test helper                               |
 
-All five version **in lockstep** from one signed tag. That removes the
+All four version **in lockstep** from one signed tag. That removes the
 compatibility matrix: the audit asserts every installed `@branchleft/*` package
 is on one version at or above the floor, which is a one-line check rather than a
 grid nobody maintains.

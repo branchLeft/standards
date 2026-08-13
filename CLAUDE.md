@@ -25,7 +25,7 @@ internal-only shorthand.
 - **Every gate script carries a `--self-test`.** A matcher that silently stops
   matching reports a clean run, which is worse than reporting a failure. Prove
   the matcher still matches before trusting a pass.
-- **The five packages version in lockstep.** Do not let them drift apart — the
+- **The four packages version in lockstep.** Do not let them drift apart — the
   alternative is a compatibility matrix nobody maintains.
 
 ## Local development
@@ -36,11 +36,43 @@ ever published.
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use && pnpm install
-pnpm lint:check && pnpm typecheck && pnpm test --run && ./tools/tests/run.sh
+pnpm build
+pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test:unit && pnpm selftest
 ```
 
-`tools/tests/run.sh` drives every gate's `--self-test` plus the fixture matrix.
-Run it after touching anything in `tools/`.
+`pnpm build` is not optional and not first out of tidiness. The eslint flat
+config imports `@branchleft/eslint-config` from its built `dist/`, so in a fresh
+clone or worktree `lint:check` fails to resolve the module until the packages
+are built.
+
+There are two suites, and they do not overlap. `pnpm selftest` runs
+`tools/tests/run.sh`, which drives every gate's `--self-test` plus the fixture
+matrix — run it after touching anything in `tools/`. `pnpm test:unit` runs
+Vitest over `packages/*/src/**/*.test.ts` — run it after touching anything in
+`packages/`.
+
+The package tests are about invariants that fail quietly. Flat ESLint config is
+last-wins, so the order of the blocks is the whole correctness of a rule and
+nothing in the type system says so; `coverage.include` is what makes a coverage
+number able to fall at all. Both would go on producing a green run while
+measuring or enforcing nothing, which is why they are asserted rather than left
+to review.
+
+**Never write `pnpm test` in a script or a document here.** `test` is a package
+manager builtin, and when no `test` script is defined it exits 0 having run
+nothing, so an `&&` chain carries straight on. Every other name in the canonical
+vocabulary fails loudly when it is undefined; that one does not, which is why
+TS-6 names `test:unit`.
+
+## graphify
+
+`graphify-out/` holds a knowledge graph of this repo, rebuilt by CI on every push to `main` and published as a `chore(graphify)` PR.
+
+- Answer codebase and architecture questions with `graphify query "<question>"` first — `graphify path "<A>" "<B>"` for a relationship, `graphify explain "<concept>"` for a concept. Each returns a scoped subgraph, far smaller than the equivalent grep. Which clause a gate enforces, and which gate a clause is enforced by, is exactly the kind of link the graph answers better than a search.
+- `graphify-out/GRAPH_REPORT.md` is the broad-navigation entry point. The payload files behind it are read-blocked in `.claude/settings.json` — go through the query commands instead.
+- The graph is not the clause table. `docs/index.md` is authoritative for what a rule says and what its ID is; the graph tells you where things connect.
+- If a `chore(graphify)` PR is open, the graph you have is behind — get it merged and pulled before reasoning from it.
+- After changing code, `graphify update .` refreshes the graph locally. AST-only, no API cost.
 
 ## Releasing
 

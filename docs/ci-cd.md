@@ -62,16 +62,23 @@ Nothing watches this on its own — Dependabot's `github-actions` ecosystem
 updates action pins but not reusable-workflow refs — so caller drift is a
 standing audit item rather than something that fixes itself.
 
-## CI-9 — never write an empty expression, not even in a comment
+## CI-9 — never write an empty expression where Actions evaluates one
 
-GitHub Actions parses `${{ … }}` **anywhere in a workflow file, comments
-included**. An empty one is a syntax error, and the failure mode is the worst
-kind: no jobs run, no log is produced, and the only signal is "this run likely
-failed because of a workflow file issue".
+GitHub Actions substitutes `${{ … }}` in every value it evaluates, and a `run:`
+block scalar is evaluated **whole — shell comments inside it included**. An empty
+expression there is a syntax error, and the failure mode is the worst kind: no
+jobs run, no log is produced, and the only signal is "this run likely failed
+because of a workflow file issue".
+
+A YAML comment outside any scalar is a different matter. The parser removes it
+before expressions are read, so an empty expression written there is inert. The
+gate is scoped accordingly: a rule that fires on documentation which breaks
+nothing is a rule people learn to suppress, and the suppression then covers the
+case that does break.
 
 The way this gets introduced is by documenting CI-2 — writing a comment that
 shows the empty-expression form while explaining why values must be bound rather
-than interpolated. Describe the rule in words instead.
+than interpolated. Inside a `run:` body, describe the rule in words instead.
 
 ## CI-6 — required checks agree with the repo's mode and job names
 
