@@ -1,6 +1,6 @@
 {
   "name": "@branchleft/eslint-config",
-  "version": "0.1.0",
+  "version": "0.3.1",
   "description": "Composable ESLint flat-config presets for branchLeft repos.",
   "license": "MIT",
   "type": "module",
