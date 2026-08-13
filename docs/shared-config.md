@@ -73,3 +73,37 @@ treat those as the same pattern — the leading slash anchors to the repo root a
 the trailing slash restricts the match to directories. Normalising them would
 change what is ignored, so a `contains` template would either be wrong or would
 report drift for every repo without any of them being at fault.
+
+## Adopting the pre-commit config: install it, do not sweep
+
+Install `.pre-commit-config.yaml` and stop. Do **not** follow it with
+`pre-commit run --all-files`, and do not let a first commit that touches many
+files stand in for one.
+
+The shared hook set includes `trailing-whitespace` and `end-of-file-fixer`, both
+of which rewrite files in place. A whole-tree sweep therefore produces a diff
+across every file in the repo that has ever had a stray space — a diff with no
+content change in it at all. That looks like the safest possible commit, and it
+is the one most likely to turn a green branch red.
+
+The mechanism is [the ratchet](ratchet.md), not the hooks. Every ratcheted gate
+here keys on the branch's changed-file set, and in `warn` mode that set is the
+_only_ thing enforced: the rest of the tree is advisory. A whitespace-only edit
+still puts a file in that set. Every pre-existing finding in every swept file
+becomes an error simultaneously, and the failure names rules that have nothing
+to do with anything the author did — so the first reading is always that the
+adoption broke something, when in fact the adoption revealed a backlog and
+assigned all of it to whoever ran the command.
+
+The order that works is the ordinary one: install the config, leave the tree
+alone, and let each file get fixed by the hooks when it is next edited for its
+own reasons. Findings then land on the author who is already in that file, a few
+at a time, which is what a ratchet is for. Clearing a tree deliberately is a
+separate, scheduled piece of work with someone's name against it — not a side
+effect of installing a hook.
+
+Whether the ratchet ought to treat a whitespace-only diff as no change at all is
+a fair question, and the answer is no. A file's findings genuinely do become the
+author's business once they touch it, and a ratchet that decides which _kinds_
+of change count is a ratchet that can be defeated by making a change of that
+kind. The cost is paid once, at adoption, by not sweeping.
