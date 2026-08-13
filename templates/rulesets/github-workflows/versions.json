@@ -14,6 +14,12 @@
     },
     {
       "type": "non_fast_forward"
+    },
+    {
+      "type": "update"
+    },
+    {
+      "type": "required_signatures"
     }
   ],
   "bypass_actors": [
