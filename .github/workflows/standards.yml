@@ -1,9 +1,10 @@
 # The reusable gate. Every repo calls this; see templates/workflows/standards.yml.
 #
-# It checks out THIS repo at github.job_workflow_sha — the revision the caller
-# actually asked for — so the workflow and the scripts it runs can never skew.
-# A workflow here must never hardcode a tag of this repo internally: a literal
-# tag would pin callers to a revision unrelated to the one they requested.
+# It checks out THIS repo at the revision the caller actually asked for — read
+# from the caller's own workflow file, since the runner exposes no context that
+# names it — so the workflow and the scripts it runs can never skew. A workflow
+# here must never hardcode a tag of this repo internally: a literal tag would
+# pin callers to a revision unrelated to the one they requested.
 #
 # Uses only actions/checkout plus `run:` steps, deliberately, so it passes under
 # `allowed_actions: selected` with no per-repo allow-list change.
@@ -35,11 +36,52 @@ jobs:
           # file falls out of the enforced set — the gate would pass silently.
           fetch-depth: 0
 
+      # Nothing the runner provides identifies the revision the caller asked
+      # for. Measured on this runner: `github.job_workflow_ref` and
+      # `github.job_workflow_sha` are both empty, and `github.workflow_ref`
+      # names the *caller's* workflow rather than this one. An empty `ref:`
+      # makes actions/checkout fall back to the default branch, so the gate
+      # runs main's scripts under a workflow the caller pinned to a tag —
+      # silently, and in whichever direction main happens to differ.
+      #
+      # The caller's own workflow file does identify it, and it is checked out
+      # above. Exactly one distinct pin is required: two workflows in one repo
+      # naming different revisions is caller drift, and guessing which one
+      # governs would reintroduce the same class of silence.
+      - name: Resolve the revision the caller pinned
+        id: pin
+        env:
+          CALLER_REPO: ${{ github.repository }}
+          CALLER_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+
+          # The dogfood job calls this workflow by local path, which names no
+          # revision because it means "the one already checked out".
+          if [ "$CALLER_REPO" = "branchLeft/standards" ]; then
+            printf 'ref=%s\n' "$CALLER_REF" >> "$GITHUB_OUTPUT"
+            echo "Running the gates from this checkout ($CALLER_REF)"
+            exit 0
+          fi
+
+          # `|| true` so no match reaches the count below with its message,
+          # rather than aborting under `set -e` with a bare exit 1.
+          refs=$(grep -rhoE 'branchLeft/standards/\.github/workflows/standards\.yml@[^[:space:]"]+' \
+                   .github/workflows/ | sed 's/.*@//' | sort -u || true)
+          n=$(printf '%s' "$refs" | grep -c . || true)
+          if [ "$n" -ne 1 ]; then
+            echo "::error::expected exactly one pinned branchLeft/standards revision under .github/workflows/, found ${n}: ${refs}. Refusing to run the gates against an unknown revision."
+            exit 1
+          fi
+
+          printf 'ref=%s\n' "$refs" >> "$GITHUB_OUTPUT"
+          echo "Running the gates from branchLeft/standards@$refs"
+
       - name: Check out the standards at the revision the caller pinned
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: branchLeft/standards
-          ref: ${{ github.job_workflow_sha }}
+          ref: ${{ steps.pin.outputs.ref }}
           path: .standards
           persist-credentials: false
 
