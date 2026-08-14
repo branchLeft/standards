@@ -11,8 +11,8 @@ packages when one changes is trivial next to debugging a repo running
 3. Tag the merge commit — **annotated and signed**:
 
    ```bash
-   git tag -s v0.3.1 -m "standards v0.3.1"
-   git push origin v0.3.1
+   git tag -s v0.4.0 -m "standards v0.4.0"
+   git push origin v0.4.0
    ```
 
    The tag ruleset requires signatures, but it cannot enforce this on its own:
@@ -32,7 +32,7 @@ packages when one changes is trivial next to debugging a repo running
 
 ## Gates are versioned by the tag, not by semver
 
-Consumers pin the reusable workflow at an exact tag (`@v0.3.1`), never `@main`.
+Consumers pin the reusable workflow at an exact tag (`@v0.4.0`), never `@main`.
 Tags are immutable, so there is no moving `@v1` to inherit fixes: every change,
 including a fix, ships as a new tag and every caller needs a one-line bump.
 

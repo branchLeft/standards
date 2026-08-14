@@ -1,6 +1,6 @@
 {
   "name": "@branchleft/vitest-config",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Vitest defaults for branchLeft repos. Sets coverage.include so coverage is measurable at all, which the standards coverage clauses depend on.",
   "license": "MIT",
   "type": "module",
