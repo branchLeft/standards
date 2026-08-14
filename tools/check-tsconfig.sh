@@ -63,11 +63,42 @@ const lineOf = (needle) => {
   return i < 0 ? 1 : i + 1;
 };
 
-const extendsList = cfg.extends == null ? []
-  : Array.isArray(cfg.extends) ? cfg.extends : [cfg.extends];
+const extendsOf = (c) => c.extends == null ? []
+  : Array.isArray(c.extends) ? c.extends : [c.extends];
 
-// TS-1 — must extend a @branchleft base.
-if (!extendsList.some((e) => String(e).startsWith('@branchleft/tsconfig'))) {
+const extendsList = extendsOf(cfg);
+
+// Every `extends` specifier reachable from this config, following relative
+// entries into the configs they name. A build config that extends a sibling
+// which extends a shared base inherits that base exactly as the sibling does,
+// so judging it on its own `extends` line alone reports a project that has
+// adopted the standard as one that has not. The normal shape for a published
+// library — a typecheck config plus a build config narrowing to the
+// publishable surface — is unrepresentable otherwise.
+const collectExtends = (from, depth = 0, seen = new Set()) => {
+  const abs = path.resolve(from);
+  if (depth > 10 || seen.has(abs) || !fs.existsSync(abs)) return [];
+  seen.add(abs);
+  let c;
+  try { c = JSON.parse(stripJsonc(fs.readFileSync(abs, 'utf8'))); } catch { return []; }
+  const out = [];
+  for (const e of extendsOf(c)) {
+    const s = String(e);
+    out.push(s);
+    // Only relative entries are followed. A bare package specifier other than
+    // @branchleft is someone else's config and ends the walk.
+    if (s.startsWith('.')) {
+      const base = path.resolve(path.dirname(abs), s);
+      const target = fs.existsSync(base) && fs.statSync(base).isFile() ? base : `${base}.json`;
+      out.push(...collectExtends(target, depth + 1, seen));
+    }
+  }
+  return out;
+};
+const extendsChain = collectExtends(file);
+
+// TS-1 — must extend a @branchleft base, directly or through a relative parent.
+if (!extendsChain.some((e) => e.startsWith('@branchleft/tsconfig'))) {
   console.log(`TS-1\t${lineOf('"extends"') || 1}\tdoes not extend a @branchleft/tsconfig base`);
 }
 
@@ -133,9 +164,12 @@ for (const [k, v] of Object.entries(opts)) {
   }
 }
 
-// TS-4 — tier floor.
-const tier = extendsList
-  .map((e) => (String(e).match(/(base|strict-1|strict-2)\.json$/) || [])[1])
+// TS-4 — tier floor. Read from the whole chain for the same reason as TS-1:
+// judging only the direct line reports `none` for a child that inherits its
+// tier from a parent, which skips the floor comparison entirely rather than
+// failing it.
+const tier = extendsChain
+  .map((e) => (e.match(/(base|strict-1|strict-2)\.json$/) || [])[1])
   .filter(Boolean)
   .pop();
 console.log(`__TIER__\t0\t${tier || 'none'}`);
@@ -255,6 +289,45 @@ EOF
     git add -A && git commit -qm fix
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -qE 'TS-(2|3|4)' && { echo "FAIL: clean config reported"; echo "$out"; exit 1; }
+
+    # A child that reaches the shared base through a relative parent has
+    # adopted it. Judging its own `extends` line alone fails the normal shape
+    # for a published library: a typecheck config plus a build config that
+    # narrows to the publishable surface.
+    cat > tsconfig.build.json <<'EOF'
+{
+  "extends": "./tsconfig.json",
+  "include": ["**/*.ts"],
+  "exclude": ["sub"]
+}
+EOF
+    git add -A && git commit -qm child
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'TS-1' && {
+      echo "FAIL: child inheriting the base through a relative parent reported TS-1"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'TS-4' && {
+      echo "FAIL: child's tier read as none rather than inherited"; echo "$out"; exit 1; }
+
+    # Mutation: break the chain at the parent. Both configs must now fail,
+    # otherwise the walk above is passing everything rather than resolving.
+    cat > tsconfig.json <<'EOF'
+{
+  "include": ["**/*.ts"]
+}
+EOF
+    git add -A && git commit -qm break
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    [ "$(printf '%s\n' "$out" | grep -c 'TS-1')" -eq 2 ] || {
+      echo "FAIL: broken chain should report TS-1 on both configs"; echo "$out"; exit 1; }
+
+    cat > tsconfig.json <<'EOF'
+{
+  "extends": "@branchleft/tsconfig/strict-1.json",
+  "include": ["**/*.ts"]
+}
+EOF
+    rm tsconfig.build.json
+    git add -A && git commit -qm restore
 
     # An unresolvable base is a check that did not run, not a violation. The
     # reusable workflow installs nothing, so this is the normal case there —
