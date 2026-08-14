@@ -72,12 +72,12 @@
       "packages_prettier_config_package_repository_url",
       "packages_prettier_config_package_version",
       "packages_tsconfig_package_files",
+      "packages_tsconfig_package_json_ref_readme_md",
       "packages_vitest_config_package_files",
-      "ref_dist",
+      "packages_vitest_config_package_json_ref_dist",
       "ref_index_json",
       "ref_json",
-      "ref_prettierignore",
-      "ref_readme_md"
+      "ref_prettierignore"
     ],
     "3": [
       "package",
