@@ -3818,9 +3818,9 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig",
       "community": 22,
-      "norm_label": "check-tsconfig.sh"
+      "norm_label": "check-tsconfig.sh",
+      "id": "tools_check_tsconfig"
     },
     {
       "label": "check-tsconfig.sh script",
@@ -3832,9 +3832,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig_sh__entry",
       "community": 22,
-      "norm_label": "check-tsconfig.sh script"
+      "norm_label": "check-tsconfig.sh script",
+      "id": "tools_check_tsconfig_sh__entry"
     },
     {
       "label": "tier_rank()",
@@ -3846,9 +3846,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig_tier_rank",
       "community": 22,
-      "norm_label": "tier_rank()"
+      "norm_label": "tier_rank()",
+      "id": "tools_check_tsconfig_tier_rank"
     },
     {
       "label": "analyse_tsconfig()",
@@ -3860,9 +3860,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig_analyse_tsconfig",
       "community": 22,
-      "norm_label": "analyse_tsconfig()"
+      "norm_label": "analyse_tsconfig()",
+      "id": "tools_check_tsconfig_analyse_tsconfig"
     },
     {
       "label": "main()",
@@ -3874,9 +3874,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig_main",
       "community": 22,
-      "norm_label": "main()"
+      "norm_label": "main()",
+      "id": "tools_check_tsconfig_main"
     },
     {
       "label": "check_ts5()",
@@ -3888,9 +3888,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig_check_ts5",
       "community": 22,
-      "norm_label": "check_ts5()"
+      "norm_label": "check_ts5()",
+      "id": "tools_check_tsconfig_check_ts5"
     },
     {
       "label": "self_test()",
@@ -3902,9 +3902,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_tsconfig_self_test",
       "community": 22,
-      "norm_label": "self_test()"
+      "norm_label": "self_test()",
+      "id": "tools_check_tsconfig_self_test"
     }
   ],
   "links": [
@@ -5573,9 +5573,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 0.5,
       "source": "tools_check_tsconfig",
-      "target": "tools_lib_ratchet",
-      "confidence_score": 0.5
+      "target": "tools_lib_ratchet"
     },
     {
       "relation": "imports_from",
@@ -8528,9 +8528,9 @@
       "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig",
-      "target": "tools_check_tsconfig_analyse_tsconfig",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_analyse_tsconfig"
     },
     {
       "relation": "defines",
@@ -8539,9 +8539,9 @@
       "source_location": "L221",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig",
-      "target": "tools_check_tsconfig_check_ts5",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_check_ts5"
     },
     {
       "relation": "defines",
@@ -8550,9 +8550,9 @@
       "source_location": "L179",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig",
-      "target": "tools_check_tsconfig_main",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_main"
     },
     {
       "relation": "defines",
@@ -8561,9 +8561,9 @@
       "source_location": "L253",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig",
-      "target": "tools_check_tsconfig_self_test",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_self_test"
     },
     {
       "relation": "contains",
@@ -8572,9 +8572,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig",
-      "target": "tools_check_tsconfig_sh__entry",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_sh__entry"
     },
     {
       "relation": "defines",
@@ -8583,9 +8583,9 @@
       "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig",
-      "target": "tools_check_tsconfig_tier_rank",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_tier_rank"
     },
     {
       "relation": "calls",
@@ -8595,9 +8595,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig_sh__entry",
-      "target": "tools_check_tsconfig_main",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_main"
     },
     {
       "relation": "calls",
@@ -8607,9 +8607,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig_sh__entry",
-      "target": "tools_check_tsconfig_self_test",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_self_test"
     },
     {
       "relation": "calls",
@@ -8619,11 +8619,11 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_tsconfig_main",
-      "target": "tools_check_tsconfig_check_ts5",
-      "confidence_score": 1.0
+      "target": "tools_check_tsconfig_check_ts5"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c71028551197e51089b72ff14c588858f70d423f"
+  "built_at_commit": "2b9a0d173d65bc92f95c45796eabab8043828a33"
 }
