@@ -89,10 +89,16 @@ check_index() {
   # The reverse direction is advisory while families are still being authored:
   # index.md deliberately declares pending families so nothing invents a
   # competing ID scheme in the meantime.
+  #
+  # Advisory means the run still passes. It does not mean the run may claim
+  # everything agrees — a summary asserting agreement over a list of
+  # disagreements is read instead of the list, not alongside it.
+  local undefined=0
   while IFS= read -r c; do
     [ -n "$c" ] || continue
     printf '%s\n' "$defined" | grep -qx "$c" || {
-      echo "::warning::$c is indexed but not yet defined in a doc"; }
+      echo "::warning::$c is indexed but not yet defined in a doc"
+      undefined=$((undefined + 1)); }
   done <<< "$indexed"
 
   while IFS=$'\t' read -r id gate header value; do
@@ -120,7 +126,13 @@ check_index() {
     fi
   done < <(index_rows "$index")
 
-  [ "$rc" -eq 0 ] && echo "check-clause-index.sh: index, docs and artefacts agree"
+  if [ "$rc" -eq 0 ]; then
+    if [ "$undefined" -gt 0 ]; then
+      echo "check-clause-index.sh: no errors, but $undefined indexed clause(s) have no doc — see the warnings above"
+    else
+      echo "check-clause-index.sh: index, docs and artefacts agree"
+    fi
+  fi
   return "$rc"
 }
 
@@ -150,6 +162,29 @@ self_test() {
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: honest index exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'index, docs and artefacts agree' \
+      || { echo "FAIL: honest index did not report agreement"; echo "$out"; exit 1; }
+
+    # A passing run that emitted warnings must not claim agreement. The summary
+    # is the line people read; if it contradicts the warnings above it, the
+    # warnings may as well not be printed.
+    write_index <<'EOF'
+# Clause index
+
+| ID   | Rule        | Gate      | Encoded by      |
+| ---- | ----------- | --------- | --------------- |
+| AA-1 | implemented | `auto`    | `tools/gate.sh` |
+| AA-2 | declared    | `pending` | —               |
+| AA-9 | undocumented | `pending` | —              |
+EOF
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: undocumented pending clause exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'AA-9 is indexed but not yet defined' \
+      || { echo "FAIL: undocumented clause not warned about"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'index, docs and artefacts agree' \
+      && { echo "FAIL: claimed agreement while warning about AA-9"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '1 indexed clause(s) have no doc' \
+      || { echo "FAIL: summary did not count the undocumented clause"; echo "$out"; exit 1; }
 
     # The whole point: `auto` with nothing behind it.
     write_index <<'EOF'
