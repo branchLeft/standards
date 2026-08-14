@@ -1,18 +1,18 @@
 # Releasing
 
-All five packages version **in lockstep** from one tag. A no-op bump for four
+All four packages version **in lockstep** from one tag. A no-op bump for three
 packages when one changes is trivial next to debugging a repo running
 `eslint-config@2` against `tsconfig@1`.
 
 ## Cutting a release
 
-1. Bump `version` in all five `packages/*/package.json` to the same value.
+1. Bump `version` in all four `packages/*/package.json` to the same value.
 2. PR, review, merge.
 3. Tag the merge commit — **annotated and signed**:
 
    ```bash
-   git tag -s v0.2.0 -m "standards v0.2.0"
-   git push origin v0.2.0
+   git tag -s v0.3.1 -m "standards v0.3.1"
+   git push origin v0.3.1
    ```
 
    The tag ruleset requires signatures, but it cannot enforce this on its own:
@@ -27,12 +27,12 @@ packages when one changes is trivial next to debugging a repo running
    before it builds anything. A lightweight or unverified tag fails the release
    rather than publishing under it.
 
-4. `publish.yml` fires on `v*.*.*` and publishes all five to GitHub Packages.
+4. `publish.yml` fires on `v*.*.*` and publishes all four to GitHub Packages.
    Never `npm publish` locally.
 
 ## Gates are versioned by the tag, not by semver
 
-Consumers pin the reusable workflow at an exact tag (`@v0.2.0`), never `@main`.
+Consumers pin the reusable workflow at an exact tag (`@v0.3.1`), never `@main`.
 Tags are immutable, so there is no moving `@v1` to inherit fixes: every change,
 including a fix, ships as a new tag and every caller needs a one-line bump.
 
