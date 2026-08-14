@@ -12,8 +12,8 @@
   "prettier": "@branchleft/prettier-config",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write . --ignore-path .gitignore --ignore-path packages/prettier-config/prettierignore",
-    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path packages/prettier-config/prettierignore",
+    "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path packages/prettier-config/prettierignore",
+    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path packages/prettier-config/prettierignore",
     "selftest": "./tools/tests/run.sh",
     "prepare": "[ \"$CI\" = \"true\" ] || pre-commit install",
     "build": "pnpm -r --filter \"./packages/*\" run build",

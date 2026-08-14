@@ -68,13 +68,22 @@ Format commands take a second ignore path:
 ```json
 {
   "scripts": {
-    "format": "prettier --write . --ignore-path .gitignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore",
-    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore"
+    "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore",
+    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore"
   }
 }
 ```
 
 This only resolves correctly when the command runs from the repo root.
+
+**`.prettierignore` must be listed explicitly**, even though Prettier reads it by
+default when no flag is given. Passing any `--ignore-path` replaces that default
+rather than adding to it, so a repo with its own `.prettierignore` silently stops
+honouring it the moment these scripts land — and the failure is invisible,
+because the command still succeeds and simply formats more than it should.
+
+Keep a repo-local `.prettierignore` for anything the shared set cannot know
+about: a vendored checkout, or a file whose syntax Prettier would damage.
 
 ## 4. Canonical script names
 

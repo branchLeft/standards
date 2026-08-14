@@ -6,7 +6,12 @@
 #
 #   prettier --check . \
 #     --ignore-path .gitignore \
+#     --ignore-path .prettierignore \
 #     --ignore-path node_modules/@branchleft/prettier-config/prettierignore
+#
+# .prettierignore is named explicitly because passing any --ignore-path replaces
+# the default rather than adding to it, so omitting it silently disables a
+# repo's own ignore file.
 #
 # Only resolves correctly when the command runs from the repo root.
 
