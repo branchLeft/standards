@@ -1,7 +1,7 @@
 {
   "name": "@branchleft/vitest-config",
   "version": "0.3.1",
-  "description": "Vitest defaults for branchLeft repos. Sets coverage.include so coverage is measurable at all, which COV-1 and COV-2 depend on.",
+  "description": "Vitest defaults for branchLeft repos. Sets coverage.include so coverage is measurable at all, which the standards coverage clauses depend on.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

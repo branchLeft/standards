@@ -4,9 +4,11 @@
 # its own schedule. Never raise a floor and fix a repo in the same PR, and never
 # lower one to make a repo green. See docs/ratchet.md.
 #
+# A line here is a value some gate reads. The coverage floors live in
+# docs/testing.md instead, because those clauses are `pending` and a floor
+# sitting in this file for a clause nothing computes reads as enforced.
+#
 # clause	floor
 TS-4	strict-1
-COV-1	80/70
-COV-2	no-regression
 SH-2	set -euo pipefail
 CON-2	tag+digest

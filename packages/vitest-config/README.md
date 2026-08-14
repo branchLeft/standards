@@ -42,11 +42,15 @@ same PR, or `main` goes red on merge.
 
 ## Why it sets no thresholds
 
-COV-1 is a per-file floor over the branch's **changed-file set**; COV-2 is a
-comparison against the **merge base**. Vitest can express neither — both need
-git. So both are computed by the standards gate from the `json` reporter's
-output, and a global threshold here would be a third, weaker rule competing with
-them.
+The two coverage clauses in the standards are a per-file floor over the branch's
+**changed-file set** and a comparison against the **merge base**. Vitest can
+express neither — both need git. A global threshold here would be a third,
+weaker rule competing with them, and it would pass while either of them failed.
 
 That is also why `reporter` includes `json` and why `reportsDirectory` is fixed:
-the gate reads `coverage/coverage-final.json`.
+so a gate reading `coverage/coverage-final.json` has an input it can rely on.
+
+**No such gate exists yet.** This package produces the artefact and stops there;
+both clauses are marked `pending` in the clause index. Setting this config does
+not put a coverage floor on your repo, and nothing today will tell you if
+coverage falls.
