@@ -134,6 +134,13 @@ COV-1 until a gate exists to say so.
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state.
 
+## Dependencies — `dependencies.md`
+
+| ID    | Rule                                                                             | Gate      | Encoded by |
+| ----- | -------------------------------------------------------------------------------- | --------- | ---------- |
+| DEP-3 | A major-version dependency PR is closed unmerged by default                      | `pending` | —          |
+| DEP-4 | A Dependabot security-advisory PR merges the day it appears, regardless of DEP-3 | `pending` | —          |
+
 ## Repository settings — `repo-settings.md`
 
 | ID     | Rule                                                                            | Gate      | Encoded by               |
@@ -262,7 +269,7 @@ These families are declared so the index is the single place to look, and so
 nothing else invents a competing ID scheme in the meantime. Each is written in
 dialogue with the platform owner.
 
-| Family                    | Doc                                           | Covers                                                                                              |
-| ------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `SEC-*`, `NAM-*`, `DEP-*` | `security.md`, `naming.md`, `dependencies.md` | Boundaries as constants, resource naming and length budgets, pinning policy                         |
-| `CON-*`, `SH-*`, `PY-*`   | `containers.md`, `shell-and-python.md`        | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script |
+| Family                  | Doc                                    | Covers                                                                                              |
+| ----------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `SEC-*`, `NAM-*`        | `security.md`, `naming.md`             | Boundaries as constants, resource naming and length budgets                                         |
+| `CON-*`, `SH-*`, `PY-*` | `containers.md`, `shell-and-python.md` | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script |
