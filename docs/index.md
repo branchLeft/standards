@@ -233,9 +233,9 @@ scattered across test files cannot.
 
 ## Contract-driven development — `contract-development.md`
 
-| ID    | Rule                                                                                | Gate     | Encoded by |
-| ----- | ------------------------------------------------------------------------------------ | -------- | ---------- |
-| CTR-1 | The interface (type, spec file, signature) is authored before its implementation     | `review` | —          |
+| ID    | Rule                                                                                  | Gate     | Encoded by |
+| ----- | ------------------------------------------------------------------------------------- | -------- | ---------- |
+| CTR-1 | The interface (type, spec file, signature) is authored before its implementation      | `review` | —          |
 | CTR-2 | A cross-service or cross-repo API is a committed spec artefact, not an inferred shape | `review` | —          |
 
 `CTR-1` is `TEST-5`'s sibling for shape rather than behaviour: the contract
