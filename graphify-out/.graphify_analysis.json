@@ -332,6 +332,18 @@
       "tsconfig_json_ref_dist"
     ],
     "18": [
+      "tools_check_clause_index",
+      "tools_check_clause_index_check_index",
+      "tools_check_clause_index_clause_is_named",
+      "tools_check_clause_index_encoding_resolves",
+      "tools_check_clause_index_family_header_paths",
+      "tools_check_clause_index_gate",
+      "tools_check_clause_index_index_rows",
+      "tools_check_clause_index_self_test",
+      "tools_check_clause_index_sh__entry",
+      "tools_check_clause_index_write_index"
+    ],
+    "19": [
       "tools_standards_sync",
       "tools_standards_sync_apply_entry",
       "tools_standards_sync_assert_manifest_complete",
@@ -343,7 +355,7 @@
       "tools_standards_sync_self_test",
       "tools_standards_sync_sh__entry"
     ],
-    "19": [
+    "20": [
       "packages_tsconfig_strict_2",
       "packages_tsconfig_strict_2_comment",
       "packages_tsconfig_strict_2_compileroptions",
@@ -353,17 +365,6 @@
       "packages_tsconfig_strict_2_extends",
       "packages_tsconfig_strict_2_schema",
       "ref_strict_1_json"
-    ],
-    "20": [
-      "tools_check_clause_index",
-      "tools_check_clause_index_check_index",
-      "tools_check_clause_index_clause_is_named",
-      "tools_check_clause_index_encoding_resolves",
-      "tools_check_clause_index_gate",
-      "tools_check_clause_index_index_rows",
-      "tools_check_clause_index_self_test",
-      "tools_check_clause_index_sh__entry",
-      "tools_check_clause_index_write_index"
     ],
     "21": [
       "packages_vitest_config_src_index",
@@ -442,9 +443,9 @@
     "15": 0.2,
     "16": 0.2,
     "17": 0.2,
-    "18": 0.3333333333333333,
-    "19": 0.2222222222222222,
-    "20": 0.3333333333333333,
+    "18": 0.28888888888888886,
+    "19": 0.3333333333333333,
+    "20": 0.2222222222222222,
     "21": 0.2857142857142857,
     "22": 0.42857142857142855,
     "23": 0.7,
