@@ -88,6 +88,26 @@ When such a path is a pure function, extract it and test it directly. Most of
 these already are pure functions; they are untested because they live in files
 that look like configuration.
 
+## TEST-5 — test-driven development, wherever possible
+
+`review`. Write the test suite first, watch it fail for the right reason, then
+build the implementation until it passes. Red before green is the point — a
+test never run against a failing implementation has not proven it can fail,
+and a suite written after the code tends to assert what the code does rather
+than what it must do.
+
+"Wherever possible" excludes exploratory spikes thrown away before merge, and
+generated or scaffolded code where the generator is the thing under test, not
+the output. It does not exclude anything covered by TEST-1 — application-like
+code still gets its tests in the same PR, TEST-5 only orders how they arrive.
+
+This cannot be gated mechanically: a diff shows the final state, not the order
+code was written in, and a commit-order heuristic is defeated by a single
+squash. A reviewer looks for the shape TDD produces — tests that assert
+behaviour and edge cases the implementation would plausibly get wrong on a
+first pass, not tests that mirror the implementation's control flow line for
+line — and treats the latter as a finding against this clause.
+
 ## COV-1 — changed files meet a floor
 
 `pending`. **Specified below and computed by nothing.** Read the next paragraph
