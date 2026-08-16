@@ -901,7 +901,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "strict-2.json",
       "id": "packages_tsconfig_strict_2"
     },
@@ -911,7 +911,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "$schema",
       "id": "packages_tsconfig_strict_2_schema"
     },
@@ -921,7 +921,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "_comment",
       "id": "packages_tsconfig_strict_2_comment"
     },
@@ -931,7 +931,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "extends",
       "id": "packages_tsconfig_strict_2_extends"
     },
@@ -941,7 +941,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "./strict-1.json",
       "id": "ref_strict_1_json"
     },
@@ -951,7 +951,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "compileroptions",
       "id": "packages_tsconfig_strict_2_compileroptions"
     },
@@ -961,7 +961,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "nouncheckedindexedaccess",
       "id": "packages_tsconfig_strict_2_compileroptions_nouncheckedindexedaccess"
     },
@@ -971,7 +971,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "exactoptionalpropertytypes",
       "id": "packages_tsconfig_strict_2_compileroptions_exactoptionalpropertytypes"
     },
@@ -981,7 +981,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "noimplicitoverride",
       "id": "packages_tsconfig_strict_2_compileroptions_noimplicitoverride"
     },
@@ -1573,7 +1573,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "standards-sync.sh",
       "id": "tools_standards_sync"
     },
@@ -1587,7 +1587,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "standards-sync.sh script",
       "id": "tools_standards_sync_sh__entry"
     },
@@ -1601,7 +1601,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "parse_args()",
       "id": "tools_standards_sync_parse_args"
     },
@@ -1615,7 +1615,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "assert_manifest_complete()",
       "id": "tools_standards_sync_assert_manifest_complete"
     },
@@ -1629,7 +1629,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "first_missing_line()",
       "id": "tools_standards_sync_first_missing_line"
     },
@@ -1643,7 +1643,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "check_entry()",
       "id": "tools_standards_sync_check_entry"
     },
@@ -1657,7 +1657,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "apply_entry()",
       "id": "tools_standards_sync_apply_entry"
     },
@@ -1671,7 +1671,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "main()",
       "id": "tools_standards_sync_main"
     },
@@ -1685,7 +1685,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "self_test()",
       "id": "tools_standards_sync_self_test"
     },
@@ -1699,7 +1699,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "gate()",
       "id": "tools_standards_sync_gate"
     },
@@ -2291,132 +2291,6 @@
       "community": 21,
       "norm_label": "definestandardtest()",
       "id": "packages_vitest_config_src_index_definestandardtest"
-    },
-    {
-      "label": "check-clause-index.sh",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "check-clause-index.sh",
-      "id": "tools_check_clause_index"
-    },
-    {
-      "label": "check-clause-index.sh script",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "check-clause-index.sh script",
-      "id": "tools_check_clause_index_sh__entry"
-    },
-    {
-      "label": "index_rows()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L41",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "index_rows()",
-      "id": "tools_check_clause_index_index_rows"
-    },
-    {
-      "label": "clause_is_named()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L53",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "clause_is_named()",
-      "id": "tools_check_clause_index_clause_is_named"
-    },
-    {
-      "label": "encoding_resolves()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L65",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "encoding_resolves()",
-      "id": "tools_check_clause_index_encoding_resolves"
-    },
-    {
-      "label": "check_index()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L73",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "check_index()",
-      "id": "tools_check_clause_index_check_index"
-    },
-    {
-      "label": "self_test()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L142",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "self_test()",
-      "id": "tools_check_clause_index_self_test"
-    },
-    {
-      "label": "write_index()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L149",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "write_index()",
-      "id": "tools_check_clause_index_write_index"
-    },
-    {
-      "label": "gate()",
-      "file_type": "code",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L150",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 20,
-      "norm_label": "gate()",
-      "id": "tools_check_clause_index_gate"
     },
     {
       "label": "package.json",
@@ -3905,6 +3779,146 @@
       "community": 1,
       "norm_label": "@branchleft/tsconfig",
       "id": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
+    },
+    {
+      "label": "check-clause-index.sh",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "check-clause-index.sh",
+      "id": "tools_check_clause_index"
+    },
+    {
+      "label": "check-clause-index.sh script",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "check-clause-index.sh script",
+      "id": "tools_check_clause_index_sh__entry"
+    },
+    {
+      "label": "index_rows()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L46",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "index_rows()",
+      "id": "tools_check_clause_index_index_rows"
+    },
+    {
+      "label": "clause_is_named()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L58",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "clause_is_named()",
+      "id": "tools_check_clause_index_clause_is_named"
+    },
+    {
+      "label": "family_header_paths()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L79",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "family_header_paths()",
+      "id": "tools_check_clause_index_family_header_paths"
+    },
+    {
+      "label": "encoding_resolves()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L104",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "encoding_resolves()",
+      "id": "tools_check_clause_index_encoding_resolves"
+    },
+    {
+      "label": "check_index()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L112",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "check_index()",
+      "id": "tools_check_clause_index_check_index"
+    },
+    {
+      "label": "self_test()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L200",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "self_test()",
+      "id": "tools_check_clause_index_self_test"
+    },
+    {
+      "label": "write_index()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L207",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "write_index()",
+      "id": "tools_check_clause_index_write_index"
+    },
+    {
+      "label": "gate()",
+      "file_type": "code",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L208",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "gate()",
+      "id": "tools_check_clause_index_gate"
     }
   ],
   "links": [
@@ -6844,144 +6858,6 @@
       "target": "packages_vitest_config_src_index_testenvironment"
     },
     {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L73",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_check_index"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L53",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_clause_is_named"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L65",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_encoding_resolves"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L41",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_index_rows"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L142",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_self_test"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_sh__entry"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L315",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index_sh__entry",
-      "target": "tools_check_clause_index_check_index"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L311",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index_sh__entry",
-      "target": "tools_check_clause_index_self_test"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L107",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index_check_index",
-      "target": "tools_check_clause_index_clause_is_named"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L123",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index_check_index",
-      "target": "tools_check_clause_index_encoding_resolves"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L150",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index_self_test",
-      "target": "tools_check_clause_index_gate"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-clause-index.sh",
-      "source_location": "L149",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_clause_index_self_test",
-      "target": "tools_check_clause_index_write_index"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -8622,8 +8498,157 @@
       "confidence_score": 1.0,
       "source": "packages_vitest_config_package_devdependencies",
       "target": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L112",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_check_index"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_clause_is_named"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_encoding_resolves"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_family_header_paths"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_index_rows"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L200",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_self_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index",
+      "target": "tools_check_clause_index_sh__entry"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L503",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index_sh__entry",
+      "target": "tools_check_clause_index_check_index"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L499",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index_sh__entry",
+      "target": "tools_check_clause_index_self_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L146",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index_check_index",
+      "target": "tools_check_clause_index_clause_is_named"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L162",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index_check_index",
+      "target": "tools_check_clause_index_encoding_resolves"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L208",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index_self_test",
+      "target": "tools_check_clause_index_gate"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-clause-index.sh",
+      "source_location": "L207",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_clause_index_self_test",
+      "target": "tools_check_clause_index_write_index"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0b7082ba13473984db35fd0e33d85000b9181e39"
+  "built_at_commit": "b36621f812ce25acb94a397de217d4a468c88e3d"
 }
