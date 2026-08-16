@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Drift test between docs/index.md and everything it claims.
 #
-# Three assertions, in increasing order of what they catch:
+# Four assertions, in increasing order of what they catch:
 #
 #   1. Every clause ID defined in docs/ appears in the index, and vice versa.
 #      Without this an unindexed rule cannot be cited by the audit tool, the
@@ -13,6 +13,11 @@
 #      is visibly absent.
 #   3. Every `Encoded by` value resolves — a path that exists, or a package
 #      that exists under packages/.
+#   4. Every family header (`## Family — \`path\``) links to a file that
+#      exists under docs/. A family that is genuinely thin and has nothing
+#      beyond the index carries no path at all (`## Family`); a header naming
+#      a path promises a doc, and a promise nothing resolves is worse than no
+#      promise.
 #
 # Assertion 2 also runs in reverse: a `pending` clause that some artefact does
 # name is a row that was implemented and never re-marked, which rots the table
@@ -58,6 +63,19 @@ clause_is_named() {
       --exclude-dir=node_modules --exclude-dir=dist -- >/dev/null 2>&1 && return 0
   done
   return 1
+}
+
+# A family header is `## Name — \`path\``, one per line, the path backtick-
+# quoted. A family with no doc beyond the index carries no em-dash suffix at
+# all (`## Meta`), which this does not match — only a header that names a path
+# is a promise the file exists.
+# shellcheck disable=SC2016  # the backticks are literal markdown, not shell expansions
+family_header_re='^## .+ — `[^`]+`$'
+
+# Extract PATH from each family header line, one per line.
+family_header_paths() {
+  # shellcheck disable=SC2016  # the backticks are literal markdown, not shell expansions
+  grep -E "$family_header_re" "$1" | sed -E 's/^## .+ `([^`]+)`$/\1/'
 }
 
 # `@branchleft/x` is the published name of packages/x; anything else is a path
@@ -125,6 +143,14 @@ check_index() {
         rc=1; }
     fi
   done < <(index_rows "$index")
+
+  local path
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    [ -e "$docs/$path" ] || {
+      echo "::error::family header links to '$path', which does not exist under $docs"
+      rc=1; }
+  done < <(family_header_paths "$index")
 
   if [ "$rc" -eq 0 ]; then
     if [ "$undefined" -gt 0 ]; then
@@ -297,6 +323,39 @@ EOF
     [ "$grc" -eq 1 ] || { echo "FAIL: undocumented clause exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q 'AA-3 is defined in docs/ but missing' \
       || { echo "FAIL: unindexed clause not reported"; echo "$out"; exit 1; }
+
+    # A family header with no path is a declared-thin family, not a promise —
+    # it is not checked at all. One that names an existing path passes.
+    printf '# Fake\n\n## AA-1 — implemented\n' > docs/fake.md
+    printf 'placeholder\n' > docs/family-ok.md
+    write_index <<'EOF'
+# Clause index
+
+## Thin family
+
+## Real family — `family-ok.md`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: valid family header exited $grc"; echo "$out"; exit 1; }
+
+    # The whole point: a family header naming a path that does not exist.
+    write_index <<'EOF'
+# Clause index
+
+## Dead family — `family-missing.md`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: dead family header exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+      || { echo "FAIL: dead family header not reported"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?

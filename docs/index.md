@@ -42,7 +42,7 @@ and left advertised as unimplemented.
 | STD-001 | An exemption is a CODEOWNERS decision. A PR may not add one to make its own gate pass                         | `review` | —                          |
 | STD-002 | A stale exemption — one matching nothing — is reported and removed                                            | `auto`   | `tools/standards-audit.sh` |
 
-## TypeScript — `stacks/typescript.md`
+## TypeScript
 
 | ID   | Rule                                                                                             | Gate      | Encoded by                  |
 | ---- | ------------------------------------------------------------------------------------------------ | --------- | --------------------------- |
@@ -226,9 +226,9 @@ scattered across test files cannot.
 
 ## Contract-driven development — `contract-development.md`
 
-| ID    | Rule                                                                                | Gate     | Encoded by |
-| ----- | ------------------------------------------------------------------------------------ | -------- | ---------- |
-| CTR-1 | The interface (type, spec file, signature) is authored before its implementation     | `review` | —          |
+| ID    | Rule                                                                                  | Gate     | Encoded by |
+| ----- | ------------------------------------------------------------------------------------- | -------- | ---------- |
+| CTR-1 | The interface (type, spec file, signature) is authored before its implementation      | `review` | —          |
 | CTR-2 | A cross-service or cross-repo API is a committed spec artefact, not an inferred shape | `review` | —          |
 
 `CTR-1` is `TEST-5`'s sibling for shape rather than behaviour: the contract
@@ -237,7 +237,7 @@ shared `api-contracts` repo (spec files publishing generated
 TypeScript/Python packages) — not built yet, roadmap in
 [`contract-development.md`](contract-development.md).
 
-## Documentation — `documentation.md`
+## Documentation
 
 Thin by design. The org documentation standard and its mechanical rules
 (DL000–DL011) live elsewhere and are **cited, never restated**:
