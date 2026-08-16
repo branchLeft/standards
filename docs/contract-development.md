@@ -9,8 +9,8 @@ documented, not that it was authored first — `CTR-1` is the ordering rule).
 The shape varies; the ordering does not.
 
 This is [`TEST-5`](testing.md)'s sibling for a different boundary. TDD orders
-*behaviour* against its test before the code that produces the behaviour;
-contract-driven development orders the *shape* of a boundary against the code
+_behaviour_ against its test before the code that produces the behaviour;
+contract-driven development orders the _shape_ of a boundary against the code
 that implements either side of it. A PR can and often should do both: contract
 first, then a failing test against that contract, then the implementation.
 

@@ -34,6 +34,12 @@ to resolve, and — in the direction nobody remembers to check — fails a
 `pending` clause that an artefact does name, so a rule cannot be implemented
 and left advertised as unimplemented.
 
+A family header optionally names its doc — `## Family` followed by an em
+dash and a backtick-quoted `path` — which promises `path` exists under
+`docs/`; `tools/check-clause-index.sh` checks it. A family with nothing
+beyond this table carries no path at all, just `## Family`, which is not a
+promise and is not checked.
+
 ## Meta
 
 | ID      | Rule                                                                                                          | Gate     | Encoded by                 |

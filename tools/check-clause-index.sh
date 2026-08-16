@@ -65,17 +65,38 @@ clause_is_named() {
   return 1
 }
 
-# A family header is `## Name — \`path\``, one per line, the path backtick-
-# quoted. A family with no doc beyond the index carries no em-dash suffix at
-# all (`## Meta`), which this does not match — only a header that names a path
-# is a promise the file exists.
-# shellcheck disable=SC2016  # the backticks are literal markdown, not shell expansions
-family_header_re='^## .+ — `[^`]+`$'
-
-# Extract PATH from each family header line, one per line.
+# A family header is `## Name — \`path\``, the path backtick-quoted right
+# after a hyphen, en dash or em dash separator — an editor's smart-dash
+# substitution or a plain typed hyphen must not silently exempt the header
+# from the check. A family with no doc beyond the index carries no separator
+# at all (`## Meta`), which this does not match. Fenced code blocks are
+# skipped so a header shown as an example in prose is not read as a promise.
+#
+# A header may name more than one path (`## Two — \`a.md\` and \`b.md\``);
+# every backtick-quoted span after the separator is extracted, not just the
+# last one, so none of them can go unchecked. Nothing after the final span —
+# trailing prose, trailing whitespace — is required to be empty.
 family_header_paths() {
-  # shellcheck disable=SC2016  # the backticks are literal markdown, not shell expansions
-  grep -E "$family_header_re" "$1" | sed -E 's/^## .+ `([^`]+)`$/\1/'
+  awk '
+    /^```/  { fenced = !fenced; next }
+    fenced  { next }
+    /^## /  {
+      line = $0
+      best = 0; seplen = 0
+      n = split("- – —", seps, " ")
+      for (i = 1; i <= n; i++) {
+        sep = " " seps[i] " `"
+        p = index(line, sep)
+        if (p > 0 && (best == 0 || p < best)) { best = p; seplen = length(sep) }
+      }
+      if (best == 0) next
+      rest = substr(line, best + seplen - 1)
+      while (match(rest, /`[^`]+`/)) {
+        print substr(rest, RSTART + 1, RLENGTH - 2)
+        rest = substr(rest, RSTART + RLENGTH)
+      }
+    }
+  ' "$1"
 }
 
 # `@branchleft/x` is the published name of packages/x; anything else is a path
@@ -147,7 +168,18 @@ check_index() {
   local path
   while IFS= read -r path; do
     [ -n "$path" ] || continue
-    [ -e "$docs/$path" ] || {
+    # A `..` segment can walk the path back out of docs/ entirely — check
+    # that before existence, so the error names the real defect instead of
+    # reporting a coincidental "does not exist" for a path that resolved
+    # somewhere else.
+    case "/$path/" in
+      */../*)
+        echo "::error::family header links to '$path', which escapes $docs"
+        rc=1
+        continue
+        ;;
+    esac
+    [ -f "$docs/$path" ] || {
       echo "::error::family header links to '$path', which does not exist under $docs"
       rc=1; }
   done < <(family_header_paths "$index")
@@ -356,6 +388,103 @@ EOF
     [ "$grc" -eq 1 ] || { echo "FAIL: dead family header exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
       || { echo "FAIL: dead family header not reported"; echo "$out"; exit 1; }
+
+    # A plain hyphen and an en dash are not the em dash used elsewhere in the
+    # index, but they are the same promise — an editor's smart-dash
+    # substitution or an ordinary typo must not exempt the header from the
+    # check.
+    write_index <<'EOF'
+# Clause index
+
+## Hyphen family - `family-missing.md`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: hyphen-separated dead header exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+      || { echo "FAIL: hyphen-separated dead header not reported"; echo "$out"; exit 1; }
+
+    write_index <<'EOF'
+# Clause index
+
+## En dash family – `family-missing.md`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: en-dash-separated dead header exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+      || { echo "FAIL: en-dash-separated dead header not reported"; echo "$out"; exit 1; }
+
+    # A header naming two files must not silently check only one of them.
+    write_index <<'EOF'
+# Clause index
+
+## Two files — `family-missing.md` and `family-ok.md`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: two-path header exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+      || { echo "FAIL: dead path in a two-path header not reported"; echo "$out"; exit 1; }
+
+    # A directory exists at that path but names nothing readable — `-e` would
+    # pass this, `-f` must not.
+    mkdir -p docs/a-directory
+    write_index <<'EOF'
+# Clause index
+
+## Directory family — `a-directory`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: directory family header exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "family header links to 'a-directory', which does not exist" \
+      || { echo "FAIL: directory family header not reported"; echo "$out"; exit 1; }
+    rm -rf docs/a-directory
+
+    # A `..` segment walks the path back out of docs/ — reported as an escape,
+    # not as a coincidental "does not exist".
+    write_index <<'EOF'
+# Clause index
+
+## Escaping family — `../README.md`
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: escaping family header exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "family header links to '../README.md', which escapes" \
+      || { echo "FAIL: escaping family header not reported as an escape"; echo "$out"; exit 1; }
+
+    # A header shown as a fenced example in prose is not a promise — it must
+    # not be read as one.
+    write_index <<'EOF'
+# Clause index
+
+```
+## Example family — `family-missing.md`
+```
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: fenced example header exited $grc"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?
