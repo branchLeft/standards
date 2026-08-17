@@ -9,7 +9,7 @@
       "source_file": "eslint.config.js",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 29,
+      "community": 30,
       "norm_label": "eslint.config.js",
       "id": "eslint_config"
     },
@@ -151,7 +151,7 @@
       "source_file": "packages/eslint-config/src/vendor.d.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 24,
+      "community": 25,
       "norm_label": "vendor.d.ts",
       "id": "packages_eslint_config_src_vendor_d"
     },
@@ -161,7 +161,7 @@
       "source_file": "packages/eslint-config/src/vendor.d.ts",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 24,
+      "community": 25,
       "norm_label": "eslint-plugin-jsx-a11y",
       "id": "packages_eslint_config_src_vendor_d_eslint_plugin_jsx_a11y"
     },
@@ -171,7 +171,7 @@
       "source_file": "packages/eslint-config/src/vendor.d.ts",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 24,
+      "community": 25,
       "norm_label": "eslint-plugin-react-hooks",
       "id": "packages_eslint_config_src_vendor_d_eslint_plugin_react_hooks"
     },
@@ -181,7 +181,7 @@
       "source_file": "packages/eslint-config/src/vendor.d.ts",
       "source_location": "L25",
       "_origin": "ast",
-      "community": 24,
+      "community": 25,
       "norm_label": "eslint-config-prettier",
       "id": "packages_eslint_config_src_vendor_d_eslint_config_prettier"
     },
@@ -1135,7 +1135,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 27,
+      "community": 28,
       "norm_label": "ruleset-apply.sh",
       "id": "tools_ruleset_apply"
     },
@@ -1149,7 +1149,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 27,
+      "community": 28,
       "norm_label": "ruleset-apply.sh script",
       "id": "tools_ruleset_apply_sh__entry"
     },
@@ -1159,7 +1159,7 @@
       "source_file": "tools/ruleset_normalize.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 26,
+      "community": 27,
       "norm_label": "ruleset_normalize.py",
       "id": "tools_ruleset_normalize"
     },
@@ -1170,7 +1170,7 @@
       "source_location": "L14",
       "_callable": true,
       "_origin": "ast",
-      "community": 26,
+      "community": 27,
       "norm_label": "canon_rule()",
       "id": "tools_ruleset_normalize_canon_rule"
     },
@@ -1181,7 +1181,7 @@
       "source_location": "L24",
       "_callable": true,
       "_origin": "ast",
-      "community": 26,
+      "community": 27,
       "norm_label": "canon()",
       "id": "tools_ruleset_normalize_canon"
     },
@@ -1503,7 +1503,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "check-workflows.sh",
       "id": "tools_check_workflows"
     },
@@ -1517,7 +1517,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "check-workflows.sh script",
       "id": "tools_check_workflows_sh__entry"
     },
@@ -1531,7 +1531,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "scan_workflow()",
       "id": "tools_check_workflows_scan_workflow"
     },
@@ -1545,7 +1545,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "main()",
       "id": "tools_check_workflows_main"
     },
@@ -1559,7 +1559,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "self_test()",
       "id": "tools_check_workflows_self_test"
     },
@@ -1756,7 +1756,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 28,
+      "community": 29,
       "norm_label": "ruleset-audit.sh",
       "id": "tools_ruleset_audit"
     },
@@ -1770,163 +1770,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 28,
+      "community": 29,
       "norm_label": "ruleset-audit.sh script",
       "id": "tools_ruleset_audit_sh__entry"
-    },
-    {
-      "label": "standards-audit.sh",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "standards-audit.sh",
-      "id": "tools_standards_audit"
-    },
-    {
-      "label": "standards-audit.sh script",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "standards-audit.sh script",
-      "id": "tools_standards_audit_sh__entry"
-    },
-    {
-      "label": "json_to_tsv()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L36",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "json_to_tsv()",
-      "id": "tools_standards_audit_json_to_tsv"
-    },
-    {
-      "label": "clause_is_covered()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L40",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "clause_is_covered()",
-      "id": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "label": "clauses_all_covered()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L47",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "clauses_all_covered()",
-      "id": "tools_standards_audit_clauses_all_covered"
-    },
-    {
-      "label": "audit_exemptions()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L60",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "audit_exemptions()",
-      "id": "tools_standards_audit_audit_exemptions"
-    },
-    {
-      "label": "grep_tracked()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L162",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "grep_tracked()",
-      "id": "tools_standards_audit_grep_tracked"
-    },
-    {
-      "label": "native_suppressions()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L169",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "native_suppressions()",
-      "id": "tools_standards_audit_native_suppressions"
-    },
-    {
-      "label": "render_table()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L177",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "render_table()",
-      "id": "tools_standards_audit_render_table"
-    },
-    {
-      "label": "main()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L194",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "main()",
-      "id": "tools_standards_audit_main"
-    },
-    {
-      "label": "self_test()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L256",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 14,
-      "norm_label": "self_test()",
-      "id": "tools_standards_audit_self_test"
     },
     {
       "label": "reactApp.test.ts",
@@ -2071,68 +1917,12 @@
       "id": "tsconfig_json_ref_dist"
     },
     {
-      "label": "run.sh",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 25,
-      "norm_label": "run.sh",
-      "id": "tools_tests_run"
-    },
-    {
-      "label": "run.sh script",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 25,
-      "norm_label": "run.sh script",
-      "id": "tools_tests_run_sh__entry"
-    },
-    {
-      "label": "run()",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L15",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 25,
-      "norm_label": "run()",
-      "id": "tools_tests_run_run"
-    },
-    {
-      "label": "workflow_runs_every_gate()",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L44",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 25,
-      "norm_label": "workflow_runs_every_gate()",
-      "id": "tools_tests_run_workflow_runs_every_gate"
-    },
-    {
       "label": "vitest.config.ts",
       "file_type": "code",
       "source_file": "vitest.config.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 30,
+      "community": 31,
       "norm_label": "vitest.config.ts",
       "id": "vitest_config"
     },
@@ -2692,7 +2482,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "check-tsconfig.sh",
       "id": "tools_check_tsconfig"
     },
@@ -2706,7 +2496,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "check-tsconfig.sh script",
       "id": "tools_check_tsconfig_sh__entry"
     },
@@ -2720,7 +2510,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "tier_rank()",
       "id": "tools_check_tsconfig_tier_rank"
     },
@@ -2734,7 +2524,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "analyse_tsconfig()",
       "id": "tools_check_tsconfig_analyse_tsconfig"
     },
@@ -2748,7 +2538,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "main()",
       "id": "tools_check_tsconfig_main"
     },
@@ -2762,7 +2552,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "check_ts5()",
       "id": "tools_check_tsconfig_check_ts5"
     },
@@ -2776,1009 +2566,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "self_test()",
       "id": "tools_check_tsconfig_self_test"
-    },
-    {
-      "label": "eslint-config/package.json",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "eslint-config/package.json",
-      "id": "packages_eslint_config_package"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "name",
-      "id": "packages_eslint_config_package_name"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "version",
-      "id": "packages_eslint_config_package_version"
-    },
-    {
-      "label": "description",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "description",
-      "id": "packages_eslint_config_package_description"
-    },
-    {
-      "label": "license",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "license",
-      "id": "packages_eslint_config_package_license"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "type",
-      "id": "packages_eslint_config_package_type"
-    },
-    {
-      "label": "main",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "main",
-      "id": "packages_eslint_config_package_main"
-    },
-    {
-      "label": "types",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "types",
-      "id": "packages_eslint_config_package_types"
-    },
-    {
-      "label": "scripts",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "scripts",
-      "id": "packages_eslint_config_package_scripts"
-    },
-    {
-      "label": "build",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L10",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "build",
-      "id": "packages_eslint_config_package_scripts_build"
-    },
-    {
-      "label": "prepublishOnly",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "prepublishonly",
-      "id": "packages_eslint_config_package_scripts_prepublishonly"
-    },
-    {
-      "label": "repository",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "repository",
-      "id": "packages_eslint_config_package_repository"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L14",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "type",
-      "id": "packages_eslint_config_package_repository_type"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "url",
-      "id": "packages_eslint_config_package_repository_url"
-    },
-    {
-      "label": "directory",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "directory",
-      "id": "packages_eslint_config_package_repository_directory"
-    },
-    {
-      "label": "publishConfig",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "publishconfig",
-      "id": "packages_eslint_config_package_publishconfig"
-    },
-    {
-      "label": "registry",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "registry",
-      "id": "packages_eslint_config_package_publishconfig_registry"
-    },
-    {
-      "label": "exports",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L21",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "exports",
-      "id": "packages_eslint_config_package_exports"
-    },
-    {
-      "label": "files",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L27",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "files",
-      "id": "packages_eslint_config_package_files"
-    },
-    {
-      "label": "dist",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L27",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "dist",
-      "id": "packages_eslint_config_package_json_ref_dist"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L31",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "dependencies",
-      "id": "packages_eslint_config_package_dependencies"
-    },
-    {
-      "label": "@eslint/js",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L32",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "@eslint/js",
-      "id": "packages_eslint_config_package_dependencies_eslint_js"
-    },
-    {
-      "label": "@eslint/js",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L32",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "@eslint/js",
-      "id": "eslint_js"
-    },
-    {
-      "label": "eslint-config-prettier",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L33",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "eslint-config-prettier",
-      "id": "packages_eslint_config_package_dependencies_eslint_config_prettier"
-    },
-    {
-      "label": "eslint-config-prettier",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L33",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "eslint-config-prettier",
-      "id": "eslint_config_prettier"
-    },
-    {
-      "label": "eslint-plugin-jsx-a11y",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L34",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "eslint-plugin-jsx-a11y",
-      "id": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y"
-    },
-    {
-      "label": "eslint-plugin-jsx-a11y",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L34",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "eslint-plugin-jsx-a11y",
-      "id": "eslint_plugin_jsx_a11y"
-    },
-    {
-      "label": "eslint-plugin-react-hooks",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L35",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "eslint-plugin-react-hooks",
-      "id": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks"
-    },
-    {
-      "label": "eslint-plugin-react-hooks",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L35",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "eslint-plugin-react-hooks",
-      "id": "eslint_plugin_react_hooks"
-    },
-    {
-      "label": "globals",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L36",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "globals",
-      "id": "packages_eslint_config_package_dependencies_globals"
-    },
-    {
-      "label": "globals",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L36",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "globals",
-      "id": "globals"
-    },
-    {
-      "label": "typescript-eslint",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L37",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "typescript-eslint",
-      "id": "packages_eslint_config_package_dependencies_typescript_eslint"
-    },
-    {
-      "label": "typescript-eslint",
-      "file_type": "concept",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L37",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "typescript-eslint",
-      "id": "typescript_eslint"
-    },
-    {
-      "label": "peerDependencies",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L39",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "peerdependencies",
-      "id": "packages_eslint_config_package_peerdependencies"
-    },
-    {
-      "label": "eslint",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L40",
-      "_origin": "ast",
-      "community": 4,
-      "norm_label": "eslint",
-      "id": "packages_eslint_config_package_peerdependencies_eslint"
-    },
-    {
-      "label": "devDependencies",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L42",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "devdependencies",
-      "id": "packages_eslint_config_package_devdependencies"
-    },
-    {
-      "label": "@branchleft/tsconfig",
-      "file_type": "code",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L43",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/tsconfig",
-      "id": "packages_eslint_config_package_devdependencies_branchleft_tsconfig"
-    },
-    {
-      "label": "prettier-config/package.json",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "prettier-config/package.json",
-      "id": "packages_prettier_config_package"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "name",
-      "id": "packages_prettier_config_package_name"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "version",
-      "id": "packages_prettier_config_package_version"
-    },
-    {
-      "label": "description",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "description",
-      "id": "packages_prettier_config_package_description"
-    },
-    {
-      "label": "license",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "license",
-      "id": "packages_prettier_config_package_license"
-    },
-    {
-      "label": "main",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "main",
-      "id": "packages_prettier_config_package_main"
-    },
-    {
-      "label": "repository",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "repository",
-      "id": "packages_prettier_config_package_repository"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "type",
-      "id": "packages_prettier_config_package_repository_type"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "url",
-      "id": "packages_prettier_config_package_repository_url"
-    },
-    {
-      "label": "directory",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L10",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "directory",
-      "id": "packages_prettier_config_package_repository_directory"
-    },
-    {
-      "label": "publishConfig",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L12",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "publishconfig",
-      "id": "packages_prettier_config_package_publishconfig"
-    },
-    {
-      "label": "registry",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "registry",
-      "id": "packages_prettier_config_package_publishconfig_registry"
-    },
-    {
-      "label": "exports",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "exports",
-      "id": "packages_prettier_config_package_exports"
-    },
-    {
-      "label": "./prettierignore",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "./prettierignore",
-      "id": "packages_prettier_config_package_exports_prettierignore"
-    },
-    {
-      "label": "files",
-      "file_type": "code",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "files",
-      "id": "packages_prettier_config_package_files"
-    },
-    {
-      "label": "index.json",
-      "file_type": "concept",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "index.json",
-      "id": "ref_index_json"
-    },
-    {
-      "label": "prettierignore",
-      "file_type": "concept",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "prettierignore",
-      "id": "ref_prettierignore"
-    },
-    {
-      "label": "tsconfig/package.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "tsconfig/package.json",
-      "id": "packages_tsconfig_package"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "name",
-      "id": "packages_tsconfig_package_name"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "version",
-      "id": "packages_tsconfig_package_version"
-    },
-    {
-      "label": "description",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "description",
-      "id": "packages_tsconfig_package_description"
-    },
-    {
-      "label": "license",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "license",
-      "id": "packages_tsconfig_package_license"
-    },
-    {
-      "label": "repository",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "repository",
-      "id": "packages_tsconfig_package_repository"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "type",
-      "id": "packages_tsconfig_package_repository_type"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "url",
-      "id": "packages_tsconfig_package_repository_url"
-    },
-    {
-      "label": "directory",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "directory",
-      "id": "packages_tsconfig_package_repository_directory"
-    },
-    {
-      "label": "publishConfig",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "publishconfig",
-      "id": "packages_tsconfig_package_publishconfig"
-    },
-    {
-      "label": "registry",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L12",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "registry",
-      "id": "packages_tsconfig_package_publishconfig_registry"
-    },
-    {
-      "label": "exports",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L14",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "exports",
-      "id": "packages_tsconfig_package_exports"
-    },
-    {
-      "label": "./base.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "./base.json",
-      "id": "packages_tsconfig_package_exports_base_json"
-    },
-    {
-      "label": "./strict-1.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "./strict-1.json",
-      "id": "packages_tsconfig_package_exports_strict_1_json"
-    },
-    {
-      "label": "./strict-2.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "./strict-2.json",
-      "id": "packages_tsconfig_package_exports_strict_2_json"
-    },
-    {
-      "label": "./pulumi.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "./pulumi.json",
-      "id": "packages_tsconfig_package_exports_pulumi_json"
-    },
-    {
-      "label": "./react-app.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "./react-app.json",
-      "id": "packages_tsconfig_package_exports_react_app_json"
-    },
-    {
-      "label": "./react-lib.json",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L20",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "./react-lib.json",
-      "id": "packages_tsconfig_package_exports_react_lib_json"
-    },
-    {
-      "label": "files",
-      "file_type": "code",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L22",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "files",
-      "id": "packages_tsconfig_package_files"
-    },
-    {
-      "label": "*.json",
-      "file_type": "concept",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L22",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "*.json",
-      "id": "ref_json"
-    },
-    {
-      "label": "README.md",
-      "file_type": "concept",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L22",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "readme.md",
-      "id": "packages_tsconfig_package_json_ref_readme_md"
-    },
-    {
-      "label": "vitest-config/package.json",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "vitest-config/package.json",
-      "id": "packages_vitest_config_package"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "name",
-      "id": "packages_vitest_config_package_name"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "version",
-      "id": "packages_vitest_config_package_version"
-    },
-    {
-      "label": "description",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "description",
-      "id": "packages_vitest_config_package_description"
-    },
-    {
-      "label": "license",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "license",
-      "id": "packages_vitest_config_package_license"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "type",
-      "id": "packages_vitest_config_package_type"
-    },
-    {
-      "label": "main",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "main",
-      "id": "packages_vitest_config_package_main"
-    },
-    {
-      "label": "types",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "types",
-      "id": "packages_vitest_config_package_types"
-    },
-    {
-      "label": "scripts",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "scripts",
-      "id": "packages_vitest_config_package_scripts"
-    },
-    {
-      "label": "build",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L10",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "build",
-      "id": "packages_vitest_config_package_scripts_build"
-    },
-    {
-      "label": "prepublishOnly",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "prepublishonly",
-      "id": "packages_vitest_config_package_scripts_prepublishonly"
-    },
-    {
-      "label": "repository",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "repository",
-      "id": "packages_vitest_config_package_repository"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L14",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "type",
-      "id": "packages_vitest_config_package_repository_type"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "url",
-      "id": "packages_vitest_config_package_repository_url"
-    },
-    {
-      "label": "directory",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "directory",
-      "id": "packages_vitest_config_package_repository_directory"
-    },
-    {
-      "label": "publishConfig",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "publishconfig",
-      "id": "packages_vitest_config_package_publishconfig"
-    },
-    {
-      "label": "registry",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "registry",
-      "id": "packages_vitest_config_package_publishconfig_registry"
-    },
-    {
-      "label": "exports",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L21",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "exports",
-      "id": "packages_vitest_config_package_exports"
-    },
-    {
-      "label": "files",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L27",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "files",
-      "id": "packages_vitest_config_package_files"
-    },
-    {
-      "label": "dist",
-      "file_type": "concept",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L27",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "dist",
-      "id": "packages_vitest_config_package_json_ref_dist"
-    },
-    {
-      "label": "peerDependencies",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L31",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "peerdependencies",
-      "id": "packages_vitest_config_package_peerdependencies"
-    },
-    {
-      "label": "@vitest/coverage-v8",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L32",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@vitest/coverage-v8",
-      "id": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8"
-    },
-    {
-      "label": "vitest",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L33",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "vitest",
-      "id": "packages_vitest_config_package_peerdependencies_vitest"
-    },
-    {
-      "label": "devDependencies",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L35",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "devdependencies",
-      "id": "packages_vitest_config_package_devdependencies"
-    },
-    {
-      "label": "@branchleft/tsconfig",
-      "file_type": "code",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L36",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/tsconfig",
-      "id": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
     },
     {
       "label": "check-clause-index.sh",
@@ -3919,6 +2709,1314 @@
       "community": 18,
       "norm_label": "gate()",
       "id": "tools_check_clause_index_gate"
+    },
+    {
+      "label": "check-pulumi-secrets.sh",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "check-pulumi-secrets.sh",
+      "id": "tools_check_pulumi_secrets"
+    },
+    {
+      "label": "check-pulumi-secrets.sh script",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "check-pulumi-secrets.sh script",
+      "id": "tools_check_pulumi_secrets_sh__entry"
+    },
+    {
+      "label": "strip_bom()",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L44",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "strip_bom()",
+      "id": "tools_check_pulumi_secrets_strip_bom"
+    },
+    {
+      "label": "pul12_finding()",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L59",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "pul12_finding()",
+      "id": "tools_check_pulumi_secrets_pul12_finding"
+    },
+    {
+      "label": "scan_stack_config()",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L69",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "scan_stack_config()",
+      "id": "tools_check_pulumi_secrets_scan_stack_config"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L84",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "main()",
+      "id": "tools_check_pulumi_secrets_main"
+    },
+    {
+      "label": "self_test()",
+      "file_type": "code",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L94",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 22,
+      "norm_label": "self_test()",
+      "id": "tools_check_pulumi_secrets_self_test"
+    },
+    {
+      "label": "standards-audit.sh",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "standards-audit.sh",
+      "id": "tools_standards_audit"
+    },
+    {
+      "label": "standards-audit.sh script",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "standards-audit.sh script",
+      "id": "tools_standards_audit_sh__entry"
+    },
+    {
+      "label": "json_to_tsv()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L36",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "json_to_tsv()",
+      "id": "tools_standards_audit_json_to_tsv"
+    },
+    {
+      "label": "clause_is_covered()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L40",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "clause_is_covered()",
+      "id": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "label": "clauses_all_covered()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L47",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "clauses_all_covered()",
+      "id": "tools_standards_audit_clauses_all_covered"
+    },
+    {
+      "label": "audit_exemptions()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L60",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "audit_exemptions()",
+      "id": "tools_standards_audit_audit_exemptions"
+    },
+    {
+      "label": "grep_tracked()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L162",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "grep_tracked()",
+      "id": "tools_standards_audit_grep_tracked"
+    },
+    {
+      "label": "native_suppressions()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L169",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "native_suppressions()",
+      "id": "tools_standards_audit_native_suppressions"
+    },
+    {
+      "label": "render_table()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L177",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "render_table()",
+      "id": "tools_standards_audit_render_table"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L194",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "main()",
+      "id": "tools_standards_audit_main"
+    },
+    {
+      "label": "self_test()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L256",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 14,
+      "norm_label": "self_test()",
+      "id": "tools_standards_audit_self_test"
+    },
+    {
+      "label": "run.sh",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "run.sh",
+      "id": "tools_tests_run"
+    },
+    {
+      "label": "run.sh script",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "run.sh script",
+      "id": "tools_tests_run_sh__entry"
+    },
+    {
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L15",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "run()",
+      "id": "tools_tests_run_run"
+    },
+    {
+      "label": "workflow_runs_every_gate()",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L45",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "workflow_runs_every_gate()",
+      "id": "tools_tests_run_workflow_runs_every_gate"
+    },
+    {
+      "label": "eslint-config/package.json",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package",
+      "community": 4,
+      "norm_label": "eslint-config/package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_name",
+      "community": 4,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_version",
+      "community": 4,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_description",
+      "community": 4,
+      "norm_label": "description"
+    },
+    {
+      "label": "license",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_license",
+      "community": 4,
+      "norm_label": "license"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_type",
+      "community": 4,
+      "norm_label": "type"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_main",
+      "community": 4,
+      "norm_label": "main"
+    },
+    {
+      "label": "types",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_types",
+      "community": 4,
+      "norm_label": "types"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_scripts",
+      "community": 4,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "build",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_scripts_build",
+      "community": 4,
+      "norm_label": "build"
+    },
+    {
+      "label": "prepublishOnly",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_scripts_prepublishonly",
+      "community": 4,
+      "norm_label": "prepublishonly"
+    },
+    {
+      "label": "repository",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_repository",
+      "community": 4,
+      "norm_label": "repository"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_repository_type",
+      "community": 4,
+      "norm_label": "type"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_repository_url",
+      "community": 4,
+      "norm_label": "url"
+    },
+    {
+      "label": "directory",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_repository_directory",
+      "community": 4,
+      "norm_label": "directory"
+    },
+    {
+      "label": "publishConfig",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_publishconfig",
+      "community": 4,
+      "norm_label": "publishconfig"
+    },
+    {
+      "label": "registry",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_publishconfig_registry",
+      "community": 4,
+      "norm_label": "registry"
+    },
+    {
+      "label": "exports",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_exports",
+      "community": 4,
+      "norm_label": "exports"
+    },
+    {
+      "label": "files",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_files",
+      "community": 2,
+      "norm_label": "files"
+    },
+    {
+      "label": "dist",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_json_ref_dist",
+      "community": 2,
+      "norm_label": "dist"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies",
+      "community": 11,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "@eslint/js",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies_eslint_js",
+      "community": 11,
+      "norm_label": "@eslint/js"
+    },
+    {
+      "label": "@eslint/js",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "eslint_js",
+      "community": 11,
+      "norm_label": "@eslint/js"
+    },
+    {
+      "label": "eslint-config-prettier",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies_eslint_config_prettier",
+      "community": 11,
+      "norm_label": "eslint-config-prettier"
+    },
+    {
+      "label": "eslint-config-prettier",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "eslint_config_prettier",
+      "community": 11,
+      "norm_label": "eslint-config-prettier"
+    },
+    {
+      "label": "eslint-plugin-jsx-a11y",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
+      "community": 11,
+      "norm_label": "eslint-plugin-jsx-a11y"
+    },
+    {
+      "label": "eslint-plugin-jsx-a11y",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "eslint_plugin_jsx_a11y",
+      "community": 11,
+      "norm_label": "eslint-plugin-jsx-a11y"
+    },
+    {
+      "label": "eslint-plugin-react-hooks",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
+      "community": 11,
+      "norm_label": "eslint-plugin-react-hooks"
+    },
+    {
+      "label": "eslint-plugin-react-hooks",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "eslint_plugin_react_hooks",
+      "community": 11,
+      "norm_label": "eslint-plugin-react-hooks"
+    },
+    {
+      "label": "globals",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies_globals",
+      "community": 11,
+      "norm_label": "globals"
+    },
+    {
+      "label": "globals",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "globals",
+      "community": 11,
+      "norm_label": "globals"
+    },
+    {
+      "label": "typescript-eslint",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_dependencies_typescript_eslint",
+      "community": 11,
+      "norm_label": "typescript-eslint"
+    },
+    {
+      "label": "typescript-eslint",
+      "file_type": "concept",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "typescript_eslint",
+      "community": 11,
+      "norm_label": "typescript-eslint"
+    },
+    {
+      "label": "peerDependencies",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_peerdependencies",
+      "community": 4,
+      "norm_label": "peerdependencies"
+    },
+    {
+      "label": "eslint",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_peerdependencies_eslint",
+      "community": 4,
+      "norm_label": "eslint"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_devdependencies",
+      "community": 1,
+      "norm_label": "devdependencies"
+    },
+    {
+      "label": "@branchleft/tsconfig",
+      "file_type": "code",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
+      "community": 1,
+      "norm_label": "@branchleft/tsconfig"
+    },
+    {
+      "label": "prettier-config/package.json",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package",
+      "community": 2,
+      "norm_label": "prettier-config/package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_name",
+      "community": 2,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_version",
+      "community": 2,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_description",
+      "community": 2,
+      "norm_label": "description"
+    },
+    {
+      "label": "license",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_license",
+      "community": 2,
+      "norm_label": "license"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_main",
+      "community": 2,
+      "norm_label": "main"
+    },
+    {
+      "label": "repository",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_repository",
+      "community": 2,
+      "norm_label": "repository"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_repository_type",
+      "community": 2,
+      "norm_label": "type"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_repository_url",
+      "community": 2,
+      "norm_label": "url"
+    },
+    {
+      "label": "directory",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_repository_directory",
+      "community": 2,
+      "norm_label": "directory"
+    },
+    {
+      "label": "publishConfig",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_publishconfig",
+      "community": 2,
+      "norm_label": "publishconfig"
+    },
+    {
+      "label": "registry",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_publishconfig_registry",
+      "community": 2,
+      "norm_label": "registry"
+    },
+    {
+      "label": "exports",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_exports",
+      "community": 2,
+      "norm_label": "exports"
+    },
+    {
+      "label": "./prettierignore",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_exports_prettierignore",
+      "community": 2,
+      "norm_label": "./prettierignore"
+    },
+    {
+      "label": "files",
+      "file_type": "code",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "packages_prettier_config_package_files",
+      "community": 2,
+      "norm_label": "files"
+    },
+    {
+      "label": "index.json",
+      "file_type": "concept",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "ref_index_json",
+      "community": 2,
+      "norm_label": "index.json"
+    },
+    {
+      "label": "prettierignore",
+      "file_type": "concept",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "ref_prettierignore",
+      "community": 2,
+      "norm_label": "prettierignore"
+    },
+    {
+      "label": "tsconfig/package.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package",
+      "community": 7,
+      "norm_label": "tsconfig/package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_name",
+      "community": 7,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_version",
+      "community": 7,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_description",
+      "community": 7,
+      "norm_label": "description"
+    },
+    {
+      "label": "license",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_license",
+      "community": 7,
+      "norm_label": "license"
+    },
+    {
+      "label": "repository",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_repository",
+      "community": 7,
+      "norm_label": "repository"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_repository_type",
+      "community": 7,
+      "norm_label": "type"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_repository_url",
+      "community": 7,
+      "norm_label": "url"
+    },
+    {
+      "label": "directory",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_repository_directory",
+      "community": 7,
+      "norm_label": "directory"
+    },
+    {
+      "label": "publishConfig",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_publishconfig",
+      "community": 7,
+      "norm_label": "publishconfig"
+    },
+    {
+      "label": "registry",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_publishconfig_registry",
+      "community": 7,
+      "norm_label": "registry"
+    },
+    {
+      "label": "exports",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports",
+      "community": 7,
+      "norm_label": "exports"
+    },
+    {
+      "label": "./base.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports_base_json",
+      "community": 7,
+      "norm_label": "./base.json"
+    },
+    {
+      "label": "./strict-1.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports_strict_1_json",
+      "community": 7,
+      "norm_label": "./strict-1.json"
+    },
+    {
+      "label": "./strict-2.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports_strict_2_json",
+      "community": 7,
+      "norm_label": "./strict-2.json"
+    },
+    {
+      "label": "./pulumi.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports_pulumi_json",
+      "community": 7,
+      "norm_label": "./pulumi.json"
+    },
+    {
+      "label": "./react-app.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports_react_app_json",
+      "community": 7,
+      "norm_label": "./react-app.json"
+    },
+    {
+      "label": "./react-lib.json",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_exports_react_lib_json",
+      "community": 7,
+      "norm_label": "./react-lib.json"
+    },
+    {
+      "label": "files",
+      "file_type": "code",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_files",
+      "community": 2,
+      "norm_label": "files"
+    },
+    {
+      "label": "*.json",
+      "file_type": "concept",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "ref_json",
+      "community": 2,
+      "norm_label": "*.json"
+    },
+    {
+      "label": "README.md",
+      "file_type": "concept",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "packages_tsconfig_package_json_ref_readme_md",
+      "community": 2,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "vitest-config/package.json",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package",
+      "community": 1,
+      "norm_label": "vitest-config/package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_name",
+      "community": 1,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_version",
+      "community": 1,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_description",
+      "community": 1,
+      "norm_label": "description"
+    },
+    {
+      "label": "license",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_license",
+      "community": 1,
+      "norm_label": "license"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_type",
+      "community": 1,
+      "norm_label": "type"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_main",
+      "community": 1,
+      "norm_label": "main"
+    },
+    {
+      "label": "types",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_types",
+      "community": 1,
+      "norm_label": "types"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_scripts",
+      "community": 1,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "build",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_scripts_build",
+      "community": 1,
+      "norm_label": "build"
+    },
+    {
+      "label": "prepublishOnly",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_scripts_prepublishonly",
+      "community": 1,
+      "norm_label": "prepublishonly"
+    },
+    {
+      "label": "repository",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_repository",
+      "community": 1,
+      "norm_label": "repository"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_repository_type",
+      "community": 1,
+      "norm_label": "type"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_repository_url",
+      "community": 1,
+      "norm_label": "url"
+    },
+    {
+      "label": "directory",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_repository_directory",
+      "community": 1,
+      "norm_label": "directory"
+    },
+    {
+      "label": "publishConfig",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_publishconfig",
+      "community": 1,
+      "norm_label": "publishconfig"
+    },
+    {
+      "label": "registry",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_publishconfig_registry",
+      "community": 1,
+      "norm_label": "registry"
+    },
+    {
+      "label": "exports",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_exports",
+      "community": 1,
+      "norm_label": "exports"
+    },
+    {
+      "label": "files",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_files",
+      "community": 2,
+      "norm_label": "files"
+    },
+    {
+      "label": "dist",
+      "file_type": "concept",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_json_ref_dist",
+      "community": 2,
+      "norm_label": "dist"
+    },
+    {
+      "label": "peerDependencies",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_peerdependencies",
+      "community": 6,
+      "norm_label": "peerdependencies"
+    },
+    {
+      "label": "@vitest/coverage-v8",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
+      "community": 6,
+      "norm_label": "@vitest/coverage-v8"
+    },
+    {
+      "label": "vitest",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_peerdependencies_vitest",
+      "community": 6,
+      "norm_label": "vitest"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_devdependencies",
+      "community": 1,
+      "norm_label": "devdependencies"
+    },
+    {
+      "label": "@branchleft/tsconfig",
+      "file_type": "code",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
+      "community": 1,
+      "norm_label": "@branchleft/tsconfig"
     }
   ],
   "links": [
@@ -5582,6 +5680,18 @@
     {
       "relation": "imports_from",
       "confidence": "INFERRED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L36",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "confidence_score": 0.5,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_lib_ratchet"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "INFERRED",
       "source_file": "tools/check-tsconfig.sh",
       "source_location": "L15",
       "weight": 1.0,
@@ -6248,224 +6358,6 @@
       "target": "tools_ruleset_audit_sh__entry"
     },
     {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L60",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_audit_exemptions"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L40",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L47",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_clauses_all_covered"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L162",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_grep_tracked"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L36",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_json_to_tsv"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L194",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_main"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L169",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_native_suppressions"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L177",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_render_table"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L256",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_self_test"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_sh__entry"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L368",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_sh__entry",
-      "target": "tools_standards_audit_main"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L367",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_sh__entry",
-      "target": "tools_standards_audit_self_test"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L221",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_json_to_tsv"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L137",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_audit_exemptions",
-      "target": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L52",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_clauses_all_covered",
-      "target": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L93",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_audit_exemptions",
-      "target": "tools_standards_audit_clauses_all_covered"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L224",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_audit_exemptions"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L225",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_native_suppressions"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L235",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_render_table"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/eslint-config/src/reactApp.test.ts",
@@ -6593,51 +6485,6 @@
       "target": "tsconfig_json_ref_dist"
     },
     {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run",
-      "target": "tools_tests_run_run"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run",
-      "target": "tools_tests_run_sh__entry"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L44",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run",
-      "target": "tools_tests_run_workflow_runs_every_gate"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L26",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run_sh__entry",
-      "target": "tools_tests_run_run"
-    },
-    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -6703,9 +6550,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
-      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
-      "target": "vitest_coverage_v8"
+      "target": "vitest_coverage_v8",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6727,9 +6574,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
-      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_peerdependencies_vitest",
-      "target": "vitest"
+      "target": "vitest",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6751,9 +6598,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
-      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig"
+      "target": "branchleft_tsconfig",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6763,9 +6610,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
-      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig"
+      "target": "branchleft_tsconfig",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7265,9 +7112,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
-      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_peerdependencies_eslint",
-      "target": "eslint"
+      "target": "eslint",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7394,1110 +7241,6 @@
       "confidence_score": 1.0,
       "source": "tools_check_tsconfig_main",
       "target": "tools_check_tsconfig_check_ts5"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L31",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_dependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_description"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L42",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_devdependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L21",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_exports"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L27",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_files"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_license"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_main"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_name"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L39",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_peerdependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L18",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_publishconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L13",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_repository"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_scripts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_types"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_version"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_scripts",
-      "target": "packages_eslint_config_package_scripts_build"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_scripts",
-      "target": "packages_eslint_config_package_scripts_prepublishonly"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_repository",
-      "target": "packages_eslint_config_package_repository_directory"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L14",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_repository",
-      "target": "packages_eslint_config_package_repository_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_repository",
-      "target": "packages_eslint_config_package_repository_url"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_publishconfig",
-      "target": "packages_eslint_config_package_publishconfig_registry"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L27",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_files",
-      "target": "packages_eslint_config_package_json_ref_dist"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L27",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L33",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_config_prettier"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L32",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_js"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L34",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L35",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L36",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_globals"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L37",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_typescript_eslint"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L32",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies_eslint_js",
-      "target": "eslint_js"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L33",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies_eslint_config_prettier",
-      "target": "eslint_config_prettier"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L34",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
-      "target": "eslint_plugin_jsx_a11y"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L35",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
-      "target": "eslint_plugin_react_hooks"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L36",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies_globals",
-      "target": "globals"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L37",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_dependencies_typescript_eslint",
-      "target": "typescript_eslint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L40",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_peerdependencies",
-      "target": "packages_eslint_config_package_peerdependencies_eslint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/eslint-config/package.json",
-      "source_location": "L43",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_eslint_config_package_devdependencies",
-      "target": "packages_eslint_config_package_devdependencies_branchleft_tsconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_description"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_exports"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_files"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_license"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_main"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_name"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L12",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_publishconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_repository"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_version"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_repository",
-      "target": "packages_prettier_config_package_repository_directory"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_repository",
-      "target": "packages_prettier_config_package_repository_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_repository",
-      "target": "packages_prettier_config_package_repository_url"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L13",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_publishconfig",
-      "target": "packages_prettier_config_package_publishconfig_registry"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L17",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_exports",
-      "target": "packages_prettier_config_package_exports_prettierignore"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_files",
-      "target": "ref_index_json"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/prettier-config/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_prettier_config_package_files",
-      "target": "ref_prettierignore"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_description"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L14",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_exports"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L22",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_files"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_license"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_name"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_publishconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_repository"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_version"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_repository",
-      "target": "packages_tsconfig_package_repository_directory"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_repository",
-      "target": "packages_tsconfig_package_repository_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_repository",
-      "target": "packages_tsconfig_package_repository_url"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L12",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_publishconfig",
-      "target": "packages_tsconfig_package_publishconfig_registry"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_base_json"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L18",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_pulumi_json"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_react_app_json"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L20",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_react_lib_json"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_strict_1_json"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L17",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_strict_2_json"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L22",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/tsconfig/package.json",
-      "source_location": "L22",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_tsconfig_package_files",
-      "target": "ref_json"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L27",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_description"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L35",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_devdependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L21",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_exports"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L27",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_files"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_license"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_main"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_name"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L31",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_peerdependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L18",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_publishconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L13",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_repository"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_scripts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_types"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_version"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_scripts",
-      "target": "packages_vitest_config_package_scripts_build"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_scripts",
-      "target": "packages_vitest_config_package_scripts_prepublishonly"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_repository",
-      "target": "packages_vitest_config_package_repository_directory"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L14",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_repository",
-      "target": "packages_vitest_config_package_repository_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_repository",
-      "target": "packages_vitest_config_package_repository_url"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_publishconfig",
-      "target": "packages_vitest_config_package_publishconfig_registry"
-    },
-    {
-      "relation": "extends",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L27",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_files",
-      "target": "packages_vitest_config_package_json_ref_dist"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L33",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_peerdependencies",
-      "target": "packages_vitest_config_package_peerdependencies_vitest"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L32",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_peerdependencies",
-      "target": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "packages/vitest-config/package.json",
-      "source_location": "L36",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "packages_vitest_config_package_devdependencies",
-      "target": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
     },
     {
       "relation": "defines",
@@ -8647,8 +7390,1489 @@
       "confidence_score": 1.0,
       "source": "tools_check_clause_index_self_test",
       "target": "tools_check_clause_index_write_index"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_check_pulumi_secrets_main"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_check_pulumi_secrets_pul12_finding"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_check_pulumi_secrets_scan_stack_config"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_check_pulumi_secrets_self_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_check_pulumi_secrets_sh__entry"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets",
+      "target": "tools_check_pulumi_secrets_strip_bom"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L276",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets_sh__entry",
+      "target": "tools_check_pulumi_secrets_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L275",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets_sh__entry",
+      "target": "tools_check_pulumi_secrets_self_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L79",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets_scan_stack_config",
+      "target": "tools_check_pulumi_secrets_pul12_finding"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-pulumi-secrets.sh",
+      "source_location": "L89",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_pulumi_secrets_main",
+      "target": "tools_check_pulumi_secrets_scan_stack_config"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_audit_exemptions"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_clauses_all_covered"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L162",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_grep_tracked"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_json_to_tsv"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L194",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_main"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L169",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_native_suppressions"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_render_table"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L256",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_self_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_sh__entry"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L368",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_sh__entry",
+      "target": "tools_standards_audit_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L367",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_sh__entry",
+      "target": "tools_standards_audit_self_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L221",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_json_to_tsv"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L137",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_audit_exemptions",
+      "target": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L52",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_clauses_all_covered",
+      "target": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L93",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_audit_exemptions",
+      "target": "tools_standards_audit_clauses_all_covered"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L224",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_audit_exemptions"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L225",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_native_suppressions"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L235",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_render_table"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_tests_run",
+      "target": "tools_tests_run_run"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_tests_run",
+      "target": "tools_tests_run_sh__entry"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_tests_run",
+      "target": "tools_tests_run_workflow_runs_every_gate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L26",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_tests_run_sh__entry",
+      "target": "tools_tests_run_run"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_devdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_exports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_files",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_license",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_peerdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_publishconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_repository",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package",
+      "target": "packages_eslint_config_package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_scripts",
+      "target": "packages_eslint_config_package_scripts_build",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_scripts",
+      "target": "packages_eslint_config_package_scripts_prepublishonly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_repository",
+      "target": "packages_eslint_config_package_repository_directory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_repository",
+      "target": "packages_eslint_config_package_repository_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_repository",
+      "target": "packages_eslint_config_package_repository_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_publishconfig",
+      "target": "packages_eslint_config_package_publishconfig_registry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_files",
+      "target": "packages_eslint_config_package_json_ref_dist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_files",
+      "target": "packages_tsconfig_package_json_ref_readme_md",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies",
+      "target": "packages_eslint_config_package_dependencies_eslint_config_prettier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies",
+      "target": "packages_eslint_config_package_dependencies_eslint_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies",
+      "target": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies",
+      "target": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies",
+      "target": "packages_eslint_config_package_dependencies_globals",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies",
+      "target": "packages_eslint_config_package_dependencies_typescript_eslint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L32",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies_eslint_js",
+      "target": "eslint_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L33",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies_eslint_config_prettier",
+      "target": "eslint_config_prettier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L34",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
+      "target": "eslint_plugin_jsx_a11y",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L35",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
+      "target": "eslint_plugin_react_hooks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies_globals",
+      "target": "globals",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L37",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_dependencies_typescript_eslint",
+      "target": "typescript_eslint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_peerdependencies",
+      "target": "packages_eslint_config_package_peerdependencies_eslint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/eslint-config/package.json",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_eslint_config_package_devdependencies",
+      "target": "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_exports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_files",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_license",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_publishconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_repository",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package",
+      "target": "packages_prettier_config_package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_repository",
+      "target": "packages_prettier_config_package_repository_directory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_repository",
+      "target": "packages_prettier_config_package_repository_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_repository",
+      "target": "packages_prettier_config_package_repository_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_publishconfig",
+      "target": "packages_prettier_config_package_publishconfig_registry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_exports",
+      "target": "packages_prettier_config_package_exports_prettierignore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_files",
+      "target": "packages_tsconfig_package_json_ref_readme_md",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_files",
+      "target": "ref_index_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/prettier-config/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_prettier_config_package_files",
+      "target": "ref_prettierignore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_exports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_files",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_license",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_publishconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_repository",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package",
+      "target": "packages_tsconfig_package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_repository",
+      "target": "packages_tsconfig_package_repository_directory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_repository",
+      "target": "packages_tsconfig_package_repository_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_repository",
+      "target": "packages_tsconfig_package_repository_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_publishconfig",
+      "target": "packages_tsconfig_package_publishconfig_registry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_exports",
+      "target": "packages_tsconfig_package_exports_base_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_exports",
+      "target": "packages_tsconfig_package_exports_pulumi_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_exports",
+      "target": "packages_tsconfig_package_exports_react_app_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_exports",
+      "target": "packages_tsconfig_package_exports_react_lib_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_exports",
+      "target": "packages_tsconfig_package_exports_strict_1_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_exports",
+      "target": "packages_tsconfig_package_exports_strict_2_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L22",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_files",
+      "target": "packages_tsconfig_package_json_ref_readme_md",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/tsconfig/package.json",
+      "source_location": "L22",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_tsconfig_package_files",
+      "target": "ref_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_files",
+      "target": "packages_tsconfig_package_json_ref_readme_md",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_devdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_exports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_files",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_license",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_peerdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_publishconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_repository",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package",
+      "target": "packages_vitest_config_package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_scripts",
+      "target": "packages_vitest_config_package_scripts_build",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_scripts",
+      "target": "packages_vitest_config_package_scripts_prepublishonly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_repository",
+      "target": "packages_vitest_config_package_repository_directory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_repository",
+      "target": "packages_vitest_config_package_repository_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_repository",
+      "target": "packages_vitest_config_package_repository_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_publishconfig",
+      "target": "packages_vitest_config_package_publishconfig_registry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_files",
+      "target": "packages_vitest_config_package_json_ref_dist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_peerdependencies",
+      "target": "packages_vitest_config_package_peerdependencies_vitest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_peerdependencies",
+      "target": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/vitest-config/package.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "packages_vitest_config_package_devdependencies",
+      "target": "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b36621f812ce25acb94a397de217d4a468c88e3d"
+  "built_at_commit": "24fce99620d65faa3077d77e48374383bd7f7de2"
 }

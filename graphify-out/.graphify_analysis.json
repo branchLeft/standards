@@ -377,6 +377,15 @@
       "packages_vitest_config_src_index_testenvironment"
     ],
     "22": [
+      "tools_check_pulumi_secrets",
+      "tools_check_pulumi_secrets_main",
+      "tools_check_pulumi_secrets_pul12_finding",
+      "tools_check_pulumi_secrets_scan_stack_config",
+      "tools_check_pulumi_secrets_self_test",
+      "tools_check_pulumi_secrets_sh__entry",
+      "tools_check_pulumi_secrets_strip_bom"
+    ],
+    "23": [
       "tools_check_tsconfig",
       "tools_check_tsconfig_analyse_tsconfig",
       "tools_check_tsconfig_check_ts5",
@@ -385,42 +394,42 @@
       "tools_check_tsconfig_sh__entry",
       "tools_check_tsconfig_tier_rank"
     ],
-    "23": [
+    "24": [
       "tools_check_workflows",
       "tools_check_workflows_main",
       "tools_check_workflows_scan_workflow",
       "tools_check_workflows_self_test",
       "tools_check_workflows_sh__entry"
     ],
-    "24": [
+    "25": [
       "packages_eslint_config_src_vendor_d",
       "packages_eslint_config_src_vendor_d_eslint_config_prettier",
       "packages_eslint_config_src_vendor_d_eslint_plugin_jsx_a11y",
       "packages_eslint_config_src_vendor_d_eslint_plugin_react_hooks"
     ],
-    "25": [
+    "26": [
       "tools_tests_run",
       "tools_tests_run_run",
       "tools_tests_run_sh__entry",
       "tools_tests_run_workflow_runs_every_gate"
     ],
-    "26": [
+    "27": [
       "tools_ruleset_normalize",
       "tools_ruleset_normalize_canon",
       "tools_ruleset_normalize_canon_rule"
     ],
-    "27": [
+    "28": [
       "tools_ruleset_apply",
       "tools_ruleset_apply_sh__entry"
     ],
-    "28": [
+    "29": [
       "tools_ruleset_audit",
       "tools_ruleset_audit_sh__entry"
     ],
-    "29": [
+    "30": [
       "eslint_config"
     ],
-    "30": [
+    "31": [
       "vitest_config"
     ]
   },
@@ -447,15 +456,16 @@
     "19": 0.3333333333333333,
     "20": 0.2222222222222222,
     "21": 0.2857142857142857,
-    "22": 0.42857142857142855,
-    "23": 0.7,
-    "24": 0.5,
-    "25": 0.6666666666666666,
-    "26": 1.0,
+    "22": 0.47619047619047616,
+    "23": 0.42857142857142855,
+    "24": 0.7,
+    "25": 0.5,
+    "26": 0.6666666666666666,
     "27": 1.0,
     "28": 1.0,
     "29": 1.0,
-    "30": 1.0
+    "30": 1.0,
+    "31": 1.0
   },
   "gods": [
     {
