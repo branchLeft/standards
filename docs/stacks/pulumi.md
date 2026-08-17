@@ -170,6 +170,15 @@ the values it needs; the tree committed to history carries neither the salt
 nor the fact that the stack uses the passphrase provider at all.
 
 This is `auto`, unconditionally — there is no reviewable middle ground between
-"the oracle is in git" and "it is not". A stack that cannot yet move off a
-committed salt is a `.standardsignore` line naming PUL-12 and a reason, same
-as any other exemption, not a quieter version of the rule.
+"the oracle is in git" and "it is not", and no ratchet either. Every other
+clause in this repo is a `ratchet_finding` consumer: `.standards.mode: warn`
+makes a finding in the legacy tree advisory, and a `.standardsignore` line
+silences it with a reason. PUL-12 is not — `tools/check-pulumi-secrets.sh`
+never calls `ratchet_finding` for it, so neither mechanism applies. A repo
+adopting a `standards` release that includes PUL-12 while it still carries a
+committed salt fails from the moment it adopts, in `warn` mode as much as
+`enforce`, and stays failing until the salt is gone. That is the intended
+effect, not friction to route around: the sanctioned way to keep deploying a
+stack that is not yet off the passphrase provider is the salt-injected-at-
+deploy pattern above, not an exemption line — the exemption already exists,
+it just does not live in `.standardsignore`.

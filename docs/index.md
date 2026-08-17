@@ -181,9 +181,12 @@ everything teaches people it is noise.
 PUL-6 stays a review clause deliberately: telling a boundary from a knob needs
 judgement, and a gate that guessed would train people to suppress it.
 
-PUL-12 is `auto` and unconditional: `encryptionsalt` is an offline passphrase
-verifier, safe to commit only while a repo stays private, which nothing in
-this fleet assumes. See [`stacks/pulumi.md`](stacks/pulumi.md) for the
+**PUL-12 is `auto` and does not go through the ratchet at all** — the one
+exception in this table. `encryptionsalt` is an offline passphrase verifier,
+safe to commit only while a repo stays private, which nothing in this fleet
+assumes; `tools/check-pulumi-secrets.sh` never calls `ratchet_finding` for it,
+so neither `.standards.mode: warn` nor a `.standardsignore` line can turn a
+committed salt advisory. See [`stacks/pulumi.md`](stacks/pulumi.md) for the
 salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 
 ## Infrastructure operations — `infrastructure.md`
