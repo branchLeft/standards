@@ -92,6 +92,7 @@ jobs:
           .standards/tools/check-tsconfig.sh --self-test
           .standards/tools/check-workflows.sh --self-test
           .standards/tools/check-pulumi.sh --self-test
+          .standards/tools/check-pulumi-secrets.sh --self-test
           .standards/tools/standards-sync.sh --self-test
 
       - name: Run the gates
@@ -116,5 +117,6 @@ jobs:
           .standards/tools/check-tsconfig.sh  "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/check-workflows.sh "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/check-pulumi.sh    "${args[@]+"${args[@]}"}" || rc=1
+          .standards/tools/check-pulumi-secrets.sh "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/standards-sync.sh  "${args[@]+"${args[@]}"}" || rc=1
           exit "$rc"

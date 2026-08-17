@@ -140,3 +140,36 @@ hyphen — the transformation is applied in one place and the constraint is
 documented at the constant, along with its **length budget**: the maximum
 tenant-name length is derived from the provider's limit minus the prefix, not
 guessed.
+
+## PUL-12 — a committed stack config never carries the passphrase provider or its salt
+
+Pulumi's passphrase secrets provider commits two things to
+`Pulumi.<stack>.yaml`: the ciphertext, and an `encryptionsalt` line. The salt
+is not itself a secret value — it is an **offline verifier** for one: anyone
+holding it can test a candidate passphrase against it without touching a state
+backend or any provider IAM. Storing it in git is safe only for as long as the
+repository stays private, and this fleet does not assume that: every repo is
+expected to be engineered as if it were public already, private ones included.
+
+A committed `Pulumi.<stack>.yaml` therefore:
+
+- never contains an `encryptionsalt` line, and
+- never resolves to the passphrase provider — an explicit `secretsprovider:
+passphrase`, or an absent `secretsprovider` key, both do, since passphrase
+  is Pulumi's default when the key is missing.
+
+`secretsprovider` names the provider a stack uses; nothing about naming it is
+secret on its own; a `gcpkms://…` value (or another key-management provider)
+is exactly as safe to commit as any other configuration line.
+
+**The mandated pattern where a stack cannot move off the passphrase provider
+is salt-injected-at-deploy**: CI writes `secretsprovider` and `encryptionsalt`
+into the file at runtime, sourced from a GitHub Actions secret, and never
+commits the result back. The working tree a deploy runs against then carries
+the values it needs; the tree committed to history carries neither the salt
+nor the fact that the stack uses the passphrase provider at all.
+
+This is `auto`, unconditionally — there is no reviewable middle ground between
+"the oracle is in git" and "it is not". A stack that cannot yet move off a
+committed salt is a `.standardsignore` line naming PUL-12 and a reason, same
+as any other exemption, not a quieter version of the rule.

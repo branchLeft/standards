@@ -21,7 +21,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/ratchet.sh
 . "$HERE/lib/ratchet.sh"
 
-GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh standards-sync.sh)
+GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh)
 
 # The clauses this run can speak to, listed rather than derived. Grepping the
 # gates under-reports — check-tsconfig emits TS-2 and TS-3 through a helper's
@@ -29,7 +29,7 @@ GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh standards-sync.sh)
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
-COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 SYNC-1"
+COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1"
 
 # ratchet__json emits a fixed field order, so this is a parse rather than a
 # JSON reader: the repo has three consumers with no Node and no jq.
