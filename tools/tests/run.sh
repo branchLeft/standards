@@ -27,6 +27,7 @@ run "ratchet.sh"           bash "$TOOLS/lib/ratchet.sh" --self-test
 run "check-tsconfig.sh"    bash "$TOOLS/check-tsconfig.sh" --self-test
 run "check-workflows.sh"   bash "$TOOLS/check-workflows.sh" --self-test
 run "check-pulumi.sh"      bash "$TOOLS/check-pulumi.sh" --self-test
+run "check-pulumi-secrets.sh" bash "$TOOLS/check-pulumi-secrets.sh" --self-test
 run "standards-sync.sh"    bash "$TOOLS/standards-sync.sh" --self-test
 run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test

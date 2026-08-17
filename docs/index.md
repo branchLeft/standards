@@ -158,19 +158,20 @@ has pinned a name rather than a revision.
 
 ## Pulumi — `stacks/pulumi.md`
 
-| ID     | Rule                                                                                  | Gate     | Encoded by              |
-| ------ | ------------------------------------------------------------------------------------- | -------- | ----------------------- |
-| PUL-1  | One exported ComponentResource per unit, `<org>:<layer>:<Type>` URN, `super()` first  | `auto`   | `tools/check-pulumi.sh` |
-| PUL-2  | `registerOutputs()` closes the constructor                                            | `auto`   | `tools/check-pulumi.sh` |
-| PUL-3  | Every child resource takes `{ parent }`                                               | `auto`   | `tools/check-pulumi.sh` |
-| PUL-4  | An exported `Args` interface, with its fields documented                              | `auto`   | `tools/check-pulumi.sh` |
-| PUL-5  | A component never reads a `StackReference`                                            | `auto`   | `tools/check-pulumi.sh` |
-| PUL-6  | Security boundaries are constants, not stack config                                   | `review` | —                       |
-| PUL-7  | `Input<T>` by default; plain `string` only where needed synchronously                 | `review` | —                       |
-| PUL-8  | One file per concern; `create*` factories take `parent` first                         | `review` | —                       |
-| PUL-9  | Validate once, at construction                                                        | `review` | —                       |
-| PUL-10 | A stack with protected resources carries a three-mode delete guard                    | `review` | —                       |
-| PUL-11 | Resource naming: `<tenant>-<resource>` logical, `<product>-<scope>-<tenant>` physical | `review` | —                       |
+| ID     | Rule                                                                                  | Gate     | Encoded by                      |
+| ------ | ------------------------------------------------------------------------------------- | -------- | ------------------------------- |
+| PUL-1  | One exported ComponentResource per unit, `<org>:<layer>:<Type>` URN, `super()` first  | `auto`   | `tools/check-pulumi.sh`         |
+| PUL-2  | `registerOutputs()` closes the constructor                                            | `auto`   | `tools/check-pulumi.sh`         |
+| PUL-3  | Every child resource takes `{ parent }`                                               | `auto`   | `tools/check-pulumi.sh`         |
+| PUL-4  | An exported `Args` interface, with its fields documented                              | `auto`   | `tools/check-pulumi.sh`         |
+| PUL-5  | A component never reads a `StackReference`                                            | `auto`   | `tools/check-pulumi.sh`         |
+| PUL-6  | Security boundaries are constants, not stack config                                   | `review` | —                               |
+| PUL-7  | `Input<T>` by default; plain `string` only where needed synchronously                 | `review` | —                               |
+| PUL-8  | One file per concern; `create*` factories take `parent` first                         | `review` | —                               |
+| PUL-9  | Validate once, at construction                                                        | `review` | —                               |
+| PUL-10 | A stack with protected resources carries a three-mode delete guard                    | `review` | —                               |
+| PUL-11 | Resource naming: `<tenant>-<resource>` logical, `<product>-<scope>-<tenant>` physical | `review` | —                               |
+| PUL-12 | A committed `Pulumi.<stack>.yaml` never carries an `encryptionsalt`                   | `auto`   | `tools/check-pulumi-secrets.sh` |
 
 PUL-3 is scoped to files that declare a ComponentResource or export a factory
 taking a parent. A top-level stack program has no component to parent to, so
@@ -179,6 +180,14 @@ everything teaches people it is noise.
 
 PUL-6 stays a review clause deliberately: telling a boundary from a knob needs
 judgement, and a gate that guessed would train people to suppress it.
+
+**PUL-12 is `auto` and does not go through the ratchet at all** — the one
+exception in this table. `encryptionsalt` is an offline passphrase verifier,
+safe to commit only while a repo stays private, which nothing in this fleet
+assumes; `tools/check-pulumi-secrets.sh` never calls `ratchet_finding` for it,
+so neither `.standards.mode: warn` nor a `.standardsignore` line can turn a
+committed salt advisory. See [`stacks/pulumi.md`](stacks/pulumi.md) for the
+salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 
 ## Infrastructure operations — `infrastructure.md`
 
