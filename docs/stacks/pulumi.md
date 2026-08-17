@@ -141,7 +141,7 @@ documented at the constant, along with its **length budget**: the maximum
 tenant-name length is derived from the provider's limit minus the prefix, not
 guessed.
 
-## PUL-12 — a committed stack config never carries the passphrase provider or its salt
+## PUL-12 — a committed stack config never carries an `encryptionsalt`
 
 Pulumi's passphrase secrets provider commits two things to
 `Pulumi.<stack>.yaml`: the ciphertext, and an `encryptionsalt` line. The salt
@@ -151,26 +151,34 @@ backend or any provider IAM. Storing it in git is safe only for as long as the
 repository stays private, and this fleet does not assume that: every repo is
 expected to be engineered as if it were public already, private ones included.
 
-A committed `Pulumi.<stack>.yaml` therefore:
+**The passphrase provider itself is permitted.** `secretsprovider: passphrase`
+(or the same thing by omission — passphrase is Pulumi's default when the key
+is missing) is not, on its own, a finding. Naming or omitting a provider names
+an algorithm; it does not expose anything. The salt is the only thing that
+does, so it is the only thing this clause bans:
 
-- never contains an `encryptionsalt` line, and
-- never resolves to the passphrase provider — an explicit `secretsprovider:
-passphrase`, or an absent `secretsprovider` key, both do, since passphrase
-  is Pulumi's default when the key is missing.
+- a committed `Pulumi.<stack>.yaml` never contains an `encryptionsalt` line,
+  in any case or with any encoding — that is the whole rule.
 
-`secretsprovider` names the provider a stack uses; nothing about naming it is
-secret on its own; a `gcpkms://…` value (or another key-management provider)
-is exactly as safe to commit as any other configuration line.
+A stack config with a committed `secure:` ciphertext value and no committed
+salt is not an oracle: without `encryptionsalt`, nothing in the file lets an
+attacker derive the encryption key or verify a passphrase guess offline.
+Rejecting that file would ban the safe half of the pattern along with the
+unsafe half, for no security gain.
 
-**The mandated pattern where a stack cannot move off the passphrase provider
-is salt-injected-at-deploy**: CI writes `secretsprovider` and `encryptionsalt`
+**The mandated pattern for a stack still on the passphrase provider is
+salt-injected-at-deploy**: CI writes `secretsprovider` and `encryptionsalt`
 into the file at runtime, sourced from a GitHub Actions secret, and never
 commits the result back. The working tree a deploy runs against then carries
-the values it needs; the tree committed to history carries neither the salt
-nor the fact that the stack uses the passphrase provider at all.
+the values it needs; the tree committed to history carries neither. This is
+exactly the shape PUL-12 passes — no `secretsprovider`, no `encryptionsalt`,
+config values already encrypted — because it is exactly the shape with
+nothing crackable in it. If the salt is ever written to the file and
+committed, the next run of the gate catches it precisely because the salt,
+not the provider, is what it looks for.
 
 This is `auto`, unconditionally — there is no reviewable middle ground between
-"the oracle is in git" and "it is not", and no ratchet either. Every other
+"the salt is in git" and "it is not", and no ratchet either. Every other
 clause in this repo is a `ratchet_finding` consumer: `.standards.mode: warn`
 makes a finding in the legacy tree advisory, and a `.standardsignore` line
 silences it with a reason. PUL-12 is not — `tools/check-pulumi-secrets.sh`
@@ -178,7 +186,6 @@ never calls `ratchet_finding` for it, so neither mechanism applies. A repo
 adopting a `standards` release that includes PUL-12 while it still carries a
 committed salt fails from the moment it adopts, in `warn` mode as much as
 `enforce`, and stays failing until the salt is gone. That is the intended
-effect, not friction to route around: the sanctioned way to keep deploying a
-stack that is not yet off the passphrase provider is the salt-injected-at-
-deploy pattern above, not an exemption line — the exemption already exists,
-it just does not live in `.standardsignore`.
+effect, not friction to route around: the sanctioned way to remove a committed
+salt is the salt-injected-at-deploy pattern above, not an exemption line — the
+exemption already exists, it just does not live in `.standardsignore`.

@@ -1,23 +1,29 @@
 #!/usr/bin/env bash
-# PUL-12 — a committed Pulumi stack config never carries the passphrase
-# secrets provider or its salt.
+# PUL-12 — a committed Pulumi stack config never carries an encryptionsalt.
 #
-# Scoped to `Pulumi.<stack>.yaml` — the project file `Pulumi.yaml` has neither
-# key and is never in scope. `encryptionsalt` and `secretsprovider` are always
-# top-level keys in a stack config, so anchoring at column zero is precise: it
-# cannot match a value nested under `config:`, and a `#`-prefixed line — a
-# comment describing the pattern rather than declaring it — never starts with
-# either key name. A leading UTF-8 BOM is stripped first, since it otherwise
-# shifts whatever key opens the file off column zero without changing what
-# Pulumi itself reads.
+# Scoped to `Pulumi.<stack>.yaml` — the project file `Pulumi.yaml` never has
+# this key and is never in scope. `encryptionsalt` is always a top-level key
+# in a stack config, so anchoring at column zero is precise: it cannot match
+# a value nested under `config:`, and a `#`-prefixed line — a comment
+# describing the pattern rather than declaring it — never starts with the key
+# name. A leading UTF-8 BOM is stripped first, since it otherwise shifts
+# whatever key opens the file off column zero without changing what Pulumi
+# itself reads.
+#
+# The passphrase provider itself — `secretsprovider: passphrase`, or the same
+# thing by omission — is not checked here and is not banned. It is the salt
+# that is an offline oracle; a stack config with no committed `encryptionsalt`
+# exposes nothing crackable whatever provider it names or omits, including a
+# committed `secure:` ciphertext value with no salt alongside it. That is
+# exactly the shape the salt-injected-at-deploy pattern in
+# `docs/stacks/pulumi.md` commits, and it is meant to pass.
 #
 # PUL-12 findings bypass ratchet_finding on purpose: they are not subject to
 # `.standards.mode: warn` or a `.standardsignore` line the way every other
 # clause here is. A committed passphrase salt is a permanent public-secret
 # exposure the instant the repo goes public, and the sanctioned way out is
-# the salt-injected-at-deploy pattern in `docs/stacks/pulumi.md`, not an
-# exemption — so this is the one gate a repo cannot adopt its way past while
-# still carrying a committed salt.
+# the salt-injected-at-deploy pattern, not an exemption — so this is the one
+# gate a repo cannot adopt its way past while still carrying a committed salt.
 #
 # Usage:
 #   check-pulumi-secrets.sh [--mode warn|enforce] [--json] [--self-test]
@@ -43,13 +49,6 @@ strip_bom() {
   fi
 }
 
-# Strips the key prefix, a trailing comment and surrounding quotes, so
-# `secretsprovider: "passphrase"  # legacy` and `secretsprovider: passphrase`
-# compare equal.
-provider_value() {
-  sed -E 's/^secretsprovider:[[:space:]]*//; s/[[:space:]]*(#.*)?$//; s/^"//; s/"$//; s/^'"'"'//; s/'"'"'$//'
-}
-
 # Bypasses ratchet_finding entirely, deliberately. Exemption
 # (`.standardsignore`, an inline `standards-allow-next-line`) and mode
 # leniency (`.standards.mode: warn`) are correct for every other clause; both
@@ -68,37 +67,18 @@ pul12_finding() {
 }
 
 scan_stack_config() {
-  local f="$1" ln val
+  local f="$1" ln
 
   # The salt, matched case-insensitively. The raw bytes are an offline oracle
   # whatever case wraps the key — even where a mangled key means Pulumi's own
   # parser would not read this exact line, a leftover from a half-done
-  # migration is still crackable.
+  # migration is still crackable. This is the only thing PUL-12 checks: the
+  # provider a stack config names or omits is not a security decision on its
+  # own, only the salt is.
   while IFS=: read -r ln _; do
     [ -n "$ln" ] && pul12_finding "$f" "$ln" \
       "committed encryptionsalt — an offline passphrase oracle once this file is public; inject it at deploy time from a GitHub Actions secret instead"
   done < <(strip_bom "$f" | grep -inE '^encryptionsalt:')
-
-  # secretsprovider stays case-sensitive on the pass path: Pulumi parses it
-  # case-sensitively too, so a mangled key is not "configured" from Pulumi's
-  # own point of view either — it falls through to the same passphrase
-  # default as a genuinely missing key, which the "absent" branch below
-  # already reports correctly.
-  ln=$(strip_bom "$f" | grep -nE '^secretsprovider:' | head -1 | cut -d: -f1)
-  if [ -z "$ln" ]; then
-    pul12_finding "$f" 1 \
-      "no secretsprovider key — this stack config defaults to the passphrase provider; set an explicit non-passphrase provider (gcpkms://…)"
-    return
-  fi
-
-  val=$(strip_bom "$f" | sed -n "${ln}p" | provider_value)
-  if [ -z "$val" ]; then
-    pul12_finding "$f" "$ln" \
-      "secretsprovider is present but empty — Pulumi treats that the same as an absent key and falls back to the passphrase provider on the next config write"
-  elif [ "$val" = "passphrase" ]; then
-    pul12_finding "$f" "$ln" \
-      "secretsprovider: passphrase committed explicitly — the passphrase provider's salt becomes an offline oracle the moment it lands in git"
-  fi
 }
 
 main() {
@@ -132,32 +112,58 @@ EOF
     printf '%s' "$out" | grep -q 'encryptionsalt' \
       || { echo "FAIL: message does not name the salt"; echo "$out"; exit 1; }
 
-    # No secretsprovider at all — silently defaults to passphrase.
+    # No secretsprovider at all, no salt — PASS. The provider a stack config
+    # names or omits is not itself a security decision; only a committed salt
+    # is an offline oracle, and there is none here.
     cat > Pulumi.production.yaml <<'EOF'
 config:
   aws:region: eu-west-2
 EOF
-    git add -A && git commit -qm no-provider
+    git add -A && git commit -qm no-provider-no-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q 'PUL-12' \
-      || { echo "FAIL: absent secretsprovider not caught"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'defaults to the passphrase provider' \
-      || { echo "FAIL: default-provider message missing"; echo "$out"; exit 1; }
+      && { echo "FAIL: absent secretsprovider with no salt was reported"; echo "$out"; exit 1; }
 
-    # Explicit passphrase provider, no salt line yet — still banned. A stack
-    # in this exact state is one `pulumi up` away from writing the salt back
-    # into this file.
+    # Explicit passphrase provider, no salt — PASS. This is one `pulumi
+    # config set --secret` away from writing a salt back into the file, but
+    # that write is what PUL-12 catches, not the provider declaration itself.
     cat > Pulumi.production.yaml <<'EOF'
 secretsprovider: passphrase
 config:
   aws:region: eu-west-2
 EOF
-    git add -A && git commit -qm explicit-passphrase
+    git add -A && git commit -qm explicit-passphrase-no-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q 'PUL-12' \
-      || { echo "FAIL: explicit passphrase provider not caught"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qv 'defaults to the passphrase provider' \
-      || true
+      && { echo "FAIL: explicit passphrase provider with no salt was reported"; echo "$out"; exit 1; }
+
+    # secretsprovider: (blank), no salt — PASS, same reasoning.
+    cat > Pulumi.production.yaml <<'EOF'
+secretsprovider:
+config:
+  aws:region: eu-west-2
+EOF
+    git add -A && git commit -qm blank-provider-no-salt
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'PUL-12' \
+      && { echo "FAIL: blank secretsprovider with no salt was reported"; echo "$out"; exit 1; }
+
+    # The escape hatch itself — no secretsprovider, no encryptionsalt, but a
+    # real `secure:` ciphertext value already committed. This is exactly the
+    # shape docs/stacks/pulumi.md's salt-injected-at-deploy pattern commits:
+    # CI writes secretsprovider and encryptionsalt in only at deploy time and
+    # never commits them, so the tree PUL-12 sees never has either key. A
+    # ciphertext with no salt alongside it is not crackable, so this must
+    # PASS or the gate forbids the pattern it mandates.
+    cat > Pulumi.production.yaml <<'EOF'
+config:
+  proj:pw:
+    secure: v1:9x0abc123==:v1:def456==
+EOF
+    git add -A && git commit -qm injection-pattern
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'PUL-12' \
+      && { echo "FAIL: salt-injected-at-deploy shape (no salt, no provider, ciphertext present) was reported"; echo "$out"; exit 1; }
 
     # The pass path: a real KMS provider, no salt.
     cat > Pulumi.production.yaml <<'EOF'
@@ -221,31 +227,6 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q 'PUL-12' \
       || { echo "FAIL: case-mangled EncryptionSalt not caught"; echo "$out"; exit 1; }
-
-    # secretsprovider itself stays case-sensitive on the pass path: Pulumi
-    # parses it case-sensitively too, so a mangled key is not "configured"
-    # from Pulumi's own point of view and must fall through to the same
-    # passphrase-default verdict as a genuinely absent key.
-    cat > Pulumi.production.yaml <<'EOF'
-SecretsProvider: gcpkms://projects/p/locations/global/keyRings/r/cryptoKeys/k
-EOF
-    git add -A && git commit -qm mangled-provider-key
-    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'defaults to the passphrase provider' \
-      || { echo "FAIL: mangled secretsprovider key not treated as absent"; echo "$out"; exit 1; }
-
-    # Finding 4 — secretsprovider present but empty. Pulumi treats that the
-    # same as an absent key and will write a fresh passphrase salt back on the
-    # next `pulumi config set --secret`, so this is not a pass case.
-    cat > Pulumi.production.yaml <<'EOF'
-secretsprovider:
-config:
-  aws:region: eu-west-2
-EOF
-    git add -A && git commit -qm blank-provider
-    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
-      || { echo "FAIL: blank secretsprovider value not caught"; echo "$out"; exit 1; }
 
     # Finding 2 — warn mode must not launder a committed salt into advisory.
     # The salt lands as an already-committed, untouched-by-this-branch file —
