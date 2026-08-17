@@ -40,6 +40,24 @@ dash and a backtick-quoted `path` — which promises `path` exists under
 beyond this table carries no path at all, just `## Family`, which is not a
 promise and is not checked.
 
+## Principles — `principles.md`
+
+| ID     | Rule                                                                                                             | Gate      | Encoded by |
+| ------ | ---------------------------------------------------------------------------------------------------------------- | --------- | ---------- |
+| PRIN-1 | Repositories are public by default; a private repo is a narrow, written exception                                | `pending` | —          |
+| PRIN-2 | A repo that owns running infrastructure deploys from CI on merge to its default branch, and merging is protected | `pending` | —          |
+| PRIN-3 | Spend is driven toward zero; anything that would incur a charge is a human decision, never an automated one      | `pending` | —          |
+| PRIN-4 | Supplier choice applies the ethics rubric first, product fit second, cost as the tiebreak                        | `pending` | —          |
+| PRIN-5 | Each repository has a single, clearly delineated responsibility                                                  | `pending` | —          |
+| PRIN-6 | Automated agents hold engineering autonomy only, from an explicit allow-list; four triggers always escalate      | `pending` | —          |
+
+**All six are `pending`.** They are binding prose, not yet mechanically
+checked — no artefact under `tools/`, `packages/` or `templates/` reads any
+of them, so `check-clause-index.sh`'s `auto`/`pending` cross-check would
+fail the moment one is implemented without its row moving first. See
+[`principles.md`](principles.md) for the reasoning behind each, including
+the corollary on PRIN-1 and the honesty clause on PRIN-4.
+
 ## Meta
 
 | ID      | Rule                                                                                                          | Gate     | Encoded by                 |
