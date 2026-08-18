@@ -78,3 +78,13 @@ and then silently never audited.
 
 `ruleset-apply.sh` is the platform owner's to run. Prepare the command, run
 `ruleset-audit.sh` first to show exactly what would change, and hand both over.
+
+## Organization-level rulesets
+
+A payload targeting a **repository name pattern** across the org, rather than
+one repo, does not belong under `templates/rulesets/<repo>/` — the directory
+name would be read as a repo by both scripts above. These live in
+[`templates/org-rulesets/`](../templates/org-rulesets/) instead, which
+neither script enumerates. See that directory's README for the current
+payload, its evidence, and why applying it is blocked independently of the
+repo-level `403 Upgrade to GitHub Pro` case REPO-4 already describes.
