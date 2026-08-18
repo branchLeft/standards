@@ -5,7 +5,7 @@
   "conditions": {
     "repository_name": {
       "include": ["ghost-tenant-*"],
-      "exclude": [],
+      "exclude": ["*-archive"],
       "protected": false
     },
     "ref_name": {

@@ -25,12 +25,22 @@ force-push, linear history, signed commits, one approving + code-owner review,
 squash-only). Filed against
 [branchLeft/workspace#151](https://github.com/branchLeft/workspace/issues/151).
 
-Today `ghost-tenant-*` matches exactly one repo, `branchLeft/ghost-tenant-blog`
-(public). It does not match `ghost-platform`, `ghost-platform-docs` or
-`ghost-platform-tenant-template` — none start with `ghost-tenant-`. It also
-matches `ghost-tenant-blog-archive`, an archived **private** repo, which the
-plan-tier block below makes moot: a private repo cannot carry a ruleset on
-GitHub Free regardless of this payload.
+Today `ghost-tenant-*` matches `branchLeft/ghost-tenant-blog` (public, the
+intended target) and `ghost-tenant-blog-archive` (archived, private, a
+republish leftover — not a live tenant). It does not match `ghost-platform`,
+`ghost-platform-docs` or `ghost-platform-tenant-template` — none start with
+`ghost-tenant-`. Confirmed live against `gh repo list branchLeft --limit 100`.
+
+This is the second time an `-archive` sibling has silently widened a name
+pattern in this org, so it is excluded deliberately rather than left to the
+plan-tier block to make it moot (a plan change would otherwise re-expose it,
+silently). `conditions.repository_name.exclude` is `["*-archive"]` — a
+general suffix exclusion, not a literal `ghost-tenant-blog-archive`, so it
+also covers a future tenant that is later archived without this payload
+needing an edit each time. `repository_name.exclude` is confirmed against
+GitHub's REST schema for `POST /orgs/{org}/rulesets` (same include/exclude
+pattern shape as `ref_name`, not verified live since the endpoint 403s — see
+"Applying" below).
 
 ### Required status checks — evidence
 
@@ -62,6 +72,21 @@ and
 [#4](https://github.com/branchLeft/ghost-platform-tenant-template/pull/4),
 via `gh pr checks`.)
 
+**These are the right required checks for a freshly generated tenant. They
+are not yet correct for `ghost-tenant-blog` today.** Its own live workflow
+set does not emit `Committed-secret guard` or `standards / Standards gates` —
+it has diverged from the template these checks were verified against. With
+`strict_required_status_checks_policy: true`, applying this payload while
+that gap stands would make every future PR against `ghost-tenant-blog`
+permanently unmergeable (`REPO-4` rule 1). This is a real precondition on the
+handover command below, not a hypothetical: `ghost-tenant-blog`'s CI must
+converge with the template's `Committed-secret guard` and `standards /
+Standards gates` jobs first. Tracked separately, since it is blog-specific
+remediation rather than part of this payload: the repo-level ruleset in
+[branchLeft/workspace#119](https://github.com/branchLeft/workspace/issues/119)
+currently scopes to blog's *current* (narrower) check set rather than closing
+this gap, so a further issue covers the convergence itself.
+
 ## Applying is blocked on the current plan — not a tooling gap
 
 `gh api orgs/branchLeft/rulesets` returns:
@@ -87,10 +112,12 @@ changes, and so the intended shape is reviewable now rather than designed
 from scratch later — the same posture `REPO-6` already takes for a private
 repo's committed-but-unauditable payload.
 
-`ruleset-apply.sh`/`ruleset-audit.sh` are not extended to cover org rulesets:
-the feature cannot be exercised on this plan today, so automation for it has
-no near-term payer. Extending them is filed separately rather than built
-speculatively — see the PR that added this directory for the issue link.
+`ruleset-apply.sh`/`ruleset-audit.sh` are not extended to cover org rulesets,
+and no follow-up issue is filed to extend them either: the feature cannot be
+exercised on this plan today, so tooling for it has no near-term payer, and
+filing work to automate a permanently-plan-gated capability is the same
+category of speculative ask as the upgrade itself. If the plan ever changes,
+extend them then.
 
 ### Handover command (currently fails with the 403 above; not runnable until the org is on GitHub Team)
 
@@ -98,11 +125,25 @@ speculatively — see the PR that added this directory for the issue link.
 gh api --method POST orgs/branchLeft/rulesets --input templates/org-rulesets/ghost-tenant-default-branch.json
 ```
 
-Once it succeeds: every repo matching `ghost-tenant-*` — present and future,
-public tenants only per the plan-tier limit above — gets the default-branch
-protection described above immediately, with no per-repo step and no widened
-provisioning-workflow token. Re-running is not idempotent as written (it would
-create a duplicate ruleset on a second run); a re-run needs the same
-find-by-name-then-PUT pattern `ruleset-apply.sh` already uses for repo
-rulesets, against `orgs/branchLeft/rulesets` instead of
-`repos/branchLeft/<repo>/rulesets`.
+Once it succeeds: every repo matching `ghost-tenant-*` (except an `-archive`
+suffix) — present and future, public tenants only per the plan-tier limit
+above — gets the default-branch protection described above immediately, with
+no per-repo step and no widened provisioning-workflow token. Re-running is
+not idempotent as written (it would create a duplicate ruleset on a second
+run); a re-run needs the same find-by-name-then-PUT pattern
+`ruleset-apply.sh` already uses for repo rulesets, against
+`orgs/branchLeft/rulesets` instead of `repos/branchLeft/<repo>/rulesets`.
+
+Two further preconditions, beyond the plan tier and the `ghost-tenant-blog`
+convergence above:
+
+- **The naming convention this pattern assumes must already be enforced at
+  provisioning time.** A concurrent, not-yet-merged `branchLeft/ghost-platform`
+  change enforces `^ghost-tenant-[a-z0-9]+(-[a-z0-9]+)*$` when a tenant repo is
+  created. The two PRs have no merge-order dependency between themselves —
+  this payload is inert on the current plan regardless of provisioning-side
+  validation — but the naming-convention change must be merged and live
+  **before this handover command is ever run**, so `ghost-tenant-*` remains a
+  reliable description of every tenant repo rather than a convention a future
+  provisioning bug could silently violate.
+- `ghost-tenant-blog`'s CI convergence (above) must also be complete first.
