@@ -59,7 +59,7 @@ instead, because a freshly generated tenant copies its workflow files
 verbatim. Two recent real PRs against
 `branchLeft/ghost-platform-tenant-template` both report exactly:
 
-```
+```text
 Deploy (pulumi up)              skipping   (never — correctly excluded)
 Committed-secret guard          pass
 Type check                      pass
@@ -84,24 +84,24 @@ converge with the template's `Committed-secret guard` and `standards /
 Standards gates` jobs first. Tracked separately, since it is blog-specific
 remediation rather than part of this payload: the repo-level ruleset in
 [branchLeft/workspace#119](https://github.com/branchLeft/workspace/issues/119)
-currently scopes to blog's *current* (narrower) check set rather than closing
+currently scopes to blog's _current_ (narrower) check set rather than closing
 this gap, so a further issue covers the convergence itself.
 
 ## Applying is blocked on the current plan — not a tooling gap
 
 `gh api orgs/branchLeft/rulesets` returns:
 
-```
+```text
 403 {"message":"Upgrade to GitHub Team to enable this feature.", ...}
 ```
 
 This is a harder gate than the familiar private-repo block (`403 Upgrade to
-GitHub Pro or make this repository public`, which only stops *private*
+GitHub Pro or make this repository public`, which only stops _private_
 targets). Organization-level rulesets are unavailable on GitHub Free for
 **any** target, public or private — confirmed live against this org
 (`orgs/branchLeft` reports `"plan":{"name":"free"}`) with a token carrying
 `admin:org`, and separately confirmed against a same-session repo-level read
-on a *public* repo (`repos/branchLeft/standards/rulesets`), which succeeds —
+on a _public_ repo (`repos/branchLeft/standards/rulesets`), which succeeds —
 so the block is specific to the org-level endpoint, not a scope or visibility
 issue.
 
@@ -121,7 +121,7 @@ extend them then.
 
 ### Handover command (currently fails with the 403 above; not runnable until the org is on GitHub Team)
 
-```
+```bash
 gh api --method POST orgs/branchLeft/rulesets --input templates/org-rulesets/ghost-tenant-default-branch.json
 ```
 
