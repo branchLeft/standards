@@ -3024,9 +3024,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "packages_eslint_config_package",
       "community": 4,
-      "norm_label": "eslint-config/package.json"
+      "norm_label": "eslint-config/package.json",
+      "id": "packages_eslint_config_package"
     },
     {
       "label": "name",
@@ -3034,9 +3034,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_name",
       "community": 4,
-      "norm_label": "name"
+      "norm_label": "name",
+      "id": "packages_eslint_config_package_name"
     },
     {
       "label": "version",
@@ -3044,9 +3044,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_version",
       "community": 4,
-      "norm_label": "version"
+      "norm_label": "version",
+      "id": "packages_eslint_config_package_version"
     },
     {
       "label": "description",
@@ -3054,9 +3054,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_description",
       "community": 4,
-      "norm_label": "description"
+      "norm_label": "description",
+      "id": "packages_eslint_config_package_description"
     },
     {
       "label": "license",
@@ -3064,9 +3064,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_license",
       "community": 4,
-      "norm_label": "license"
+      "norm_label": "license",
+      "id": "packages_eslint_config_package_license"
     },
     {
       "label": "type",
@@ -3074,9 +3074,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_type",
       "community": 4,
-      "norm_label": "type"
+      "norm_label": "type",
+      "id": "packages_eslint_config_package_type"
     },
     {
       "label": "main",
@@ -3084,9 +3084,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_main",
       "community": 4,
-      "norm_label": "main"
+      "norm_label": "main",
+      "id": "packages_eslint_config_package_main"
     },
     {
       "label": "types",
@@ -3094,9 +3094,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_types",
       "community": 4,
-      "norm_label": "types"
+      "norm_label": "types",
+      "id": "packages_eslint_config_package_types"
     },
     {
       "label": "scripts",
@@ -3104,9 +3104,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_scripts",
       "community": 4,
-      "norm_label": "scripts"
+      "norm_label": "scripts",
+      "id": "packages_eslint_config_package_scripts"
     },
     {
       "label": "build",
@@ -3114,9 +3114,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L10",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_scripts_build",
       "community": 4,
-      "norm_label": "build"
+      "norm_label": "build",
+      "id": "packages_eslint_config_package_scripts_build"
     },
     {
       "label": "prepublishOnly",
@@ -3124,9 +3124,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_scripts_prepublishonly",
       "community": 4,
-      "norm_label": "prepublishonly"
+      "norm_label": "prepublishonly",
+      "id": "packages_eslint_config_package_scripts_prepublishonly"
     },
     {
       "label": "repository",
@@ -3134,9 +3134,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_repository",
       "community": 4,
-      "norm_label": "repository"
+      "norm_label": "repository",
+      "id": "packages_eslint_config_package_repository"
     },
     {
       "label": "type",
@@ -3144,9 +3144,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L14",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_repository_type",
       "community": 4,
-      "norm_label": "type"
+      "norm_label": "type",
+      "id": "packages_eslint_config_package_repository_type"
     },
     {
       "label": "url",
@@ -3154,9 +3154,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_repository_url",
       "community": 4,
-      "norm_label": "url"
+      "norm_label": "url",
+      "id": "packages_eslint_config_package_repository_url"
     },
     {
       "label": "directory",
@@ -3164,9 +3164,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_repository_directory",
       "community": 4,
-      "norm_label": "directory"
+      "norm_label": "directory",
+      "id": "packages_eslint_config_package_repository_directory"
     },
     {
       "label": "publishConfig",
@@ -3174,9 +3174,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_publishconfig",
       "community": 4,
-      "norm_label": "publishconfig"
+      "norm_label": "publishconfig",
+      "id": "packages_eslint_config_package_publishconfig"
     },
     {
       "label": "registry",
@@ -3184,9 +3184,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_publishconfig_registry",
       "community": 4,
-      "norm_label": "registry"
+      "norm_label": "registry",
+      "id": "packages_eslint_config_package_publishconfig_registry"
     },
     {
       "label": "exports",
@@ -3194,9 +3194,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L21",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_exports",
       "community": 4,
-      "norm_label": "exports"
+      "norm_label": "exports",
+      "id": "packages_eslint_config_package_exports"
     },
     {
       "label": "files",
@@ -3204,9 +3204,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_files",
       "community": 2,
-      "norm_label": "files"
+      "norm_label": "files",
+      "id": "packages_eslint_config_package_files"
     },
     {
       "label": "dist",
@@ -3214,9 +3214,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_json_ref_dist",
       "community": 2,
-      "norm_label": "dist"
+      "norm_label": "dist",
+      "id": "packages_eslint_config_package_json_ref_dist"
     },
     {
       "label": "dependencies",
@@ -3224,9 +3224,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L31",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies",
       "community": 11,
-      "norm_label": "dependencies"
+      "norm_label": "dependencies",
+      "id": "packages_eslint_config_package_dependencies"
     },
     {
       "label": "@eslint/js",
@@ -3234,9 +3234,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L32",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies_eslint_js",
       "community": 11,
-      "norm_label": "@eslint/js"
+      "norm_label": "@eslint/js",
+      "id": "packages_eslint_config_package_dependencies_eslint_js"
     },
     {
       "label": "@eslint/js",
@@ -3244,9 +3244,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L32",
       "_origin": "ast",
-      "id": "eslint_js",
       "community": 11,
-      "norm_label": "@eslint/js"
+      "norm_label": "@eslint/js",
+      "id": "eslint_js"
     },
     {
       "label": "eslint-config-prettier",
@@ -3254,9 +3254,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L33",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies_eslint_config_prettier",
       "community": 11,
-      "norm_label": "eslint-config-prettier"
+      "norm_label": "eslint-config-prettier",
+      "id": "packages_eslint_config_package_dependencies_eslint_config_prettier"
     },
     {
       "label": "eslint-config-prettier",
@@ -3264,9 +3264,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L33",
       "_origin": "ast",
-      "id": "eslint_config_prettier",
       "community": 11,
-      "norm_label": "eslint-config-prettier"
+      "norm_label": "eslint-config-prettier",
+      "id": "eslint_config_prettier"
     },
     {
       "label": "eslint-plugin-jsx-a11y",
@@ -3274,9 +3274,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L34",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
       "community": 11,
-      "norm_label": "eslint-plugin-jsx-a11y"
+      "norm_label": "eslint-plugin-jsx-a11y",
+      "id": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y"
     },
     {
       "label": "eslint-plugin-jsx-a11y",
@@ -3284,9 +3284,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L34",
       "_origin": "ast",
-      "id": "eslint_plugin_jsx_a11y",
       "community": 11,
-      "norm_label": "eslint-plugin-jsx-a11y"
+      "norm_label": "eslint-plugin-jsx-a11y",
+      "id": "eslint_plugin_jsx_a11y"
     },
     {
       "label": "eslint-plugin-react-hooks",
@@ -3294,9 +3294,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L35",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
       "community": 11,
-      "norm_label": "eslint-plugin-react-hooks"
+      "norm_label": "eslint-plugin-react-hooks",
+      "id": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks"
     },
     {
       "label": "eslint-plugin-react-hooks",
@@ -3304,9 +3304,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L35",
       "_origin": "ast",
-      "id": "eslint_plugin_react_hooks",
       "community": 11,
-      "norm_label": "eslint-plugin-react-hooks"
+      "norm_label": "eslint-plugin-react-hooks",
+      "id": "eslint_plugin_react_hooks"
     },
     {
       "label": "globals",
@@ -3314,9 +3314,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies_globals",
       "community": 11,
-      "norm_label": "globals"
+      "norm_label": "globals",
+      "id": "packages_eslint_config_package_dependencies_globals"
     },
     {
       "label": "globals",
@@ -3324,9 +3324,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "id": "globals",
       "community": 11,
-      "norm_label": "globals"
+      "norm_label": "globals",
+      "id": "globals"
     },
     {
       "label": "typescript-eslint",
@@ -3334,9 +3334,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L37",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_dependencies_typescript_eslint",
       "community": 11,
-      "norm_label": "typescript-eslint"
+      "norm_label": "typescript-eslint",
+      "id": "packages_eslint_config_package_dependencies_typescript_eslint"
     },
     {
       "label": "typescript-eslint",
@@ -3344,9 +3344,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L37",
       "_origin": "ast",
-      "id": "typescript_eslint",
       "community": 11,
-      "norm_label": "typescript-eslint"
+      "norm_label": "typescript-eslint",
+      "id": "typescript_eslint"
     },
     {
       "label": "peerDependencies",
@@ -3354,9 +3354,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L39",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_peerdependencies",
       "community": 4,
-      "norm_label": "peerdependencies"
+      "norm_label": "peerdependencies",
+      "id": "packages_eslint_config_package_peerdependencies"
     },
     {
       "label": "eslint",
@@ -3364,9 +3364,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L40",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_peerdependencies_eslint",
       "community": 4,
-      "norm_label": "eslint"
+      "norm_label": "eslint",
+      "id": "packages_eslint_config_package_peerdependencies_eslint"
     },
     {
       "label": "devDependencies",
@@ -3374,9 +3374,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L42",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_devdependencies",
       "community": 1,
-      "norm_label": "devdependencies"
+      "norm_label": "devdependencies",
+      "id": "packages_eslint_config_package_devdependencies"
     },
     {
       "label": "@branchleft/tsconfig",
@@ -3384,9 +3384,9 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L43",
       "_origin": "ast",
-      "id": "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
       "community": 1,
-      "norm_label": "@branchleft/tsconfig"
+      "norm_label": "@branchleft/tsconfig",
+      "id": "packages_eslint_config_package_devdependencies_branchleft_tsconfig"
     },
     {
       "label": "prettier-config/package.json",
@@ -3394,9 +3394,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "packages_prettier_config_package",
       "community": 2,
-      "norm_label": "prettier-config/package.json"
+      "norm_label": "prettier-config/package.json",
+      "id": "packages_prettier_config_package"
     },
     {
       "label": "name",
@@ -3404,9 +3404,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_name",
       "community": 2,
-      "norm_label": "name"
+      "norm_label": "name",
+      "id": "packages_prettier_config_package_name"
     },
     {
       "label": "version",
@@ -3414,9 +3414,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_version",
       "community": 2,
-      "norm_label": "version"
+      "norm_label": "version",
+      "id": "packages_prettier_config_package_version"
     },
     {
       "label": "description",
@@ -3424,9 +3424,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_description",
       "community": 2,
-      "norm_label": "description"
+      "norm_label": "description",
+      "id": "packages_prettier_config_package_description"
     },
     {
       "label": "license",
@@ -3434,9 +3434,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_license",
       "community": 2,
-      "norm_label": "license"
+      "norm_label": "license",
+      "id": "packages_prettier_config_package_license"
     },
     {
       "label": "main",
@@ -3444,9 +3444,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_main",
       "community": 2,
-      "norm_label": "main"
+      "norm_label": "main",
+      "id": "packages_prettier_config_package_main"
     },
     {
       "label": "repository",
@@ -3454,9 +3454,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_repository",
       "community": 2,
-      "norm_label": "repository"
+      "norm_label": "repository",
+      "id": "packages_prettier_config_package_repository"
     },
     {
       "label": "type",
@@ -3464,9 +3464,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_repository_type",
       "community": 2,
-      "norm_label": "type"
+      "norm_label": "type",
+      "id": "packages_prettier_config_package_repository_type"
     },
     {
       "label": "url",
@@ -3474,9 +3474,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_repository_url",
       "community": 2,
-      "norm_label": "url"
+      "norm_label": "url",
+      "id": "packages_prettier_config_package_repository_url"
     },
     {
       "label": "directory",
@@ -3484,9 +3484,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L10",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_repository_directory",
       "community": 2,
-      "norm_label": "directory"
+      "norm_label": "directory",
+      "id": "packages_prettier_config_package_repository_directory"
     },
     {
       "label": "publishConfig",
@@ -3494,9 +3494,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_publishconfig",
       "community": 2,
-      "norm_label": "publishconfig"
+      "norm_label": "publishconfig",
+      "id": "packages_prettier_config_package_publishconfig"
     },
     {
       "label": "registry",
@@ -3504,9 +3504,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_publishconfig_registry",
       "community": 2,
-      "norm_label": "registry"
+      "norm_label": "registry",
+      "id": "packages_prettier_config_package_publishconfig_registry"
     },
     {
       "label": "exports",
@@ -3514,9 +3514,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_exports",
       "community": 2,
-      "norm_label": "exports"
+      "norm_label": "exports",
+      "id": "packages_prettier_config_package_exports"
     },
     {
       "label": "./prettierignore",
@@ -3524,9 +3524,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_exports_prettierignore",
       "community": 2,
-      "norm_label": "./prettierignore"
+      "norm_label": "./prettierignore",
+      "id": "packages_prettier_config_package_exports_prettierignore"
     },
     {
       "label": "files",
@@ -3534,9 +3534,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "packages_prettier_config_package_files",
       "community": 2,
-      "norm_label": "files"
+      "norm_label": "files",
+      "id": "packages_prettier_config_package_files"
     },
     {
       "label": "index.json",
@@ -3544,9 +3544,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "ref_index_json",
       "community": 2,
-      "norm_label": "index.json"
+      "norm_label": "index.json",
+      "id": "ref_index_json"
     },
     {
       "label": "prettierignore",
@@ -3554,9 +3554,9 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "ref_prettierignore",
       "community": 2,
-      "norm_label": "prettierignore"
+      "norm_label": "prettierignore",
+      "id": "ref_prettierignore"
     },
     {
       "label": "tsconfig/package.json",
@@ -3564,9 +3564,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "packages_tsconfig_package",
       "community": 7,
-      "norm_label": "tsconfig/package.json"
+      "norm_label": "tsconfig/package.json",
+      "id": "packages_tsconfig_package"
     },
     {
       "label": "name",
@@ -3574,9 +3574,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_name",
       "community": 7,
-      "norm_label": "name"
+      "norm_label": "name",
+      "id": "packages_tsconfig_package_name"
     },
     {
       "label": "version",
@@ -3584,9 +3584,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_version",
       "community": 7,
-      "norm_label": "version"
+      "norm_label": "version",
+      "id": "packages_tsconfig_package_version"
     },
     {
       "label": "description",
@@ -3594,9 +3594,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_description",
       "community": 7,
-      "norm_label": "description"
+      "norm_label": "description",
+      "id": "packages_tsconfig_package_description"
     },
     {
       "label": "license",
@@ -3604,9 +3604,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_license",
       "community": 7,
-      "norm_label": "license"
+      "norm_label": "license",
+      "id": "packages_tsconfig_package_license"
     },
     {
       "label": "repository",
@@ -3614,9 +3614,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_repository",
       "community": 7,
-      "norm_label": "repository"
+      "norm_label": "repository",
+      "id": "packages_tsconfig_package_repository"
     },
     {
       "label": "type",
@@ -3624,9 +3624,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_repository_type",
       "community": 7,
-      "norm_label": "type"
+      "norm_label": "type",
+      "id": "packages_tsconfig_package_repository_type"
     },
     {
       "label": "url",
@@ -3634,9 +3634,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_repository_url",
       "community": 7,
-      "norm_label": "url"
+      "norm_label": "url",
+      "id": "packages_tsconfig_package_repository_url"
     },
     {
       "label": "directory",
@@ -3644,9 +3644,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_repository_directory",
       "community": 7,
-      "norm_label": "directory"
+      "norm_label": "directory",
+      "id": "packages_tsconfig_package_repository_directory"
     },
     {
       "label": "publishConfig",
@@ -3654,9 +3654,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_publishconfig",
       "community": 7,
-      "norm_label": "publishconfig"
+      "norm_label": "publishconfig",
+      "id": "packages_tsconfig_package_publishconfig"
     },
     {
       "label": "registry",
@@ -3664,9 +3664,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_publishconfig_registry",
       "community": 7,
-      "norm_label": "registry"
+      "norm_label": "registry",
+      "id": "packages_tsconfig_package_publishconfig_registry"
     },
     {
       "label": "exports",
@@ -3674,9 +3674,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L14",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports",
       "community": 7,
-      "norm_label": "exports"
+      "norm_label": "exports",
+      "id": "packages_tsconfig_package_exports"
     },
     {
       "label": "./base.json",
@@ -3684,9 +3684,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports_base_json",
       "community": 7,
-      "norm_label": "./base.json"
+      "norm_label": "./base.json",
+      "id": "packages_tsconfig_package_exports_base_json"
     },
     {
       "label": "./strict-1.json",
@@ -3694,9 +3694,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports_strict_1_json",
       "community": 7,
-      "norm_label": "./strict-1.json"
+      "norm_label": "./strict-1.json",
+      "id": "packages_tsconfig_package_exports_strict_1_json"
     },
     {
       "label": "./strict-2.json",
@@ -3704,9 +3704,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports_strict_2_json",
       "community": 7,
-      "norm_label": "./strict-2.json"
+      "norm_label": "./strict-2.json",
+      "id": "packages_tsconfig_package_exports_strict_2_json"
     },
     {
       "label": "./pulumi.json",
@@ -3714,9 +3714,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports_pulumi_json",
       "community": 7,
-      "norm_label": "./pulumi.json"
+      "norm_label": "./pulumi.json",
+      "id": "packages_tsconfig_package_exports_pulumi_json"
     },
     {
       "label": "./react-app.json",
@@ -3724,9 +3724,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports_react_app_json",
       "community": 7,
-      "norm_label": "./react-app.json"
+      "norm_label": "./react-app.json",
+      "id": "packages_tsconfig_package_exports_react_app_json"
     },
     {
       "label": "./react-lib.json",
@@ -3734,9 +3734,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_exports_react_lib_json",
       "community": 7,
-      "norm_label": "./react-lib.json"
+      "norm_label": "./react-lib.json",
+      "id": "packages_tsconfig_package_exports_react_lib_json"
     },
     {
       "label": "files",
@@ -3744,9 +3744,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_files",
       "community": 2,
-      "norm_label": "files"
+      "norm_label": "files",
+      "id": "packages_tsconfig_package_files"
     },
     {
       "label": "*.json",
@@ -3754,9 +3754,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "id": "ref_json",
       "community": 2,
-      "norm_label": "*.json"
+      "norm_label": "*.json",
+      "id": "ref_json"
     },
     {
       "label": "README.md",
@@ -3764,9 +3764,9 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "id": "packages_tsconfig_package_json_ref_readme_md",
       "community": 2,
-      "norm_label": "readme.md"
+      "norm_label": "readme.md",
+      "id": "packages_tsconfig_package_json_ref_readme_md"
     },
     {
       "label": "vitest-config/package.json",
@@ -3774,9 +3774,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "packages_vitest_config_package",
       "community": 1,
-      "norm_label": "vitest-config/package.json"
+      "norm_label": "vitest-config/package.json",
+      "id": "packages_vitest_config_package"
     },
     {
       "label": "name",
@@ -3784,9 +3784,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_name",
       "community": 1,
-      "norm_label": "name"
+      "norm_label": "name",
+      "id": "packages_vitest_config_package_name"
     },
     {
       "label": "version",
@@ -3794,9 +3794,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_version",
       "community": 1,
-      "norm_label": "version"
+      "norm_label": "version",
+      "id": "packages_vitest_config_package_version"
     },
     {
       "label": "description",
@@ -3804,9 +3804,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_description",
       "community": 1,
-      "norm_label": "description"
+      "norm_label": "description",
+      "id": "packages_vitest_config_package_description"
     },
     {
       "label": "license",
@@ -3814,9 +3814,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_license",
       "community": 1,
-      "norm_label": "license"
+      "norm_label": "license",
+      "id": "packages_vitest_config_package_license"
     },
     {
       "label": "type",
@@ -3824,9 +3824,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_type",
       "community": 1,
-      "norm_label": "type"
+      "norm_label": "type",
+      "id": "packages_vitest_config_package_type"
     },
     {
       "label": "main",
@@ -3834,9 +3834,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_main",
       "community": 1,
-      "norm_label": "main"
+      "norm_label": "main",
+      "id": "packages_vitest_config_package_main"
     },
     {
       "label": "types",
@@ -3844,9 +3844,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_types",
       "community": 1,
-      "norm_label": "types"
+      "norm_label": "types",
+      "id": "packages_vitest_config_package_types"
     },
     {
       "label": "scripts",
@@ -3854,9 +3854,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_scripts",
       "community": 1,
-      "norm_label": "scripts"
+      "norm_label": "scripts",
+      "id": "packages_vitest_config_package_scripts"
     },
     {
       "label": "build",
@@ -3864,9 +3864,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L10",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_scripts_build",
       "community": 1,
-      "norm_label": "build"
+      "norm_label": "build",
+      "id": "packages_vitest_config_package_scripts_build"
     },
     {
       "label": "prepublishOnly",
@@ -3874,9 +3874,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_scripts_prepublishonly",
       "community": 1,
-      "norm_label": "prepublishonly"
+      "norm_label": "prepublishonly",
+      "id": "packages_vitest_config_package_scripts_prepublishonly"
     },
     {
       "label": "repository",
@@ -3884,9 +3884,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_repository",
       "community": 1,
-      "norm_label": "repository"
+      "norm_label": "repository",
+      "id": "packages_vitest_config_package_repository"
     },
     {
       "label": "type",
@@ -3894,9 +3894,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L14",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_repository_type",
       "community": 1,
-      "norm_label": "type"
+      "norm_label": "type",
+      "id": "packages_vitest_config_package_repository_type"
     },
     {
       "label": "url",
@@ -3904,9 +3904,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_repository_url",
       "community": 1,
-      "norm_label": "url"
+      "norm_label": "url",
+      "id": "packages_vitest_config_package_repository_url"
     },
     {
       "label": "directory",
@@ -3914,9 +3914,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_repository_directory",
       "community": 1,
-      "norm_label": "directory"
+      "norm_label": "directory",
+      "id": "packages_vitest_config_package_repository_directory"
     },
     {
       "label": "publishConfig",
@@ -3924,9 +3924,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_publishconfig",
       "community": 1,
-      "norm_label": "publishconfig"
+      "norm_label": "publishconfig",
+      "id": "packages_vitest_config_package_publishconfig"
     },
     {
       "label": "registry",
@@ -3934,9 +3934,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_publishconfig_registry",
       "community": 1,
-      "norm_label": "registry"
+      "norm_label": "registry",
+      "id": "packages_vitest_config_package_publishconfig_registry"
     },
     {
       "label": "exports",
@@ -3944,9 +3944,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L21",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_exports",
       "community": 1,
-      "norm_label": "exports"
+      "norm_label": "exports",
+      "id": "packages_vitest_config_package_exports"
     },
     {
       "label": "files",
@@ -3954,9 +3954,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_files",
       "community": 2,
-      "norm_label": "files"
+      "norm_label": "files",
+      "id": "packages_vitest_config_package_files"
     },
     {
       "label": "dist",
@@ -3964,9 +3964,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_json_ref_dist",
       "community": 2,
-      "norm_label": "dist"
+      "norm_label": "dist",
+      "id": "packages_vitest_config_package_json_ref_dist"
     },
     {
       "label": "peerDependencies",
@@ -3974,9 +3974,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L31",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_peerdependencies",
       "community": 6,
-      "norm_label": "peerdependencies"
+      "norm_label": "peerdependencies",
+      "id": "packages_vitest_config_package_peerdependencies"
     },
     {
       "label": "@vitest/coverage-v8",
@@ -3984,9 +3984,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L32",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
       "community": 6,
-      "norm_label": "@vitest/coverage-v8"
+      "norm_label": "@vitest/coverage-v8",
+      "id": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8"
     },
     {
       "label": "vitest",
@@ -3994,9 +3994,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L33",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_peerdependencies_vitest",
       "community": 6,
-      "norm_label": "vitest"
+      "norm_label": "vitest",
+      "id": "packages_vitest_config_package_peerdependencies_vitest"
     },
     {
       "label": "devDependencies",
@@ -4004,9 +4004,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L35",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_devdependencies",
       "community": 1,
-      "norm_label": "devdependencies"
+      "norm_label": "devdependencies",
+      "id": "packages_vitest_config_package_devdependencies"
     },
     {
       "label": "@branchleft/tsconfig",
@@ -4014,9 +4014,9 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "id": "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
       "community": 1,
-      "norm_label": "@branchleft/tsconfig"
+      "norm_label": "@branchleft/tsconfig",
+      "id": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
     }
   ],
   "links": [
@@ -6550,9 +6550,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
-      "target": "vitest_coverage_v8",
-      "confidence_score": 1.0
+      "target": "vitest_coverage_v8"
     },
     {
       "relation": "imports",
@@ -6574,9 +6574,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_peerdependencies_vitest",
-      "target": "vitest",
-      "confidence_score": 1.0
+      "target": "vitest"
     },
     {
       "relation": "imports",
@@ -6598,9 +6598,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "branchleft_tsconfig"
     },
     {
       "relation": "imports",
@@ -6610,9 +6610,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "branchleft_tsconfig"
     },
     {
       "relation": "imports_from",
@@ -7112,9 +7112,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_peerdependencies_eslint",
-      "target": "eslint",
-      "confidence_score": 1.0
+      "target": "eslint"
     },
     {
       "relation": "imports",
@@ -7775,9 +7775,9 @@
       "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_dependencies",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies"
     },
     {
       "relation": "contains",
@@ -7786,9 +7786,9 @@
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_description",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_description"
     },
     {
       "relation": "contains",
@@ -7797,9 +7797,9 @@
       "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_devdependencies",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_devdependencies"
     },
     {
       "relation": "contains",
@@ -7808,9 +7808,9 @@
       "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_exports",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_exports"
     },
     {
       "relation": "contains",
@@ -7819,9 +7819,9 @@
       "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_files",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_files"
     },
     {
       "relation": "contains",
@@ -7830,9 +7830,9 @@
       "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_license",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_license"
     },
     {
       "relation": "contains",
@@ -7841,9 +7841,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_main",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_main"
     },
     {
       "relation": "contains",
@@ -7852,9 +7852,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_name",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_name"
     },
     {
       "relation": "contains",
@@ -7863,9 +7863,9 @@
       "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_peerdependencies",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_peerdependencies"
     },
     {
       "relation": "contains",
@@ -7874,9 +7874,9 @@
       "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_publishconfig",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_publishconfig"
     },
     {
       "relation": "contains",
@@ -7885,9 +7885,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_repository",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_repository"
     },
     {
       "relation": "contains",
@@ -7896,9 +7896,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_scripts",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_scripts"
     },
     {
       "relation": "contains",
@@ -7907,9 +7907,9 @@
       "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_type",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_type"
     },
     {
       "relation": "contains",
@@ -7918,9 +7918,9 @@
       "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_types",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_types"
     },
     {
       "relation": "contains",
@@ -7929,9 +7929,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package",
-      "target": "packages_eslint_config_package_version",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_version"
     },
     {
       "relation": "contains",
@@ -7940,9 +7940,9 @@
       "source_location": "L10",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_scripts",
-      "target": "packages_eslint_config_package_scripts_build",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_scripts_build"
     },
     {
       "relation": "contains",
@@ -7951,9 +7951,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_scripts",
-      "target": "packages_eslint_config_package_scripts_prepublishonly",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_scripts_prepublishonly"
     },
     {
       "relation": "contains",
@@ -7962,9 +7962,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_repository",
-      "target": "packages_eslint_config_package_repository_directory",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_repository_directory"
     },
     {
       "relation": "contains",
@@ -7973,9 +7973,9 @@
       "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_repository",
-      "target": "packages_eslint_config_package_repository_type",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_repository_type"
     },
     {
       "relation": "contains",
@@ -7984,9 +7984,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_repository",
-      "target": "packages_eslint_config_package_repository_url",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_repository_url"
     },
     {
       "relation": "contains",
@@ -7995,9 +7995,9 @@
       "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_publishconfig",
-      "target": "packages_eslint_config_package_publishconfig_registry",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_publishconfig_registry"
     },
     {
       "relation": "extends",
@@ -8007,9 +8007,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_files",
-      "target": "packages_eslint_config_package_json_ref_dist",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_json_ref_dist"
     },
     {
       "relation": "extends",
@@ -8019,9 +8019,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_json_ref_readme_md"
     },
     {
       "relation": "contains",
@@ -8030,9 +8030,9 @@
       "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_config_prettier",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies_eslint_config_prettier"
     },
     {
       "relation": "contains",
@@ -8041,9 +8041,9 @@
       "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_js",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies_eslint_js"
     },
     {
       "relation": "contains",
@@ -8052,9 +8052,9 @@
       "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y"
     },
     {
       "relation": "contains",
@@ -8063,9 +8063,9 @@
       "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks"
     },
     {
       "relation": "contains",
@@ -8074,9 +8074,9 @@
       "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_globals",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies_globals"
     },
     {
       "relation": "contains",
@@ -8085,9 +8085,9 @@
       "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies",
-      "target": "packages_eslint_config_package_dependencies_typescript_eslint",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_dependencies_typescript_eslint"
     },
     {
       "relation": "imports",
@@ -8097,9 +8097,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies_eslint_js",
-      "target": "eslint_js",
-      "confidence_score": 1.0
+      "target": "eslint_js"
     },
     {
       "relation": "imports",
@@ -8109,9 +8109,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies_eslint_config_prettier",
-      "target": "eslint_config_prettier",
-      "confidence_score": 1.0
+      "target": "eslint_config_prettier"
     },
     {
       "relation": "imports",
@@ -8121,9 +8121,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y",
-      "target": "eslint_plugin_jsx_a11y",
-      "confidence_score": 1.0
+      "target": "eslint_plugin_jsx_a11y"
     },
     {
       "relation": "imports",
@@ -8133,9 +8133,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks",
-      "target": "eslint_plugin_react_hooks",
-      "confidence_score": 1.0
+      "target": "eslint_plugin_react_hooks"
     },
     {
       "relation": "imports",
@@ -8145,9 +8145,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies_globals",
-      "target": "globals",
-      "confidence_score": 1.0
+      "target": "globals"
     },
     {
       "relation": "imports",
@@ -8157,9 +8157,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_dependencies_typescript_eslint",
-      "target": "typescript_eslint",
-      "confidence_score": 1.0
+      "target": "typescript_eslint"
     },
     {
       "relation": "contains",
@@ -8168,9 +8168,9 @@
       "source_location": "L40",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_peerdependencies",
-      "target": "packages_eslint_config_package_peerdependencies_eslint",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_peerdependencies_eslint"
     },
     {
       "relation": "contains",
@@ -8179,9 +8179,9 @@
       "source_location": "L43",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_eslint_config_package_devdependencies",
-      "target": "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "packages_eslint_config_package_devdependencies_branchleft_tsconfig"
     },
     {
       "relation": "contains",
@@ -8190,9 +8190,9 @@
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_description",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_description"
     },
     {
       "relation": "contains",
@@ -8201,9 +8201,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_exports",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_exports"
     },
     {
       "relation": "contains",
@@ -8212,9 +8212,9 @@
       "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_files",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_files"
     },
     {
       "relation": "contains",
@@ -8223,9 +8223,9 @@
       "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_license",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_license"
     },
     {
       "relation": "contains",
@@ -8234,9 +8234,9 @@
       "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_main",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_main"
     },
     {
       "relation": "contains",
@@ -8245,9 +8245,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_name",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_name"
     },
     {
       "relation": "contains",
@@ -8256,9 +8256,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_publishconfig",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_publishconfig"
     },
     {
       "relation": "contains",
@@ -8267,9 +8267,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_repository",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_repository"
     },
     {
       "relation": "contains",
@@ -8278,9 +8278,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package",
-      "target": "packages_prettier_config_package_version",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_version"
     },
     {
       "relation": "contains",
@@ -8289,9 +8289,9 @@
       "source_location": "L10",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_repository",
-      "target": "packages_prettier_config_package_repository_directory",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_repository_directory"
     },
     {
       "relation": "contains",
@@ -8300,9 +8300,9 @@
       "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_repository",
-      "target": "packages_prettier_config_package_repository_type",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_repository_type"
     },
     {
       "relation": "contains",
@@ -8311,9 +8311,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_repository",
-      "target": "packages_prettier_config_package_repository_url",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_repository_url"
     },
     {
       "relation": "contains",
@@ -8322,9 +8322,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_publishconfig",
-      "target": "packages_prettier_config_package_publishconfig_registry",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_publishconfig_registry"
     },
     {
       "relation": "contains",
@@ -8333,9 +8333,9 @@
       "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_exports",
-      "target": "packages_prettier_config_package_exports_prettierignore",
-      "confidence_score": 1.0
+      "target": "packages_prettier_config_package_exports_prettierignore"
     },
     {
       "relation": "extends",
@@ -8345,9 +8345,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_json_ref_readme_md"
     },
     {
       "relation": "extends",
@@ -8357,9 +8357,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_files",
-      "target": "ref_index_json",
-      "confidence_score": 1.0
+      "target": "ref_index_json"
     },
     {
       "relation": "extends",
@@ -8369,9 +8369,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_prettier_config_package_files",
-      "target": "ref_prettierignore",
-      "confidence_score": 1.0
+      "target": "ref_prettierignore"
     },
     {
       "relation": "contains",
@@ -8380,9 +8380,9 @@
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_description",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_description"
     },
     {
       "relation": "contains",
@@ -8391,9 +8391,9 @@
       "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_exports",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports"
     },
     {
       "relation": "contains",
@@ -8402,9 +8402,9 @@
       "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_files",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_files"
     },
     {
       "relation": "contains",
@@ -8413,9 +8413,9 @@
       "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_license",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_license"
     },
     {
       "relation": "contains",
@@ -8424,9 +8424,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_name",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_name"
     },
     {
       "relation": "contains",
@@ -8435,9 +8435,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_publishconfig",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_publishconfig"
     },
     {
       "relation": "contains",
@@ -8446,9 +8446,9 @@
       "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_repository",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_repository"
     },
     {
       "relation": "contains",
@@ -8457,9 +8457,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package",
-      "target": "packages_tsconfig_package_version",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_version"
     },
     {
       "relation": "contains",
@@ -8468,9 +8468,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_repository",
-      "target": "packages_tsconfig_package_repository_directory",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_repository_directory"
     },
     {
       "relation": "contains",
@@ -8479,9 +8479,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_repository",
-      "target": "packages_tsconfig_package_repository_type",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_repository_type"
     },
     {
       "relation": "contains",
@@ -8490,9 +8490,9 @@
       "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_repository",
-      "target": "packages_tsconfig_package_repository_url",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_repository_url"
     },
     {
       "relation": "contains",
@@ -8501,9 +8501,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_publishconfig",
-      "target": "packages_tsconfig_package_publishconfig_registry",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_publishconfig_registry"
     },
     {
       "relation": "contains",
@@ -8512,9 +8512,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_base_json",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports_base_json"
     },
     {
       "relation": "contains",
@@ -8523,9 +8523,9 @@
       "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_pulumi_json",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports_pulumi_json"
     },
     {
       "relation": "contains",
@@ -8534,9 +8534,9 @@
       "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_react_app_json",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports_react_app_json"
     },
     {
       "relation": "contains",
@@ -8545,9 +8545,9 @@
       "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_react_lib_json",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports_react_lib_json"
     },
     {
       "relation": "contains",
@@ -8556,9 +8556,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_strict_1_json",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports_strict_1_json"
     },
     {
       "relation": "contains",
@@ -8567,9 +8567,9 @@
       "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_exports",
-      "target": "packages_tsconfig_package_exports_strict_2_json",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_exports_strict_2_json"
     },
     {
       "relation": "extends",
@@ -8579,9 +8579,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_json_ref_readme_md"
     },
     {
       "relation": "extends",
@@ -8591,9 +8591,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_tsconfig_package_files",
-      "target": "ref_json",
-      "confidence_score": 1.0
+      "target": "ref_json"
     },
     {
       "relation": "extends",
@@ -8603,9 +8603,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_files",
-      "target": "packages_tsconfig_package_json_ref_readme_md",
-      "confidence_score": 1.0
+      "target": "packages_tsconfig_package_json_ref_readme_md"
     },
     {
       "relation": "contains",
@@ -8614,9 +8614,9 @@
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_description",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_description"
     },
     {
       "relation": "contains",
@@ -8625,9 +8625,9 @@
       "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_devdependencies",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_devdependencies"
     },
     {
       "relation": "contains",
@@ -8636,9 +8636,9 @@
       "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_exports",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_exports"
     },
     {
       "relation": "contains",
@@ -8647,9 +8647,9 @@
       "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_files",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_files"
     },
     {
       "relation": "contains",
@@ -8658,9 +8658,9 @@
       "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_license",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_license"
     },
     {
       "relation": "contains",
@@ -8669,9 +8669,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_main",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_main"
     },
     {
       "relation": "contains",
@@ -8680,9 +8680,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_name",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_name"
     },
     {
       "relation": "contains",
@@ -8691,9 +8691,9 @@
       "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_peerdependencies",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_peerdependencies"
     },
     {
       "relation": "contains",
@@ -8702,9 +8702,9 @@
       "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_publishconfig",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_publishconfig"
     },
     {
       "relation": "contains",
@@ -8713,9 +8713,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_repository",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_repository"
     },
     {
       "relation": "contains",
@@ -8724,9 +8724,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_scripts",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_scripts"
     },
     {
       "relation": "contains",
@@ -8735,9 +8735,9 @@
       "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_type",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_type"
     },
     {
       "relation": "contains",
@@ -8746,9 +8746,9 @@
       "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_types",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_types"
     },
     {
       "relation": "contains",
@@ -8757,9 +8757,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package",
-      "target": "packages_vitest_config_package_version",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_version"
     },
     {
       "relation": "contains",
@@ -8768,9 +8768,9 @@
       "source_location": "L10",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_scripts",
-      "target": "packages_vitest_config_package_scripts_build",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_scripts_build"
     },
     {
       "relation": "contains",
@@ -8779,9 +8779,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_scripts",
-      "target": "packages_vitest_config_package_scripts_prepublishonly",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_scripts_prepublishonly"
     },
     {
       "relation": "contains",
@@ -8790,9 +8790,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_repository",
-      "target": "packages_vitest_config_package_repository_directory",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_repository_directory"
     },
     {
       "relation": "contains",
@@ -8801,9 +8801,9 @@
       "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_repository",
-      "target": "packages_vitest_config_package_repository_type",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_repository_type"
     },
     {
       "relation": "contains",
@@ -8812,9 +8812,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_repository",
-      "target": "packages_vitest_config_package_repository_url",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_repository_url"
     },
     {
       "relation": "contains",
@@ -8823,9 +8823,9 @@
       "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_publishconfig",
-      "target": "packages_vitest_config_package_publishconfig_registry",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_publishconfig_registry"
     },
     {
       "relation": "extends",
@@ -8835,9 +8835,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_files",
-      "target": "packages_vitest_config_package_json_ref_dist",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_json_ref_dist"
     },
     {
       "relation": "contains",
@@ -8846,9 +8846,9 @@
       "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_peerdependencies",
-      "target": "packages_vitest_config_package_peerdependencies_vitest",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_peerdependencies_vitest"
     },
     {
       "relation": "contains",
@@ -8857,9 +8857,9 @@
       "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_peerdependencies",
-      "target": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_peerdependencies_vitest_coverage_v8"
     },
     {
       "relation": "contains",
@@ -8868,11 +8868,11 @@
       "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "packages_vitest_config_package_devdependencies",
-      "target": "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "24fce99620d65faa3077d77e48374383bd7f7de2"
+  "built_at_commit": "c50f74921e2db1c2aade5a3f3243c96ac586d733"
 }
