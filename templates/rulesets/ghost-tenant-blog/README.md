@@ -9,6 +9,18 @@ runs on push to `main` and never reports on a pull request, so requiring it
 would block every merge permanently (`REPO-4` rule 1,
 [`docs/repo-settings.md`](../../../docs/repo-settings.md)).
 
+`docs-lint / docs-lint` and `standards / Standards gates` run in `warn` mode
+on `ghost-tenant-blog` today (`.docs-lint.mode` and `.standards.mode`, both
+`warn`). A required warn-mode check still fails on findings in files the pull
+request itself touches — only the pre-existing, whole-tree backlog is
+advisory — so requiring these two contexts is real, if partial, coverage,
+not a check that cannot fail. Clearing the repo's `warn` state is
+[branchLeft/workspace#164](https://github.com/branchLeft/workspace/issues/164);
+the wording of the clause this touches is
+[branchLeft/workspace#166](https://github.com/branchLeft/workspace/issues/166).
+Until #164 lands, "four required checks" means new and changed files are
+gated, not that the whole tree is clean.
+
 ## Do not apply yet — this payload is ahead of the repo's live CI
 
 Today `ghost-tenant-blog`'s PRs report exactly three contexts: `Type check`,
