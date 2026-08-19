@@ -74,6 +74,10 @@ Note that the enumeration uses `find`, not a `*/` glob: the org's `.github` repo
 is a legitimate target and a glob skips dot-directories, so it would be captured
 and then silently never audited.
 
+`templates/rulesets/ghost-tenant-blog/main.json` is committed ahead of a live
+CI gap on that repo — see that directory's `README.md` for the required-check
+evidence and the precondition on when `ruleset-apply.sh` may be run against it.
+
 ## Applying is privileged
 
 `ruleset-apply.sh` is the platform owner's to run. Prepare the command, run
