@@ -7,7 +7,7 @@ the same four contexts as `templates/org-rulesets/ghost-tenant-default-branch.js
 `standards / Standards gates`. `Deploy (pulumi up)` is excluded — it only
 runs on push to `main` and never reports on a pull request, so requiring it
 would block every merge permanently (`REPO-4` rule 1,
-[`../../docs/repo-settings.md`](../../docs/repo-settings.md)).
+[`docs/repo-settings.md`](../../../docs/repo-settings.md)).
 
 ## Do not apply yet — this payload is ahead of the repo's live CI
 
