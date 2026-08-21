@@ -103,6 +103,15 @@ shrugs at what it does not understand would miss the next one.
 
 `--allow-weakening` exists for a reduction that is deliberate, and it prints
 what it is about to remove. It is not a way past a payload that is merely stale.
+It takes exactly one repo, because a run-wide override would authorise every
+other reduction in the same invocation — including in repos nobody was thinking
+about — and it cannot cover a finding the guard could not classify, because an
+override expresses intent about a reduction someone can see.
+
+`--dry-run` reports the decision without calling PUT or POST. Use it to exercise
+the script. There is otherwise no way to see what the guard makes of a payload
+except by performing the write, and a run that reaches the override path
+performs a real one.
 
 This is a separate control from REPO-6, not a duplicate of it. The audit reports
 drift in both directions and is read by a person; the guard blocks one direction
