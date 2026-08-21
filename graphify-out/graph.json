@@ -19,7 +19,7 @@
       "source_file": "packages/eslint-config/src/index.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "eslint-config/src/index.ts",
       "id": "packages_eslint_config_src_index"
     },
@@ -29,7 +29,7 @@
       "source_file": "packages/eslint-config/src/library.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "library.ts",
       "id": "packages_eslint_config_src_library"
     },
@@ -39,7 +39,7 @@
       "source_file": "packages/eslint-config/src/library.ts",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "library",
       "id": "packages_eslint_config_src_library_library"
     },
@@ -49,7 +49,7 @@
       "source_file": "packages/eslint-config/src/pulumi.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "pulumi.ts",
       "id": "packages_eslint_config_src_pulumi"
     },
@@ -59,7 +59,7 @@
       "source_file": "packages/eslint-config/src/pulumi.ts",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "pulumi",
       "id": "packages_eslint_config_src_pulumi_pulumi"
     },
@@ -69,7 +69,7 @@
       "source_file": "packages/eslint-config/src/pulumi.ts",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "scripts",
       "id": "packages_eslint_config_src_pulumi_scripts"
     },
@@ -79,7 +79,7 @@
       "source_file": "packages/eslint-config/src/react.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "react.ts",
       "id": "packages_eslint_config_src_react"
     },
@@ -90,7 +90,7 @@
       "source_location": "L11",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "recommendedrules()",
       "id": "packages_eslint_config_src_react_recommendedrules"
     },
@@ -100,7 +100,7 @@
       "source_file": "packages/eslint-config/src/react.ts",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "react",
       "id": "packages_eslint_config_src_react_react"
     },
@@ -110,7 +110,7 @@
       "source_file": "packages/eslint-config/src/tests.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "tests.ts",
       "id": "packages_eslint_config_src_tests"
     },
@@ -120,7 +120,7 @@
       "source_file": "packages/eslint-config/src/tests.ts",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "tests",
       "id": "packages_eslint_config_src_tests_tests"
     },
@@ -130,7 +130,7 @@
       "source_file": "packages/eslint-config/src/typeChecked.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "typechecked.ts",
       "id": "packages_eslint_config_src_typechecked"
     },
@@ -141,7 +141,7 @@
       "source_location": "L15",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "typechecked()",
       "id": "packages_eslint_config_src_typechecked_typechecked"
     },
@@ -331,7 +331,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "base.json",
       "id": "packages_tsconfig_base"
     },
@@ -341,7 +341,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "$schema",
       "id": "packages_tsconfig_base_schema"
     },
@@ -351,7 +351,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "_comment",
       "id": "packages_tsconfig_base_comment"
     },
@@ -361,7 +361,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "compileroptions",
       "id": "packages_tsconfig_base_compileroptions"
     },
@@ -371,7 +371,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "strict",
       "id": "packages_tsconfig_base_compileroptions_strict"
     },
@@ -381,7 +381,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "target",
       "id": "packages_tsconfig_base_compileroptions_target"
     },
@@ -391,7 +391,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "skiplibcheck",
       "id": "packages_tsconfig_base_compileroptions_skiplibcheck"
     },
@@ -401,7 +401,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "esmoduleinterop",
       "id": "packages_tsconfig_base_compileroptions_esmoduleinterop"
     },
@@ -411,7 +411,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "forceconsistentcasinginfilenames",
       "id": "packages_tsconfig_base_compileroptions_forceconsistentcasinginfilenames"
     },
@@ -421,7 +421,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "resolvejsonmodule",
       "id": "packages_tsconfig_base_compileroptions_resolvejsonmodule"
     },
@@ -431,7 +431,7 @@
       "source_file": "packages/tsconfig/base.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 13,
+      "community": 14,
       "norm_label": "noemit",
       "id": "packages_tsconfig_base_compileroptions_noemit"
     },
@@ -441,7 +441,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "pulumi.json",
       "id": "packages_tsconfig_pulumi"
     },
@@ -451,7 +451,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "$schema",
       "id": "packages_tsconfig_pulumi_schema"
     },
@@ -461,7 +461,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "_comment",
       "id": "packages_tsconfig_pulumi_comment"
     },
@@ -471,7 +471,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "compileroptions",
       "id": "packages_tsconfig_pulumi_compileroptions"
     },
@@ -481,7 +481,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "module",
       "id": "packages_tsconfig_pulumi_compileroptions_module"
     },
@@ -491,7 +491,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "moduleresolution",
       "id": "packages_tsconfig_pulumi_compileroptions_moduleresolution"
     },
@@ -501,7 +501,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "lib",
       "id": "packages_tsconfig_pulumi_compileroptions_lib"
     },
@@ -511,7 +511,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "es2022",
       "id": "packages_tsconfig_pulumi_json_ref_es2022"
     },
@@ -521,7 +521,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "types",
       "id": "packages_tsconfig_pulumi_compileroptions_types"
     },
@@ -531,7 +531,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "node",
       "id": "ref_node"
     },
@@ -541,7 +541,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "sourcemap",
       "id": "packages_tsconfig_pulumi_compileroptions_sourcemap"
     },
@@ -551,7 +551,7 @@
       "source_file": "packages/tsconfig/pulumi.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 12,
+      "community": 13,
       "norm_label": "experimentaldecorators",
       "id": "packages_tsconfig_pulumi_compileroptions_experimentaldecorators"
     },
@@ -701,7 +701,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "react-lib.json",
       "id": "packages_tsconfig_react_lib"
     },
@@ -711,7 +711,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "$schema",
       "id": "packages_tsconfig_react_lib_schema"
     },
@@ -721,7 +721,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "_comment",
       "id": "packages_tsconfig_react_lib_comment"
     },
@@ -731,7 +731,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "extends",
       "id": "packages_tsconfig_react_lib_extends"
     },
@@ -741,7 +741,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "./react-app.json",
       "id": "ref_react_app_json"
     },
@@ -751,7 +751,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "compileroptions",
       "id": "packages_tsconfig_react_lib_compileroptions"
     },
@@ -761,7 +761,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "noemit",
       "id": "packages_tsconfig_react_lib_compileroptions_noemit"
     },
@@ -771,7 +771,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "declaration",
       "id": "packages_tsconfig_react_lib_compileroptions_declaration"
     },
@@ -781,7 +781,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "declarationmap",
       "id": "packages_tsconfig_react_lib_compileroptions_declarationmap"
     },
@@ -791,7 +791,7 @@
       "source_file": "packages/tsconfig/react-lib.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "norm_label": "sourcemap",
       "id": "packages_tsconfig_react_lib_compileroptions_sourcemap"
     },
@@ -801,7 +801,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "strict-1.json",
       "id": "packages_tsconfig_strict_1"
     },
@@ -811,7 +811,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "$schema",
       "id": "packages_tsconfig_strict_1_schema"
     },
@@ -821,7 +821,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "_comment",
       "id": "packages_tsconfig_strict_1_comment"
     },
@@ -831,7 +831,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "extends",
       "id": "packages_tsconfig_strict_1_extends"
     },
@@ -841,7 +841,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "./base.json",
       "id": "ref_base_json"
     },
@@ -851,7 +851,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "compileroptions",
       "id": "packages_tsconfig_strict_1_compileroptions"
     },
@@ -861,7 +861,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "nounusedlocals",
       "id": "packages_tsconfig_strict_1_compileroptions_nounusedlocals"
     },
@@ -871,7 +871,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "nounusedparameters",
       "id": "packages_tsconfig_strict_1_compileroptions_nounusedparameters"
     },
@@ -881,7 +881,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "noimplicitreturns",
       "id": "packages_tsconfig_strict_1_compileroptions_noimplicitreturns"
     },
@@ -891,7 +891,7 @@
       "source_file": "packages/tsconfig/strict-1.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "norm_label": "nofallthroughcasesinswitch",
       "id": "packages_tsconfig_strict_1_compileroptions_nofallthroughcasesinswitch"
     },
@@ -901,7 +901,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "strict-2.json",
       "id": "packages_tsconfig_strict_2"
     },
@@ -911,7 +911,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "$schema",
       "id": "packages_tsconfig_strict_2_schema"
     },
@@ -921,7 +921,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "_comment",
       "id": "packages_tsconfig_strict_2_comment"
     },
@@ -931,7 +931,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "extends",
       "id": "packages_tsconfig_strict_2_extends"
     },
@@ -941,7 +941,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "./strict-1.json",
       "id": "ref_strict_1_json"
     },
@@ -951,7 +951,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "compileroptions",
       "id": "packages_tsconfig_strict_2_compileroptions"
     },
@@ -961,7 +961,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "nouncheckedindexedaccess",
       "id": "packages_tsconfig_strict_2_compileroptions_nouncheckedindexedaccess"
     },
@@ -971,7 +971,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "exactoptionalpropertytypes",
       "id": "packages_tsconfig_strict_2_compileroptions_exactoptionalpropertytypes"
     },
@@ -981,7 +981,7 @@
       "source_file": "packages/tsconfig/strict-2.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "noimplicitoverride",
       "id": "packages_tsconfig_strict_2_compileroptions_noimplicitoverride"
     },
@@ -1126,34 +1126,6 @@
       "id": "packages_vitest_config_tsconfig_build_json_ref_src_ts"
     },
     {
-      "label": "ruleset-apply.sh",
-      "file_type": "code",
-      "source_file": "tools/ruleset-apply.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 28,
-      "norm_label": "ruleset-apply.sh",
-      "id": "tools_ruleset_apply"
-    },
-    {
-      "label": "ruleset-apply.sh script",
-      "file_type": "code",
-      "source_file": "tools/ruleset-apply.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 28,
-      "norm_label": "ruleset-apply.sh script",
-      "id": "tools_ruleset_apply_sh__entry"
-    },
-    {
       "label": "ruleset_normalize.py",
       "file_type": "code",
       "source_file": "tools/ruleset_normalize.py",
@@ -1195,7 +1167,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "check-pulumi.sh",
       "id": "tools_check_pulumi"
     },
@@ -1209,7 +1181,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "check-pulumi.sh script",
       "id": "tools_check_pulumi_sh__entry"
     },
@@ -1223,7 +1195,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "is_component_file()",
       "id": "tools_check_pulumi_is_component_file"
     },
@@ -1237,7 +1209,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "scan_component()",
       "id": "tools_check_pulumi_scan_component"
     },
@@ -1251,7 +1223,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "takes_parent()",
       "id": "tools_check_pulumi_takes_parent"
     },
@@ -1265,7 +1237,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "scan_parenting()",
       "id": "tools_check_pulumi_scan_parenting"
     },
@@ -1279,7 +1251,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "scan_args()",
       "id": "tools_check_pulumi_scan_args"
     },
@@ -1293,7 +1265,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "main()",
       "id": "tools_check_pulumi_main"
     },
@@ -1307,7 +1279,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "self_test()",
       "id": "tools_check_pulumi_self_test"
     },
@@ -1321,7 +1293,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet.sh",
       "id": "tools_lib_ratchet"
     },
@@ -1335,7 +1307,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet.sh script",
       "id": "tools_lib_ratchet_sh__entry"
     },
@@ -1349,7 +1321,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_init()",
       "id": "tools_lib_ratchet_ratchet_init"
     },
@@ -1363,7 +1335,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_scope_files()",
       "id": "tools_lib_ratchet_ratchet_scope_files"
     },
@@ -1377,7 +1349,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_is_enforced()",
       "id": "tools_lib_ratchet_ratchet_is_enforced"
     },
@@ -1391,7 +1363,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_glob_matches()",
       "id": "tools_lib_ratchet_ratchet_glob_matches"
     },
@@ -1405,7 +1377,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_is_exempt()",
       "id": "tools_lib_ratchet_ratchet_is_exempt"
     },
@@ -1419,7 +1391,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_is_allowed()",
       "id": "tools_lib_ratchet_ratchet_is_allowed"
     },
@@ -1433,7 +1405,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_finding()",
       "id": "tools_lib_ratchet_ratchet_finding"
     },
@@ -1447,7 +1419,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet__json()",
       "id": "tools_lib_ratchet_ratchet_json"
     },
@@ -1461,7 +1433,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_summary()",
       "id": "tools_lib_ratchet_ratchet_summary"
     },
@@ -1475,7 +1447,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_scratch_repo_init()",
       "id": "tools_lib_ratchet_ratchet_scratch_repo_init"
     },
@@ -1489,7 +1461,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 5,
+      "community": 0,
       "norm_label": "ratchet_self_test()",
       "id": "tools_lib_ratchet_ratchet_self_test"
     },
@@ -1503,7 +1475,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 24,
+      "community": 0,
       "norm_label": "check-workflows.sh",
       "id": "tools_check_workflows"
     },
@@ -1517,7 +1489,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 24,
+      "community": 0,
       "norm_label": "check-workflows.sh script",
       "id": "tools_check_workflows_sh__entry"
     },
@@ -1531,7 +1503,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 24,
+      "community": 0,
       "norm_label": "scan_workflow()",
       "id": "tools_check_workflows_scan_workflow"
     },
@@ -1545,7 +1517,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 24,
+      "community": 0,
       "norm_label": "main()",
       "id": "tools_check_workflows_main"
     },
@@ -1559,7 +1531,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 24,
+      "community": 0,
       "norm_label": "self_test()",
       "id": "tools_check_workflows_self_test"
     },
@@ -1573,7 +1545,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "standards-sync.sh",
       "id": "tools_standards_sync"
     },
@@ -1587,7 +1559,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "standards-sync.sh script",
       "id": "tools_standards_sync_sh__entry"
     },
@@ -1601,7 +1573,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "parse_args()",
       "id": "tools_standards_sync_parse_args"
     },
@@ -1615,7 +1587,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "assert_manifest_complete()",
       "id": "tools_standards_sync_assert_manifest_complete"
     },
@@ -1629,7 +1601,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "first_missing_line()",
       "id": "tools_standards_sync_first_missing_line"
     },
@@ -1643,7 +1615,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "check_entry()",
       "id": "tools_standards_sync_check_entry"
     },
@@ -1657,7 +1629,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "apply_entry()",
       "id": "tools_standards_sync_apply_entry"
     },
@@ -1671,7 +1643,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "main()",
       "id": "tools_standards_sync_main"
     },
@@ -1685,7 +1657,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "self_test()",
       "id": "tools_standards_sync_self_test"
     },
@@ -1699,7 +1671,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "gate()",
       "id": "tools_standards_sync_gate"
     },
@@ -1709,7 +1681,7 @@
       "source_file": "packages/eslint-config/src/reactApp.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "reactapp.ts",
       "id": "packages_eslint_config_src_reactapp"
     },
@@ -1721,7 +1693,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "reactappoptions",
       "id": "packages_eslint_config_src_reactapp_reactappoptions"
     },
@@ -1731,7 +1703,7 @@
       "source_file": "packages/eslint-config/src/reactApp.ts",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "default_framework_modules",
       "id": "packages_eslint_config_src_reactapp_default_framework_modules"
     },
@@ -1742,7 +1714,7 @@
       "source_location": "L22",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "reactapp()",
       "id": "packages_eslint_config_src_reactapp_reactapp"
     },
@@ -1780,7 +1752,7 @@
       "source_file": "packages/eslint-config/src/reactApp.test.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "reactapp.test.ts",
       "id": "packages_eslint_config_src_reactapp_test"
     },
@@ -1791,7 +1763,7 @@
       "source_location": "L9",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "indexofrule()",
       "id": "packages_eslint_config_src_reactapp_test_indexofrule"
     },
@@ -1801,7 +1773,7 @@
       "source_file": "packages/eslint-config/src/typeChecked.test.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "typechecked.test.ts",
       "id": "packages_eslint_config_src_typechecked_test"
     },
@@ -1812,7 +1784,7 @@
       "source_location": "L6",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "alloweddefaultprojects()",
       "id": "packages_eslint_config_src_typechecked_test_alloweddefaultprojects"
     },
@@ -1822,7 +1794,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "tsconfig.json",
       "id": "tsconfig"
     },
@@ -1832,7 +1804,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "extends",
       "id": "tsconfig_extends"
     },
@@ -1842,7 +1814,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "@branchleft/tsconfig/strict-2.json",
       "id": "ref_branchleft_tsconfig_strict_2_json"
     },
@@ -1852,7 +1824,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "@branchleft/tsconfig/react-app.json",
       "id": "ref_branchleft_tsconfig_react_app_json"
     },
@@ -1862,7 +1834,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "include",
       "id": "tsconfig_include"
     },
@@ -1872,7 +1844,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "packages/*/src/**/*.ts",
       "id": "ref_packages_src_ts"
     },
@@ -1882,7 +1854,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "vitest.config.ts",
       "id": "ref_vitest_config_ts"
     },
@@ -1892,7 +1864,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "exclude",
       "id": "tsconfig_exclude"
     },
@@ -1902,7 +1874,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "node_modules",
       "id": "ref_node_modules"
     },
@@ -1912,7 +1884,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "norm_label": "**/dist",
       "id": "tsconfig_json_ref_dist"
     },
@@ -1932,7 +1904,7 @@
       "source_file": "packages/eslint-config/src/base.test.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "base.test.ts",
       "id": "packages_eslint_config_src_base_test"
     },
@@ -1943,7 +1915,7 @@
       "source_location": "L11",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "effective()",
       "id": "packages_eslint_config_src_base_test_effective"
     },
@@ -1953,7 +1925,7 @@
       "source_file": "packages/eslint-config/src/base.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "base.ts",
       "id": "packages_eslint_config_src_base"
     },
@@ -1963,7 +1935,7 @@
       "source_file": "packages/eslint-config/src/base.ts",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 0,
+      "community": 1,
       "norm_label": "base",
       "id": "packages_eslint_config_src_base_base"
     },
@@ -1993,7 +1965,7 @@
       "source_file": "package.json",
       "source_location": "L28",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "@branchleft/tsconfig",
       "id": "branchleft_tsconfig"
     },
@@ -2003,7 +1975,7 @@
       "source_file": "packages/vitest-config/src/index.test.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "index.test.ts",
       "id": "packages_vitest_config_src_index_test"
     },
@@ -2013,7 +1985,7 @@
       "source_file": "packages/vitest-config/src/index.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "vitest-config/src/index.ts",
       "id": "packages_vitest_config_src_index"
     },
@@ -2025,7 +1997,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "testenvironment",
       "id": "packages_vitest_config_src_index_testenvironment"
     },
@@ -2037,7 +2009,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "standardtestoptions",
       "id": "packages_vitest_config_src_index_standardtestoptions"
     },
@@ -2047,7 +2019,7 @@
       "source_file": "packages/vitest-config/src/index.ts",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "default_coverage_include",
       "id": "packages_vitest_config_src_index_default_coverage_include"
     },
@@ -2057,7 +2029,7 @@
       "source_file": "packages/vitest-config/src/index.ts",
       "source_location": "L22",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "default_coverage_exclude",
       "id": "packages_vitest_config_src_index_default_coverage_exclude"
     },
@@ -2067,7 +2039,7 @@
       "source_file": "packages/vitest-config/src/index.ts",
       "source_location": "L37",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "default_test_exclude",
       "id": "packages_vitest_config_src_index_default_test_exclude"
     },
@@ -2078,7 +2050,7 @@
       "source_location": "L61",
       "_callable": true,
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "norm_label": "definestandardtest()",
       "id": "packages_vitest_config_src_index_definestandardtest"
     },
@@ -2088,7 +2060,7 @@
       "source_file": "package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "package.json",
       "id": "package"
     },
@@ -2098,7 +2070,7 @@
       "source_file": "package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "name",
       "id": "package_name"
     },
@@ -2108,7 +2080,7 @@
       "source_file": "package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "version",
       "id": "package_version"
     },
@@ -2118,7 +2090,7 @@
       "source_file": "package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "private",
       "id": "package_private"
     },
@@ -2128,7 +2100,7 @@
       "source_file": "package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "description",
       "id": "package_description"
     },
@@ -2138,7 +2110,7 @@
       "source_file": "package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "license",
       "id": "package_license"
     },
@@ -2148,7 +2120,7 @@
       "source_file": "package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "repository",
       "id": "package_repository"
     },
@@ -2158,7 +2130,7 @@
       "source_file": "package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "type",
       "id": "package_repository_type"
     },
@@ -2168,7 +2140,7 @@
       "source_file": "package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "url",
       "id": "package_repository_url"
     },
@@ -2178,7 +2150,7 @@
       "source_file": "package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "packagemanager",
       "id": "package_packagemanager"
     },
@@ -2188,7 +2160,7 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "prettier",
       "id": "package_prettier"
     },
@@ -2198,7 +2170,7 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "scripts",
       "id": "package_scripts"
     },
@@ -2208,7 +2180,7 @@
       "source_file": "package.json",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "typecheck",
       "id": "package_scripts_typecheck"
     },
@@ -2218,7 +2190,7 @@
       "source_file": "package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "format",
       "id": "package_scripts_format"
     },
@@ -2228,7 +2200,7 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "format:check",
       "id": "package_scripts_format_check"
     },
@@ -2238,7 +2210,7 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "selftest",
       "id": "package_scripts_selftest"
     },
@@ -2248,7 +2220,7 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "prepare",
       "id": "package_scripts_prepare"
     },
@@ -2258,7 +2230,7 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "build",
       "id": "package_scripts_build"
     },
@@ -2268,7 +2240,7 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "lint",
       "id": "package_scripts_lint"
     },
@@ -2278,7 +2250,7 @@
       "source_file": "package.json",
       "source_location": "L21",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "lint:check",
       "id": "package_scripts_lint_check"
     },
@@ -2288,7 +2260,7 @@
       "source_file": "package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "test:unit",
       "id": "package_scripts_test_unit"
     },
@@ -2298,7 +2270,7 @@
       "source_file": "package.json",
       "source_location": "L23",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "test:coverage",
       "id": "package_scripts_test_coverage"
     },
@@ -2358,7 +2330,7 @@
       "source_file": "package.json",
       "source_location": "L28",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "@branchleft/tsconfig",
       "id": "package_devdependencies_branchleft_tsconfig"
     },
@@ -2398,7 +2370,7 @@
       "source_file": "package.json",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "eslint",
       "id": "package_devdependencies_eslint"
     },
@@ -2408,7 +2380,7 @@
       "source_file": "package.json",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "eslint",
       "id": "eslint"
     },
@@ -2468,7 +2440,7 @@
       "source_file": "package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "type",
       "id": "package_type"
     },
@@ -2482,7 +2454,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "check-tsconfig.sh",
       "id": "tools_check_tsconfig"
     },
@@ -2496,7 +2468,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "check-tsconfig.sh script",
       "id": "tools_check_tsconfig_sh__entry"
     },
@@ -2510,7 +2482,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "tier_rank()",
       "id": "tools_check_tsconfig_tier_rank"
     },
@@ -2524,7 +2496,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "analyse_tsconfig()",
       "id": "tools_check_tsconfig_analyse_tsconfig"
     },
@@ -2538,7 +2510,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "main()",
       "id": "tools_check_tsconfig_main"
     },
@@ -2552,7 +2524,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "check_ts5()",
       "id": "tools_check_tsconfig_check_ts5"
     },
@@ -2566,7 +2538,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "norm_label": "self_test()",
       "id": "tools_check_tsconfig_self_test"
     },
@@ -2580,7 +2552,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "check-clause-index.sh",
       "id": "tools_check_clause_index"
     },
@@ -2594,7 +2566,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "check-clause-index.sh script",
       "id": "tools_check_clause_index_sh__entry"
     },
@@ -2608,7 +2580,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "index_rows()",
       "id": "tools_check_clause_index_index_rows"
     },
@@ -2622,7 +2594,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "clause_is_named()",
       "id": "tools_check_clause_index_clause_is_named"
     },
@@ -2636,7 +2608,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "family_header_paths()",
       "id": "tools_check_clause_index_family_header_paths"
     },
@@ -2650,7 +2622,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "encoding_resolves()",
       "id": "tools_check_clause_index_encoding_resolves"
     },
@@ -2664,7 +2636,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "check_index()",
       "id": "tools_check_clause_index_check_index"
     },
@@ -2678,7 +2650,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "self_test()",
       "id": "tools_check_clause_index_self_test"
     },
@@ -2692,7 +2664,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "write_index()",
       "id": "tools_check_clause_index_write_index"
     },
@@ -2706,7 +2678,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "norm_label": "gate()",
       "id": "tools_check_clause_index_gate"
     },
@@ -2720,7 +2692,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "check-pulumi-secrets.sh",
       "id": "tools_check_pulumi_secrets"
     },
@@ -2734,7 +2706,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "check-pulumi-secrets.sh script",
       "id": "tools_check_pulumi_secrets_sh__entry"
     },
@@ -2748,7 +2720,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "strip_bom()",
       "id": "tools_check_pulumi_secrets_strip_bom"
     },
@@ -2762,7 +2734,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "pul12_finding()",
       "id": "tools_check_pulumi_secrets_pul12_finding"
     },
@@ -2776,7 +2748,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "scan_stack_config()",
       "id": "tools_check_pulumi_secrets_scan_stack_config"
     },
@@ -2790,7 +2762,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "main()",
       "id": "tools_check_pulumi_secrets_main"
     },
@@ -2804,7 +2776,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "norm_label": "self_test()",
       "id": "tools_check_pulumi_secrets_self_test"
     },
@@ -2818,7 +2790,7 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "standards-audit.sh",
       "id": "tools_standards_audit"
     },
@@ -2832,7 +2804,7 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "standards-audit.sh script",
       "id": "tools_standards_audit_sh__entry"
     },
@@ -2846,7 +2818,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "json_to_tsv()",
       "id": "tools_standards_audit_json_to_tsv"
     },
@@ -2860,7 +2832,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "clause_is_covered()",
       "id": "tools_standards_audit_clause_is_covered"
     },
@@ -2874,7 +2846,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "clauses_all_covered()",
       "id": "tools_standards_audit_clauses_all_covered"
     },
@@ -2888,7 +2860,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "audit_exemptions()",
       "id": "tools_standards_audit_audit_exemptions"
     },
@@ -2902,7 +2874,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "grep_tracked()",
       "id": "tools_standards_audit_grep_tracked"
     },
@@ -2916,7 +2888,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "native_suppressions()",
       "id": "tools_standards_audit_native_suppressions"
     },
@@ -2930,7 +2902,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "render_table()",
       "id": "tools_standards_audit_render_table"
     },
@@ -2944,7 +2916,7 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "main()",
       "id": "tools_standards_audit_main"
     },
@@ -2958,65 +2930,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "community": 14,
+      "community": 15,
       "norm_label": "self_test()",
       "id": "tools_standards_audit_self_test"
-    },
-    {
-      "label": "run.sh",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "run.sh",
-      "id": "tools_tests_run"
-    },
-    {
-      "label": "run.sh script",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "run.sh script",
-      "id": "tools_tests_run_sh__entry"
-    },
-    {
-      "label": "run()",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L15",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "run()",
-      "id": "tools_tests_run_run"
-    },
-    {
-      "label": "workflow_runs_every_gate()",
-      "file_type": "code",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L45",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "workflow_runs_every_gate()",
-      "id": "tools_tests_run_workflow_runs_every_gate"
     },
     {
       "label": "eslint-config/package.json",
@@ -3024,7 +2940,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "eslint-config/package.json",
       "id": "packages_eslint_config_package"
     },
@@ -3034,7 +2950,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "name",
       "id": "packages_eslint_config_package_name"
     },
@@ -3044,7 +2960,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "version",
       "id": "packages_eslint_config_package_version"
     },
@@ -3054,7 +2970,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "description",
       "id": "packages_eslint_config_package_description"
     },
@@ -3064,7 +2980,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "license",
       "id": "packages_eslint_config_package_license"
     },
@@ -3074,7 +2990,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "type",
       "id": "packages_eslint_config_package_type"
     },
@@ -3084,7 +3000,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "main",
       "id": "packages_eslint_config_package_main"
     },
@@ -3094,7 +3010,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "types",
       "id": "packages_eslint_config_package_types"
     },
@@ -3104,7 +3020,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "scripts",
       "id": "packages_eslint_config_package_scripts"
     },
@@ -3114,7 +3030,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "build",
       "id": "packages_eslint_config_package_scripts_build"
     },
@@ -3124,7 +3040,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "prepublishonly",
       "id": "packages_eslint_config_package_scripts_prepublishonly"
     },
@@ -3134,7 +3050,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "repository",
       "id": "packages_eslint_config_package_repository"
     },
@@ -3144,7 +3060,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "type",
       "id": "packages_eslint_config_package_repository_type"
     },
@@ -3154,7 +3070,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "url",
       "id": "packages_eslint_config_package_repository_url"
     },
@@ -3164,7 +3080,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "directory",
       "id": "packages_eslint_config_package_repository_directory"
     },
@@ -3174,7 +3090,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "publishconfig",
       "id": "packages_eslint_config_package_publishconfig"
     },
@@ -3184,7 +3100,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "registry",
       "id": "packages_eslint_config_package_publishconfig_registry"
     },
@@ -3194,7 +3110,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L21",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "exports",
       "id": "packages_eslint_config_package_exports"
     },
@@ -3204,7 +3120,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "files",
       "id": "packages_eslint_config_package_files"
     },
@@ -3214,7 +3130,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "dist",
       "id": "packages_eslint_config_package_json_ref_dist"
     },
@@ -3224,7 +3140,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "dependencies",
       "id": "packages_eslint_config_package_dependencies"
     },
@@ -3234,7 +3150,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L32",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "@eslint/js",
       "id": "packages_eslint_config_package_dependencies_eslint_js"
     },
@@ -3244,7 +3160,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L32",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "@eslint/js",
       "id": "eslint_js"
     },
@@ -3254,7 +3170,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "eslint-config-prettier",
       "id": "packages_eslint_config_package_dependencies_eslint_config_prettier"
     },
@@ -3264,7 +3180,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "eslint-config-prettier",
       "id": "eslint_config_prettier"
     },
@@ -3274,7 +3190,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L34",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "eslint-plugin-jsx-a11y",
       "id": "packages_eslint_config_package_dependencies_eslint_plugin_jsx_a11y"
     },
@@ -3284,7 +3200,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L34",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "eslint-plugin-jsx-a11y",
       "id": "eslint_plugin_jsx_a11y"
     },
@@ -3294,7 +3210,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L35",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "eslint-plugin-react-hooks",
       "id": "packages_eslint_config_package_dependencies_eslint_plugin_react_hooks"
     },
@@ -3304,7 +3220,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L35",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "eslint-plugin-react-hooks",
       "id": "eslint_plugin_react_hooks"
     },
@@ -3314,7 +3230,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "globals",
       "id": "packages_eslint_config_package_dependencies_globals"
     },
@@ -3324,7 +3240,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "globals",
       "id": "globals"
     },
@@ -3334,7 +3250,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L37",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "typescript-eslint",
       "id": "packages_eslint_config_package_dependencies_typescript_eslint"
     },
@@ -3344,7 +3260,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L37",
       "_origin": "ast",
-      "community": 11,
+      "community": 12,
       "norm_label": "typescript-eslint",
       "id": "typescript_eslint"
     },
@@ -3354,7 +3270,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L39",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "peerdependencies",
       "id": "packages_eslint_config_package_peerdependencies"
     },
@@ -3364,7 +3280,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L40",
       "_origin": "ast",
-      "community": 4,
+      "community": 5,
       "norm_label": "eslint",
       "id": "packages_eslint_config_package_peerdependencies_eslint"
     },
@@ -3374,7 +3290,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L42",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "devdependencies",
       "id": "packages_eslint_config_package_devdependencies"
     },
@@ -3384,7 +3300,7 @@
       "source_file": "packages/eslint-config/package.json",
       "source_location": "L43",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "@branchleft/tsconfig",
       "id": "packages_eslint_config_package_devdependencies_branchleft_tsconfig"
     },
@@ -3394,7 +3310,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "prettier-config/package.json",
       "id": "packages_prettier_config_package"
     },
@@ -3404,7 +3320,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "name",
       "id": "packages_prettier_config_package_name"
     },
@@ -3414,7 +3330,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "version",
       "id": "packages_prettier_config_package_version"
     },
@@ -3424,7 +3340,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "description",
       "id": "packages_prettier_config_package_description"
     },
@@ -3434,7 +3350,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "license",
       "id": "packages_prettier_config_package_license"
     },
@@ -3444,7 +3360,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "main",
       "id": "packages_prettier_config_package_main"
     },
@@ -3454,7 +3370,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "repository",
       "id": "packages_prettier_config_package_repository"
     },
@@ -3464,7 +3380,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "type",
       "id": "packages_prettier_config_package_repository_type"
     },
@@ -3474,7 +3390,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "url",
       "id": "packages_prettier_config_package_repository_url"
     },
@@ -3484,7 +3400,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "directory",
       "id": "packages_prettier_config_package_repository_directory"
     },
@@ -3494,7 +3410,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "publishconfig",
       "id": "packages_prettier_config_package_publishconfig"
     },
@@ -3504,7 +3420,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "registry",
       "id": "packages_prettier_config_package_publishconfig_registry"
     },
@@ -3514,7 +3430,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "exports",
       "id": "packages_prettier_config_package_exports"
     },
@@ -3524,7 +3440,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "./prettierignore",
       "id": "packages_prettier_config_package_exports_prettierignore"
     },
@@ -3534,7 +3450,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "files",
       "id": "packages_prettier_config_package_files"
     },
@@ -3544,7 +3460,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "index.json",
       "id": "ref_index_json"
     },
@@ -3554,7 +3470,7 @@
       "source_file": "packages/prettier-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "prettierignore",
       "id": "ref_prettierignore"
     },
@@ -3744,7 +3660,7 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "files",
       "id": "packages_tsconfig_package_files"
     },
@@ -3754,7 +3670,7 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "*.json",
       "id": "ref_json"
     },
@@ -3764,7 +3680,7 @@
       "source_file": "packages/tsconfig/package.json",
       "source_location": "L22",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "readme.md",
       "id": "packages_tsconfig_package_json_ref_readme_md"
     },
@@ -3774,7 +3690,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "vitest-config/package.json",
       "id": "packages_vitest_config_package"
     },
@@ -3784,7 +3700,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "name",
       "id": "packages_vitest_config_package_name"
     },
@@ -3794,7 +3710,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "version",
       "id": "packages_vitest_config_package_version"
     },
@@ -3804,7 +3720,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "description",
       "id": "packages_vitest_config_package_description"
     },
@@ -3814,7 +3730,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "license",
       "id": "packages_vitest_config_package_license"
     },
@@ -3824,7 +3740,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "type",
       "id": "packages_vitest_config_package_type"
     },
@@ -3834,7 +3750,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "main",
       "id": "packages_vitest_config_package_main"
     },
@@ -3844,7 +3760,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "types",
       "id": "packages_vitest_config_package_types"
     },
@@ -3854,7 +3770,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "scripts",
       "id": "packages_vitest_config_package_scripts"
     },
@@ -3864,7 +3780,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "build",
       "id": "packages_vitest_config_package_scripts_build"
     },
@@ -3874,7 +3790,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "prepublishonly",
       "id": "packages_vitest_config_package_scripts_prepublishonly"
     },
@@ -3884,7 +3800,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "repository",
       "id": "packages_vitest_config_package_repository"
     },
@@ -3894,7 +3810,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "type",
       "id": "packages_vitest_config_package_repository_type"
     },
@@ -3904,7 +3820,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "url",
       "id": "packages_vitest_config_package_repository_url"
     },
@@ -3914,7 +3830,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "directory",
       "id": "packages_vitest_config_package_repository_directory"
     },
@@ -3924,7 +3840,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "publishconfig",
       "id": "packages_vitest_config_package_publishconfig"
     },
@@ -3934,7 +3850,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "registry",
       "id": "packages_vitest_config_package_publishconfig_registry"
     },
@@ -3944,7 +3860,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L21",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "exports",
       "id": "packages_vitest_config_package_exports"
     },
@@ -3954,7 +3870,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "files",
       "id": "packages_vitest_config_package_files"
     },
@@ -3964,7 +3880,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "dist",
       "id": "packages_vitest_config_package_json_ref_dist"
     },
@@ -4004,7 +3920,7 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L35",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "devdependencies",
       "id": "packages_vitest_config_package_devdependencies"
     },
@@ -4014,9 +3930,243 @@
       "source_file": "packages/vitest-config/package.json",
       "source_location": "L36",
       "_origin": "ast",
-      "community": 1,
+      "community": 2,
       "norm_label": "@branchleft/tsconfig",
       "id": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
+    },
+    {
+      "label": "ruleset-apply.sh",
+      "file_type": "code",
+      "source_file": "tools/ruleset-apply.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "tools_ruleset_apply",
+      "community": 28,
+      "norm_label": "ruleset-apply.sh"
+    },
+    {
+      "label": "ruleset-apply.sh script",
+      "file_type": "code",
+      "source_file": "tools/ruleset-apply.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "tools_ruleset_apply_sh__entry",
+      "community": 28,
+      "norm_label": "ruleset-apply.sh script"
+    },
+    {
+      "label": "ruleset_guard.py",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tools_ruleset_guard",
+      "community": 11,
+      "norm_label": "ruleset_guard.py"
+    },
+    {
+      "label": "elem_key()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L51",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_elem_key",
+      "community": 11,
+      "norm_label": "elem_key()"
+    },
+    {
+      "label": "unclassified()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L65",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_unclassified",
+      "community": 11,
+      "norm_label": "unclassified()"
+    },
+    {
+      "label": "reduction()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L69",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_reduction",
+      "community": 11,
+      "norm_label": "reduction()"
+    },
+    {
+      "label": "rules_by_type()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L73",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_rules_by_type",
+      "community": 11,
+      "norm_label": "rules_by_type()"
+    },
+    {
+      "label": "compare_value()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L84",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_compare_value",
+      "community": 11,
+      "norm_label": "compare_value()"
+    },
+    {
+      "label": "bypass_actors()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L131",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_bypass_actors",
+      "community": 11,
+      "norm_label": "bypass_actors()"
+    },
+    {
+      "label": "weakenings()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L138",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_weakenings",
+      "community": 11,
+      "norm_label": "weakenings()"
+    },
+    {
+      "label": "exit_code()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L187",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_exit_code",
+      "community": 11,
+      "norm_label": "exit_code()"
+    },
+    {
+      "label": "self_test()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L193",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_self_test",
+      "community": 11,
+      "norm_label": "self_test()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L415",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_main",
+      "community": 11,
+      "norm_label": "main()"
+    },
+    {
+      "label": "A hashable identity for a list entry. Status checks key on `context` alone: the\u2026",
+      "file_type": "rationale",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_rationale_52",
+      "community": 11,
+      "norm_label": "a hashable identity for a list entry. status checks key on `context` alone: the..."
+    },
+    {
+      "label": "Walk one parameter subtree, recording anything the payload loosens.",
+      "file_type": "rationale",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_rationale_85",
+      "community": 11,
+      "norm_label": "walk one parameter subtree, recording anything the payload loosens."
+    },
+    {
+      "label": "Every way `payload` would leave the repo less protected than `live`.",
+      "file_type": "rationale",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L139",
+      "_origin": "ast",
+      "id": "tools_ruleset_guard_rationale_139",
+      "community": 11,
+      "norm_label": "every way `payload` would leave the repo less protected than `live`."
+    },
+    {
+      "label": "run.sh",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "tools_tests_run",
+      "community": 26,
+      "norm_label": "run.sh"
+    },
+    {
+      "label": "run.sh script",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "tools_tests_run_sh__entry",
+      "community": 26,
+      "norm_label": "run.sh script"
+    },
+    {
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L15",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "tools_tests_run_run",
+      "community": 26,
+      "norm_label": "run()"
+    },
+    {
+      "label": "workflow_runs_every_gate()",
+      "file_type": "code",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L46",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "tools_tests_run_workflow_runs_every_gate",
+      "community": 26,
+      "norm_label": "workflow_runs_every_gate()"
     }
   ],
   "links": [
@@ -5351,17 +5501,6 @@
       "confidence_score": 1.0,
       "source": "packages_vitest_config_tsconfig_build_include",
       "target": "packages_vitest_config_tsconfig_build_json_ref_src_ts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/ruleset-apply.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_ruleset_apply",
-      "target": "tools_ruleset_apply_sh__entry"
     },
     {
       "relation": "contains",
@@ -7724,51 +7863,6 @@
       "target": "tools_standards_audit_render_table"
     },
     {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run",
-      "target": "tools_tests_run_run"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run",
-      "target": "tools_tests_run_sh__entry"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L45",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run",
-      "target": "tools_tests_run_workflow_runs_every_gate"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/tests/run.sh",
-      "source_location": "L26",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_tests_run_sh__entry",
-      "target": "tools_tests_run_run"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/eslint-config/package.json",
@@ -8871,8 +8965,375 @@
       "confidence_score": 1.0,
       "source": "packages_vitest_config_package_devdependencies",
       "target": "packages_vitest_config_package_devdependencies_branchleft_tsconfig"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset-apply.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_apply",
+      "target": "tools_ruleset_apply_sh__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_bypass_actors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_compare_value",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_elem_key",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L187",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_exit_code",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L415",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_reduction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L73",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_rules_by_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L193",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_self_test",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_unclassified",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L138",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard",
+      "target": "tools_ruleset_guard_weakenings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_compare_value",
+      "target": "tools_ruleset_guard_elem_key",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_rationale_52",
+      "target": "tools_ruleset_guard_elem_key",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_compare_value",
+      "target": "tools_ruleset_guard_unclassified",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_rules_by_type",
+      "target": "tools_ruleset_guard_unclassified",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_weakenings",
+      "target": "tools_ruleset_guard_unclassified",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L95",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_compare_value",
+      "target": "tools_ruleset_guard_reduction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_weakenings",
+      "target": "tools_ruleset_guard_reduction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_weakenings",
+      "target": "tools_ruleset_guard_rules_by_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L85",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_rationale_85",
+      "target": "tools_ruleset_guard_compare_value",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L163",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_weakenings",
+      "target": "tools_ruleset_guard_compare_value",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L172",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_weakenings",
+      "target": "tools_ruleset_guard_bypass_actors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L424",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_main",
+      "target": "tools_ruleset_guard_weakenings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L139",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_rationale_139",
+      "target": "tools_ruleset_guard_weakenings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L398",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_self_test",
+      "target": "tools_ruleset_guard_weakenings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L427",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_main",
+      "target": "tools_ruleset_guard_exit_code",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L407",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_self_test",
+      "target": "tools_ruleset_guard_exit_code",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/ruleset_guard.py",
+      "source_location": "L417",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_ruleset_guard_main",
+      "target": "tools_ruleset_guard_self_test",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_tests_run",
+      "target": "tools_tests_run_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_tests_run",
+      "target": "tools_tests_run_sh__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_tests_run",
+      "target": "tools_tests_run_workflow_runs_every_gate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/tests/run.sh",
+      "source_location": "L26",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "tools_tests_run_sh__entry",
+      "target": "tools_tests_run_run",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3e78f849b5f125cc7c6aafc89eab1b8728144c82"
+  "built_at_commit": "3660b11076af61bc8fa041ca8445e346acfc3f49"
 }
