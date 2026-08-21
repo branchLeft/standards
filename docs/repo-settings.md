@@ -9,8 +9,17 @@ not a click-through per repo, and drift is a diff rather than a discovery.
 
 On the default branch: no deletion, no force-push, linear history, signed
 commits, and a pull request requiring one approving review, code-owner review,
-stale-review dismissal, last-push approval, resolved conversations, and
-squash-only merge.
+stale-review dismissal, last-push approval, resolved conversations, an extra
+approval for unattributed changes, and squash-only merge.
+
+`require_extra_approval_for_unattributed_changes` arrived in the payloads by
+being **chosen**, not by being inherited: GitHub began setting it server-side,
+every payload drifted on that one line, and the honest options were to adopt it
+or to remove it. It demands a second approval when a PR carries commits GitHub
+cannot attribute to a known account — which is precisely the shape of a commit
+pushed with someone else's identity — so it is adopted, and a payload that
+omits it now reads as a deliberate reduction rather than as a payload nobody
+updated.
 
 ## REPO-2 — one bypass actor, in pull_request mode
 
@@ -77,6 +86,30 @@ and then silently never audited.
 `templates/rulesets/ghost-tenant-blog/main.json` is committed ahead of a live
 CI gap on that repo — see that directory's `README.md` for the required-check
 evidence and the precondition on when `ruleset-apply.sh` may be run against it.
+
+## REPO-7 — an apply never reduces live protection
+
+`ruleset-apply.sh` PUTs the committed payload over the live ruleset, and a PUT
+replaces rather than merges. A payload that has fallen behind the repo therefore
+does not fail loudly — it applies whatever protection it has stopped carrying,
+which is the same thing as removing the rest.
+
+Before every update the script reads live and refuses if the payload would drop
+a rule, a required status check, a protective flag, a protected ref, or would
+downgrade enforcement, widen a bypass actor, lower the review count or permit a
+merge method live forbids. Unrecognised structure is treated as a reduction:
+this class of bug arrives as a field GitHub adds server-side, so a guard that
+shrugs at what it does not understand would miss the next one.
+
+`--allow-weakening` exists for a reduction that is deliberate, and it prints
+what it is about to remove. It is not a way past a payload that is merely stale.
+
+This is a separate control from REPO-6, not a duplicate of it. The audit reports
+drift in both directions and is read by a person; the guard blocks one direction
+and is read by the script. The audit had in fact been reporting three repos'
+missing status-check rules for as long as they had been missing — while also
+reporting the same server-side field as drift on nine of nine repos, so it was
+red everywhere and read nowhere. A control that always fires is not a control.
 
 ## Applying is privileged
 
