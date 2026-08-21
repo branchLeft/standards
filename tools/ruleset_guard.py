@@ -16,6 +16,11 @@ how this class of bug arrives (`require_extra_approval_for_unattributed_changes`
 appeared that way), and a guard that shrugs at what it does not understand is
 not a guard.
 
+Exit 0 no finding, 1 a reduction the caller may knowingly accept, 3 structure
+the guard could not classify. 3 is deliberately not the same as 1: an override
+expresses intent about a reduction the operator can see, and a finding the guard
+could not read is not one anybody has seen.
+
 Usage: ruleset_guard.py PAYLOAD.json < live.json | --self-test
 """
 
@@ -29,13 +34,18 @@ ENFORCEMENT_RANK = {"disabled": 0, "evaluate": 1, "active": 2}
 BYPASS_RANK = {"pull_request": 0, "always": 1}
 
 # Booleans whose protective sense is inverted: true is the *permissive* value.
-INVERTED_BOOLS = {"do_not_enforce_on_create"}
+# GitHub's two, and the reason the sense cannot be inferred from the name alone.
+INVERTED_BOOLS = {"do_not_enforce_on_create", "update_allows_fetch_and_merge"}
 
 # Lists whose entries are things demanded — losing one is a weakening.
 REQUIRE_LISTS = {"required_status_checks", "required_reviewers", "include"}
 
 # Lists whose entries are things permitted — gaining one is a weakening.
 ALLOW_LISTS = {"allowed_merge_methods", "allowed_actors", "exclude"}
+
+# Exit code for a finding the guard could not classify, which `--allow-weakening`
+# must not be able to wave through.
+UNCLASSIFIED = 3
 
 
 def elem_key(elem):
@@ -52,12 +62,20 @@ def elem_key(elem):
     return json.dumps(elem, sort_keys=True)
 
 
+def unclassified(findings, text):
+    findings.append((text, False))
+
+
+def reduction(findings, text):
+    findings.append((text, True))
+
+
 def rules_by_type(ruleset, side, findings):
     out = {}
     for rule in ruleset.get("rules", []):
         rtype = rule["type"]
         if rtype in out:
-            findings.append(f"{side} carries two `{rtype}` rules — cannot compare")
+            unclassified(findings, f"{side} carries two `{rtype}` rules — cannot compare")
             continue
         out[rtype] = rule.get("parameters") or {}
     return out
@@ -74,12 +92,12 @@ def compare_value(live, payload, path, findings):
             weaker = payload_b and not live_b
         if weaker:
             shown = "absent from payload" if payload is None else f"{json.dumps(payload)} in payload"
-            findings.append(f"{path}: {json.dumps(live)} live, {shown}")
+            reduction(findings, f"{path}: {json.dumps(live)} live, {shown}")
         return
 
     if isinstance(live, int) and isinstance(payload, int):
         if payload < live:
-            findings.append(f"{path}: {live} live, {payload} in payload")
+            reduction(findings, f"{path}: {live} live, {payload} in payload")
         return
 
     if isinstance(live, list) or isinstance(payload, list):
@@ -89,12 +107,12 @@ def compare_value(live, payload, path, findings):
         payload_keys = {elem_key(e) for e in payload_l}
         if key in REQUIRE_LISTS:
             for lost in sorted(live_keys - payload_keys):
-                findings.append(f"{path}: payload drops {json.dumps(lost)}")
+                reduction(findings, f"{path}: payload drops {json.dumps(lost)}")
         elif key in ALLOW_LISTS:
             for gained in sorted(payload_keys - live_keys):
-                findings.append(f"{path}: payload permits {json.dumps(gained)}, live does not")
+                reduction(findings, f"{path}: payload permits {json.dumps(gained)}, live does not")
         elif live_keys != payload_keys:
-            findings.append(f"{path}: list changed and the guard cannot tell which way")
+            unclassified(findings, f"{path}: list changed and the guard cannot tell which way")
         return
 
     if isinstance(live, dict) or isinstance(payload, dict):
@@ -105,7 +123,9 @@ def compare_value(live, payload, path, findings):
         return
 
     if live != payload and live is not None:
-        findings.append(f"{path}: {json.dumps(live)} live, {json.dumps(payload)} in payload")
+        unclassified(
+            findings, f"{path}: {json.dumps(live)} live, {json.dumps(payload)} in payload"
+        )
 
 
 def bypass_actors(ruleset):
@@ -122,19 +142,22 @@ def weakenings(live, payload):
     live_rank = ENFORCEMENT_RANK.get(live.get("enforcement"))
     payload_rank = ENFORCEMENT_RANK.get(payload.get("enforcement"))
     if live_rank is None or payload_rank is None:
-        findings.append(
+        unclassified(
+            findings,
             f"enforcement: unrecognised value "
-            f"({live.get('enforcement')!r} live, {payload.get('enforcement')!r} in payload)"
+            f"({live.get('enforcement')!r} live, {payload.get('enforcement')!r} in payload)",
         )
     elif payload_rank < live_rank:
-        findings.append(
-            f"enforcement: {live['enforcement']} live, {payload['enforcement']} in payload"
+        reduction(
+            findings,
+            f"enforcement: {live['enforcement']} live, {payload['enforcement']} in payload",
         )
 
     if live.get("target") != payload.get("target"):
-        findings.append(
+        unclassified(
+            findings,
             f"target: {live.get('target')!r} live, {payload.get('target')!r} in payload "
-            "— the payload would protect something else"
+            "— the payload would protect something else",
         )
 
     compare_value(live.get("conditions"), payload.get("conditions"), "conditions", findings)
@@ -142,25 +165,29 @@ def weakenings(live, payload):
     live_rules = rules_by_type(live, "live", findings)
     payload_rules = rules_by_type(payload, "payload", findings)
     for rtype in sorted(set(live_rules) - set(payload_rules)):
-        findings.append(f"rules: payload drops the whole `{rtype}` rule")
+        reduction(findings, f"rules: payload drops the whole `{rtype}` rule")
     for rtype in sorted(set(live_rules) & set(payload_rules)):
         compare_value(live_rules[rtype], payload_rules[rtype], f"rules.{rtype}", findings)
 
     live_bypass, payload_bypass = bypass_actors(live), bypass_actors(payload)
     for actor, mode in sorted(payload_bypass.items(), key=str):
         if actor not in live_bypass:
-            findings.append(f"bypass_actors: payload adds {actor[0]} ({mode})")
+            reduction(findings, f"bypass_actors: payload adds {actor[0]} ({mode})")
             continue
         gained = BYPASS_RANK.get(mode)
         held = BYPASS_RANK.get(live_bypass[actor])
         if gained is None or held is None:
-            findings.append(f"bypass_actors: unrecognised bypass_mode for {actor[0]}")
+            unclassified(findings, f"bypass_actors: unrecognised bypass_mode for {actor[0]}")
         elif gained > held:
-            findings.append(
-                f"bypass_actors: {actor[0]} goes {live_bypass[actor]} → {mode}"
-            )
+            reduction(findings, f"bypass_actors: {actor[0]} goes {live_bypass[actor]} → {mode}")
 
     return findings
+
+
+def exit_code(findings):
+    if not findings:
+        return 0
+    return 1 if all(classified for _, classified in findings) else UNCLASSIFIED
 
 
 def self_test():
@@ -171,6 +198,7 @@ def self_test():
         "conditions": {"ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}},
         "rules": [
             {"type": "deletion"},
+            {"type": "update", "parameters": {"update_allows_fetch_and_merge": False}},
             {
                 "type": "pull_request",
                 "parameters": {
@@ -217,8 +245,8 @@ def self_test():
     )
 
     cases = [
-        ("identical", base, []),
-        ("payload as committed (no integration_id, reordered)", as_committed, []),
+        ("identical", base, [], 0),
+        ("payload as committed (no integration_id, reordered)", as_committed, [], 0),
         (
             "adds a required check",
             mutate(
@@ -227,12 +255,14 @@ def self_test():
                 )
             ),
             [],
+            0,
         ),
-        ("removes a bypass actor", mutate(lambda rs: rs.__setitem__("bypass_actors", [])), []),
+        ("removes a bypass actor", mutate(lambda rs: rs.__setitem__("bypass_actors", [])), [], 0),
         (
             "drops the whole required_status_checks rule",
             mutate(lambda rs: drop_rule(rs, "required_status_checks")),
             ["payload drops the whole `required_status_checks` rule"],
+            1,
         ),
         (
             "drops one required context",
@@ -242,11 +272,13 @@ def self_test():
                 )
             ),
             ['payload drops "Test (scripts)"'],
+            1,
         ),
         (
             "drops the deletion rule",
             mutate(lambda rs: drop_rule(rs, "deletion")),
             ["payload drops the whole `deletion` rule"],
+            1,
         ),
         (
             "loses a server-set boolean",
@@ -256,6 +288,7 @@ def self_test():
                 )
             ),
             ["require_extra_approval_for_unattributed_changes"],
+            1,
         ),
         (
             "drops strict status-check policy",
@@ -265,6 +298,7 @@ def self_test():
                 )
             ),
             ["strict_required_status_checks_policy"],
+            1,
         ),
         (
             "stops enforcing on create",
@@ -274,6 +308,7 @@ def self_test():
                 )
             ),
             ["do_not_enforce_on_create"],
+            1,
         ),
         (
             "lowers the review count",
@@ -283,6 +318,7 @@ def self_test():
                 )
             ),
             ["required_approving_review_count"],
+            1,
         ),
         (
             "permits a second merge method",
@@ -292,21 +328,25 @@ def self_test():
                 )
             ),
             ['payload permits "merge"'],
+            1,
         ),
         (
             "downgrades enforcement",
             mutate(lambda rs: rs.__setitem__("enforcement", "evaluate")),
             ["enforcement"],
+            1,
         ),
         (
             "unrecognised enforcement fails closed",
             mutate(lambda rs: rs.__setitem__("enforcement", "sometimes")),
             ["unrecognised value"],
+            3,
         ),
         (
             "escalates the bypass actor",
             mutate(lambda rs: rs["bypass_actors"][0].__setitem__("bypass_mode", "always")),
             ["pull_request → always"],
+            1,
         ),
         (
             "adds a bypass actor",
@@ -316,34 +356,56 @@ def self_test():
                 )
             ),
             ["payload adds RepositoryRole"],
+            1,
         ),
         (
             "narrows the protected refs",
             mutate(lambda rs: rs["conditions"]["ref_name"].__setitem__("include", [])),
             ["payload drops"],
+            1,
         ),
         (
             "excludes a ref live protects",
             mutate(lambda rs: rs["conditions"]["ref_name"].__setitem__("exclude", ["refs/heads/x"])),
             ["payload permits"],
+            1,
+        ),
+        (
+            "payload turns on the permissive `update` flag",
+            mutate(
+                lambda rs: next(r for r in rs["rules"] if r["type"] == "update")["parameters"]
+                .__setitem__("update_allows_fetch_and_merge", True)
+            ),
+            ["update_allows_fetch_and_merge"],
+            1,
+        ),
+        (
+            "two rules of one type cannot be compared",
+            mutate(lambda rs: rs["rules"].append({"type": "deletion"})),
+            ["carries two `deletion` rules"],
+            3,
         ),
         (
             "changes target",
             mutate(lambda rs: rs.__setitem__("target", "tag")),
             ["would protect something else"],
+            3,
         ),
     ]
 
     rc = 0
-    for name, payload, expected in cases:
+    for name, payload, expected, want_code in cases:
         found = weakenings(base, payload)
-        if expected:
-            for want in expected:
-                if not any(want in f for f in found):
-                    print(f"  FAIL {name}: expected {want!r} in {found}")
-                    rc = 1
-        elif found:
-            print(f"  FAIL {name}: expected no finding, got {found}")
+        texts = [text for text, _ in found]
+        for want in expected:
+            if not any(want in text for text in texts):
+                print(f"  FAIL {name}: expected {want!r} in {texts}")
+                rc = 1
+        if not expected and found:
+            print(f"  FAIL {name}: expected no finding, got {texts}")
+            rc = 1
+        if exit_code(found) != want_code:
+            print(f"  FAIL {name}: expected exit {want_code}, got {exit_code(found)}")
             rc = 1
     if rc == 0:
         print("ruleset_guard.py: self-test passed")
@@ -360,9 +422,9 @@ def main(argv):
     payload = json.load(open(argv[1]))
     live = json.load(sys.stdin)
     findings = weakenings(live, payload)
-    for f in findings:
-        print(f"    {f}")
-    return 1 if findings else 0
+    for text, classified in findings:
+        print(f"    {text}" if classified else f"    [unclassified] {text}")
+    return exit_code(findings)
 
 
 if __name__ == "__main__":
