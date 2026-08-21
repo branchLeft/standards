@@ -16,6 +16,7 @@
         "required_reviewers": [],
         "require_code_owner_review": true,
         "require_last_push_approval": true,
+        "require_extra_approval_for_unattributed_changes": true,
         "required_review_thread_resolution": true,
         "allowed_merge_methods": ["squash"],
         "dismissal_restriction": { "enabled": false, "allowed_actors": [] }
@@ -30,7 +31,8 @@
           { "context": "docker build" },
           { "context": "Platform type check" },
           { "context": "Type check (provisioning)" },
-          { "context": "Tenant type check" }
+          { "context": "Tenant type check" },
+          { "context": "Format and lint" }
         ]
       }
     }
