@@ -1,212 +1,217 @@
 {
   "eslint.config.js": {
-    "mtime": 1787156689.7361817,
+    "mtime": 1787347935.1990573,
     "ast_hash": "04712094daec8ee307391b11d2b9c3d4",
     "semantic_hash": "04712094daec8ee307391b11d2b9c3d4"
   },
   "package.json": {
-    "mtime": 1787156689.7395432,
+    "mtime": 1787347935.2028208,
     "ast_hash": "416f6c05004643fc63994f6937ec56b0",
     "semantic_hash": "416f6c05004643fc63994f6937ec56b0"
   },
   "packages/eslint-config/package.json": {
-    "mtime": 1787156689.7407243,
+    "mtime": 1787347935.2036407,
     "ast_hash": "3ab944d77942a4681a18c74e8d244b08",
     "semantic_hash": "3ab944d77942a4681a18c74e8d244b08"
   },
   "packages/eslint-config/src/base.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "b1205afdac739d0c65b4b9eb34f60d03",
     "semantic_hash": "b1205afdac739d0c65b4b9eb34f60d03"
   },
   "packages/eslint-config/src/index.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "0f20683f9ff90ba00d104c8a3d1f76db",
     "semantic_hash": "0f20683f9ff90ba00d104c8a3d1f76db"
   },
   "packages/eslint-config/src/library.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "2b5ec10b0a4c18a8fcab5c89c692d1f1",
     "semantic_hash": "2b5ec10b0a4c18a8fcab5c89c692d1f1"
   },
   "packages/eslint-config/src/pulumi.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "ba330b15965b73c3d8c1649eaee916b2",
     "semantic_hash": "ba330b15965b73c3d8c1649eaee916b2"
   },
   "packages/eslint-config/src/react.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "fe1b30d0c14944659f1ebde3d6c1d88a",
     "semantic_hash": "fe1b30d0c14944659f1ebde3d6c1d88a"
   },
   "packages/eslint-config/src/reactApp.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "58e26b3f6245bbc66baef0a87dd43a0b",
     "semantic_hash": "58e26b3f6245bbc66baef0a87dd43a0b"
   },
   "packages/eslint-config/src/tests.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "243e194716c6508f45aa454cb21e632d",
     "semantic_hash": "243e194716c6508f45aa454cb21e632d"
   },
   "packages/eslint-config/src/typeChecked.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "8cd2cc51d93639cdb91a467d159cdf98",
     "semantic_hash": "8cd2cc51d93639cdb91a467d159cdf98"
   },
   "packages/eslint-config/src/vendor.d.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "ee5eed4684898d424259c4f1d14d98e1",
     "semantic_hash": "ee5eed4684898d424259c4f1d14d98e1"
   },
   "packages/eslint-config/tsconfig.build.json": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "44d73a70d0c7bdfcd87ab69da57139f7",
     "semantic_hash": "44d73a70d0c7bdfcd87ab69da57139f7"
   },
   "packages/prettier-config/package.json": {
-    "mtime": 1787156689.741411,
+    "mtime": 1787347935.2043114,
     "ast_hash": "6e8bd94c83b8242d7013751088cab468",
     "semantic_hash": "6e8bd94c83b8242d7013751088cab468"
   },
   "packages/tsconfig/base.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "0538e116646bf44146ed32d02c0cf730",
     "semantic_hash": "0538e116646bf44146ed32d02c0cf730"
   },
   "packages/tsconfig/package.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "3759ffa13e56b61d4e5901e1b9aed5e7",
     "semantic_hash": "3759ffa13e56b61d4e5901e1b9aed5e7"
   },
   "packages/tsconfig/pulumi.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "47026dbb356e8e956093e78a9205c81f",
     "semantic_hash": "47026dbb356e8e956093e78a9205c81f"
   },
   "packages/tsconfig/react-app.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "f39eea079ecbd55ac77395da5ae7ff72",
     "semantic_hash": "f39eea079ecbd55ac77395da5ae7ff72"
   },
   "packages/tsconfig/react-lib.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "e4e58c9e13827e0142bd170119536750",
     "semantic_hash": "e4e58c9e13827e0142bd170119536750"
   },
   "packages/tsconfig/strict-1.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "1ac2c42ab8357dea1bbe531f04bf30e5",
     "semantic_hash": "1ac2c42ab8357dea1bbe531f04bf30e5"
   },
   "packages/tsconfig/strict-2.json": {
-    "mtime": 1787156689.7415612,
+    "mtime": 1787347935.2044647,
     "ast_hash": "ec5fcad0bec0c8d665ce8e7e23a18405",
     "semantic_hash": "ec5fcad0bec0c8d665ce8e7e23a18405"
   },
   "packages/vitest-config/package.json": {
-    "mtime": 1787156689.74186,
+    "mtime": 1787347935.2047632,
     "ast_hash": "a3c38f3d6dede4923205a72a376e47dc",
     "semantic_hash": "a3c38f3d6dede4923205a72a376e47dc"
   },
   "packages/vitest-config/src/index.ts": {
-    "mtime": 1787156689.741991,
+    "mtime": 1787347935.204888,
     "ast_hash": "9c15737b9ea9515bacd79d80e2be6d8a",
     "semantic_hash": "9c15737b9ea9515bacd79d80e2be6d8a"
   },
   "packages/vitest-config/tsconfig.build.json": {
-    "mtime": 1787156689.741991,
+    "mtime": 1787347935.204888,
     "ast_hash": "44d73a70d0c7bdfcd87ab69da57139f7",
     "semantic_hash": "44d73a70d0c7bdfcd87ab69da57139f7"
   },
   "tools/check-clause-index.sh": {
-    "mtime": 1787156689.7437673,
+    "mtime": 1787347935.20685,
     "ast_hash": "96a1fa03ae21832bdc1e53023513a6cc",
     "semantic_hash": "96a1fa03ae21832bdc1e53023513a6cc"
   },
   "tools/check-pulumi.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "0e9ec1c92835b87cf726c6077aaeffe7",
     "semantic_hash": "0e9ec1c92835b87cf726c6077aaeffe7"
   },
   "tools/check-tsconfig.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "180faa6479238e8ca45cd93659307ae3",
     "semantic_hash": "180faa6479238e8ca45cd93659307ae3"
   },
   "tools/check-workflows.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "391af1d2cbd08cc6ba5e5b4c453c35dd",
     "semantic_hash": "391af1d2cbd08cc6ba5e5b4c453c35dd"
   },
   "tools/lib/ratchet.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "24cc971b9fda3523b26ed1d649204461",
     "semantic_hash": "24cc971b9fda3523b26ed1d649204461"
   },
   "tools/ruleset-apply.sh": {
-    "mtime": 1787156689.7439911,
-    "ast_hash": "509644c0bc1549a3a5b82b63e6c7cc19",
-    "semantic_hash": "509644c0bc1549a3a5b82b63e6c7cc19"
+    "mtime": 1787347935.20685,
+    "ast_hash": "237b1f3b310ebf2875b4c9ddad7419a3",
+    "semantic_hash": "237b1f3b310ebf2875b4c9ddad7419a3"
   },
   "tools/ruleset-audit.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "82fc4497254091ee3b18abb32a1a3f4f",
     "semantic_hash": "82fc4497254091ee3b18abb32a1a3f4f"
   },
   "tools/ruleset_normalize.py": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "b9b370addc65a36e94e8dac5d14a0029",
     "semantic_hash": "b9b370addc65a36e94e8dac5d14a0029"
   },
   "tools/tests/run.sh": {
-    "mtime": 1787156689.7439911,
-    "ast_hash": "66faf9378b1253501c703c6314e76161",
-    "semantic_hash": "66faf9378b1253501c703c6314e76161"
+    "mtime": 1787347935.20685,
+    "ast_hash": "84c6e05b14e47c24f92121176eec140b",
+    "semantic_hash": "84c6e05b14e47c24f92121176eec140b"
   },
   "tsconfig.json": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "761ec0e7319de0b093ca00fe3eeea1d2",
     "semantic_hash": "761ec0e7319de0b093ca00fe3eeea1d2"
   },
   "tools/standards-audit.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "198ba27f3b86a0e43bd418ae121212ca",
     "semantic_hash": "198ba27f3b86a0e43bd418ae121212ca"
   },
   "tools/standards-sync.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "db6aa1ba654646185775618645b4ebca",
     "semantic_hash": "db6aa1ba654646185775618645b4ebca"
   },
   "packages/eslint-config/src/base.test.ts": {
-    "mtime": 1787156689.7407243,
+    "mtime": 1787347935.2036407,
     "ast_hash": "8b669331d63c6f057bc666b8924ec79a",
     "semantic_hash": "8b669331d63c6f057bc666b8924ec79a"
   },
   "packages/eslint-config/src/reactApp.test.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "ab0a40f3622ad3536d42b0a0f8ec3390",
     "semantic_hash": "ab0a40f3622ad3536d42b0a0f8ec3390"
   },
   "packages/eslint-config/src/typeChecked.test.ts": {
-    "mtime": 1787156689.7408621,
+    "mtime": 1787347935.2037718,
     "ast_hash": "6751eab0926adcf593460f551a0590db",
     "semantic_hash": "6751eab0926adcf593460f551a0590db"
   },
   "packages/vitest-config/src/index.test.ts": {
-    "mtime": 1787156689.74186,
+    "mtime": 1787347935.2047632,
     "ast_hash": "b76933997658f4c17d321f359ca1f0bb",
     "semantic_hash": "b76933997658f4c17d321f359ca1f0bb"
   },
   "vitest.config.ts": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "1f01eddfb6cdf9fc294e16c35f3ae9d0",
     "semantic_hash": "1f01eddfb6cdf9fc294e16c35f3ae9d0"
   },
   "tools/check-pulumi-secrets.sh": {
-    "mtime": 1787156689.7439911,
+    "mtime": 1787347935.20685,
     "ast_hash": "a3d234d566ec7c2c3b53d51e1fabd5fb",
     "semantic_hash": "a3d234d566ec7c2c3b53d51e1fabd5fb"
+  },
+  "tools/ruleset_guard.py": {
+    "mtime": 1787347935.20685,
+    "ast_hash": "db16180a9ca6de4a347a8cf8b266723d",
+    "semantic_hash": "db16180a9ca6de4a347a8cf8b266723d"
   }
 }
