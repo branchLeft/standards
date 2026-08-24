@@ -240,12 +240,15 @@ them. Marking any of them `auto` today would be the false-coverage failure
 that section describes, and marking them `review` would promise a bounded
 evidence list that does not exist until the estate has artefacts to point at.
 
-`DP-7` is the one designed to become `auto`. Its violation is the only one in
-the family that cannot be undone — a commit stays reachable by revision after
-a branch is deleted, and in a public repo it is disclosed on push — so when it
-is implemented it follows `PUL-12`'s precedent and skips the ratchet
-entirely. A rule whose breach is already published is not a finding to triage
-at leisure.
+`DP-7` is the most likely of the eleven to become `auto`, being the one whose
+subject a matcher can actually recognise. Its ratchet behaviour is left open
+deliberately rather than settled here: `PUL-12` skips the ratchet because a
+repo can always reach green — the salt has a remedy that always exists — and
+whether that holds for `DP-7` depends on a design decision nobody has taken
+yet. A gate scanning only the working tree is remediable in the same way; a
+gate scanning history is not, and would permanently bar a repo that once
+committed an address from adopting any release. That choice belongs in the
+PR that writes the gate, with its reasoning, not in a note written before it.
 
 `DP-1` and `PUL-12` are adjacent and distinct: `PUL-12` keeps key _material_
 out of a committed tree, while `DP-1` governs how the data those keys protect

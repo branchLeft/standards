@@ -18,10 +18,27 @@ data across a trust boundary is never an autonomous act.
 
 ## DP-1 — a key scoped to one entity is what makes erasure reach backups
 
-Every durable store of personal data is encrypted with a key scoped no wider
-than one logical entity, such that destroying that key erases that entity's
-data in every copy — live storage, backups, and any off-site second copy —
-without reaching into the backup media at all.
+Every durable store of personal data is encrypted with a key scoped to the
+**narrowest entity that store can actually carry**, such that destroying that
+key erases that entity's data in every copy — live storage, backups, and any
+off-site second copy — without reaching into the backup media at all.
+
+"Narrowest achievable" is the operative phrase, and it is deliberately
+relative to the store rather than fixed. A store the organisation designs
+itself can often be keyed per data subject. A store belonging to
+off-the-shelf software usually cannot be keyed below the account or tenant
+that owns it, because doing so would mean modifying schema and query paths
+the organisation does not control. DP-1 requires the narrowest granularity
+the store permits; **it does not claim that granularity is always the
+individual**, and it is not satisfied by choosing a coarse entity when a
+finer one was available.
+
+That distinction is the boundary with `DP-2`. Where the achievable
+granularity is coarser than the erasure request being served — the common
+case, where one member of a tenant asks to be forgotten and the key covers
+the whole tenant — key destruction is not the mechanism, and `DP-2` governs
+what happens instead. Neither clause is satisfied by leaving that gap
+unstated.
 
 The property is fragile in one specific way: it survives only while exactly
 one key opens the data. A second recipient added for convenience, a
@@ -38,16 +55,23 @@ for compliance, when the key-scoping approach gives both.
 
 ## DP-2 — where keying is not achievable, say so and bound it instead
 
-Per-entity keying is the floor to design for, not a universal claim. Some
-stores genuinely cannot carry it: data owned by upstream software that is not
-forked, a log stream that physically interleaves every entity's writes, a
-snapshot held by a supplier under the supplier's own keys.
+`DP-1` gets erasure down to the narrowest granularity a store can carry. This
+clause governs everything below that line — and there is always something
+below it, so this is the clause that does the work in most real estates
+rather than an exception for unusual ones.
 
-For those, the store is retention-bounded instead, and **the limitation is
-recorded in the record of processing** — the granularity that was achievable,
-the one that was not, and the residual window that follows. A deferred
-decision is recorded as deferred; an impossible one as impossible; and the
-two are not the same word.
+Two cases. A store may carry no useful keying at all: data owned by upstream
+software that is not forked, a log stream that physically interleaves every
+entity's writes, a snapshot held by a supplier under the supplier's own keys.
+Or — more commonly — the store is keyed correctly per `DP-1`, but the erasure
+being requested is finer than the key: one person inside a tenant, where
+destroying the tenant key would erase everyone else too.
+
+In both cases the store is retention-bounded instead, and **the limitation is
+recorded in the record of processing** that `DP-8` requires — the granularity
+that was achievable, the one that was not, and the residual window that
+follows. A deferred decision is recorded as deferred; an impossible one as
+impossible; and the two are not the same word.
 
 Both directions of overstatement are defects. Claiming a store is shreddable
 when it is not is a false assurance to a data subject. Claiming a store
@@ -76,20 +100,26 @@ data that was supposed to be gone.
 
 Destruction is logged in a register, and the log entry is created **before**
 the key is destroyed rather than after. Written afterwards, it depends on
-someone remembering to write it, which is the assumption the register exists
-to remove.
+someone remembering to write it — and the moment it is most likely to be
+forgotten is the moment it matters most, because after the destruction there
+is no longer any artefact that could reconstruct what was destroyed. Ordering
+the write first also makes the record a precondition of the act rather than a
+report about it, so a destruction that skipped the register is visibly
+missing a step rather than merely undocumented.
 
-`CI-7` requires a privileged action to be gated by two independent
-mechanisms. Where an organisation is too small to supply two people, the
-substitute is two steps separated by a review — the register entry lands
-first, and only then is the key destroyed — not the abandonment of the
-requirement.
+This is a sequencing rule, not a gate, and it should not be mistaken for one:
+it constrains a careful operator and stops nothing on its own. Where the
+estate can enforce the ordering mechanically, it should.
 
 ## DP-4 — every personal-data store names its retention and what enforces it
 
-No store of personal data is unbounded. Each names a retention period and the
-mechanism that enforces it, and both are written down where someone auditing
-the system will find them.
+No store of personal data is unbounded. Each has a retention period and a
+mechanism that actually enforces it.
+
+`DP-8` is where the period and mechanism are _written down_, one row per
+store. This clause is about the property itself — that a bound exists and
+something enforces it — because a record of processing listing a retention
+period nothing implements is a tidier version of the same defect.
 
 **A tool default is not a policy.** A log rotation that happens to keep ninety
 days because that is what the software ships with is not a ninety-day
@@ -118,9 +148,18 @@ resurrects the records of people who asked to be forgotten — turning an
 incident into a second, worse incident, and one that nobody is looking for
 because the restore succeeded.
 
+A replay can only re-apply what was written down, so this clause requires
+that **executed erasures are themselves recorded** — a register of erasure
+events, alongside the register of key destructions `DP-3` requires. Without
+it a repo can satisfy every other clause in this family, restore from backup,
+faithfully replay its key destructions, and still resurrect every
+individually-erased record: exactly the incident this clause opens by
+describing. `DP-8`'s record of processing does not close this gap; it names
+the erasure _mechanism_ for each store, not the erasures that were performed.
+
 A drill that omits the replay has not tested the procedure, because the
-procedure includes it. This is why the registers in `DP-3` are operational
-records rather than an archive: the restore path reads them.
+procedure includes it. This is why both registers are operational records
+rather than an archive: the restore path reads them.
 
 ## DP-6 — logs and security tooling hold personal data too
 
@@ -154,6 +193,11 @@ The agent-context half is easy to overlook and is not optional: a transcript
 or a memory file holding a real address is a copy of personal data in a
 system that has its own retention, its own operator, and its own jurisdiction.
 
+`CMT-2` bans people's names from code comments and is the narrower, already
+linter-enforced case of the same instinct. This clause is broader in what it
+covers and in where it applies — commit messages, trackers, CI output and
+agent memory are all outside a comment linter's reach.
+
 ## DP-8 — every service declares what personal data it holds
 
 Every deployed service and store is represented in the estate's record of
@@ -173,14 +217,23 @@ erasure path has never been established.
 ## DP-9 — a breach has a route to a decision fast enough to matter
 
 Every service that could originate a personal-data breach has a defined route
-into an incident procedure, and that procedure is fast enough to preserve the
-notification deadline of whoever must report it.
+into an incident procedure, and the estate **states its own internal
+escalation deadline as a figure** — derived from whatever external
+notification deadline applies to it, and shorter than that deadline by enough
+margin to act on.
 
-Where the organisation processes on someone else's behalf, the deadline that
-matters is **theirs**, not the processor's own. Detection and escalation speed
-is therefore a compliance property of the system rather than an operational
-preference, and a detection mechanism that has not been built is a gap in the
-procedure regardless of how well the procedure is written.
+Naming the figure is what makes the clause checkable. "Fast enough" is not a
+requirement anyone can be held to; "the tenant is notified within N hours of
+detection, because their own regulatory clock is M" is. Where the
+organisation processes on someone else's behalf, the deadline that matters is
+**theirs**, not the processor's own, so the figure is derived from the
+obligation of the party who must report — not from what is convenient
+internally.
+
+Detection speed is part of the same property. A procedure that depends on a
+detection mechanism nobody has built is a procedure with an unbounded first
+step, and the honest response is to record that gap rather than to let the
+written procedure imply a capability that does not exist.
 
 Without this, the first question after an incident — when did we know, and who
 did we tell — has an answer assembled retrospectively from chat logs.
@@ -189,6 +242,13 @@ did we tell — has an answer assembled retrospectively from chat logs.
 
 No third party processes personal data without a row in a versioned
 sub-processor register and a recorded transfer assessment.
+
+A transfer assessment records four things and is a paragraph, not a project:
+what data actually reaches the third party, where it is processed and under
+whose jurisdiction, what makes the transfer lawful, and what the organisation
+concluded. Assessments that conclude "no personal data is transferred" are
+the common case and still get written down — an unrecorded conclusion is
+indistinguishable from an unasked question.
 
 Versioned matters: the obligation is usually not merely to have a list but to
 notify when it changes, and a list with no history cannot say what changed or
@@ -210,11 +270,22 @@ destruction for each.
 
 The record is what makes this checkable: without it, offboarding deletes the
 stores somebody remembered. Every row therefore needs an action that has been
-run at least once against real data, not a documented intention.
+**executed and observed to work**, not a documented intention — proven
+against a restored copy, a scratch entity created for the purpose, or a
+genuine offboarding.
+
+**Never against live production data.** "Prove the delete path works" is not a
+licence to run it somewhere it would destroy data still in use, and this
+clause never overrides a `PUL-10` delete guard, a protected-resource flag, or
+any other control standing between an operator and an unrecoverable apply. A
+rehearsal that needs such a control bypassed is a rehearsal pointed at the
+wrong target. Those guards exist because a destructive plan against a
+database or a state bucket is materially unrecoverable, and nothing in this
+family is worth that trade.
 
 **Deletion tooling ships in the same change as the store it deletes from.** A
-store that outlives its delete path accumulates data while the tooling stays a
-plan, and the gap is only noticed when someone needs it urgently. Where an
-estate carries guards that deliberately prevent deletion — a sensible
-protection for infrastructure — this clause is what ensures a deliberate,
-audited deletion path exists alongside them.
+store that outlives its delete path accumulates data while the tooling stays
+a plan, and the gap is only noticed when someone needs it urgently — which is
+the worst moment to be writing it. An estate that guards against accidental
+deletion still needs a deliberate, audited deletion path; this clause
+requires that path to exist, and the guards to stay standing around it.
