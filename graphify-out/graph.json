@@ -3944,9 +3944,9 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "id": "tools_ruleset_apply",
       "community": 28,
-      "norm_label": "ruleset-apply.sh"
+      "norm_label": "ruleset-apply.sh",
+      "id": "tools_ruleset_apply"
     },
     {
       "label": "ruleset-apply.sh script",
@@ -3958,9 +3958,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "id": "tools_ruleset_apply_sh__entry",
       "community": 28,
-      "norm_label": "ruleset-apply.sh script"
+      "norm_label": "ruleset-apply.sh script",
+      "id": "tools_ruleset_apply_sh__entry"
     },
     {
       "label": "ruleset_guard.py",
@@ -3968,9 +3968,9 @@
       "source_file": "tools/ruleset_guard.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tools_ruleset_guard",
       "community": 11,
-      "norm_label": "ruleset_guard.py"
+      "norm_label": "ruleset_guard.py",
+      "id": "tools_ruleset_guard"
     },
     {
       "label": "elem_key()",
@@ -3979,9 +3979,9 @@
       "source_location": "L51",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_elem_key",
       "community": 11,
-      "norm_label": "elem_key()"
+      "norm_label": "elem_key()",
+      "id": "tools_ruleset_guard_elem_key"
     },
     {
       "label": "unclassified()",
@@ -3990,9 +3990,9 @@
       "source_location": "L65",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_unclassified",
       "community": 11,
-      "norm_label": "unclassified()"
+      "norm_label": "unclassified()",
+      "id": "tools_ruleset_guard_unclassified"
     },
     {
       "label": "reduction()",
@@ -4001,9 +4001,9 @@
       "source_location": "L69",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_reduction",
       "community": 11,
-      "norm_label": "reduction()"
+      "norm_label": "reduction()",
+      "id": "tools_ruleset_guard_reduction"
     },
     {
       "label": "rules_by_type()",
@@ -4012,9 +4012,9 @@
       "source_location": "L73",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_rules_by_type",
       "community": 11,
-      "norm_label": "rules_by_type()"
+      "norm_label": "rules_by_type()",
+      "id": "tools_ruleset_guard_rules_by_type"
     },
     {
       "label": "compare_value()",
@@ -4023,9 +4023,9 @@
       "source_location": "L84",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_compare_value",
       "community": 11,
-      "norm_label": "compare_value()"
+      "norm_label": "compare_value()",
+      "id": "tools_ruleset_guard_compare_value"
     },
     {
       "label": "bypass_actors()",
@@ -4034,9 +4034,9 @@
       "source_location": "L131",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_bypass_actors",
       "community": 11,
-      "norm_label": "bypass_actors()"
+      "norm_label": "bypass_actors()",
+      "id": "tools_ruleset_guard_bypass_actors"
     },
     {
       "label": "weakenings()",
@@ -4045,9 +4045,9 @@
       "source_location": "L138",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_weakenings",
       "community": 11,
-      "norm_label": "weakenings()"
+      "norm_label": "weakenings()",
+      "id": "tools_ruleset_guard_weakenings"
     },
     {
       "label": "exit_code()",
@@ -4056,9 +4056,9 @@
       "source_location": "L187",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_exit_code",
       "community": 11,
-      "norm_label": "exit_code()"
+      "norm_label": "exit_code()",
+      "id": "tools_ruleset_guard_exit_code"
     },
     {
       "label": "self_test()",
@@ -4067,9 +4067,9 @@
       "source_location": "L193",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_self_test",
       "community": 11,
-      "norm_label": "self_test()"
+      "norm_label": "self_test()",
+      "id": "tools_ruleset_guard_self_test"
     },
     {
       "label": "main()",
@@ -4078,9 +4078,9 @@
       "source_location": "L415",
       "_callable": true,
       "_origin": "ast",
-      "id": "tools_ruleset_guard_main",
       "community": 11,
-      "norm_label": "main()"
+      "norm_label": "main()",
+      "id": "tools_ruleset_guard_main"
     },
     {
       "label": "A hashable identity for a list entry. Status checks key on `context` alone: the\u2026",
@@ -4088,9 +4088,9 @@
       "source_file": "tools/ruleset_guard.py",
       "source_location": "L52",
       "_origin": "ast",
-      "id": "tools_ruleset_guard_rationale_52",
       "community": 11,
-      "norm_label": "a hashable identity for a list entry. status checks key on `context` alone: the..."
+      "norm_label": "a hashable identity for a list entry. status checks key on `context` alone: the...",
+      "id": "tools_ruleset_guard_rationale_52"
     },
     {
       "label": "Walk one parameter subtree, recording anything the payload loosens.",
@@ -4098,9 +4098,9 @@
       "source_file": "tools/ruleset_guard.py",
       "source_location": "L85",
       "_origin": "ast",
-      "id": "tools_ruleset_guard_rationale_85",
       "community": 11,
-      "norm_label": "walk one parameter subtree, recording anything the payload loosens."
+      "norm_label": "walk one parameter subtree, recording anything the payload loosens.",
+      "id": "tools_ruleset_guard_rationale_85"
     },
     {
       "label": "Every way `payload` would leave the repo less protected than `live`.",
@@ -4108,9 +4108,9 @@
       "source_file": "tools/ruleset_guard.py",
       "source_location": "L139",
       "_origin": "ast",
-      "id": "tools_ruleset_guard_rationale_139",
       "community": 11,
-      "norm_label": "every way `payload` would leave the repo less protected than `live`."
+      "norm_label": "every way `payload` would leave the repo less protected than `live`.",
+      "id": "tools_ruleset_guard_rationale_139"
     },
     {
       "label": "run.sh",
@@ -4122,9 +4122,9 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "id": "tools_tests_run",
       "community": 26,
-      "norm_label": "run.sh"
+      "norm_label": "run.sh",
+      "id": "tools_tests_run"
     },
     {
       "label": "run.sh script",
@@ -4136,9 +4136,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "id": "tools_tests_run_sh__entry",
       "community": 26,
-      "norm_label": "run.sh script"
+      "norm_label": "run.sh script",
+      "id": "tools_tests_run_sh__entry"
     },
     {
       "label": "run()",
@@ -4150,9 +4150,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_tests_run_run",
       "community": 26,
-      "norm_label": "run()"
+      "norm_label": "run()",
+      "id": "tools_tests_run_run"
     },
     {
       "label": "workflow_runs_every_gate()",
@@ -4164,9 +4164,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_tests_run_workflow_runs_every_gate",
       "community": 26,
-      "norm_label": "workflow_runs_every_gate()"
+      "norm_label": "workflow_runs_every_gate()",
+      "id": "tools_tests_run_workflow_runs_every_gate"
     }
   ],
   "links": [
@@ -8973,9 +8973,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_apply",
-      "target": "tools_ruleset_apply_sh__entry",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_apply_sh__entry"
     },
     {
       "relation": "contains",
@@ -8984,9 +8984,9 @@
       "source_location": "L131",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_bypass_actors",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_bypass_actors"
     },
     {
       "relation": "contains",
@@ -8995,9 +8995,9 @@
       "source_location": "L84",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_compare_value",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_compare_value"
     },
     {
       "relation": "contains",
@@ -9006,9 +9006,9 @@
       "source_location": "L51",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_elem_key",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_elem_key"
     },
     {
       "relation": "contains",
@@ -9017,9 +9017,9 @@
       "source_location": "L187",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_exit_code",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_exit_code"
     },
     {
       "relation": "contains",
@@ -9028,9 +9028,9 @@
       "source_location": "L415",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_main",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_main"
     },
     {
       "relation": "contains",
@@ -9039,9 +9039,9 @@
       "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_reduction",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_reduction"
     },
     {
       "relation": "contains",
@@ -9050,9 +9050,9 @@
       "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_rules_by_type",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_rules_by_type"
     },
     {
       "relation": "contains",
@@ -9061,9 +9061,9 @@
       "source_location": "L193",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_self_test",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_self_test"
     },
     {
       "relation": "contains",
@@ -9072,9 +9072,9 @@
       "source_location": "L65",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_unclassified",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_unclassified"
     },
     {
       "relation": "contains",
@@ -9083,9 +9083,9 @@
       "source_location": "L138",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard",
-      "target": "tools_ruleset_guard_weakenings",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_weakenings"
     },
     {
       "relation": "calls",
@@ -9095,9 +9095,9 @@
       "source_location": "L106",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_compare_value",
-      "target": "tools_ruleset_guard_elem_key",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_elem_key"
     },
     {
       "relation": "rationale_for",
@@ -9106,9 +9106,9 @@
       "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_rationale_52",
-      "target": "tools_ruleset_guard_elem_key",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_elem_key"
     },
     {
       "relation": "calls",
@@ -9118,9 +9118,9 @@
       "source_location": "L115",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_compare_value",
-      "target": "tools_ruleset_guard_unclassified",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_unclassified"
     },
     {
       "relation": "calls",
@@ -9130,9 +9130,9 @@
       "source_location": "L78",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_rules_by_type",
-      "target": "tools_ruleset_guard_unclassified",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_unclassified"
     },
     {
       "relation": "calls",
@@ -9142,9 +9142,9 @@
       "source_location": "L145",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_weakenings",
-      "target": "tools_ruleset_guard_unclassified",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_unclassified"
     },
     {
       "relation": "calls",
@@ -9154,9 +9154,9 @@
       "source_location": "L95",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_compare_value",
-      "target": "tools_ruleset_guard_reduction",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_reduction"
     },
     {
       "relation": "calls",
@@ -9166,9 +9166,9 @@
       "source_location": "L151",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_weakenings",
-      "target": "tools_ruleset_guard_reduction",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_reduction"
     },
     {
       "relation": "calls",
@@ -9178,9 +9178,9 @@
       "source_location": "L165",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_weakenings",
-      "target": "tools_ruleset_guard_rules_by_type",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_rules_by_type"
     },
     {
       "relation": "rationale_for",
@@ -9189,9 +9189,9 @@
       "source_location": "L85",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_rationale_85",
-      "target": "tools_ruleset_guard_compare_value",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_compare_value"
     },
     {
       "relation": "calls",
@@ -9201,9 +9201,9 @@
       "source_location": "L163",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_weakenings",
-      "target": "tools_ruleset_guard_compare_value",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_compare_value"
     },
     {
       "relation": "calls",
@@ -9213,9 +9213,9 @@
       "source_location": "L172",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_weakenings",
-      "target": "tools_ruleset_guard_bypass_actors",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_bypass_actors"
     },
     {
       "relation": "calls",
@@ -9225,9 +9225,9 @@
       "source_location": "L424",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_main",
-      "target": "tools_ruleset_guard_weakenings",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_weakenings"
     },
     {
       "relation": "rationale_for",
@@ -9236,9 +9236,9 @@
       "source_location": "L139",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_rationale_139",
-      "target": "tools_ruleset_guard_weakenings",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_weakenings"
     },
     {
       "relation": "calls",
@@ -9248,9 +9248,9 @@
       "source_location": "L398",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_self_test",
-      "target": "tools_ruleset_guard_weakenings",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_weakenings"
     },
     {
       "relation": "calls",
@@ -9260,9 +9260,9 @@
       "source_location": "L427",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_main",
-      "target": "tools_ruleset_guard_exit_code",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_exit_code"
     },
     {
       "relation": "calls",
@@ -9272,9 +9272,9 @@
       "source_location": "L407",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_self_test",
-      "target": "tools_ruleset_guard_exit_code",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_exit_code"
     },
     {
       "relation": "calls",
@@ -9284,9 +9284,9 @@
       "source_location": "L417",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_ruleset_guard_main",
-      "target": "tools_ruleset_guard_self_test",
-      "confidence_score": 1.0
+      "target": "tools_ruleset_guard_self_test"
     },
     {
       "relation": "defines",
@@ -9295,9 +9295,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run",
-      "target": "tools_tests_run_run",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_run"
     },
     {
       "relation": "contains",
@@ -9306,9 +9306,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run",
-      "target": "tools_tests_run_sh__entry",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_sh__entry"
     },
     {
       "relation": "defines",
@@ -9317,9 +9317,9 @@
       "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run",
-      "target": "tools_tests_run_workflow_runs_every_gate",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_workflow_runs_every_gate"
     },
     {
       "relation": "calls",
@@ -9329,11 +9329,11 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run_sh__entry",
-      "target": "tools_tests_run_run",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_run"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3660b11076af61bc8fa041ca8445e346acfc3f49"
+  "built_at_commit": "ebeeb9355d18112326b7de9c99ba265f14fb1ca7"
 }
