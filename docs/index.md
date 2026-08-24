@@ -218,6 +218,39 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 `review` because whether a 403 is genuinely bootstrap-class or a role list
 that should just be widened needs judgement no script can make safely.
 
+## Data protection — `data-protection.md`
+
+| ID    | Rule                                                                              | Gate      | Encoded by |
+| ----- | --------------------------------------------------------------------------------- | --------- | ---------- |
+| DP-1  | A key scoped to one entity, so destroying it erases that entity from backups too  | `pending` | —          |
+| DP-2  | Where keying is not achievable, record the limitation and bound retention instead | `pending` | —          |
+| DP-3  | Every key's escrow copies enumerated; destruction logged before it happens        | `pending` | —          |
+| DP-4  | Every personal-data store names a retention period and what enforces it           | `pending` | —          |
+| DP-5  | A restore replays every erasure recorded after the backup was taken               | `pending` | —          |
+| DP-6  | Access logs, container logs and security-tooling state carry explicit retention   | `pending` | —          |
+| DP-7  | No personal data in repos, trackers, CI logs, or agent transcripts and memory     | `pending` | —          |
+| DP-8  | Every deployed service declares its holdings in the record of processing          | `pending` | —          |
+| DP-9  | A breach route fast enough to preserve the reporting deadline that applies        | `pending` | —          |
+| DP-10 | Third parties touching personal data are registered and transfer-assessed         | `pending` | —          |
+| DP-11 | Offboarding executes a tested deletion for every row of the record                | `pending` | —          |
+
+Every clause lands `pending`, and the honest reading of that is the one in
+the Columns section above: the rules are binding prose and nothing checks
+them. Marking any of them `auto` today would be the false-coverage failure
+that section describes, and marking them `review` would promise a bounded
+evidence list that does not exist until the estate has artefacts to point at.
+
+`DP-7` is the one designed to become `auto`. Its violation is the only one in
+the family that cannot be undone — a commit stays reachable by revision after
+a branch is deleted, and in a public repo it is disclosed on push — so when it
+is implemented it follows `PUL-12`'s precedent and skips the ratchet
+entirely. A rule whose breach is already published is not a finding to triage
+at leisure.
+
+`DP-1` and `PUL-12` are adjacent and distinct: `PUL-12` keeps key _material_
+out of a committed tree, while `DP-1` governs how the data those keys protect
+is partitioned. A repo can satisfy either while failing the other.
+
 ## Styling — `stacks/styling.md`
 
 | ID    | Rule                                                                      | Gate     | Encoded by |
@@ -301,3 +334,10 @@ dialogue with the platform owner.
 | ----------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `SEC-*`, `NAM-*`        | `security.md`, `naming.md`             | Boundaries as constants, resource naming and length budgets                                         |
 | `CON-*`, `SH-*`, `PY-*` | `containers.md`, `shell-and-python.md` | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script |
+
+`SEC-*` and `DP-*` are deliberately separate families rather than one. `SEC-*`
+is about where a boundary is drawn and whether it can move at runtime; `DP-*`
+is about what happens to personal data on either side of it — how long it is
+kept and how it is destroyed. Retention and erasure are not boundary rules,
+and folding them into a security family would leave the eventual `security.md`
+covering two unrelated questions under one prefix.

@@ -83,6 +83,8 @@ still security-sensitive if it decides who can reach what:
 | Response security headers and nonces       | CSP, HSTS, frame options, per-request nonce generation                                                                                                                         |
 | Rate limiting                              | Window arithmetic, key derivation, and the reset path                                                                                                                          |
 | Suppression and permission state           | Anything that records "this recipient/actor may not" and is later consulted                                                                                                    |
+| Encryption-recipient selection             | Choosing which key an artifact is encrypted to. One extra recipient is a second decryption path and nothing downstream looks different, so assert the recipient set itself     |
+| Erasure and its refusal path               | Code that deletes personal data, and the fail-closed branch that declines to write an artifact it could not key correctly. The refusal needs a test as much as the deletion    |
 
 When such a path is a pure function, extract it and test it directly. Most of
 these already are pure functions; they are untested because they live in files
