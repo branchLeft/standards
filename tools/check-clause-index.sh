@@ -6,21 +6,27 @@
 #   1. Every clause ID defined in docs/ appears in the index, and vice versa.
 #      Without this an unindexed rule cannot be cited by the audit tool, the
 #      backlog or a CI annotation — so in practice it is not a rule.
-#   2. Every `auto` clause is named by a SCRIPT under tools/ specifically —
-#      not merely by an artefact somewhere under tools/, packages/ or
-#      templates/. A package existing under packages/ proves it could be
-#      imported, never that anything runs it; a row marked `auto` reads as
-#      mechanically enforced to every consumer of the table, and a script
-#      under tools/ is the one thing in this repo that ever executes. This is
-#      necessarily a proxy: it proves a gate script exists that mentions the
-#      ID, not that the script's logic is correct, nor that any fleet repo's
-#      CI actually invokes it — the same blind spot as every assertion below,
-#      which prove a named thing exists, not that it does what the rule says.
+#   2. Every `auto` clause is backed by one of two things: a SCRIPT under
+#      tools/ that names it, or — for a clause encoded by a shared-config
+#      package rather than a script — a row for that package in
+#      tools/package-consumers.tsv, the committed record of which packages
+#      the fleet genuinely consumes. A package existing under packages/ is
+#      neither: it proves the package could be imported, never that anything
+#      runs it — a row marked `auto` reads as mechanically enforced to every
+#      consumer of the table, and "could be imported" is not enforcement.
+#      This is necessarily a proxy either way: it proves a gate script exists
+#      that mentions the ID, or that someone has committed a claim of
+#      consumption, not that the script's logic is correct or that the
+#      consumption claim is true — the same blind spot as every assertion
+#      below, which prove a named thing exists, not that it does what the
+#      rule says. The consumer-record path is honest about being unverified:
+#      see tools/package-consumers.tsv's own header.
 #   3. Every `Encoded by` value resolves — a path that exists, or a package
 #      that exists under packages/. Weaker than assertion 2: it accepts a
-#      package, deliberately, because a `review` or `pending` row may still
-#      name one honestly (see LINT-1, FMT-1) — only `auto` requires the
-#      stronger form.
+#      package on existence alone, deliberately, because a `review` or
+#      `pending` row may still name one honestly as the thing that would
+#      enforce the rule once adopted — only `auto` requires the stronger
+#      form, either a real gate script or a consumer record.
 #   4. Every family header (`## Family — \`path\``) links to a file that
 #      exists under docs/. A family that is genuinely thin and has nothing
 #      beyond the index carries no path at all (`## Family`); a header naming
@@ -91,6 +97,19 @@ floor_ids() {
   local floors="$1"
   [ -f "$floors" ] || return 0
   awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print $1 }' "$floors"
+}
+
+# True if PKG has a row in tools/package-consumers.tsv — the committed record
+# that a shared-config package (as opposed to a tools/ script) is genuinely
+# consumed somewhere in the fleet. Standards' own package.json is deliberately
+# not read as evidence here, for the same reason docs/ is absent from
+# ARTEFACT_DIRS: a package naming itself as its own consumer is not evidence
+# anything else acts on it.
+package_has_consumers() {
+  local pkg="$1" file="$2"
+  [ -f "$file" ] || return 1
+  awk -F'\t' -v pkg="$pkg" \
+    '/^[ \t]*#/ || NF < 2 { next } $1 == pkg { found = 1 } END { exit !found }' "$file"
 }
 
 # A family header is `## Name — \`path\``, the path backtick-quoted right
@@ -171,8 +190,21 @@ check_index() {
   while IFS=$'\t' read -r id gate header value; do
     case "$gate" in
       auto)
-        clause_is_named "$id" tools || {
-          echo "::error::$id is marked \`auto\` but no script under tools/ names it — a package under packages/ existing is not evidence anything runs; mark it \`review\` or add a gate script"
+        auto_ok=0
+        clause_is_named "$id" tools && auto_ok=1
+        # The second legitimate shape: a package-encoded clause with a
+        # committed consumer record. Only a package value is eligible — a
+        # path under tools/ or templates/ that isn't found above is a script
+        # or payload that genuinely does not exist, and package-consumers.tsv
+        # cannot rescue that.
+        if [ "$auto_ok" -eq 0 ] && [ "$header" = "Encoded by" ]; then
+          case "$value" in
+            @branchleft/*)
+              package_has_consumers "$value" "$ROOT/tools/package-consumers.tsv" && auto_ok=1 ;;
+          esac
+        fi
+        [ "$auto_ok" -eq 1 ] || {
+          echo "::error::$id is marked \`auto\` but no script under tools/ names it, and its \`Encoded by\` value has no row in tools/package-consumers.tsv — mark it \`review\`, add a gate script, or add a consumer record"
           rc=1; }
         ;;
       pending)
@@ -384,6 +416,33 @@ EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: package backed by a tools/ script exited $grc"; echo "$out"; exit 1; }
     rm -f packages/eslint-config/note.ts
+
+    # Shape two of a legitimate `auto`: a package-encoded clause with a
+    # committed consumer record, and nothing under tools/ at all. This is
+    # deliberately worded to avoid the literal clause ID it mirrors in the
+    # real index — that exact word appearing in this comment would satisfy
+    # clause_is_named() against this script's own text, the same
+    # self-contamination the tools/-only search exists to avoid elsewhere.
+    # tools/gate.sh is cleared so only the consumer record can carry it.
+    rm -f tools/gate.sh
+    printf '# package	consumers
+@branchleft/eslint-config	website:pre-commit
+' > tools/package-consumers.tsv
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: package with a consumer record exited $grc"; echo "$out"; exit 1; }
+
+    # The negative twin, and the one that matters most: a consumers file
+    # exists, but carries no row for this exact package — its mere presence
+    # must not grant every package-encoded clause a free pass.
+    printf '# package	consumers
+@branchleft/some-other-config	website:pre-commit
+' > tools/package-consumers.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: unlisted package exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "no row in tools/package-consumers.tsv" \
+      || { echo "FAIL: unlisted package not reported"; echo "$out"; exit 1; }
+    rm -f tools/package-consumers.tsv
+    printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
 
     # An Evidence column is prose. Resolving it as a path would fail every
     # review clause in the real index and teach people the gate is noise.
