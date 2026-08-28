@@ -10,6 +10,10 @@ The exception is expressed in the ESLint config as a `files` override scoped to
 the route directory, so it is visible where it is enforced rather than
 remembered from prose.
 
+`review`, not `auto`: `@branchleft/eslint-config`'s `reactApp` preset
+implements this, but no application repo composes it yet — see
+[`../index.md`](../index.md) and [`../../ADOPTION.md`](../../ADOPTION.md).
+
 ## APP-2 — imports are absolute from the application root
 
 No `../../..`. A relative chain encodes the current file's location into every

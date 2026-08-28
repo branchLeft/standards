@@ -8,7 +8,10 @@
 # docs/testing.md instead, because those clauses are `pending` and a floor
 # sitting in this file for a clause nothing computes reads as enforced.
 #
+# A floor for a clause not in docs/index.md cannot be cited by anything that
+# reads the index, so check-clause-index.sh fails one — see that file's
+# "Pending — blocked on authorship" table for the SH-*/CON-* families this
+# once carried rows for.
+#
 # clause	floor
 TS-4	strict-1
-SH-2	set -euo pipefail
-CON-2	tag+digest

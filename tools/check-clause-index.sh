@@ -1,27 +1,42 @@
 #!/usr/bin/env bash
 # Drift test between docs/index.md and everything it claims.
 #
-# Four assertions, in increasing order of what they catch:
+# Six assertions, in increasing order of what they catch:
 #
 #   1. Every clause ID defined in docs/ appears in the index, and vice versa.
 #      Without this an unindexed rule cannot be cited by the audit tool, the
 #      backlog or a CI annotation — so in practice it is not a rule.
-#   2. Every `auto` clause is named by an artefact under tools/, packages/ or
-#      templates/. A row marked `auto` reads as mechanically enforced to every
-#      consumer of the table; if no artefact so much as mentions the ID, the
-#      row is decoration and worse than an absent one, because an absent rule
-#      is visibly absent.
+#   2. Every `auto` clause is named by a SCRIPT under tools/ specifically —
+#      not merely by an artefact somewhere under tools/, packages/ or
+#      templates/. A package existing under packages/ proves it could be
+#      imported, never that anything runs it; a row marked `auto` reads as
+#      mechanically enforced to every consumer of the table, and a script
+#      under tools/ is the one thing in this repo that ever executes. This is
+#      necessarily a proxy: it proves a gate script exists that mentions the
+#      ID, not that the script's logic is correct, nor that any fleet repo's
+#      CI actually invokes it — the same blind spot as every assertion below,
+#      which prove a named thing exists, not that it does what the rule says.
 #   3. Every `Encoded by` value resolves — a path that exists, or a package
-#      that exists under packages/.
+#      that exists under packages/. Weaker than assertion 2: it accepts a
+#      package, deliberately, because a `review` or `pending` row may still
+#      name one honestly (see LINT-1, FMT-1) — only `auto` requires the
+#      stronger form.
 #   4. Every family header (`## Family — \`path\``) links to a file that
 #      exists under docs/. A family that is genuinely thin and has nothing
 #      beyond the index carries no path at all (`## Family`); a header naming
 #      a path promises a doc, and a promise nothing resolves is worse than no
 #      promise.
+#   5. Every clause ID that carries a floor in tools/floors.tsv appears in the
+#      index. A floor for an unindexed clause cannot be cited by anything that
+#      reads the index — only by the floors file itself, which is not a
+#      citation anyone else can follow.
 #
-# Assertion 2 also runs in reverse: a `pending` clause that some artefact does
-# name is a row that was implemented and never re-marked, which rots the table
-# in the direction nobody checks.
+# Assertion 2 also runs in reverse: a `pending` clause that some artefact
+# anywhere under tools/, packages/ or templates/ does name is a row that was
+# implemented and never re-marked, which rots the table in the direction
+# nobody checks. That direction deliberately stays broad — the point there is
+# recall (catch any hint of implementation), where the forward direction wants
+# precision (accept only a real gate script).
 #
 # Usage: check-clause-index.sh [DOCS_DIR] | --self-test
 
@@ -53,16 +68,29 @@ index_rows() {
     }' "$1"
 }
 
-# A literal, word-bounded search. `TS-1` must not be satisfied by `TS-10`, and
-# built output is skipped so a stale dist/ cannot vouch for a deleted rule.
+# A literal, word-bounded search over the given directories. `TS-1` must not
+# be satisfied by `TS-10`, and built output is skipped so a stale dist/ cannot
+# vouch for a deleted rule. Callers pass which directories count: the broad
+# "was this implemented at all" check searches ARTEFACT_DIRS, the narrow
+# "does a gate script name it" check searches tools/ alone.
 clause_is_named() {
-  local id="$1" d
-  for d in "${ARTEFACT_DIRS[@]}"; do
+  local id="$1"; shift
+  local d
+  for d in "$@"; do
     [ -d "$ROOT/$d" ] || continue
     grep -rlE "$(printf '\\b%s\\b' "$id")" "$ROOT/$d" \
       --exclude-dir=node_modules --exclude-dir=dist -- >/dev/null 2>&1 && return 0
   done
   return 1
+}
+
+# clause<TAB>floor rows from tools/floors.tsv, comment and blank lines
+# skipped. Absent file means nothing to check, not a failure — a repo mid-way
+# through adopting the ratchet may not have floors yet.
+floor_ids() {
+  local floors="$1"
+  [ -f "$floors" ] || return 0
+  awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print $1 }' "$floors"
 }
 
 # A family header is `## Name — \`path\``, the path backtick-quoted right
@@ -143,12 +171,12 @@ check_index() {
   while IFS=$'\t' read -r id gate header value; do
     case "$gate" in
       auto)
-        clause_is_named "$id" || {
-          echo "::error::$id is marked \`auto\` but no artefact under ${ARTEFACT_DIRS[*]} names it — mark it \`pending\` or implement it"
+        clause_is_named "$id" tools || {
+          echo "::error::$id is marked \`auto\` but no script under tools/ names it — a package under packages/ existing is not evidence anything runs; mark it \`review\` or add a gate script"
           rc=1; }
         ;;
       pending)
-        clause_is_named "$id" && {
+        clause_is_named "$id" "${ARTEFACT_DIRS[@]}" && {
           echo "::error::$id is marked \`pending\` but an artefact names it — mark it \`auto\`"
           rc=1; }
         ;;
@@ -183,6 +211,14 @@ check_index() {
       echo "::error::family header links to '$path', which does not exist under $docs"
       rc=1; }
   done < <(family_header_paths "$index")
+
+  local floor_id
+  while IFS= read -r floor_id; do
+    [ -n "$floor_id" ] || continue
+    printf '%s\n' "$indexed" | grep -qx "$floor_id" || {
+      echo "::error::$floor_id has a floor in tools/floors.tsv but is not indexed in $index"
+      rc=1; }
+  done < <(floor_ids "$ROOT/tools/floors.tsv")
 
   if [ "$rc" -eq 0 ]; then
     if [ "$undefined" -gt 0 ]; then
@@ -255,7 +291,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: unimplemented auto exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-2 is marked .auto. but no artefact" \
+    printf '%s' "$out" | grep -q "AA-2 is marked .auto. but no script under tools/" \
       || { echo "FAIL: unimplemented auto not named"; echo "$out"; exit 1; }
 
     # Rot in the other direction: implemented, still advertised as pending.
@@ -319,6 +355,30 @@ EOF
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: existing package exited $grc"; echo "$out"; exit 1; }
+
+    # The whole point of the tools/ restriction: a package existing under
+    # packages/ is not evidence anything runs it. Clear the artefact that was
+    # incidentally vouching for AA-1 above, so this fixture isolates the case
+    # it means to prove.
+    rm -f tools/gate.sh
+    write_index <<'EOF'
+# Clause index
+
+| ID   | Rule        | Gate   | Encoded by                  |
+| ---- | ----------- | ------ | ---------------------------- |
+| AA-1 | implemented | `auto` | `@branchleft/eslint-config` |
+EOF
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: package-only auto clause exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "AA-1 is marked .auto. but no script under tools/ names it" \
+      || { echo "FAIL: package-only auto clause not reported"; echo "$out"; exit 1; }
+
+    # The positive twin: the same package, but a real script under tools/
+    # also names the clause — this is what distinguishes an encoding actually
+    # acted on from a package that merely exists.
+    printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: package backed by a tools/ script exited $grc"; echo "$out"; exit 1; }
 
     # An Evidence column is prose. Resolving it as a path would fail every
     # review clause in the real index and teach people the gate is noise.
@@ -485,6 +545,31 @@ EOF
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: fenced example header exited $grc"; echo "$out"; exit 1; }
+
+    # A floors.tsv entry for a clause the index carries is fine — the same
+    # index as the previous fixture, AA-1 auto via tools/gate.sh, still holds.
+    printf '# clause\tfloor\nAA-1\tstrict-1\n' > tools/floors.tsv
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: indexed floor exited $grc"; echo "$out"; exit 1; }
+
+    # The whole point: a floor for a clause that does not exist cannot be
+    # cited by anything that reads the index, only by floors.tsv itself.
+    printf '# clause\tfloor\nAA-1\tstrict-1\nZZ-9\tstrict-1\n' > tools/floors.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: ghost floor exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "ZZ-9 has a floor in tools/floors.tsv but is not indexed" \
+      || { echo "FAIL: ghost floor not reported"; echo "$out"; exit 1; }
+
+    # A missing floors.tsv is nothing to check, not a failure.
+    rm -f tools/floors.tsv
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: absent floors.tsv exited $grc"; echo "$out"; exit 1; }
+
+    # A comment or header-only floors.tsv names no clause and checks nothing.
+    printf '# clause\tfloor\n' > tools/floors.tsv
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: comment-only floors.tsv exited $grc"; echo "$out"; exit 1; }
+    rm -f tools/floors.tsv
 
     exit 0
   ) || rc=$?
