@@ -356,11 +356,14 @@ EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: existing package exited $grc"; echo "$out"; exit 1; }
 
-    # The whole point of the tools/ restriction: a package existing under
-    # packages/ is not evidence anything runs it. Clear the artefact that was
-    # incidentally vouching for AA-1 above, so this fixture isolates the case
-    # it means to prove.
+    # The whole point of the tools/ restriction: the ID appearing inside the
+    # package's own source is exactly the real defect this closes — a test
+    # file or comment naming the clause read as evidence under the old, broad
+    # ARTEFACT_DIRS search. Clear tools/gate.sh, which was incidentally
+    # vouching for AA-1 above, and put the ID only where a package's own
+    # source would carry it.
     rm -f tools/gate.sh
+    printf "// AA-1 is what this preset implements\n" > packages/eslint-config/note.ts
     write_index <<'EOF'
 # Clause index
 
@@ -373,12 +376,14 @@ EOF
     printf '%s' "$out" | grep -q "AA-1 is marked .auto. but no script under tools/ names it" \
       || { echo "FAIL: package-only auto clause not reported"; echo "$out"; exit 1; }
 
-    # The positive twin: the same package, but a real script under tools/
-    # also names the clause — this is what distinguishes an encoding actually
-    # acted on from a package that merely exists.
+    # The positive twin: the same package, and the same mention still sits in
+    # packages/, but a real script under tools/ also names the clause — this
+    # is what distinguishes an encoding actually acted on from a package that
+    # merely mentions the ID in its own source.
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: package backed by a tools/ script exited $grc"; echo "$out"; exit 1; }
+    rm -f packages/eslint-config/note.ts
 
     # An Evidence column is prose. Resolving it as a path would fail every
     # review clause in the real index and teach people the gate is noise.
