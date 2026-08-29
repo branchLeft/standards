@@ -28,11 +28,18 @@ not a gap, it is a false statement about coverage, and it is invisible because
 a clean run and an unimplemented rule look identical.
 
 `tools/check-clause-index.sh` therefore does more than match IDs between the
-index and `docs/`. It requires an `auto` clause to be named by some artefact
-under `tools/`, `packages/` or `templates/`, requires every `Encoded by` value
-to resolve, and — in the direction nobody remembers to check — fails a
-`pending` clause that an artefact does name, so a rule cannot be implemented
-and left advertised as unimplemented.
+index and `docs/`. It requires an `auto` clause to be backed by one of two
+things: a **script** under `tools/` that names it, or — for a clause encoded
+by a shared-config package rather than a script — a committed row in
+`tools/package-consumers.tsv` recording that the package is genuinely
+consumed somewhere in the fleet. A package existing under `packages/` is
+neither: it is evidence the package could be imported, not that anything
+runs it. It also requires every `Encoded by` value to resolve, and — in the
+direction nobody remembers to check — fails a `pending` clause that an
+artefact does name, so a rule cannot be implemented and left advertised as
+unimplemented. It also requires every clause ID that carries a floor in
+`tools/floors.tsv` to appear here, so a floor cannot outlive, or precede, the
+row it constrains.
 
 A family header optionally names its doc — `## Family` followed by an em
 dash and a backtick-quoted `path` — which promises `path` exists under
@@ -68,15 +75,15 @@ the corollary on PRIN-1 and the honesty clause on PRIN-4.
 
 ## TypeScript
 
-| ID   | Rule                                                                                             | Gate      | Encoded by                  |
-| ---- | ------------------------------------------------------------------------------------------------ | --------- | --------------------------- |
-| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto`    | `@branchleft/tsconfig`      |
-| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                           |
-| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                           |
-| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`          |
-| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                           |
-| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                           |
-| TS-7 | No default exports outside framework-mandated module shapes                                      | `auto`    | `@branchleft/eslint-config` |
+| ID   | Rule                                                                                             | Gate      | Encoded by             |
+| ---- | ------------------------------------------------------------------------------------------------ | --------- | ---------------------- |
+| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto`    | `@branchleft/tsconfig` |
+| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                      |
+| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                      |
+| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`     |
+| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                      |
+| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                      |
+| TS-7 | No default exports outside framework-mandated module shapes                                      | `review`  | —                      |
 
 **Why TS-2 and TS-5 are gates rather than inheritance.** `include`, `exclude` and
 `files` resolve relative to the config file that declares them, so an `include`
@@ -85,12 +92,32 @@ and matches nothing. A flat glob produces no error and no output difference — 
 simply compiles less. TS-5 is the only assertion that cannot be defeated by
 writing a differently-shaped bad glob.
 
+**TS-7 is `review`, not `auto`.** `@branchleft/eslint-config` implements the
+ban, and this repo lints against it, but no other repo in the fleet consumes
+the package — every repo still hand-rolls its own `eslint.config.js`, so
+nothing runs the rule anywhere it would matter. `Encoded by` is `—` until a
+repo's own lint run is what enforces it; adopting the shared config is tracked
+as [`ADOPTION.md`](../ADOPTION.md) work per repo, not assumed.
+
 ## Formatting and linting
 
-| ID     | Rule                                                                               | Gate   | Encoded by                    |
-| ------ | ---------------------------------------------------------------------------------- | ------ | ----------------------------- |
-| LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `auto` | `@branchleft/eslint-config`   |
-| FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto` | `@branchleft/prettier-config` |
+| ID     | Rule                                                                               | Gate     | Encoded by                    |
+| ------ | ---------------------------------------------------------------------------------- | -------- | ----------------------------- |
+| LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `review` | —                             |
+| FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto`   | `@branchleft/prettier-config` |
+
+LINT-1 is `review`, not `auto`: `@branchleft/eslint-config` exists and this
+repo dogfoods it, but no other repo in the fleet consumes it — every repo
+still hand-rolls its own `eslint.config.js`. `Encoded by` is `—` until a
+repo's own lint run is what enforces it; adopting the shared config is
+tracked as [`ADOPTION.md`](../ADOPTION.md) work per repo, not assumed.
+
+**FMT-1 stays `auto`.** Unlike `eslint-config`, `@branchleft/prettier-config`
+is genuinely consumed today: see `tools/package-consumers.tsv`, the committed
+record `check-clause-index.sh` requires before a package-encoded row — as
+opposed to a `tools/` gate script — may claim `auto`. Consumption by fleet
+repos is what distinguishes FMT-1 from LINT-1/TS-7/APP-1/LIB-4, which name
+the same shape of package but currently have no consumers to record.
 
 ## Shared config files — `shared-config.md`
 
@@ -269,37 +296,44 @@ published package, which deliberately has no Tailwind and no theme of its own.
 
 ## React applications — `stacks/react-app.md`
 
-| ID    | Rule                                                                       | Gate      | Encoded by                  |
-| ----- | -------------------------------------------------------------------------- | --------- | --------------------------- |
-| APP-1 | No default exports, except framework-mandated route and root modules       | `auto`    | `@branchleft/eslint-config` |
-| APP-2 | Imports are absolute from the application root                             | `pending` | —                           |
-| APP-3 | One file per route, with metadata; shared loaders move to a library module | `review`  | —                           |
-| APP-4 | Every route has a browser axe assertion; failures are build-blocking       | `review`  | —                           |
-| APP-5 | Reduced motion is honoured, and the browser suite runs with it forced      | `review`  | —                           |
-| APP-6 | Progressive enhancement is tested, not asserted                            | `review`  | —                           |
-| APP-7 | Security headers built in one unit-tested module                           | `review`  | —                           |
-| APP-8 | Derived data has a single source and a drift test                          | `review`  | —                           |
+| ID    | Rule                                                                       | Gate      | Encoded by |
+| ----- | -------------------------------------------------------------------------- | --------- | ---------- |
+| APP-1 | No default exports, except framework-mandated route and root modules       | `review`  | —          |
+| APP-2 | Imports are absolute from the application root                             | `pending` | —          |
+| APP-3 | One file per route, with metadata; shared loaders move to a library module | `review`  | —          |
+| APP-4 | Every route has a browser axe assertion; failures are build-blocking       | `review`  | —          |
+| APP-5 | Reduced motion is honoured, and the browser suite runs with it forced      | `review`  | —          |
+| APP-6 | Progressive enhancement is tested, not asserted                            | `review`  | —          |
+| APP-7 | Security headers built in one unit-tested module                           | `review`  | —          |
+| APP-8 | Derived data has a single source and a drift test                          | `review`  | —          |
 
 APP-1's exception is a `files` override in the ESLint config scoped to the route
 directory, so it is visible where it is enforced and a file that moves out loses
-the exemption automatically.
+the exemption automatically — in `@branchleft/eslint-config`'s `reactApp`
+preset, which implements the rule. APP-1 is `review` rather than `auto`
+because no application repo composes that preset yet; adopting it is
+[`ADOPTION.md`](../ADOPTION.md) work, tracked per repo rather than assumed.
 
 ## Component libraries — `stacks/component-library.md`
 
-| ID    | Rule                                                                  | Gate     | Encoded by                  |
-| ----- | --------------------------------------------------------------------- | -------- | --------------------------- |
-| LIB-1 | The colocated quartet: component, test, story, and CSS where it ships | `review` | —                           |
-| LIB-2 | An explicit barrel, no `export *`                                     | `review` | —                           |
-| LIB-3 | Props are an exported, named, `readonly` interface                    | `review` | —                           |
-| LIB-4 | No default exports — absolute, no framework exception                 | `auto`   | `@branchleft/eslint-config` |
-| LIB-5 | Native semantics first; ARIA only where semantics are insufficient    | `review` | —                           |
-| LIB-6 | Every component carries an SSR-safe axe assertion                     | `review` | —                           |
-| LIB-7 | Storybook is a development environment until it runs headlessly in CI | `review` | —                           |
-| LIB-8 | Tests import through the package entry point, not by deep path        | `review` | —                           |
+| ID    | Rule                                                                  | Gate     | Encoded by |
+| ----- | --------------------------------------------------------------------- | -------- | ---------- |
+| LIB-1 | The colocated quartet: component, test, story, and CSS where it ships | `review` | —          |
+| LIB-2 | An explicit barrel, no `export *`                                     | `review` | —          |
+| LIB-3 | Props are an exported, named, `readonly` interface                    | `review` | —          |
+| LIB-4 | No default exports — absolute, no framework exception                 | `review` | —          |
+| LIB-5 | Native semantics first; ARIA only where semantics are insufficient    | `review` | —          |
+| LIB-6 | Every component carries an SSR-safe axe assertion                     | `review` | —          |
+| LIB-7 | Storybook is a development environment until it runs headlessly in CI | `review` | —          |
+| LIB-8 | Tests import through the package entry point, not by deep path        | `review` | —          |
 
 LIB-6's rule disables live in one central config with a written reason each,
 never as per-test workarounds: two disables with reasons can be reviewed, twenty
 scattered across test files cannot.
+
+LIB-4 is `review`, not `auto`: `@branchleft/eslint-config`'s `library` preset
+implements the absolute ban, but no library repo composes it yet — adopting it
+is [`ADOPTION.md`](../ADOPTION.md) work, tracked per repo rather than assumed.
 
 ## Contract-driven development — `contract-development.md`
 

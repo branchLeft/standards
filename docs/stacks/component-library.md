@@ -40,6 +40,10 @@ A default export has no canonical name, so every consumer picks their own and
 the same component appears under three names across a codebase. It also makes
 re-exporting through a barrel lossy.
 
+`review`, not `auto`: `@branchleft/eslint-config`'s `library` preset implements
+this, but no library repo composes it yet — see [`../index.md`](../index.md)
+and [`../../ADOPTION.md`](../../ADOPTION.md).
+
 ## LIB-5 — native semantics first
 
 Reach for the HTML element that already has the behaviour before reaching for

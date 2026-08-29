@@ -1,0 +1,16 @@
+# A committed record that a shared-config PACKAGE — as opposed to a tools/
+# gate script — is genuinely consumed somewhere in the fleet, not merely
+# published. check-clause-index.sh requires a row here before it will let a
+# package-encoded clause claim `auto`; a package with no row here cannot,
+# whatever the package itself contains. Standards' own dogfooding does not
+# count as a row: a package describing its own consumer is not evidence
+# anyone else acts on it, the same reasoning that keeps docs/ out of
+# ARTEFACT_DIRS.
+#
+# `consumers` is free text naming repo:mechanism pairs, comma-separated. This
+# is not independently verified by the gate — it carries the same trust as
+# any other committed claim in this repo, and is wrong exactly when someone
+# commits something false, same as a wrong `Encoded by` path would be.
+#
+# package	consumers
+@branchleft/prettier-config	website:pre-commit, components:pre-commit, ghost-platform:pre-commit, shared-infra:package.json, ghost-platform-tenant-template:package.json

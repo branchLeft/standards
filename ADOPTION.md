@@ -85,7 +85,32 @@ because the command still succeeds and simply formats more than it should.
 Keep a repo-local `.prettierignore` for anything the shared set cannot know
 about: a vendored checkout, or a file whose syntax Prettier would damage.
 
-## 4. Canonical script names
+## 4. ESLint
+
+```bash
+pnpm add -D @branchleft/eslint-config   # or npm i -D
+```
+
+```js
+// eslint.config.js
+import { base, reactApp } from '@branchleft/eslint-config'; // or library, pulumi, scripts, tests
+
+export default [...base, ...reactApp, { ignores: ['dist', 'node_modules'] }];
+```
+
+Compose the stack preset that matches the repo — `reactApp` for TS-7's
+route/root exception (APP-1), `library` for the absolute ban (LIB-4), `pulumi`
+or `scripts`/`tests` otherwise — after `base`, so the later block's `files`
+override wins. Delete the repo's own `eslint.config.js` rules once the shared
+set covers them; a rule kept in both places drifts the moment one of them
+changes.
+
+This is the step that makes TS-7, LINT-1, APP-1 and LIB-4 true for the repo
+running it. None of the four run anywhere until this step lands, which is why
+the clause table carries them as `review` rather than `auto` — see
+[`docs/index.md`](docs/index.md).
+
+## 5. Canonical script names
 
 `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit`.
 
@@ -96,7 +121,7 @@ message then describes a tree that no longer exists.
 Every required check needs a local equivalent. A project whose type check lives
 only inside workflow YAML cannot be reproduced by anyone before pushing.
 
-## 5. Turn the gates on in warn mode
+## 6. Turn the gates on in warn mode
 
 ```yaml
 # .github/workflows/standards.yml
@@ -119,13 +144,13 @@ echo warn > .standards.mode
 One caller per repo runs every gate, so adding a gate later never costs a new
 caller file — only a version bump.
 
-## 6. Clear the tree, then delete the mode file
+## 7. Clear the tree, then delete the mode file
 
 In `warn`, the legacy tree is advisory and the files your branch touches are
 not. Work through the findings at whatever pace suits, then remove
 `.standards.mode`. The gate tells you when the tree is clean.
 
-## 7. Only then, make it required
+## 8. Only then, make it required
 
 **Never add a required status check before one green run has produced its
 literal context name.** A required context that never reports blocks every merge
