@@ -1,35 +1,6 @@
 {
   "communities": {
     "0": [
-      "tools_check_pulumi",
-      "tools_check_pulumi_is_component_file",
-      "tools_check_pulumi_main",
-      "tools_check_pulumi_scan_args",
-      "tools_check_pulumi_scan_component",
-      "tools_check_pulumi_scan_parenting",
-      "tools_check_pulumi_self_test",
-      "tools_check_pulumi_sh__entry",
-      "tools_check_pulumi_takes_parent",
-      "tools_check_workflows",
-      "tools_check_workflows_main",
-      "tools_check_workflows_scan_workflow",
-      "tools_check_workflows_self_test",
-      "tools_check_workflows_sh__entry",
-      "tools_lib_ratchet",
-      "tools_lib_ratchet_ratchet_finding",
-      "tools_lib_ratchet_ratchet_glob_matches",
-      "tools_lib_ratchet_ratchet_init",
-      "tools_lib_ratchet_ratchet_is_allowed",
-      "tools_lib_ratchet_ratchet_is_enforced",
-      "tools_lib_ratchet_ratchet_is_exempt",
-      "tools_lib_ratchet_ratchet_json",
-      "tools_lib_ratchet_ratchet_scope_files",
-      "tools_lib_ratchet_ratchet_scratch_repo_init",
-      "tools_lib_ratchet_ratchet_self_test",
-      "tools_lib_ratchet_ratchet_summary",
-      "tools_lib_ratchet_sh__entry"
-    ],
-    "1": [
       "packages_eslint_config_src_base",
       "packages_eslint_config_src_base_base",
       "packages_eslint_config_src_base_test",
@@ -56,7 +27,7 @@
       "packages_eslint_config_src_typechecked_test_alloweddefaultprojects",
       "packages_eslint_config_src_typechecked_typechecked"
     ],
-    "2": [
+    "1": [
       "branchleft_tsconfig",
       "package_devdependencies_branchleft_tsconfig",
       "packages_eslint_config_package_devdependencies",
@@ -82,7 +53,7 @@
       "packages_vitest_config_package_types",
       "packages_vitest_config_package_version"
     ],
-    "3": [
+    "2": [
       "packages_eslint_config_package_files",
       "packages_eslint_config_package_json_ref_dist",
       "packages_prettier_config_package",
@@ -108,7 +79,7 @@
       "ref_json",
       "ref_prettierignore"
     ],
-    "4": [
+    "3": [
       "package",
       "package_description",
       "package_license",
@@ -133,7 +104,7 @@
       "package_type",
       "package_version"
     ],
-    "5": [
+    "4": [
       "eslint",
       "package_devdependencies_eslint",
       "packages_eslint_config_package",
@@ -156,6 +127,30 @@
       "packages_eslint_config_package_type",
       "packages_eslint_config_package_types",
       "packages_eslint_config_package_version"
+    ],
+    "5": [
+      "tools_check_pulumi",
+      "tools_check_pulumi_is_component_file",
+      "tools_check_pulumi_main",
+      "tools_check_pulumi_scan_args",
+      "tools_check_pulumi_scan_component",
+      "tools_check_pulumi_scan_parenting",
+      "tools_check_pulumi_self_test",
+      "tools_check_pulumi_sh__entry",
+      "tools_check_pulumi_takes_parent",
+      "tools_lib_ratchet",
+      "tools_lib_ratchet_ratchet_finding",
+      "tools_lib_ratchet_ratchet_glob_matches",
+      "tools_lib_ratchet_ratchet_init",
+      "tools_lib_ratchet_ratchet_is_allowed",
+      "tools_lib_ratchet_ratchet_is_enforced",
+      "tools_lib_ratchet_ratchet_is_exempt",
+      "tools_lib_ratchet_ratchet_json",
+      "tools_lib_ratchet_ratchet_scope_files",
+      "tools_lib_ratchet_ratchet_scratch_repo_init",
+      "tools_lib_ratchet_ratchet_self_test",
+      "tools_lib_ratchet_ratchet_summary",
+      "tools_lib_ratchet_sh__entry"
     ],
     "6": [
       "branchleft_eslint_config",
@@ -291,6 +286,20 @@
       "ref_node"
     ],
     "14": [
+      "tools_check_clause_index",
+      "tools_check_clause_index_check_index",
+      "tools_check_clause_index_clause_is_named",
+      "tools_check_clause_index_encoding_resolves",
+      "tools_check_clause_index_family_header_paths",
+      "tools_check_clause_index_floor_ids",
+      "tools_check_clause_index_gate",
+      "tools_check_clause_index_index_rows",
+      "tools_check_clause_index_package_has_consumers",
+      "tools_check_clause_index_self_test",
+      "tools_check_clause_index_sh__entry",
+      "tools_check_clause_index_write_index"
+    ],
+    "15": [
       "packages_tsconfig_base",
       "packages_tsconfig_base_comment",
       "packages_tsconfig_base_compileroptions",
@@ -303,7 +312,7 @@
       "packages_tsconfig_base_compileroptions_target",
       "packages_tsconfig_base_schema"
     ],
-    "15": [
+    "16": [
       "tools_standards_audit",
       "tools_standards_audit_audit_exemptions",
       "tools_standards_audit_clause_is_covered",
@@ -316,7 +325,7 @@
       "tools_standards_audit_self_test",
       "tools_standards_audit_sh__entry"
     ],
-    "16": [
+    "17": [
       "packages_tsconfig_react_lib",
       "packages_tsconfig_react_lib_comment",
       "packages_tsconfig_react_lib_compileroptions",
@@ -328,7 +337,7 @@
       "packages_tsconfig_react_lib_schema",
       "ref_react_app_json"
     ],
-    "17": [
+    "18": [
       "packages_tsconfig_strict_1",
       "packages_tsconfig_strict_1_comment",
       "packages_tsconfig_strict_1_compileroptions",
@@ -340,7 +349,7 @@
       "packages_tsconfig_strict_1_schema",
       "ref_base_json"
     ],
-    "18": [
+    "19": [
       "ref_branchleft_tsconfig_react_app_json",
       "ref_branchleft_tsconfig_strict_2_json",
       "ref_node_modules",
@@ -351,18 +360,6 @@
       "tsconfig_extends",
       "tsconfig_include",
       "tsconfig_json_ref_dist"
-    ],
-    "19": [
-      "tools_check_clause_index",
-      "tools_check_clause_index_check_index",
-      "tools_check_clause_index_clause_is_named",
-      "tools_check_clause_index_encoding_resolves",
-      "tools_check_clause_index_family_header_paths",
-      "tools_check_clause_index_gate",
-      "tools_check_clause_index_index_rows",
-      "tools_check_clause_index_self_test",
-      "tools_check_clause_index_sh__entry",
-      "tools_check_clause_index_write_index"
     ],
     "20": [
       "tools_standards_sync",
@@ -416,44 +413,51 @@
       "tools_check_tsconfig_tier_rank"
     ],
     "25": [
+      "tools_check_workflows",
+      "tools_check_workflows_main",
+      "tools_check_workflows_scan_workflow",
+      "tools_check_workflows_self_test",
+      "tools_check_workflows_sh__entry"
+    ],
+    "26": [
       "packages_eslint_config_src_vendor_d",
       "packages_eslint_config_src_vendor_d_eslint_config_prettier",
       "packages_eslint_config_src_vendor_d_eslint_plugin_jsx_a11y",
       "packages_eslint_config_src_vendor_d_eslint_plugin_react_hooks"
     ],
-    "26": [
+    "27": [
       "tools_tests_run",
       "tools_tests_run_run",
       "tools_tests_run_sh__entry",
       "tools_tests_run_workflow_runs_every_gate"
     ],
-    "27": [
+    "28": [
       "tools_ruleset_normalize",
       "tools_ruleset_normalize_canon",
       "tools_ruleset_normalize_canon_rule"
     ],
-    "28": [
+    "29": [
       "tools_ruleset_apply",
       "tools_ruleset_apply_sh__entry"
     ],
-    "29": [
+    "30": [
       "tools_ruleset_audit",
       "tools_ruleset_audit_sh__entry"
     ],
-    "30": [
+    "31": [
       "eslint_config"
     ],
-    "31": [
+    "32": [
       "vitest_config"
     ]
   },
   "cohesion": {
-    "0": 0.15954415954415954,
-    "1": 0.14,
+    "0": 0.14,
+    "1": 0.08333333333333333,
     "2": 0.08333333333333333,
-    "3": 0.08333333333333333,
-    "4": 0.08695652173913043,
-    "5": 0.09090909090909091,
+    "3": 0.08695652173913043,
+    "4": 0.09090909090909091,
+    "5": 0.2077922077922078,
     "6": 0.11764705882352941,
     "7": 0.1111111111111111,
     "8": 0.14285714285714285,
@@ -462,24 +466,25 @@
     "11": 0.2967032967032967,
     "12": 0.15384615384615385,
     "13": 0.16666666666666666,
-    "14": 0.18181818181818182,
-    "15": 0.34545454545454546,
-    "16": 0.2,
+    "14": 0.24242424242424243,
+    "15": 0.18181818181818182,
+    "16": 0.34545454545454546,
     "17": 0.2,
     "18": 0.2,
-    "19": 0.28888888888888886,
+    "19": 0.2,
     "20": 0.3333333333333333,
     "21": 0.2222222222222222,
     "22": 0.2857142857142857,
     "23": 0.47619047619047616,
     "24": 0.42857142857142855,
-    "25": 0.5,
-    "26": 0.6666666666666666,
-    "27": 1.0,
+    "25": 0.7,
+    "26": 0.5,
+    "27": 0.6666666666666666,
     "28": 1.0,
     "29": 1.0,
     "30": 1.0,
-    "31": 1.0
+    "31": 1.0,
+    "32": 1.0
   },
   "gods": [
     {
