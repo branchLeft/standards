@@ -94,14 +94,26 @@ index_rows() {
 # "named by an artefact under tools/", which would mark every `pending`
 # clause implemented the moment it gets a row, and would let clause-paths.tsv
 # alone satisfy the `auto` check for a clause with no real gate script.
+#
+# The exclusion is by exact path, not `grep --exclude`'s basename glob:
+# `--exclude=clause-paths.tsv` would also exempt an unrelated file elsewhere
+# under tools/ that merely happens to share the name — over-exclusion in the
+# other direction from the bug this exists to fix. Filtering the hit list
+# against $ROOT/tools/clause-paths.tsv by exact match pins it to the one file
+# this comment is actually about. A rename of that file simply drops back out
+# of this filter — the exclusion silently stops applying rather than silently
+# widening to something else — which is why this fails loud (26 false
+# `pending`-but-implemented errors) rather than open; see the PR description
+# for that sabotage.
 clause_is_named() {
   local id="$1"; shift
-  local d
+  local d hits
   for d in "$@"; do
     [ -d "$ROOT/$d" ] || continue
-    grep -rlE "$(printf '\\b%s\\b' "$id")" "$ROOT/$d" \
-      --exclude-dir=node_modules --exclude-dir=dist --exclude=clause-paths.tsv \
-      -- >/dev/null 2>&1 && return 0
+    hits=$(grep -rlE "$(printf '\\b%s\\b' "$id")" "$ROOT/$d" \
+      --exclude-dir=node_modules --exclude-dir=dist -- 2>/dev/null)
+    hits=$(printf '%s\n' "$hits" | grep -vFx "$ROOT/tools/clause-paths.tsv")
+    [ -n "$hits" ] && return 0
   done
   return 1
 }

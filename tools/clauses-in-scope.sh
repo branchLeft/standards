@@ -61,20 +61,15 @@ clause_paths_rows() {
   awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print }' "$1"
 }
 
-# Byte-for-byte tools/lib/ratchet.sh's ratchet_glob_matches(): `*` matches
-# across `/` because this is `case` pattern matching, not filename
-# expansion; `**` folds to `*` first so both spellings mean the same thing.
-# Copied rather than called so a caller who only vendors this one script
-# still gets identical matching — the source-and-call path is fine within
-# this repo, where ratchet.sh is already sourced above for changed_files(),
-# but duplicating the ~4 lines keeps the matcher itself dependency-free.
-glob_matches() {
-  local glob="$1" path="$2"
-  glob=${glob//\*\*/\*}
-  # shellcheck disable=SC2254  # $glob is a pattern by design
-  case "$path" in $glob) return 0 ;; esac
-  return 1
-}
+# Matching is tools/lib/ratchet.sh's own ratchet_glob_matches() — called, not
+# copied. This file already sources ratchet.sh unconditionally above (for
+# changed_files()'s ratchet_init call), so a second copy of the matcher would
+# be pure duplication, and ratchet_glob_matches()'s own comment names exactly
+# what that costs: "two copies of this would eventually disagree, and the
+# disagreement would show up as an exemption reported stale while it is
+# still suppressing a finding." The same failure shows up here as a clause
+# silently going out of scope, or into it, after a glob-syntax change lands
+# in one file and not the other.
 
 # The changed-file set: either a caller-supplied list, or exactly what
 # ratchet_init's warn mode already computes for every other gate — merge-base
@@ -125,7 +120,7 @@ run() {
       [ -n "$f" ] || continue
       hit=0
       for g in "${glob_list[@]}"; do
-        glob_matches "$g" "$f" && { hit=1; break; }
+        ratchet_glob_matches "$g" "$f" && { hit=1; break; }
       done
       [ "$hit" -eq 1 ] && matches="$matches${matches:+,}$f"
     done <<< "$changed"

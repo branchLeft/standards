@@ -156,7 +156,7 @@ LIB-8	*.test.tsx;*.test.ts	[fleet] "tests import through the package entry point
 
 ## Contract-driven development — contract-development.md
 CTR-1	*	[none] "applies wherever a boundary is crossed" — no path or language named
-CTR-2	openapi*.yaml;*/openapi*.yaml;openapi*.json;*/openapi*.json;*.proto;*.graphql	[doc] the three spec formats CTR-2 names (OpenAPI, protobuf, JSON Schema/GraphQL); the api-contracts repo the clause anticipates does not exist yet, so this is aspirational
+CTR-2	openapi*.yaml;*/openapi*.yaml;openapi*.json;*/openapi*.json;*.proto;*.schema.json	[fleet] contract-development.md names three formats (OpenAPI, protobuf, JSON Schema), not filenames or paths, so the glob is an inference from ecosystem filename convention, not a doc-stated location — hence [fleet], not [doc]. GraphQL is not one of the three named formats and was wrongly conflated with JSON Schema in an earlier draft of this row; no `*.graphql` glob belongs here. The api-contracts repo the clause anticipates does not exist yet, so this row is aspirational either way
 
 ## Documentation — index.md "Documentation"
 DOC-1	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] "runs the docs-lint caller" is a workflow file; DOC-1 is `pending`, no gate script to copy from
