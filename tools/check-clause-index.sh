@@ -36,6 +36,14 @@
 #      index. A floor for an unindexed clause cannot be cited by anything that
 #      reads the index — only by the floors file itself, which is not a
 #      citation anyone else can follow.
+#   6. Every clause ID with a row in tools/clause-paths.tsv appears in the
+#      index — the same "cannot be cited" reasoning as assertion 5, applied
+#      to the file-scope map instead of the floor map.
+#   7. Every indexed clause has a row in tools/clause-paths.tsv. Unlike the
+#      floor map, this direction is required rather than advisory: a clause
+#      with no mapping is invisible to a reviewer using the map to find what
+#      applies to a diff, and that silent gap is worse than an absent floor
+#      because nothing else prints a warning for it.
 #
 # Assertion 2 also runs in reverse: a `pending` clause that some artefact
 # anywhere under tools/, packages/ or templates/ does name is a row that was
@@ -79,13 +87,33 @@ index_rows() {
 # vouch for a deleted rule. Callers pass which directories count: the broad
 # "was this implemented at all" check searches ARTEFACT_DIRS, the narrow
 # "does a gate script name it" check searches tools/ alone.
+#
+# tools/clause-paths.tsv is excluded for the same reason docs/ is absent from
+# ARTEFACT_DIRS: it names every clause by construction — that is the whole
+# point of a file-scope map — so every ID in it would otherwise read as
+# "named by an artefact under tools/", which would mark every `pending`
+# clause implemented the moment it gets a row, and would let clause-paths.tsv
+# alone satisfy the `auto` check for a clause with no real gate script.
+#
+# The exclusion is by exact path, not `grep --exclude`'s basename glob:
+# `--exclude=clause-paths.tsv` would also exempt an unrelated file elsewhere
+# under tools/ that merely happens to share the name — over-exclusion in the
+# other direction from the bug this exists to fix. Filtering the hit list
+# against $ROOT/tools/clause-paths.tsv by exact match pins it to the one file
+# this comment is actually about. A rename of that file simply drops back out
+# of this filter — the exclusion silently stops applying rather than silently
+# widening to something else — which is why this fails loud (26 false
+# `pending`-but-implemented errors) rather than open; see the PR description
+# for that sabotage.
 clause_is_named() {
   local id="$1"; shift
-  local d
+  local d hits
   for d in "$@"; do
     [ -d "$ROOT/$d" ] || continue
-    grep -rlE "$(printf '\\b%s\\b' "$id")" "$ROOT/$d" \
-      --exclude-dir=node_modules --exclude-dir=dist -- >/dev/null 2>&1 && return 0
+    hits=$(grep -rlE "$(printf '\\b%s\\b' "$id")" "$ROOT/$d" \
+      --exclude-dir=node_modules --exclude-dir=dist -- 2>/dev/null)
+    hits=$(printf '%s\n' "$hits" | grep -vFx "$ROOT/tools/clause-paths.tsv")
+    [ -n "$hits" ] && return 0
   done
   return 1
 }
@@ -97,6 +125,19 @@ floor_ids() {
   local floors="$1"
   [ -f "$floors" ] || return 0
   awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print $1 }' "$floors"
+}
+
+# clause<TAB>globs<TAB>scope rows from tools/clause-paths.tsv, comment and
+# blank lines skipped — same extraction shape as floor_ids(). Unlike
+# floor_ids(), an absent file is the caller's problem, not this function's:
+# every indexed clause is required to have a row here (see the completeness
+# assertion below), so a repo without the file has not started, not finished
+# early, and the caller reports that as a hard error rather than "nothing to
+# check".
+clause_paths_ids() {
+  local paths="$1"
+  [ -f "$paths" ] || return 0
+  awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print $1 }' "$paths"
 }
 
 # True if PKG has a row in tools/package-consumers.tsv — the committed record
@@ -252,6 +293,42 @@ check_index() {
       rc=1; }
   done < <(floor_ids "$ROOT/tools/floors.tsv")
 
+  # tools/clause-paths.tsv maps every clause to the files a reviewer should
+  # read it against. Absent entirely, that is reported once here rather than
+  # as 96 missing rows below — a missing file and an incomplete one are
+  # different defects and deserve different error text.
+  local clause_paths="$ROOT/tools/clause-paths.tsv" mapped=""
+  if [ -f "$clause_paths" ]; then
+    mapped=$(clause_paths_ids "$clause_paths")
+
+    # Same shape as the floors check just above: a mapped clause that is not
+    # indexed cannot be cited by anything that reads the index, only by
+    # clause-paths.tsv itself.
+    local mapped_id
+    while IFS= read -r mapped_id; do
+      [ -n "$mapped_id" ] || continue
+      printf '%s\n' "$indexed" | grep -qx "$mapped_id" || {
+        echo "::error::$mapped_id has a row in tools/clause-paths.tsv but is not indexed in $index"
+        rc=1; }
+    done <<< "$mapped"
+
+    # The direction floors.tsv is deliberately exempt from: every floor is
+    # optional, but every indexed clause is expected to have a mapping, so a
+    # reviewer facing a diff never has to fall back to reading the full
+    # table by hand. A clause added to the index without a row here is the
+    # exact gap this tool exists to close.
+    local idx_id
+    while IFS= read -r idx_id; do
+      [ -n "$idx_id" ] || continue
+      printf '%s\n' "$mapped" | grep -qx "$idx_id" || {
+        echo "::error::$idx_id is indexed in $index but has no row in tools/clause-paths.tsv"
+        rc=1; }
+    done <<< "$indexed"
+  else
+    echo "::error::no clause-paths file at $clause_paths"
+    rc=1
+  fi
+
   if [ "$rc" -eq 0 ]; then
     if [ "$undefined" -gt 0 ]; then
       echo "check-clause-index.sh: no errors, but $undefined indexed clause(s) have no doc — see the warnings above"
@@ -273,7 +350,27 @@ self_test() {
     mkdir -p docs tools packages/eslint-config templates
 
     write_index() { cat > docs/index.md; }
-    gate() { out=$("$CHECK_SCRIPT" "$tmp/docs" 2>&1); grc=$?; }
+
+    # Every existing fixture below writes an index and immediately calls
+    # gate(), which now requires a matching tools/clause-paths.tsv (assertion
+    # 7) or it fails a test that has nothing to do with clause-paths.tsv at
+    # all. Auto-deriving one from whatever index.md currently says — one row
+    # per indexed ID, same extraction the real script uses — keeps every
+    # pre-existing case below unchanged. SYNC_PATHS=0 turns this off for the
+    # dedicated clause-paths.tsv cases near the end, which corrupt the file
+    # on purpose and must not have gate() silently repair it first.
+    sync_paths_to_index() {
+      : > tools/clause-paths.tsv
+      local id
+      while IFS= read -r id; do
+        [ -n "$id" ] || continue
+        printf '%s\t*\tfixture\n' "$id" >> tools/clause-paths.tsv
+      done < <(grep -oE '\b[A-Z]{2,5}-[0-9]{1,3}\b' docs/index.md | sort -u)
+    }
+    gate() {
+      [ "${SYNC_PATHS:-1}" = "1" ] && sync_paths_to_index
+      out=$("$CHECK_SCRIPT" "$tmp/docs" 2>&1); grc=$?
+    }
 
     printf '# Fake\n\n## AA-1 — implemented\n\n## AA-2 — declared\n' > docs/fake.md
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
@@ -634,6 +731,55 @@ EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: comment-only floors.tsv exited $grc"; echo "$out"; exit 1; }
     rm -f tools/floors.tsv
+
+    # --- clause-paths.tsv: assertions 6 and 7 --------------------------------
+    # A single indexed clause, auto-synced to a matching clause-paths.tsv row.
+    # The honest case, proven before any of the sabotage below.
+    write_index <<'EOF'
+# Clause index
+
+| ID   | Rule        | Gate   | Encoded by      |
+| ---- | ----------- | ------ | --------------- |
+| AA-1 | implemented | `auto` | `tools/gate.sh` |
+EOF
+    printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: synced clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
+
+    # Assertion 7, the direction floors.tsv does not require: an indexed
+    # clause with no row in clause-paths.tsv at all.
+    SYNC_PATHS=0
+    : > tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: unmapped indexed clause exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" \
+      || { echo "FAIL: unmapped indexed clause not reported"; echo "$out"; exit 1; }
+
+    # Assertion 6, clause-paths.tsv's own version of a ghost floor: a row for
+    # an ID the index does not carry.
+    printf 'AA-1\t*\tfixture\nZZ-9\t*\tfixture\n' > tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: ghost clause-paths row exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "ZZ-9 has a row in tools/clause-paths.tsv but is not indexed" \
+      || { echo "FAIL: ghost clause-paths row not reported"; echo "$out"; exit 1; }
+
+    # A comment-only clause-paths.tsv names no clause, so the one indexed
+    # clause is unmapped — same defect and same message as the empty-file
+    # case above.
+    printf '# clause\tglobs\tscope\n' > tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: comment-only clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" \
+      || { echo "FAIL: comment-only clause-paths.tsv did not report the unmapped clause"; echo "$out"; exit 1; }
+
+    # An absent file is a harder, single error rather than one per clause —
+    # deliberately distinct wording from the "no row" case above.
+    rm -f tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: missing clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "no clause-paths file at" \
+      || { echo "FAIL: missing clause-paths.tsv not reported"; echo "$out"; exit 1; }
+    SYNC_PATHS=1
 
     exit 0
   ) || rc=$?

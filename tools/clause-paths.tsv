@@ -1,0 +1,163 @@
+# Which clauses are in scope for a changed file — discovery, not a gate.
+#
+# clause<TAB>globs<TAB>scope
+#
+# globs is a semicolon-separated list of case-pattern globs in the exact
+# syntax tools/lib/ratchet.sh's ratchet_glob_matches() already uses for
+# .standardsignore: `*` matches across `/` (this is `case` pattern matching,
+# not filename expansion, so a bare `*` is not restricted to one path
+# segment). A pattern with no `/` therefore matches at any depth — `*.ts`
+# matches both `app.ts` and `packages/foo/app.ts` — so most rows need no
+# leading `**/`. A literal root filename (`package.json`) matches only the
+# repo-root copy; pair it with `*/package.json` to also catch a nested one.
+# `*` alone as the entire glob list means "matches every path" and is used
+# only where the clause's own doc states, or an existing gate script's
+# ratchet_scope_files() pattern proves, that the clause is not file-scoped —
+# never as a stand-in for "not sure".
+#
+# scope carries a confidence tag:
+#   [gate]     the exact ratchet_scope_files() pattern a real tools/*.sh gate
+#              already uses — copied from source, not guessed
+#   [doc]      the clause's own doc names this location or file directly
+#   [fleet]    inferred from a naming convention evidenced elsewhere in this
+#              repo or the workspace CLAUDE.md (e.g. `infra/`, `app/`,
+#              `src/`), but not asserted by the clause's own doc
+#   [none]     the doc states, or implies by giving no path/language/
+#              directory signal at all, that the clause is not file-scoped
+#
+# A [fleet] row is the weakest kind here and the one most likely to need
+# correction once this ships against a real diff from outside this repo —
+# see the PR description for the full list of what could not be grounded
+# in a doc or a script.
+
+## Principles — principles.md (all six `pending`, all repo-level decisions)
+PRIN-1	*	[none] a public-vs-private choice made once, at repo creation — not tied to any file in a diff
+PRIN-2	*	[none] a repo-level deploy/merge-protection posture — not tied to any file in a diff
+PRIN-3	*	[none] a spend decision — not tied to any file in a diff
+PRIN-4	*	[none] a supplier-choice decision — not tied to any file in a diff
+PRIN-5	*	[none] a repo-scope decision — not tied to any file in a diff
+PRIN-6	*	[none] an agent-authorisation decision — not tied to any file in a diff
+
+## Meta — index.md "Meta"
+STD-000	*	[doc] a `standards-allow-next-line` suppression can be the preceding line of any tracked file
+STD-001	.standardsignore	[doc] exemptions are rows in this file only
+STD-002	.standardsignore	[doc] staleness is computed over this file's rows
+
+## TypeScript — tsconfig.md, tools/check-tsconfig.sh
+TS-1	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] check-tsconfig.sh: ratchet_scope_files '(^|/)tsconfig(\.[a-z]+)?\.json$'
+TS-2	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script
+TS-3	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script
+TS-4	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script; compares against tools/floors.tsv
+TS-5	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json;*.ts	[gate] same tsconfig pattern, plus check_ts5() reads every tracked *.ts to compare against tsc --listFiles
+TS-6	package.json;*/package.json	[fleet] canonical script names live in package.json; clause is `pending`, no gate script to copy a pattern from
+TS-7	*.ts;*.tsx	[fleet] the reactApp eslint preset's target; tsconfig.md/index.md name no path
+
+## Formatting and linting — index.md "Formatting and linting"
+LINT-1	*.ts;*.tsx;*.js;*.jsx	[fleet] lintable source extensions; no path stated
+FMT-1	*.ts;*.tsx;*.js;*.jsx;*.json;*.md;*.yml;*.yaml	[fleet] @branchleft/prettier-config's usual targets; no path stated
+
+## Shared config files — shared-config.md, templates/manifest.tsv
+SYNC-1	.editorconfig;.nvmrc;.github/CODEOWNERS;.pre-commit-config.yaml	[doc] exactly the four rows templates/manifest.tsv registers today
+
+## Code comments — code-comments.md
+CMT-1	*	[none] "a comment" — the doc names no language or extension
+CMT-2	*	[none] same as CMT-1
+CMT-3	*	[none] same as CMT-1
+
+## Testing and coverage — testing.md
+TEST-1	*	[none] testing.md is explicit: "the distinction is logic versus declaration, not language or directory"
+TEST-2	*	[none] same disclaimer as TEST-1; a ritual test is a shape, not a path
+TEST-3	*	[none] same disclaimer as TEST-1
+TEST-4	*	[none] the nine categories in testing.md are named by what code decides, never by path
+TEST-5	*	[none] same disclaimer as TEST-1
+COV-1	*	[none] `pending` — measured over whatever coverage.include names, not a path this file can state
+COV-2	*	[none] `pending` — repo-total comparison, not file-scoped
+
+## CI and CD — ci-cd.md, tools/check-workflows.sh
+CI-1	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] check-workflows.sh: ratchet_scope_files '^\.github/workflows/.*\.ya?ml$'
+CI-2	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
+CI-3	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
+CI-4	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
+CI-5	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
+CI-6	.github/workflows/*.yml;.github/workflows/*.yaml;templates/rulesets/*	[fleet] audited via gh api against live state, not in-repo — these are the two artefacts it compares
+CI-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] "a privileged job" is defined in a workflow file
+CI-8	tools/*.sh;tools/*.py;packages/*;templates/*	[fleet] "a script whose pass is load-bearing" — this repo's own ARTEFACT_DIRS convention (check-clause-index.sh); may not generalise to another repo's script location
+CI-9	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
+
+## Dependencies — dependencies.md
+DEP-3	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] common dependency-manifest filenames; dependencies.md describes PR provenance (a Dependabot major bump), not a path
+DEP-4	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3; the alert-vs-bump distinction is PR metadata this tool cannot see
+
+## Repository settings — repo-settings.md
+REPO-1	templates/rulesets/*	[doc] "committed as payloads under templates/rulesets/<repo>/<name>.json"
+REPO-2	templates/rulesets/*	[doc] same payload location as REPO-1
+REPO-3	templates/rulesets/*	[doc] same payload location as REPO-1
+REPO-4	templates/rulesets/*;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] required-check names come from both the payload and the workflow job names
+REPO-5	.github/CODEOWNERS	[doc] "CODEOWNERS must cover..."
+REPO-6	templates/rulesets/*	[doc] same payload location as REPO-1
+REPO-7	templates/rulesets/*;tools/ruleset-apply.sh	[doc] payload location plus the script named throughout the clause's own doc
+
+## Pulumi — stacks/pulumi.md, tools/check-pulumi.sh, tools/check-pulumi-secrets.sh
+PUL-1	*.ts	[gate] check-pulumi.sh: ratchet_scope_files '\.ts$', then content-filtered for a ComponentResource declaration — a path glob cannot replicate the content filter, so this over-matches every .ts file
+PUL-2	*.ts	[gate] same scan as PUL-1, same script, same over-match caveat
+PUL-3	*.ts	[gate] same scan as PUL-1, same script, same over-match caveat
+PUL-4	*.ts	[gate] same scan as PUL-1, same script, same over-match caveat
+PUL-5	*.ts	[gate] same scan as PUL-1, same script, same over-match caveat
+PUL-6	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
+PUL-7	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
+PUL-8	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
+PUL-9	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
+PUL-10	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
+PUL-11	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
+PUL-12	Pulumi.*.yaml;*/Pulumi.*.yaml	[gate] check-pulumi-secrets.sh: ratchet_scope_files '(^|/)Pulumi\.[A-Za-z0-9_-]+\.yaml$'
+
+## Infrastructure operations — infrastructure.md
+IAC-1	*	[none] a CI-403-vs-hand-apply judgement call; infrastructure.md names no path
+IAC-2	*	[none] same disclaimer as IAC-1
+
+## Data protection — data-protection.md (all eleven `pending`)
+DP-1	*	[none] no path named anywhere in data-protection.md
+DP-2	*	[none] same as DP-1
+DP-3	*	[none] same as DP-1
+DP-4	*	[none] same as DP-1
+DP-5	*	[none] same as DP-1
+DP-6	*	[none] same as DP-1; explicitly "logs...and security-tooling state", not a repo path
+DP-7	*	[none] same as DP-1; explicitly "repos, trackers, CI logs, agent transcripts" — deliberately universal
+DP-8	*	[none] same as DP-1
+DP-9	*	[none] same as DP-1
+DP-10	*	[none] same as DP-1
+DP-11	*	[none] same as DP-1
+
+## Styling — stacks/styling.md
+STY-1	*.tsx;*.jsx;*.css	[fleet] "a Tailwind pipeline"; styling.md names no path. Cannot be distinguished from STY-3/4 by glob alone — see PR description
+STY-2	*.tsx;*.jsx;*.css	[fleet] same caveat as STY-1
+STY-3	*.tsx;*.jsx;*.css	[fleet] "a published component package"; same extensions as STY-1/2 — the doc gives no path signal that tells an app pipeline from a library package
+STY-4	*.css;index.ts;*/index.ts	[fleet] "a dedicated subpath" from a package's entry point; index.ts is inferred, not named
+
+## React applications — stacks/react-app.md
+APP-1	app/*	[fleet] React Router Framework Mode route/root convention; `app/` evidenced by the workspace CLAUDE.md's own example path, not asserted in react-app.md
+APP-2	app/*	[fleet] same convention as APP-1
+APP-3	app/routes/*	[fleet] "one file per route"; app/routes/ is the same inferred convention, narrowed to the routes directory
+APP-4	app/routes/*;*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] route files plus the browser-suite spec files that would carry the axe assertion
+APP-5	app/*	[fleet] same convention as APP-1
+APP-6	app/*	[fleet] same convention as APP-1
+APP-7	app/*.ts;app/*.tsx	[fleet] "one tested module"; app/ convention as above
+APP-8	app/*.ts;app/*.tsx	[fleet] same convention as APP-7
+
+## Component libraries — stacks/component-library.md
+LIB-1	src/*.tsx;src/*.ts;src/*.css	[fleet] "one components directory", flat — src/ inferred from the published-package convention, not asserted in the doc
+LIB-2	src/index.ts	[fleet] "the package's entry point"; same inferred convention
+LIB-3	src/*.tsx	[fleet] same convention as LIB-1
+LIB-4	src/*.tsx;src/*.ts	[fleet] same convention as LIB-1
+LIB-5	src/*.tsx	[fleet] same convention as LIB-1
+LIB-6	src/*.tsx	[fleet] same convention as LIB-1
+LIB-7	*.stories.tsx	[doc] the file extension the clause itself names
+LIB-8	*.test.tsx;*.test.ts	[fleet] "tests import through the package entry point" — test files, same inferred src/ convention loosened to any depth
+
+## Contract-driven development — contract-development.md
+CTR-1	*	[none] "applies wherever a boundary is crossed" — no path or language named
+CTR-2	openapi*.yaml;*/openapi*.yaml;openapi*.json;*/openapi*.json;*.proto;*.schema.json	[fleet] contract-development.md names three formats (OpenAPI, protobuf, JSON Schema), not filenames or paths, so the glob is an inference from ecosystem filename convention, not a doc-stated location — hence [fleet], not [doc]. GraphQL is not one of the three named formats and was wrongly conflated with JSON Schema in an earlier draft of this row; no `*.graphql` glob belongs here. The api-contracts repo the clause anticipates does not exist yet, so this row is aspirational either way
+
+## Documentation — index.md "Documentation"
+DOC-1	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] "runs the docs-lint caller" is a workflow file; DOC-1 is `pending`, no gate script to copy from
+DOC-2	.docs-lint.mode	[doc] the file the clause names directly
