@@ -27,11 +27,11 @@
     "@branchleft/prettier-config": "workspace:*",
     "@branchleft/tsconfig": "workspace:*",
     "@branchleft/vitest-config": "workspace:*",
-    "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^9.39.5",
+    "@vitest/coverage-v8": "^4.1.11",
+    "eslint": "^10.9.1",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.10"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
   },
   "type": "module"
 }
