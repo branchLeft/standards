@@ -175,7 +175,7 @@ COV-1 until a gate exists to say so.
 | CI-7  | A privileged job is gated twice, by mechanisms that do not share a failure mode | `review` | —                          |
 | CI-8  | A script whose pass is load-bearing carries a `--self-test`, run before it      | `review` | —                          |
 | CI-9  | No empty expression where Actions evaluates one, `run:` bodies included         | `auto`   | `tools/check-workflows.sh` |
-| CI-10 | Every job sets `timeout-minutes`                                                | `auto`   | `tools/check-workflows.sh` |
+| CI-10 | Every job sets `timeout-minutes`, except reusable-workflow callers             | `auto`   | `tools/check-workflows.sh` |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state.

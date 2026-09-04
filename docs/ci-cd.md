@@ -104,6 +104,19 @@ says nothing about its siblings. A `timeout-minutes` on an individual step
 bounds only that step, not the job as a whole, so it does not satisfy this
 clause either.
 
+**A job that calls a reusable workflow is exempt, and must not set the key.**
+GitHub accepts only `name`, `uses`, `with`, `secrets`, `needs`, `if`,
+`permissions`, `strategy` and `concurrency` on a `uses:` job. Adding
+`timeout-minutes` there does not bound anything — it makes the whole workflow
+file invalid, so every job in it stops running and the only signal is "this run
+likely failed because of a workflow file issue", with no logs and no job names.
+That is a strictly worse outcome than the unbounded job this clause exists to
+prevent, which is why the gate reports it rather than passing over it.
+
+The bound for that work belongs to the jobs inside the called workflow, and this
+clause checks them in the repo that owns them. A caller is not an unbounded job;
+it is a job whose bound is declared elsewhere.
+
 Set each value from that job's own observed runtime with headroom, not one
 number copied across every job in a file — a fast lint job and a long-running
 suite do not share a ceiling.

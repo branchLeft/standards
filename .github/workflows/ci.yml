@@ -54,7 +54,6 @@ jobs:
 
   self-check:
     name: Dogfood the reusable workflow
-    timeout-minutes: 5
     # Relative path, not a tag: the tag for this commit does not exist yet, and
     # pinning an older one would check this PR against superseded rules.
     uses: ./.github/workflows/standards.yml

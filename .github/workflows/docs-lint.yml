@@ -10,5 +10,4 @@ permissions:
 
 jobs:
   docs-lint:
-    timeout-minutes: 5
     uses: branchLeft/github-workflows/.github/workflows/docs-lint.yml@v1.0.6

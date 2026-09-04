@@ -134,10 +134,35 @@ scan_workflow() {
 # deeper again and is never mistaken for the job's. Every job in the file is
 # walked to the end regardless of any one being bounded, so a compliant job
 # never hides an unbounded sibling.
+# Closing a job is three-way, not two-way, so it lives here rather than being
+# repeated at each of the three points a job can end.
+#
+# A job that calls a reusable workflow (`uses:` as a direct job key) is exempt.
+# GitHub permits only name/uses/with/secrets/needs/if/permissions/strategy/
+# concurrency there, so `timeout-minutes` does not bound it -- it invalidates
+# the file. The bound for that work belongs to the jobs inside the called
+# workflow, which this gate checks in the repo that owns them.
+#
+# Setting it on a caller anyway is its own finding, and a sharper one than the
+# omission this clause was written for: the whole file stops running and the
+# only signal is "this run likely failed because of a workflow file issue",
+# with no logs and no job names.
+_ci10_close_job() {
+  [ -n "$job" ] || return 0
+  if [ "$job_is_call" -eq 1 ]; then
+    [ "$job_has_timeout" -eq 1 ] && ratchet_finding "CI-10" "$f" "$job_line" \
+      "job '$job' calls a reusable workflow and sets timeout-minutes -- GitHub rejects that key on a uses: job, and the whole file then runs nothing"
+    return 0
+  fi
+  [ "$job_has_timeout" -eq 0 ] && ratchet_finding "CI-10" "$f" "$job_line" \
+    "job '$job' has no timeout-minutes -- it inherits GitHub's 360-minute default"
+  return 0
+}
+
 scan_timeouts() {
   local f="$1" ln=0 line indent trimmed
   local in_jobs=0 jobs_indent=-1
-  local job="" job_indent=-1 job_line=0 job_child_indent=-1 job_has_timeout=0
+  local job="" job_indent=-1 job_line=0 job_child_indent=-1 job_has_timeout=0 job_is_call=0
 
   while IFS= read -r line; do
     ln=$((ln + 1))
@@ -149,11 +174,8 @@ scan_timeouts() {
     # De-dented back out of the jobs: map entirely — close whichever job was
     # still open and stop tracking.
     if [ "$in_jobs" -eq 1 ] && [ "$indent" -le "$jobs_indent" ]; then
-      if [ -n "$job" ] && [ "$job_has_timeout" -eq 0 ]; then
-        ratchet_finding "CI-10" "$f" "$job_line" \
-          "job '$job' has no timeout-minutes — it inherits GitHub's 360-minute default"
-      fi
-      job=""; job_indent=-1; job_child_indent=-1; job_has_timeout=0
+      _ci10_close_job
+      job=""; job_indent=-1; job_child_indent=-1; job_has_timeout=0; job_is_call=0
       in_jobs=0
     fi
 
@@ -167,14 +189,12 @@ scan_timeouts() {
     # A new job entry: same indent as (or shallower than) the current job
     # name, i.e. the next key in the jobs: map. Close the previous job first.
     if [ "$job_indent" -eq -1 ] || [ "$indent" -le "$job_indent" ]; then
-      if [ -n "$job" ] && [ "$job_has_timeout" -eq 0 ]; then
-        ratchet_finding "CI-10" "$f" "$job_line" \
-          "job '$job' has no timeout-minutes — it inherits GitHub's 360-minute default"
-      fi
+      _ci10_close_job
       job=$(printf '%s' "$trimmed" | sed -n 's/^\([A-Za-z0-9_.-]*\):.*/\1/p')
       job_indent="$indent"
       job_line="$ln"
       job_child_indent=-1
+      job_is_call=0
       job_has_timeout=0
       continue
     fi
@@ -187,14 +207,12 @@ scan_timeouts() {
     if [ "$indent" -eq "$job_child_indent" ]; then
       case "$trimmed" in
         timeout-minutes:*) job_has_timeout=1 ;;
+        uses:*) job_is_call=1 ;;
       esac
     fi
   done < "$f"
 
-  if [ -n "$job" ] && [ "$job_has_timeout" -eq 0 ]; then
-    ratchet_finding "CI-10" "$f" "$job_line" \
-      "job '$job' has no timeout-minutes — it inherits GitHub's 360-minute default"
-  fi
+  _ci10_close_job
 }
 
 main() {
@@ -320,6 +338,45 @@ EOF
       echo "FAIL: CI-10 did not name the unbounded job"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "job 'bounded'" && {
       echo "FAIL: CI-10 fired on a job that sets its own timeout-minutes"; echo "$out"; exit 1; }
+
+    # A reusable-workflow caller job takes neither branch of the omission
+    # rule. GitHub rejects timeout-minutes on a uses: job, so requiring it
+    # would make the clause unsatisfiable for every repo that calls a shared
+    # workflow -- and setting it anyway invalidates the file, which is why
+    # `invalid` below must be reported rather than passed over.
+    #
+    # `exempt` and `invalid` sit in the same file as an ordinary unbounded
+    # steps job: a caller must not suppress a real finding on its sibling,
+    # and the exemption must not leak to jobs that merely contain a step
+    # with its own `uses:`.
+    rm -f .github/workflows/mixed.yml
+    cat > .github/workflows/calls.yml <<'EOF'
+name: Calls
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  exempt:
+    uses: ./.github/workflows/standards.yml
+  invalid:
+    uses: ./.github/workflows/standards.yml
+    timeout-minutes: 5
+  stepsjob:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+EOF
+    git add -A && git commit -qm calls
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 2 ] || {
+      echo "FAIL: expected exactly 2 CI-10 findings in calls.yml"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'invalid' calls a reusable workflow and sets timeout-minutes" || {
+      echo "FAIL: CI-10 did not report timeout-minutes on a caller job"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'stepsjob' has no timeout-minutes" || {
+      echo "FAIL: a caller job suppressed a real finding on its sibling"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'exempt'" && {
+      echo "FAIL: CI-10 fired on a reusable-workflow caller that correctly omits the key"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?
