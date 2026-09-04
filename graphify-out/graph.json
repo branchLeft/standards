@@ -1466,76 +1466,6 @@
       "id": "tools_lib_ratchet_ratchet_self_test"
     },
     {
-      "label": "check-workflows.sh",
-      "file_type": "code",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "check-workflows.sh",
-      "id": "tools_check_workflows"
-    },
-    {
-      "label": "check-workflows.sh script",
-      "file_type": "code",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "check-workflows.sh script",
-      "id": "tools_check_workflows_sh__entry"
-    },
-    {
-      "label": "scan_workflow()",
-      "file_type": "code",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L22",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "scan_workflow()",
-      "id": "tools_check_workflows_scan_workflow"
-    },
-    {
-      "label": "main()",
-      "file_type": "code",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L125",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "main()",
-      "id": "tools_check_workflows_main"
-    },
-    {
-      "label": "self_test()",
-      "file_type": "code",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L135",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "self_test()",
-      "id": "tools_check_workflows_self_test"
-    },
-    {
       "label": "standards-sync.sh",
       "file_type": "code",
       "source_file": "tools/standards-sync.sh",
@@ -2639,160 +2569,6 @@
       "community": 24,
       "norm_label": "self_test()",
       "id": "tools_check_pulumi_secrets_self_test"
-    },
-    {
-      "label": "standards-audit.sh",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "standards-audit.sh",
-      "id": "tools_standards_audit"
-    },
-    {
-      "label": "standards-audit.sh script",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L1",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "standards-audit.sh script",
-      "id": "tools_standards_audit_sh__entry"
-    },
-    {
-      "label": "json_to_tsv()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L36",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "json_to_tsv()",
-      "id": "tools_standards_audit_json_to_tsv"
-    },
-    {
-      "label": "clause_is_covered()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L40",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "clause_is_covered()",
-      "id": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "label": "clauses_all_covered()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L47",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "clauses_all_covered()",
-      "id": "tools_standards_audit_clauses_all_covered"
-    },
-    {
-      "label": "audit_exemptions()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L60",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "audit_exemptions()",
-      "id": "tools_standards_audit_audit_exemptions"
-    },
-    {
-      "label": "grep_tracked()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L162",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "grep_tracked()",
-      "id": "tools_standards_audit_grep_tracked"
-    },
-    {
-      "label": "native_suppressions()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L169",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "native_suppressions()",
-      "id": "tools_standards_audit_native_suppressions"
-    },
-    {
-      "label": "render_table()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L177",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "render_table()",
-      "id": "tools_standards_audit_render_table"
-    },
-    {
-      "label": "main()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L194",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "main()",
-      "id": "tools_standards_audit_main"
-    },
-    {
-      "label": "self_test()",
-      "file_type": "code",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L256",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "_origin": "ast",
-      "community": 16,
-      "norm_label": "self_test()",
-      "id": "tools_standards_audit_self_test"
     },
     {
       "label": "eslint-config/package.json",
@@ -3982,9 +3758,9 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index",
       "community": 11,
-      "norm_label": "check-clause-index.sh"
+      "norm_label": "check-clause-index.sh",
+      "id": "tools_check_clause_index"
     },
     {
       "label": "check-clause-index.sh script",
@@ -3996,9 +3772,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_sh__entry",
       "community": 11,
-      "norm_label": "check-clause-index.sh script"
+      "norm_label": "check-clause-index.sh script",
+      "id": "tools_check_clause_index_sh__entry"
     },
     {
       "label": "index_rows()",
@@ -4010,9 +3786,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_index_rows",
       "community": 11,
-      "norm_label": "index_rows()"
+      "norm_label": "index_rows()",
+      "id": "tools_check_clause_index_index_rows"
     },
     {
       "label": "clause_is_named()",
@@ -4024,9 +3800,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_clause_is_named",
       "community": 11,
-      "norm_label": "clause_is_named()"
+      "norm_label": "clause_is_named()",
+      "id": "tools_check_clause_index_clause_is_named"
     },
     {
       "label": "floor_ids()",
@@ -4038,9 +3814,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_floor_ids",
       "community": 11,
-      "norm_label": "floor_ids()"
+      "norm_label": "floor_ids()",
+      "id": "tools_check_clause_index_floor_ids"
     },
     {
       "label": "clause_paths_ids()",
@@ -4052,9 +3828,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_clause_paths_ids",
       "community": 11,
-      "norm_label": "clause_paths_ids()"
+      "norm_label": "clause_paths_ids()",
+      "id": "tools_check_clause_index_clause_paths_ids"
     },
     {
       "label": "package_has_consumers()",
@@ -4066,9 +3842,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_package_has_consumers",
       "community": 11,
-      "norm_label": "package_has_consumers()"
+      "norm_label": "package_has_consumers()",
+      "id": "tools_check_clause_index_package_has_consumers"
     },
     {
       "label": "family_header_paths()",
@@ -4080,9 +3856,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_family_header_paths",
       "community": 11,
-      "norm_label": "family_header_paths()"
+      "norm_label": "family_header_paths()",
+      "id": "tools_check_clause_index_family_header_paths"
     },
     {
       "label": "encoding_resolves()",
@@ -4094,9 +3870,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_encoding_resolves",
       "community": 11,
-      "norm_label": "encoding_resolves()"
+      "norm_label": "encoding_resolves()",
+      "id": "tools_check_clause_index_encoding_resolves"
     },
     {
       "label": "check_index()",
@@ -4108,9 +3884,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_check_index",
       "community": 11,
-      "norm_label": "check_index()"
+      "norm_label": "check_index()",
+      "id": "tools_check_clause_index_check_index"
     },
     {
       "label": "self_test()",
@@ -4122,9 +3898,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_self_test",
       "community": 11,
-      "norm_label": "self_test()"
+      "norm_label": "self_test()",
+      "id": "tools_check_clause_index_self_test"
     },
     {
       "label": "write_index()",
@@ -4136,9 +3912,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_write_index",
       "community": 11,
-      "norm_label": "write_index()"
+      "norm_label": "write_index()",
+      "id": "tools_check_clause_index_write_index"
     },
     {
       "label": "sync_paths_to_index()",
@@ -4150,9 +3926,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_sync_paths_to_index",
       "community": 11,
-      "norm_label": "sync_paths_to_index()"
+      "norm_label": "sync_paths_to_index()",
+      "id": "tools_check_clause_index_sync_paths_to_index"
     },
     {
       "label": "gate()",
@@ -4164,9 +3940,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_check_clause_index_gate",
       "community": 11,
-      "norm_label": "gate()"
+      "norm_label": "gate()",
+      "id": "tools_check_clause_index_gate"
     },
     {
       "label": "clauses-in-scope.sh",
@@ -4178,9 +3954,9 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope",
       "community": 23,
-      "norm_label": "clauses-in-scope.sh"
+      "norm_label": "clauses-in-scope.sh",
+      "id": "tools_clauses_in_scope"
     },
     {
       "label": "clauses-in-scope.sh script",
@@ -4192,9 +3968,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_sh__entry",
       "community": 23,
-      "norm_label": "clauses-in-scope.sh script"
+      "norm_label": "clauses-in-scope.sh script",
+      "id": "tools_clauses_in_scope_sh__entry"
     },
     {
       "label": "index_gates()",
@@ -4206,9 +3982,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_index_gates",
       "community": 23,
-      "norm_label": "index_gates()"
+      "norm_label": "index_gates()",
+      "id": "tools_clauses_in_scope_index_gates"
     },
     {
       "label": "clause_paths_rows()",
@@ -4220,9 +3996,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_clause_paths_rows",
       "community": 23,
-      "norm_label": "clause_paths_rows()"
+      "norm_label": "clause_paths_rows()",
+      "id": "tools_clauses_in_scope_clause_paths_rows"
     },
     {
       "label": "changed_files()",
@@ -4234,9 +4010,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_changed_files",
       "community": 23,
-      "norm_label": "changed_files()"
+      "norm_label": "changed_files()",
+      "id": "tools_clauses_in_scope_changed_files"
     },
     {
       "label": "run()",
@@ -4248,9 +4024,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_run",
       "community": 23,
-      "norm_label": "run()"
+      "norm_label": "run()",
+      "id": "tools_clauses_in_scope_run"
     },
     {
       "label": "self_test()",
@@ -4262,9 +4038,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_self_test",
       "community": 23,
-      "norm_label": "self_test()"
+      "norm_label": "self_test()",
+      "id": "tools_clauses_in_scope_self_test"
     },
     {
       "label": "run_args()",
@@ -4276,9 +4052,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_clauses_in_scope_run_args",
       "community": 23,
-      "norm_label": "run_args()"
+      "norm_label": "run_args()",
+      "id": "tools_clauses_in_scope_run_args"
     },
     {
       "label": "run.sh",
@@ -4290,9 +4066,9 @@
         "kind": "file"
       },
       "_origin": "ast",
-      "id": "tools_tests_run",
       "community": 28,
-      "norm_label": "run.sh"
+      "norm_label": "run.sh",
+      "id": "tools_tests_run"
     },
     {
       "label": "run.sh script",
@@ -4304,9 +4080,9 @@
         "kind": "bash_entrypoint"
       },
       "_origin": "ast",
-      "id": "tools_tests_run_sh__entry",
       "community": 28,
-      "norm_label": "run.sh script"
+      "norm_label": "run.sh script",
+      "id": "tools_tests_run_sh__entry"
     },
     {
       "label": "run()",
@@ -4318,9 +4094,9 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_tests_run_run",
       "community": 28,
-      "norm_label": "run()"
+      "norm_label": "run()",
+      "id": "tools_tests_run_run"
     },
     {
       "label": "workflow_runs_every_gate()",
@@ -4332,9 +4108,261 @@
         "kind": "bash_function"
       },
       "_origin": "ast",
-      "id": "tools_tests_run_workflow_runs_every_gate",
       "community": 28,
-      "norm_label": "workflow_runs_every_gate()"
+      "norm_label": "workflow_runs_every_gate()",
+      "id": "tools_tests_run_workflow_runs_every_gate"
+    },
+    {
+      "label": "check-workflows.sh",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "check-workflows.sh",
+      "id": "tools_check_workflows"
+    },
+    {
+      "label": "check-workflows.sh script",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "check-workflows.sh script",
+      "id": "tools_check_workflows_sh__entry"
+    },
+    {
+      "label": "scan_workflow()",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L22",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "scan_workflow()",
+      "id": "tools_check_workflows_scan_workflow"
+    },
+    {
+      "label": "_ci10_close_job()",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L150",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "_ci10_close_job()",
+      "id": "tools_check_workflows_ci10_close_job"
+    },
+    {
+      "label": "scan_timeouts()",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L162",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "scan_timeouts()",
+      "id": "tools_check_workflows_scan_timeouts"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L230",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "main()",
+      "id": "tools_check_workflows_main"
+    },
+    {
+      "label": "self_test()",
+      "file_type": "code",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L241",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 26,
+      "norm_label": "self_test()",
+      "id": "tools_check_workflows_self_test"
+    },
+    {
+      "label": "standards-audit.sh",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "standards-audit.sh",
+      "id": "tools_standards_audit"
+    },
+    {
+      "label": "standards-audit.sh script",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "standards-audit.sh script",
+      "id": "tools_standards_audit_sh__entry"
+    },
+    {
+      "label": "json_to_tsv()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L36",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "json_to_tsv()",
+      "id": "tools_standards_audit_json_to_tsv"
+    },
+    {
+      "label": "clause_is_covered()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L40",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "clause_is_covered()",
+      "id": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "label": "clauses_all_covered()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L47",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "clauses_all_covered()",
+      "id": "tools_standards_audit_clauses_all_covered"
+    },
+    {
+      "label": "audit_exemptions()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L60",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "audit_exemptions()",
+      "id": "tools_standards_audit_audit_exemptions"
+    },
+    {
+      "label": "grep_tracked()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L162",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "grep_tracked()",
+      "id": "tools_standards_audit_grep_tracked"
+    },
+    {
+      "label": "native_suppressions()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L169",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "native_suppressions()",
+      "id": "tools_standards_audit_native_suppressions"
+    },
+    {
+      "label": "render_table()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L177",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "render_table()",
+      "id": "tools_standards_audit_render_table"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L194",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "main()",
+      "id": "tools_standards_audit_main"
+    },
+    {
+      "label": "self_test()",
+      "file_type": "code",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L256",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 16,
+      "norm_label": "self_test()",
+      "id": "tools_standards_audit_self_test"
     }
   ],
   "links": [
@@ -6028,9 +6056,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 0.5,
       "source": "tools_clauses_in_scope",
-      "target": "tools_lib_ratchet",
-      "confidence_score": 0.5
+      "target": "tools_lib_ratchet"
     },
     {
       "relation": "defines",
@@ -6331,86 +6359,6 @@
       "confidence_score": 1.0,
       "source": "tools_lib_ratchet_ratchet_self_test",
       "target": "tools_lib_ratchet_ratchet_scratch_repo_init"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L125",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows",
-      "target": "tools_check_workflows_main"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L22",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows",
-      "target": "tools_check_workflows_scan_workflow"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L135",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows",
-      "target": "tools_check_workflows_self_test"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows",
-      "target": "tools_check_workflows_sh__entry"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L218",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows_sh__entry",
-      "target": "tools_check_workflows_main"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L217",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows_sh__entry",
-      "target": "tools_check_workflows_self_test"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/check-workflows.sh",
-      "source_location": "L130",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_check_workflows_main",
-      "target": "tools_check_workflows_scan_workflow"
     },
     {
       "relation": "defines",
@@ -7674,224 +7622,6 @@
       "confidence_score": 1.0,
       "source": "tools_check_pulumi_secrets_main",
       "target": "tools_check_pulumi_secrets_scan_stack_config"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L60",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_audit_exemptions"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L40",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L47",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_clauses_all_covered"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L162",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_grep_tracked"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L36",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_json_to_tsv"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L194",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_main"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L169",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_native_suppressions"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L177",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_render_table"
-    },
-    {
-      "relation": "defines",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L256",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_self_test"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit",
-      "target": "tools_standards_audit_sh__entry"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L368",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_sh__entry",
-      "target": "tools_standards_audit_main"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L367",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_sh__entry",
-      "target": "tools_standards_audit_self_test"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L221",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_json_to_tsv"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L137",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_audit_exemptions",
-      "target": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L52",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_clauses_all_covered",
-      "target": "tools_standards_audit_clause_is_covered"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L93",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_audit_exemptions",
-      "target": "tools_standards_audit_clauses_all_covered"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L224",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_audit_exemptions"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L225",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_native_suppressions"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "tools/standards-audit.sh",
-      "source_location": "L235",
-      "weight": 1.0,
-      "context": "call",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "tools_standards_audit_main",
-      "target": "tools_standards_audit_render_table"
     },
     {
       "relation": "contains",
@@ -9326,9 +9056,9 @@
       "source_location": "L200",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_check_index",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_check_index"
     },
     {
       "relation": "defines",
@@ -9337,9 +9067,9 @@
       "source_location": "L108",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_clause_is_named",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_clause_is_named"
     },
     {
       "relation": "defines",
@@ -9348,9 +9078,9 @@
       "source_location": "L137",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_clause_paths_ids",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_clause_paths_ids"
     },
     {
       "relation": "defines",
@@ -9359,9 +9089,9 @@
       "source_location": "L192",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_encoding_resolves",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_encoding_resolves"
     },
     {
       "relation": "defines",
@@ -9370,9 +9100,9 @@
       "source_location": "L167",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_family_header_paths",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_family_header_paths"
     },
     {
       "relation": "defines",
@@ -9381,9 +9111,9 @@
       "source_location": "L124",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_floor_ids",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_floor_ids"
     },
     {
       "relation": "defines",
@@ -9392,9 +9122,9 @@
       "source_location": "L75",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_index_rows",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_index_rows"
     },
     {
       "relation": "defines",
@@ -9403,9 +9133,9 @@
       "source_location": "L149",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_package_has_consumers",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_package_has_consumers"
     },
     {
       "relation": "defines",
@@ -9414,9 +9144,9 @@
       "source_location": "L345",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_self_test",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_self_test"
     },
     {
       "relation": "contains",
@@ -9425,9 +9155,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index",
-      "target": "tools_check_clause_index_sh__entry",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_sh__entry"
     },
     {
       "relation": "calls",
@@ -9437,9 +9167,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_sh__entry",
-      "target": "tools_check_clause_index_check_index",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_check_index"
     },
     {
       "relation": "calls",
@@ -9449,9 +9179,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_sh__entry",
-      "target": "tools_check_clause_index_self_test",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_self_test"
     },
     {
       "relation": "calls",
@@ -9461,9 +9191,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_check_index",
-      "target": "tools_check_clause_index_clause_is_named",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_clause_is_named"
     },
     {
       "relation": "calls",
@@ -9473,9 +9203,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_check_index",
-      "target": "tools_check_clause_index_package_has_consumers",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_package_has_consumers"
     },
     {
       "relation": "calls",
@@ -9485,9 +9215,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_check_index",
-      "target": "tools_check_clause_index_encoding_resolves",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_encoding_resolves"
     },
     {
       "relation": "defines",
@@ -9497,9 +9227,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_self_test",
-      "target": "tools_check_clause_index_gate",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_gate"
     },
     {
       "relation": "defines",
@@ -9508,9 +9238,9 @@
       "source_location": "L362",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_self_test",
-      "target": "tools_check_clause_index_sync_paths_to_index",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_sync_paths_to_index"
     },
     {
       "relation": "defines",
@@ -9520,9 +9250,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_self_test",
-      "target": "tools_check_clause_index_write_index",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_write_index"
     },
     {
       "relation": "calls",
@@ -9532,9 +9262,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_check_clause_index_gate",
-      "target": "tools_check_clause_index_sync_paths_to_index",
-      "confidence_score": 1.0
+      "target": "tools_check_clause_index_sync_paths_to_index"
     },
     {
       "relation": "defines",
@@ -9543,9 +9273,9 @@
       "source_location": "L81",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope",
-      "target": "tools_clauses_in_scope_changed_files",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_changed_files"
     },
     {
       "relation": "defines",
@@ -9554,9 +9284,9 @@
       "source_location": "L60",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope",
-      "target": "tools_clauses_in_scope_clause_paths_rows",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_clause_paths_rows"
     },
     {
       "relation": "defines",
@@ -9565,9 +9295,9 @@
       "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope",
-      "target": "tools_clauses_in_scope_index_gates",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_index_gates"
     },
     {
       "relation": "defines",
@@ -9576,9 +9306,9 @@
       "source_location": "L91",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope",
-      "target": "tools_clauses_in_scope_run",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_run"
     },
     {
       "relation": "defines",
@@ -9587,9 +9317,9 @@
       "source_location": "L143",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope",
-      "target": "tools_clauses_in_scope_self_test",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_self_test"
     },
     {
       "relation": "contains",
@@ -9598,9 +9328,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope",
-      "target": "tools_clauses_in_scope_sh__entry",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_sh__entry"
     },
     {
       "relation": "calls",
@@ -9610,9 +9340,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope_sh__entry",
-      "target": "tools_clauses_in_scope_run",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_run"
     },
     {
       "relation": "calls",
@@ -9622,9 +9352,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope_sh__entry",
-      "target": "tools_clauses_in_scope_self_test",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_self_test"
     },
     {
       "relation": "defines",
@@ -9634,9 +9364,9 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_clauses_in_scope_self_test",
-      "target": "tools_clauses_in_scope_run_args",
-      "confidence_score": 1.0
+      "target": "tools_clauses_in_scope_run_args"
     },
     {
       "relation": "defines",
@@ -9645,9 +9375,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run",
-      "target": "tools_tests_run_run",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_run"
     },
     {
       "relation": "contains",
@@ -9656,9 +9386,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run",
-      "target": "tools_tests_run_sh__entry",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_sh__entry"
     },
     {
       "relation": "defines",
@@ -9667,9 +9397,9 @@
       "source_location": "L47",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run",
-      "target": "tools_tests_run_workflow_runs_every_gate",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_workflow_runs_every_gate"
     },
     {
       "relation": "calls",
@@ -9679,11 +9409,355 @@
       "weight": 1.0,
       "context": "call",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "tools_tests_run_sh__entry",
-      "target": "tools_tests_run_run",
-      "confidence_score": 1.0
+      "target": "tools_tests_run_run"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L150",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows",
+      "target": "tools_check_workflows_ci10_close_job"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L230",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows",
+      "target": "tools_check_workflows_main"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L162",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows",
+      "target": "tools_check_workflows_scan_timeouts"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows",
+      "target": "tools_check_workflows_scan_workflow"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L241",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows",
+      "target": "tools_check_workflows_self_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows",
+      "target": "tools_check_workflows_sh__entry"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L441",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows_sh__entry",
+      "target": "tools_check_workflows_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L440",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows_sh__entry",
+      "target": "tools_check_workflows_self_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L235",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows_main",
+      "target": "tools_check_workflows_scan_workflow"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L177",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows_scan_timeouts",
+      "target": "tools_check_workflows_ci10_close_job"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/check-workflows.sh",
+      "source_location": "L236",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_check_workflows_main",
+      "target": "tools_check_workflows_scan_timeouts"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_audit_exemptions"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_clauses_all_covered"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L162",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_grep_tracked"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_json_to_tsv"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L194",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_main"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L169",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_native_suppressions"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_render_table"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L256",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_self_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit",
+      "target": "tools_standards_audit_sh__entry"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L371",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_sh__entry",
+      "target": "tools_standards_audit_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L370",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_sh__entry",
+      "target": "tools_standards_audit_self_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L221",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_json_to_tsv"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L137",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_audit_exemptions",
+      "target": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L52",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_clauses_all_covered",
+      "target": "tools_standards_audit_clause_is_covered"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L93",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_audit_exemptions",
+      "target": "tools_standards_audit_clauses_all_covered"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L224",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_audit_exemptions"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L225",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_native_suppressions"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/standards-audit.sh",
+      "source_location": "L235",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tools_standards_audit_main",
+      "target": "tools_standards_audit_render_table"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e0592eacb91c9d5e931e1101f7b06ef3123cda3d"
+  "built_at_commit": "5d315e1e59ce26ba3ce538e56ac2c2aaec6be1db"
 }

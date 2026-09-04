@@ -426,7 +426,9 @@
     ],
     "26": [
       "tools_check_workflows",
+      "tools_check_workflows_ci10_close_job",
       "tools_check_workflows_main",
+      "tools_check_workflows_scan_timeouts",
       "tools_check_workflows_scan_workflow",
       "tools_check_workflows_self_test",
       "tools_check_workflows_sh__entry"
@@ -490,7 +492,7 @@
     "23": 0.32142857142857145,
     "24": 0.47619047619047616,
     "25": 0.42857142857142855,
-    "26": 0.7,
+    "26": 0.5238095238095238,
     "27": 0.5,
     "28": 0.6666666666666666,
     "29": 1.0,
