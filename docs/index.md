@@ -164,17 +164,18 @@ COV-1 until a gate exists to say so.
 
 ## CI and CD — `ci-cd.md`
 
-| ID   | Rule                                                                            | Gate     | Encoded by                 |
-| ---- | ------------------------------------------------------------------------------- | -------- | -------------------------- |
-| CI-1 | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment           | `auto`   | `tools/check-workflows.sh` |
-| CI-2 | Environment values bound, never interpolated into a `run:` body                 | `auto`   | `tools/check-workflows.sh` |
-| CI-3 | A gate that runs on `pull_request` also runs on push to `main`                  | `auto`   | `tools/check-workflows.sh` |
-| CI-4 | CI reports, it does not rewrite — no `--fix` or `--write` in a job              | `auto`   | `tools/check-workflows.sh` |
-| CI-5 | Reusable workflows pinned to an exact tag, never `@main`                        | `auto`   | `tools/check-workflows.sh` |
-| CI-6 | Required checks agree with the repo's mode and with the job names it emits      | `auto`   | `tools/ruleset-audit.sh`   |
-| CI-7 | A privileged job is gated twice, by mechanisms that do not share a failure mode | `review` | —                          |
-| CI-8 | A script whose pass is load-bearing carries a `--self-test`, run before it      | `review` | —                          |
-| CI-9 | No empty expression where Actions evaluates one, `run:` bodies included         | `auto`   | `tools/check-workflows.sh` |
+| ID    | Rule                                                                            | Gate     | Encoded by                 |
+| ----- | ------------------------------------------------------------------------------- | -------- | -------------------------- |
+| CI-1  | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment           | `auto`   | `tools/check-workflows.sh` |
+| CI-2  | Environment values bound, never interpolated into a `run:` body                 | `auto`   | `tools/check-workflows.sh` |
+| CI-3  | A gate that runs on `pull_request` also runs on push to `main`                  | `auto`   | `tools/check-workflows.sh` |
+| CI-4  | CI reports, it does not rewrite — no `--fix` or `--write` in a job              | `auto`   | `tools/check-workflows.sh` |
+| CI-5  | Reusable workflows pinned to an exact tag, never `@main`                        | `auto`   | `tools/check-workflows.sh` |
+| CI-6  | Required checks agree with the repo's mode and with the job names it emits      | `auto`   | `tools/ruleset-audit.sh`   |
+| CI-7  | A privileged job is gated twice, by mechanisms that do not share a failure mode | `review` | —                          |
+| CI-8  | A script whose pass is load-bearing carries a `--self-test`, run before it      | `review` | —                          |
+| CI-9  | No empty expression where Actions evaluates one, `run:` bodies included         | `auto`   | `tools/check-workflows.sh` |
+| CI-10 | Every job sets `timeout-minutes`, except reusable-workflow callers              | `auto`   | `tools/check-workflows.sh` |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state.
