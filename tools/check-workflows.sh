@@ -160,7 +160,7 @@ _ci10_close_job() {
 }
 
 scan_timeouts() {
-  local f="$1" ln=0 line indent trimmed
+  local f="$1" ln=0 line indent trimmed key
   local in_jobs=0 jobs_indent=-1
   local job="" job_indent=-1 job_line=0 job_child_indent=-1 job_has_timeout=0 job_is_call=0
 
@@ -205,9 +205,21 @@ scan_timeouts() {
     [ "$job_child_indent" -eq -1 ] && job_child_indent="$indent"
 
     if [ "$indent" -eq "$job_child_indent" ]; then
-      case "$trimmed" in
-        timeout-minutes:*) job_has_timeout=1 ;;
-        uses:*) job_is_call=1 ;;
+      # A YAML key may be quoted: `"uses":` and `uses:` are the same key, and
+      # matching the unquoted spelling literally reads a quoted caller as an
+      # ordinary job. Both directions of that are wrong, and the quiet one is
+      # the dangerous one -- a quoted caller that also sets timeout-minutes
+      # (the combination that invalidates the file) draws no finding at all,
+      # while the correct quoted caller is told to add the key, which walks
+      # the author into causing the outage this clause exists to prevent.
+      # The same applies to `"timeout-minutes":`, where the miss is an ordinary
+      # bounded job reported as unbounded.
+      key="${trimmed%%:*}"
+      key="${key#[\"\']}"
+      key="${key%[\"\']}"
+      case "$key" in
+        timeout-minutes) job_has_timeout=1 ;;
+        uses) job_is_call=1 ;;
       esac
     fi
   done < "$f"
@@ -377,6 +389,43 @@ EOF
       echo "FAIL: a caller job suppressed a real finding on its sibling"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "job 'exempt'" && {
       echo "FAIL: CI-10 fired on a reusable-workflow caller that correctly omits the key"; echo "$out"; exit 1; }
+
+    # Quoted keys. `"uses":` and `uses:` are the same YAML key, and matching
+    # the unquoted spelling literally got all three of these wrong: the
+    # invalid combination drew no finding at all, and both correct forms were
+    # reported as unbounded -- which tells an author to add the very key that
+    # invalidates the file.
+    rm -f .github/workflows/calls.yml
+    cat > .github/workflows/quoted.yml <<'EOF'
+name: Quoted
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  quotedinvalid:
+    "uses": ./.github/workflows/standards.yml
+    timeout-minutes: 5
+  quotedcaller:
+    "uses": ./.github/workflows/standards.yml
+  quotedbound:
+    runs-on: ubuntu-latest
+    "timeout-minutes": 10
+    steps:
+      - run: echo ok
+  singlequoted:
+    'uses': ./.github/workflows/standards.yml
+EOF
+    git add -A && git commit -qm quoted
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 1 ] || {
+      echo "FAIL: expected exactly 1 CI-10 finding in quoted.yml"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'quotedinvalid' calls a reusable workflow and sets timeout-minutes" || {
+      echo "FAIL: a quoted uses: key hid the invalid caller combination"; echo "$out"; exit 1; }
+    for j in quotedcaller quotedbound singlequoted; do
+      printf '%s' "$out" | grep -q "job '$j'" && {
+        echo "FAIL: CI-10 fired on '$j' — a quoted key was read as a missing one"; echo "$out"; exit 1; }
+    done
 
     exit 0
   ) || rc=$?
