@@ -80,6 +80,34 @@ The way this gets introduced is by documenting CI-2 — writing a comment that
 shows the empty-expression form while explaining why values must be bound rather
 than interpolated. Inside a `run:` body, describe the rule in words instead.
 
+## CI-10 — every job sets `timeout-minutes`
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps: ...
+```
+
+GitHub's default job timeout is 360 minutes. A hung runner is indistinguishable
+from a slow one until someone notices, and with no cap it holds a required
+check for six hours over work that normally finishes in under a minute.
+`timeout-minutes` turns an ambiguous wait into a failed check with a clear
+cause, re-runnable as soon as it is seen, and it bounds the runner-minutes a
+wedged job can burn in the meantime.
+
+The key belongs on the **job**, not the workflow — Actions has no
+workflow-level `timeout-minutes`, so the job is the only place it can be set at
+all, and a file with several jobs needs it on every one: a timeout on one job
+says nothing about its siblings. A `timeout-minutes` on an individual step
+bounds only that step, not the job as a whole, so it does not satisfy this
+clause either.
+
+Set each value from that job's own observed runtime with headroom, not one
+number copied across every job in a file — a fast lint job and a long-running
+suite do not share a ceiling.
+
 ## CI-6 — required checks agree with the repo's mode and job names
 
 `auto`, but at audit time rather than in-repo: it needs `gh api` to read live

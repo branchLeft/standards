@@ -83,6 +83,7 @@ CI-6	.github/workflows/*.yml;.github/workflows/*.yaml;templates/rulesets/*	[flee
 CI-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] "a privileged job" is defined in a workflow file
 CI-8	tools/*.sh;tools/*.py;packages/*;templates/*	[fleet] "a script whose pass is load-bearing" — this repo's own ARTEFACT_DIRS convention (check-clause-index.sh); may not generalise to another repo's script location
 CI-9	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
+CI-10	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
 
 ## Dependencies — dependencies.md
 DEP-3	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] common dependency-manifest filenames; dependencies.md describes PR provenance (a Dependabot major bump), not a path

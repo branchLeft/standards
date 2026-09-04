@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# CI-1..CI-5 — GitHub Actions workflow hygiene.
+# CI-1, CI-2, CI-3, CI-4, CI-5, CI-9, CI-10 — GitHub Actions workflow hygiene.
 #
 # CI-6 (required checks agree with mode and job names) is not here: it needs
 # `gh api` to read live ruleset state, so it runs in the audit, not in-repo CI.
@@ -122,12 +122,88 @@ scan_workflow() {
   fi
 }
 
+# CI-10 — every job sets timeout-minutes. A separate pass, not folded into
+# scan_workflow's line-by-line loop, because it needs its own notion of
+# "inside which job" rather than "inside which run: block".
+#
+# The indent a job's direct keys sit at is fixed from the first such key seen
+# (mirroring how scan_workflow fixes run_indent above), so a top-level
+# `timeout-minutes:` — a sibling of `on:`/`jobs:`, which Actions has no such
+# key for but a workflow author could still write — sits at the wrong indent
+# to satisfy any job, and a step's own `timeout-minutes:` sits one level
+# deeper again and is never mistaken for the job's. Every job in the file is
+# walked to the end regardless of any one being bounded, so a compliant job
+# never hides an unbounded sibling.
+scan_timeouts() {
+  local f="$1" ln=0 line indent trimmed
+  local in_jobs=0 jobs_indent=-1
+  local job="" job_indent=-1 job_line=0 job_child_indent=-1 job_has_timeout=0
+
+  while IFS= read -r line; do
+    ln=$((ln + 1))
+    trimmed="${line#"${line%%[![:space:]]*}"}"
+    [ -n "$trimmed" ] || continue                 # blank lines never close a block
+    case "$trimmed" in \#*) continue ;; esac       # nor do comments
+    indent=$(printf '%s' "$line" | awk '{ match($0, /^[ ]*/); print RLENGTH }')
+
+    # De-dented back out of the jobs: map entirely — close whichever job was
+    # still open and stop tracking.
+    if [ "$in_jobs" -eq 1 ] && [ "$indent" -le "$jobs_indent" ]; then
+      if [ -n "$job" ] && [ "$job_has_timeout" -eq 0 ]; then
+        ratchet_finding "CI-10" "$f" "$job_line" \
+          "job '$job' has no timeout-minutes — it inherits GitHub's 360-minute default"
+      fi
+      job=""; job_indent=-1; job_child_indent=-1; job_has_timeout=0
+      in_jobs=0
+    fi
+
+    if [ "$in_jobs" -eq 0 ]; then
+      case "$trimmed" in
+        jobs:) in_jobs=1; jobs_indent="$indent" ;;
+      esac
+      continue
+    fi
+
+    # A new job entry: same indent as (or shallower than) the current job
+    # name, i.e. the next key in the jobs: map. Close the previous job first.
+    if [ "$job_indent" -eq -1 ] || [ "$indent" -le "$job_indent" ]; then
+      if [ -n "$job" ] && [ "$job_has_timeout" -eq 0 ]; then
+        ratchet_finding "CI-10" "$f" "$job_line" \
+          "job '$job' has no timeout-minutes — it inherits GitHub's 360-minute default"
+      fi
+      job=$(printf '%s' "$trimmed" | sed -n 's/^\([A-Za-z0-9_.-]*\):.*/\1/p')
+      job_indent="$indent"
+      job_line="$ln"
+      job_child_indent=-1
+      job_has_timeout=0
+      continue
+    fi
+
+    # The first line inside the job's map fixes the indent its direct keys
+    # sit at, so a step nested under steps: — always at least one level
+    # deeper — is never read at that indent.
+    [ "$job_child_indent" -eq -1 ] && job_child_indent="$indent"
+
+    if [ "$indent" -eq "$job_child_indent" ]; then
+      case "$trimmed" in
+        timeout-minutes:*) job_has_timeout=1 ;;
+      esac
+    fi
+  done < "$f"
+
+  if [ -n "$job" ] && [ "$job_has_timeout" -eq 0 ]; then
+    ratchet_finding "CI-10" "$f" "$job_line" \
+      "job '$job' has no timeout-minutes — it inherits GitHub's 360-minute default"
+  fi
+}
+
 main() {
   ratchet_init "$@" || exit 2
   local f
   while IFS= read -r f; do
     [ -n "$f" ] || continue
     scan_workflow "$f"
+    scan_timeouts "$f"
   done < <(ratchet_scope_files '^\.github/workflows/.*\.ya?ml$')
   ratchet_summary
 }
@@ -167,18 +243,23 @@ EOF
     git add -A && git commit -qm init
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
 
-    for c in CI-1 CI-2 CI-3 CI-4 CI-5 CI-9; do
+    for c in CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10; do
       printf '%s' "$out" | grep -q "$c" || { echo "FAIL: $c not caught"; echo "$out"; exit 1; }
     done
     # Two CI-1 findings: an unpinned tag, and a SHA with no version comment.
-    [ "$(printf '%s' "$out" | grep -c 'CI-1')" -eq 2 ] || {
+    # Trailing space, not a bare "CI-1": CI-10 also contains "CI-1" as a
+    # substring, and would otherwise inflate this count.
+    [ "$(printf '%s' "$out" | grep -c 'CI-1 ')" -eq 2 ] || {
       echo "FAIL: expected 2 CI-1 findings"; echo "$out"; exit 1; }
     # Exactly one CI-2: the real interpolation, not the comment describing it.
-    [ "$(printf '%s' "$out" | grep -c 'CI-2')" -eq 1 ] || {
+    [ "$(printf '%s' "$out" | grep -c 'CI-2 ')" -eq 1 ] || {
       echo "FAIL: CI-2 fired on a comment"; echo "$out"; exit 1; }
     # Two CI-9: the evaluated value, and the shell comment inside a run: body.
-    [ "$(printf '%s' "$out" | grep -c 'CI-9')" -eq 2 ] || {
+    [ "$(printf '%s' "$out" | grep -c 'CI-9 ')" -eq 2 ] || {
       echo "FAIL: CI-9 missed an empty expression inside a run: body"; echo "$out"; exit 1; }
+    # One CI-10: the file's single job, which sets no timeout-minutes.
+    [ "$(printf '%s' "$out" | grep -c 'CI-10 ')" -eq 1 ] || {
+      echo "FAIL: expected 1 CI-10 finding"; echo "$out"; exit 1; }
 
     cat > .github/workflows/bad.yml <<'EOF'
 name: Good
@@ -189,6 +270,7 @@ on:
 jobs:
   a:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       # A YAML comment is removed before expressions are read, so the ${{ }}
       # written out here is inert and must not be reported.
@@ -203,6 +285,41 @@ EOF
     git add -A && git commit -qm good
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -qE 'CI-[0-9]' && { echo "FAIL: clean workflow reported"; echo "$out"; exit 1; }
+
+    # CI-10 sharper cases: a workflow-level timeout-minutes (a key GitHub
+    # does not even read there) must not excuse any job; a step's own
+    # timeout-minutes must not excuse its job; one bounded job must not mask
+    # an unbounded sibling in the same file.
+    rm -f .github/workflows/bad.yml
+    cat > .github/workflows/mixed.yml <<'EOF'
+name: Mixed
+timeout-minutes: 999
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  bounded:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: echo ok
+  unbounded:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a step timeout does not cover its siblings, or the job
+        timeout-minutes: 5
+        run: echo ok
+      - run: echo also ok
+EOF
+    git add -A && git commit -qm mixed
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 1 ] || {
+      echo "FAIL: expected exactly 1 CI-10 finding in mixed.yml"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'unbounded' has no timeout-minutes" || {
+      echo "FAIL: CI-10 did not name the unbounded job"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'bounded'" && {
+      echo "FAIL: CI-10 fired on a job that sets its own timeout-minutes"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?

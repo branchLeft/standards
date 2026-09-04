@@ -14,6 +14,7 @@ jobs:
   ci:
     name: Lint, typecheck and self-test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -53,6 +54,7 @@ jobs:
 
   self-check:
     name: Dogfood the reusable workflow
+    timeout-minutes: 5
     # Relative path, not a tag: the tag for this commit does not exist yet, and
     # pinning an older one would check this PR against superseded rules.
     uses: ./.github/workflows/standards.yml
