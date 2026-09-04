@@ -10,3 +10,8 @@ coverage/
 
 graphify-out/.graphify_root
 graphify-out/.graphify_python
+
+# Written by every local `graphify query`. CI's own extract step never reads
+# or writes it, so a fresh query here is disposable state, not part of the
+# graph CI commits.
+graphify-out/cache/last_query_stamp
