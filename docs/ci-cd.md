@@ -86,6 +86,23 @@ than interpolated. Inside a `run:` body, describe the rule in words instead.
 ruleset state. See [`repo-settings.md`](repo-settings.md) REPO-4 for the three
 constraints and why each exists.
 
+## CI-11 — a fleet caller's reusable-workflow tag matches the tag last published
+
+CI-5 pins a caller to an exact tag; this is the standing audit item CI-5's own
+text already names — nothing else notices when a caller stays on an old tag
+after a newer one ships, because a reusable-workflow ref is not a dependency
+manifest entry and no bot bumps it.
+
+`auto`, but at audit time rather than in-repo, for the same reason as CI-6: a
+single repo's checkout has no view of any other repo's caller files, so
+checking this needs `gh api` against every fleet repo, not a ratchet over one
+tree. Every divergence from the latest published tag is reported; there is no
+allowance and no exemption list — a caller pinned old for a deliberate reason
+records that reason where the pin was made, not in a file this gate would have
+to trust unverified. A repo that calls neither reusable workflow is reported as
+having no caller, not skipped, so a clean read is distinguishable from one that
+never ran.
+
 ## CI-7 — a privileged job is gated twice, independently
 
 A job that can spend money or mutate production carries two gates that do not
