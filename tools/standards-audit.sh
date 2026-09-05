@@ -29,7 +29,7 @@ GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
-COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1"
+COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1"
 
 # ratchet__json emits a fixed field order, so this is a parse rather than a
 # JSON reader: the repo has three consumers with no Node and no jq.
@@ -271,6 +271,7 @@ on:
 jobs:
   a:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 EOF
@@ -283,6 +284,7 @@ on:
 jobs:
   a:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/setup-node@v4
 EOF
@@ -320,6 +322,7 @@ on:
 jobs:
   a:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/setup-node@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 EOF
