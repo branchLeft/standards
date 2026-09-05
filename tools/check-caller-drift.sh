@@ -114,6 +114,17 @@ STATUS=0
 
 run_audit() {
   local repos=("$@") latest repo
+  # A zero-length repo list must never fall through to the loop below: on
+  # bash >= 4.4, `for repo in "${repos[@]}"` over an empty array just runs
+  # zero times, which prints only the "latest:" line and returns STATUS=0 —
+  # a "clean" report that is bitwise indistinguishable from a real all-clear
+  # scan, and would silently mask an emptied FLEET_REPOS or an audit
+  # invoked with no repos at all. Refuse outright instead of trusting the
+  # loop to notice it checked nothing.
+  if [ "${#repos[@]}" -eq 0 ]; then
+    echo "check-caller-drift: no repos to check — refusing to report a clean run with nothing scanned" >&2
+    return 2
+  fi
   latest=$(fetch_latest_tag) || {
     echo "check-caller-drift: could not read the latest tag for ${WORKFLOW_REPO}" >&2
     return 2
@@ -178,6 +189,23 @@ self_test() {
   rc=0
   run_audit on-latest no-caller >/dev/null 2>&1 && rc=0 || rc=$?
   [ "$rc" -eq 0 ] || { echo "FAIL: an all-clean run exited non-zero"; return 1; }
+
+  # The control case for "all clear": a run given ZERO repos must not be
+  # able to report the same clean result as a genuine all-clear scan. An
+  # empty scan is indistinguishable from a matching one unless this is
+  # checked explicitly — the loop alone would happily iterate zero times
+  # and return STATUS=0.
+  STATUS=0
+  rc=0
+  out=$(run_audit 2>&1) && rc=0 || rc=$?
+  [ "$rc" -eq 0 ] && { echo "FAIL: a run with zero repos exited 0 — an empty scan reported as clean"; printf '%s\n' "$out"; return 1; }
+  printf '%s\n' "$out" | grep -q 'no repos to check' \
+    || { echo "FAIL: a zero-repo run did not name the reason"; printf '%s\n' "$out"; return 1; }
+
+  # The fleet list itself must never be empty, or `main`'s default path
+  # silently inherits the same hole.
+  [ "${#FLEET_REPOS[@]}" -gt 0 ] \
+    || { echo "FAIL: FLEET_REPOS is empty"; return 1; }
 
   # A fetch error must surface as ERROR, distinct from "no caller" — a
   # silently swallowed API failure previously read as a clean repo.
