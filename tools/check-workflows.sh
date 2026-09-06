@@ -489,9 +489,10 @@ EOF
     done
 
     # Merge keys (`<<: *anchor`). `merged` inherits timeout-minutes through a
-    # merge key and must pass -- this scanner has no YAML parser, so before
-    # this fix it read `<<` as neither `timeout-minutes` nor `uses` and
-    # reported a bounded job as unbounded (branchLeft/workspace#630).
+    # merge key and must pass. This scanner has no YAML parser, so a naive
+    # line scan never sees the inherited key: `<<` reads as neither
+    # `timeout-minutes` nor `uses`, and the job looks unbounded when it is
+    # not.
     # `partialmerge` merges an anchor that sets a *different* key and must
     # still be flagged: a fix that treats any `<<:` as satisfying the clause
     # would turn this real gap into another false negative, which is worse
