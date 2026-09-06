@@ -49,6 +49,29 @@ fetch_latest_tag() {
   gh api "repos/${WORKFLOW_REPO}/tags" --jq '.[0].name'
 }
 
+# Prints "<workflow-file>@<tag>" for every live caller line in one workflow
+# file's content on stdin. Pure and network-free, and split out from
+# fetch_caller_uses for exactly that reason: the gh api half cannot be
+# self-tested, so a regex living inside it is never exercised by any test and
+# a silent miss there is invisible. Both filters below are load-bearing.
+#
+# A commented-out `uses:` is documentation, not a caller. The reusable
+# workflows in branchLeft/github-workflows each carry a usage example in a
+# `#` header, and without this filter every one of them reads as a live
+# drifted caller.
+#
+# The optional quote is the false-negative half. YAML treats `uses: "x"` and
+# `uses: x` identically, so a caller written with quotes is valid and
+# ordinary — but an unquoted-only pattern skips it silently, and a repo whose
+# only caller is quoted then reports "(no caller)", which is
+# indistinguishable from a repo that genuinely has none. This script's whole
+# point is that a false negative is worse than a false positive.
+extract_uses() {
+  grep -vE '^[[:space:]]*#' \
+    | grep -oE "uses:[[:space:]]*[\"']?${WORKFLOW_REPO}/\.github/workflows/[A-Za-z0-9_.-]+\.ya?ml@[A-Za-z0-9._-]+" \
+    | sed -E 's#.*/([A-Za-z0-9_.-]+\.ya?ml)@#\1@#'
+}
+
 # Prints "<workflow-file>@<tag>" for every `uses:` line in repo's
 # .github/workflows/*.yml pointing at WORKFLOW_REPO. Empty output means no
 # caller — a fact, not a finding. Returns non-zero only when a `gh api` call
@@ -74,9 +97,7 @@ fetch_caller_uses() {
       echo "ERROR: could not read ${repo}/.github/workflows/${f}: ${err}" >&2
       return 1
     fi
-    printf '%s\n' "$content" \
-      | grep -oE "uses:[[:space:]]*${WORKFLOW_REPO}/\.github/workflows/[A-Za-z0-9_.-]+\.ya?ml@[A-Za-z0-9._-]+" \
-      | sed -E 's#.*/([A-Za-z0-9_.-]+\.ya?ml)@#\1@#'
+    printf '%s\n' "$content" | extract_uses
   done <<< "$listing"
   return 0
 }
@@ -216,6 +237,28 @@ self_test() {
   printf '%s\n' "$out" | grep -q 'ERROR' \
     || { echo "FAIL: a fetch failure was not reported as ERROR"; printf '%s\n' "$out"; return 1; }
   [ "$rc" -ne 0 ] || { echo "FAIL: a run with a fetch error exited 0"; return 1; }
+
+  # extract_uses is the only part of the fetch path testable without a
+  # network call, and until it was split out of fetch_caller_uses nothing
+  # tested it at all — the regex that decides what counts as a caller had
+  # zero coverage while every other branch of this script had some. Both
+  # defects guarded here were proved against live repo data, not imagined.
+  local parsed
+  parsed=$(printf '%s\n' \
+    '  uses: branchLeft/github-workflows/.github/workflows/docs-lint.yml@v1.0.6' \
+    '  uses: "branchLeft/github-workflows/.github/workflows/graphify.yml@v1.0.7"' \
+    "  uses: 'branchLeft/github-workflows/.github/workflows/standards.yml@v1.0.5'" \
+    '#     uses: branchLeft/github-workflows/.github/workflows/docs-lint.yml@v1.0.1' \
+    | extract_uses) || true
+
+  printf '%s\n' "$parsed" | grep -q '^docs-lint\.yml@v1\.0\.6$' \
+    || { echo "FAIL: extract_uses missed an unquoted caller"; printf '%s\n' "$parsed"; return 1; }
+  printf '%s\n' "$parsed" | grep -q '^graphify\.yml@v1\.0\.7$' \
+    || { echo "FAIL: extract_uses missed a double-quoted caller (silent false negative)"; printf '%s\n' "$parsed"; return 1; }
+  printf '%s\n' "$parsed" | grep -q '^standards\.yml@v1\.0\.5$' \
+    || { echo "FAIL: extract_uses missed a single-quoted caller (silent false negative)"; printf '%s\n' "$parsed"; return 1; }
+  printf '%s\n' "$parsed" | grep -q 'v1\.0\.1' \
+    && { echo "FAIL: extract_uses read a commented-out uses: line as a live caller"; printf '%s\n' "$parsed"; return 1; }
 
   echo "check-caller-drift.sh: self-test passed"
   return 0
