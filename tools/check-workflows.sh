@@ -159,10 +159,59 @@ _ci10_close_job() {
   return 0
 }
 
+# A merge key (`<<: *name`) inlines another mapping's keys into the job, and
+# GitHub's own YAML parser resolves it before the job schema is read -- a job
+# that merges in a mapping containing `timeout-minutes` is exactly as bounded
+# as one that sets the key directly. This scanner has no parser to resolve
+# aliases with, so it makes one pass over the whole file first, independent of
+# `jobs:`, because the anchor a job merges in is often a top-level `x-`
+# key (GitHub ignores unknown top-level keys, which is the whole reason authors
+# park shared defaults there) and can equally be a sibling job.
+#
+# Only a mapping anchor is a merge candidate -- `key: &name value` anchors a
+# scalar, and `<<:` cannot merge a scalar in, so only an anchor with nothing
+# after it on its line is tracked.
+_ci10_anchors_with_timeout() {
+  local f="$1" line trimmed indent name key
+  local anchor="" anchor_indent=-1 anchor_child_indent=-1 anchor_has_tm=0
+
+  while IFS= read -r line; do
+    trimmed="${line#"${line%%[![:space:]]*}"}"
+    [ -n "$trimmed" ] || continue
+    case "$trimmed" in \#*) continue ;; esac
+    indent=$(printf '%s' "$line" | awk '{ match($0, /^[ ]*/); print RLENGTH }')
+
+    if [ -n "$anchor" ] && [ "$indent" -le "$anchor_indent" ]; then
+      [ "$anchor_has_tm" -eq 1 ] && printf '%s\n' "$anchor"
+      anchor=""; anchor_indent=-1; anchor_child_indent=-1; anchor_has_tm=0
+    fi
+
+    name=$(printf '%s' "$trimmed" | sed -n 's/.*&\([A-Za-z0-9_.-]*\)[[:space:]]*$/\1/p')
+    if [ -n "$name" ]; then
+      [ -n "$anchor" ] && [ "$anchor_has_tm" -eq 1 ] && printf '%s\n' "$anchor"
+      anchor="$name"; anchor_indent="$indent"; anchor_child_indent=-1; anchor_has_tm=0
+      continue
+    fi
+
+    if [ -n "$anchor" ]; then
+      [ "$anchor_child_indent" -eq -1 ] && anchor_child_indent="$indent"
+      if [ "$indent" -eq "$anchor_child_indent" ]; then
+        key="${trimmed%%:*}"
+        key="${key#[\"\']}"
+        key="${key%[\"\']}"
+        [ "$key" = "timeout-minutes" ] && anchor_has_tm=1
+      fi
+    fi
+  done < "$f"
+  [ -n "$anchor" ] && [ "$anchor_has_tm" -eq 1 ] && printf '%s\n' "$anchor"
+}
+
 scan_timeouts() {
   local f="$1" ln=0 line indent trimmed key
   local in_jobs=0 jobs_indent=-1
   local job="" job_indent=-1 job_line=0 job_child_indent=-1 job_has_timeout=0 job_is_call=0
+  local anchors_with_timeout
+  anchors_with_timeout=" $(_ci10_anchors_with_timeout "$f" | tr '\n' ' ')"
 
   while IFS= read -r line; do
     ln=$((ln + 1))
@@ -220,6 +269,18 @@ scan_timeouts() {
       case "$key" in
         timeout-minutes) job_has_timeout=1 ;;
         uses) job_is_call=1 ;;
+        '<<')
+          # `<<: *name` or `<<: [*a, *b]` -- every alias referenced is
+          # checked, so a job is bounded if any merged-in mapping sets the
+          # key, matching how YAML merge itself unions the source mappings.
+          local ref alias
+          for ref in $(printf '%s' "$trimmed" | grep -oE '\*[A-Za-z0-9_.-]+'); do
+            alias="${ref#\*}"
+            case "$anchors_with_timeout" in
+              *" $alias "*) job_has_timeout=1 ;;
+            esac
+          done
+          ;;
       esac
     fi
   done < "$f"
@@ -426,6 +487,54 @@ EOF
       printf '%s' "$out" | grep -q "job '$j'" && {
         echo "FAIL: CI-10 fired on '$j' — a quoted key was read as a missing one"; echo "$out"; exit 1; }
     done
+
+    # Merge keys (`<<: *anchor`). `merged` inherits timeout-minutes through a
+    # merge key and must pass. This scanner has no YAML parser, so a naive
+    # line scan never sees the inherited key: `<<` reads as neither
+    # `timeout-minutes` nor `uses`, and the job looks unbounded when it is
+    # not.
+    # `partialmerge` merges an anchor that sets a *different* key and must
+    # still be flagged: a fix that treats any `<<:` as satisfying the clause
+    # would turn this real gap into another false negative, which is worse
+    # than the false positive it replaces. `plainunbounded` carries no merge
+    # key at all, proving the ordinary path still fires in a file that also
+    # exercises merge keys.
+    rm -f .github/workflows/quoted.yml
+    cat > .github/workflows/merge.yml <<'EOF'
+name: Merge
+on:
+  pull_request:
+  push:
+    branches: [main]
+x-defaults: &defaults
+  timeout-minutes: 10
+x-partial: &partial
+  runs-on: ubuntu-latest
+jobs:
+  merged:
+    runs-on: ubuntu-latest
+    <<: *defaults
+    steps:
+      - run: echo ok
+  partialmerge:
+    <<: *partial
+    steps:
+      - run: echo ok
+  plainunbounded:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+EOF
+    git add -A && git commit -qm merge
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 2 ] || {
+      echo "FAIL: expected exactly 2 CI-10 findings in merge.yml"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'merged'" && {
+      echo "FAIL: CI-10 fired on a job bounded via a merge key"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'partialmerge' has no timeout-minutes" || {
+      echo "FAIL: CI-10 missed a job whose merge key does not supply timeout-minutes"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "job 'plainunbounded' has no timeout-minutes" || {
+      echo "FAIL: CI-10 missed an ordinary unbounded job in a file that also uses merge keys"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?
