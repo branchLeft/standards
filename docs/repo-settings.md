@@ -50,9 +50,14 @@ Three constraints, each of which has failed somewhere:
 
 1. **Never require a context before a real run has produced it.** A required
    context that never reports blocks every merge in the repo, permanently.
-2. **Never require a check for a gate the repo runs in `warn`.** A required
-   check that cannot fail reads as coverage while providing none, and it
-   contradicts the mode the repo deliberately chose.
+2. **A required check on a `warn`-mode gate is real, partial coverage — say
+   so next to the check list.** `warn` is not "cannot fail":
+   `tools/lib/ratchet.sh` still fails a `warn`-mode gate on findings in files
+   the branch touched, and only the pre-existing whole-tree backlog is
+   advisory (see [`ratchet.md`](ratchet.md)). Requiring such a check gates new
+   and changed code, not the tree as a whole — a payload that requires one
+   must record that scope, so "N required checks" is never read as full-tree
+   enforcement.
 3. **Required contexts must match the job names the workflow actually emits.**
    Renaming a job silently orphans the requirement: the old name never reports
    again, and the repo is blocked by a check nothing produces.

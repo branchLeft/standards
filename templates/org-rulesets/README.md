@@ -72,6 +72,19 @@ and
 [#4](https://github.com/branchLeft/ghost-platform-tenant-template/pull/4),
 via `gh pr checks`.)
 
+`pass` here is not full-tree enforcement. `ghost-platform-tenant-template`
+runs both `docs-lint / docs-lint` and `standards / Standards gates` in `warn`
+mode (`.docs-lint.mode` and `.standards.mode`, both `warn`), and a required
+`warn`-mode check still fails only on findings in files the pull request
+itself touches — the pre-existing, whole-tree backlog is advisory (`REPO-4`
+rule 2, [`docs/repo-settings.md`](../../docs/repo-settings.md)). Every tenant
+generated from this template inherits that same partial coverage from day
+one, until the template's own `warn` state is cleared —
+[branchLeft/workspace#720](https://github.com/branchLeft/workspace/issues/720).
+Requiring these two contexts here is real, if partial, coverage: new and
+changed files are gated in every generated tenant immediately; "four required
+checks" does not mean the tree is certified clean.
+
 **These are the right required checks for a freshly generated tenant. They
 are not yet correct for `ghost-tenant-blog` today.** Its own live workflow
 set does not emit `Committed-secret guard` or `standards / Standards gates` —
