@@ -191,15 +191,15 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Repository settings — `repo-settings.md`
 
-| ID     | Rule                                                                            | Gate      | Encoded by               |
-| ------ | ------------------------------------------------------------------------------- | --------- | ------------------------ |
-| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR    | `auto`    | `templates/rulesets/`    |
-| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only             | `auto`    | `templates/rulesets/`    |
-| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures | `auto`    | `templates/rulesets/`    |
-| REPO-4 | Required checks: never before a real run, never for a `warn` gate, names match  | `review`  | `tools/ruleset-audit.sh` |
-| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors         | `pending` | —                        |
-| REPO-6 | Every repo's ruleset payload is committed and audited                           | `auto`    | `tools/ruleset-audit.sh` |
-| REPO-7 | An apply never reduces live protection — a weakening payload is refused         | `auto`    | `tools/ruleset-apply.sh` |
+| ID     | Rule                                                                                | Gate      | Encoded by               |
+| ------ | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
+| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
+| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
+| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
+| REPO-4 | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
+| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
+| REPO-6 | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
+| REPO-7 | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
