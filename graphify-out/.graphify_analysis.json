@@ -28,34 +28,7 @@
       "packages_eslint_config_src_typechecked_typechecked"
     ],
     "1": [
-      "branchleft_tsconfig",
-      "package_devdependencies_branchleft_tsconfig",
-      "packages_eslint_config_package_devdependencies",
-      "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
-      "packages_vitest_config_package",
-      "packages_vitest_config_package_description",
-      "packages_vitest_config_package_devdependencies",
-      "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
-      "packages_vitest_config_package_exports",
-      "packages_vitest_config_package_license",
-      "packages_vitest_config_package_main",
-      "packages_vitest_config_package_name",
-      "packages_vitest_config_package_publishconfig",
-      "packages_vitest_config_package_publishconfig_registry",
-      "packages_vitest_config_package_repository",
-      "packages_vitest_config_package_repository_directory",
-      "packages_vitest_config_package_repository_type",
-      "packages_vitest_config_package_repository_url",
-      "packages_vitest_config_package_scripts",
-      "packages_vitest_config_package_scripts_build",
-      "packages_vitest_config_package_scripts_prepublishonly",
-      "packages_vitest_config_package_type",
-      "packages_vitest_config_package_types",
-      "packages_vitest_config_package_version"
-    ],
-    "2": [
       "packages_eslint_config_package_files",
-      "packages_eslint_config_package_json_ref_dist",
       "packages_prettier_config_package",
       "packages_prettier_config_package_description",
       "packages_prettier_config_package_exports",
@@ -72,14 +45,15 @@
       "packages_prettier_config_package_repository_url",
       "packages_prettier_config_package_version",
       "packages_tsconfig_package_files",
-      "packages_tsconfig_package_json_ref_readme_md",
       "packages_vitest_config_package_files",
       "packages_vitest_config_package_json_ref_dist",
+      "ref_dist",
       "ref_index_json",
       "ref_json",
-      "ref_prettierignore"
+      "ref_prettierignore",
+      "ref_readme_md"
     ],
-    "3": [
+    "2": [
       "package",
       "package_description",
       "package_license",
@@ -104,17 +78,41 @@
       "package_type",
       "package_version"
     ],
-    "4": [
-      "eslint",
+    "3": [
+      "branchleft_eslint_config",
+      "branchleft_prettier_config",
+      "branchleft_vitest_config",
+      "package_devdependencies",
+      "package_devdependencies_branchleft_eslint_config",
+      "package_devdependencies_branchleft_prettier_config",
+      "package_devdependencies_branchleft_vitest_config",
       "package_devdependencies_eslint",
+      "package_devdependencies_prettier",
+      "package_devdependencies_typescript",
+      "package_devdependencies_vitest",
+      "package_devdependencies_vitest_coverage_v8",
+      "package_json_eslint",
+      "packages_eslint_config_package_peerdependencies",
+      "packages_eslint_config_package_peerdependencies_eslint",
+      "packages_vitest_config_package_peerdependencies",
+      "packages_vitest_config_package_peerdependencies_vitest",
+      "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
+      "prettier",
+      "typescript",
+      "vitest",
+      "vitest_coverage_v8"
+    ],
+    "4": [
+      "package_devdependencies_branchleft_tsconfig",
+      "package_json_branchleft_tsconfig",
       "packages_eslint_config_package",
       "packages_eslint_config_package_description",
+      "packages_eslint_config_package_devdependencies",
+      "packages_eslint_config_package_devdependencies_branchleft_tsconfig",
       "packages_eslint_config_package_exports",
       "packages_eslint_config_package_license",
       "packages_eslint_config_package_main",
       "packages_eslint_config_package_name",
-      "packages_eslint_config_package_peerdependencies",
-      "packages_eslint_config_package_peerdependencies_eslint",
       "packages_eslint_config_package_publishconfig",
       "packages_eslint_config_package_publishconfig_registry",
       "packages_eslint_config_package_repository",
@@ -153,24 +151,26 @@
       "tools_lib_ratchet_sh__entry"
     ],
     "6": [
-      "branchleft_eslint_config",
-      "branchleft_prettier_config",
-      "branchleft_vitest_config",
-      "package_devdependencies",
-      "package_devdependencies_branchleft_eslint_config",
-      "package_devdependencies_branchleft_prettier_config",
-      "package_devdependencies_branchleft_vitest_config",
-      "package_devdependencies_prettier",
-      "package_devdependencies_typescript",
-      "package_devdependencies_vitest",
-      "package_devdependencies_vitest_coverage_v8",
-      "packages_vitest_config_package_peerdependencies",
-      "packages_vitest_config_package_peerdependencies_vitest",
-      "packages_vitest_config_package_peerdependencies_vitest_coverage_v8",
-      "prettier",
-      "typescript",
-      "vitest",
-      "vitest_coverage_v8"
+      "packages_vitest_config_package",
+      "packages_vitest_config_package_description",
+      "packages_vitest_config_package_devdependencies",
+      "packages_vitest_config_package_devdependencies_branchleft_tsconfig",
+      "packages_vitest_config_package_exports",
+      "packages_vitest_config_package_license",
+      "packages_vitest_config_package_main",
+      "packages_vitest_config_package_name",
+      "packages_vitest_config_package_publishconfig",
+      "packages_vitest_config_package_publishconfig_registry",
+      "packages_vitest_config_package_repository",
+      "packages_vitest_config_package_repository_directory",
+      "packages_vitest_config_package_repository_type",
+      "packages_vitest_config_package_repository_url",
+      "packages_vitest_config_package_scripts",
+      "packages_vitest_config_package_scripts_build",
+      "packages_vitest_config_package_scripts_prepublishonly",
+      "packages_vitest_config_package_type",
+      "packages_vitest_config_package_types",
+      "packages_vitest_config_package_version"
     ],
     "7": [
       "packages_tsconfig_package",
@@ -387,6 +387,17 @@
       "ref_strict_1_json"
     ],
     "22": [
+      "tools_check_caller_drift",
+      "tools_check_caller_drift_extract_uses",
+      "tools_check_caller_drift_fetch_caller_uses",
+      "tools_check_caller_drift_fetch_latest_tag",
+      "tools_check_caller_drift_main",
+      "tools_check_caller_drift_report_repo",
+      "tools_check_caller_drift_run_audit",
+      "tools_check_caller_drift_self_test",
+      "tools_check_caller_drift_sh__entry"
+    ],
+    "23": [
       "packages_vitest_config_src_index",
       "packages_vitest_config_src_index_default_coverage_exclude",
       "packages_vitest_config_src_index_default_coverage_include",
@@ -396,7 +407,7 @@
       "packages_vitest_config_src_index_test",
       "packages_vitest_config_src_index_testenvironment"
     ],
-    "23": [
+    "24": [
       "tools_check_workflows",
       "tools_check_workflows_ci10_anchors_with_timeout",
       "tools_check_workflows_ci10_close_job",
@@ -406,7 +417,7 @@
       "tools_check_workflows_self_test",
       "tools_check_workflows_sh__entry"
     ],
-    "24": [
+    "25": [
       "tools_clauses_in_scope",
       "tools_clauses_in_scope_changed_files",
       "tools_clauses_in_scope_clause_paths_rows",
@@ -416,7 +427,7 @@
       "tools_clauses_in_scope_self_test",
       "tools_clauses_in_scope_sh__entry"
     ],
-    "25": [
+    "26": [
       "tools_check_pulumi_secrets",
       "tools_check_pulumi_secrets_main",
       "tools_check_pulumi_secrets_pul12_finding",
@@ -425,7 +436,7 @@
       "tools_check_pulumi_secrets_sh__entry",
       "tools_check_pulumi_secrets_strip_bom"
     ],
-    "26": [
+    "27": [
       "tools_check_tsconfig",
       "tools_check_tsconfig_analyse_tsconfig",
       "tools_check_tsconfig_check_ts5",
@@ -434,46 +445,46 @@
       "tools_check_tsconfig_sh__entry",
       "tools_check_tsconfig_tier_rank"
     ],
-    "27": [
+    "28": [
       "packages_eslint_config_src_vendor_d",
       "packages_eslint_config_src_vendor_d_eslint_config_prettier",
       "packages_eslint_config_src_vendor_d_eslint_plugin_jsx_a11y",
       "packages_eslint_config_src_vendor_d_eslint_plugin_react_hooks"
     ],
-    "28": [
+    "29": [
       "tools_tests_run",
       "tools_tests_run_run",
       "tools_tests_run_sh__entry",
       "tools_tests_run_workflow_runs_every_gate"
     ],
-    "29": [
+    "30": [
       "tools_ruleset_normalize",
       "tools_ruleset_normalize_canon",
       "tools_ruleset_normalize_canon_rule"
     ],
-    "30": [
+    "31": [
       "tools_ruleset_apply",
       "tools_ruleset_apply_sh__entry"
     ],
-    "31": [
+    "32": [
       "tools_ruleset_audit",
       "tools_ruleset_audit_sh__entry"
     ],
-    "32": [
+    "33": [
       "eslint_config"
     ],
-    "33": [
+    "34": [
       "vitest_config"
     ]
   },
   "cohesion": {
     "0": 0.14,
     "1": 0.08333333333333333,
-    "2": 0.08333333333333333,
-    "3": 0.08695652173913043,
+    "2": 0.08695652173913043,
+    "3": 0.09523809523809523,
     "4": 0.09090909090909091,
     "5": 0.2077922077922078,
-    "6": 0.11764705882352941,
+    "6": 0.1,
     "7": 0.1111111111111111,
     "8": 0.14285714285714285,
     "9": 0.14285714285714285,
@@ -489,18 +500,19 @@
     "19": 0.2,
     "20": 0.3333333333333333,
     "21": 0.2222222222222222,
-    "22": 0.2857142857142857,
-    "23": 0.42857142857142855,
-    "24": 0.32142857142857145,
-    "25": 0.47619047619047616,
-    "26": 0.42857142857142855,
-    "27": 0.5,
-    "28": 0.6666666666666666,
-    "29": 1.0,
+    "22": 0.4444444444444444,
+    "23": 0.2857142857142857,
+    "24": 0.42857142857142855,
+    "25": 0.32142857142857145,
+    "26": 0.47619047619047616,
+    "27": 0.42857142857142855,
+    "28": 0.5,
+    "29": 0.6666666666666666,
     "30": 1.0,
     "31": 1.0,
     "32": 1.0,
-    "33": 1.0
+    "33": 1.0,
+    "34": 1.0
   },
   "gods": [
     {
