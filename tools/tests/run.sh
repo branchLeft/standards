@@ -33,6 +33,7 @@ run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
+run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
 
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
