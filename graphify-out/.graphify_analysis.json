@@ -397,6 +397,16 @@
       "packages_vitest_config_src_index_testenvironment"
     ],
     "23": [
+      "tools_check_workflows",
+      "tools_check_workflows_ci10_anchors_with_timeout",
+      "tools_check_workflows_ci10_close_job",
+      "tools_check_workflows_main",
+      "tools_check_workflows_scan_timeouts",
+      "tools_check_workflows_scan_workflow",
+      "tools_check_workflows_self_test",
+      "tools_check_workflows_sh__entry"
+    ],
+    "24": [
       "tools_clauses_in_scope",
       "tools_clauses_in_scope_changed_files",
       "tools_clauses_in_scope_clause_paths_rows",
@@ -406,7 +416,7 @@
       "tools_clauses_in_scope_self_test",
       "tools_clauses_in_scope_sh__entry"
     ],
-    "24": [
+    "25": [
       "tools_check_pulumi_secrets",
       "tools_check_pulumi_secrets_main",
       "tools_check_pulumi_secrets_pul12_finding",
@@ -415,7 +425,7 @@
       "tools_check_pulumi_secrets_sh__entry",
       "tools_check_pulumi_secrets_strip_bom"
     ],
-    "25": [
+    "26": [
       "tools_check_tsconfig",
       "tools_check_tsconfig_analyse_tsconfig",
       "tools_check_tsconfig_check_ts5",
@@ -423,15 +433,6 @@
       "tools_check_tsconfig_self_test",
       "tools_check_tsconfig_sh__entry",
       "tools_check_tsconfig_tier_rank"
-    ],
-    "26": [
-      "tools_check_workflows",
-      "tools_check_workflows_ci10_close_job",
-      "tools_check_workflows_main",
-      "tools_check_workflows_scan_timeouts",
-      "tools_check_workflows_scan_workflow",
-      "tools_check_workflows_self_test",
-      "tools_check_workflows_sh__entry"
     ],
     "27": [
       "packages_eslint_config_src_vendor_d",
@@ -489,10 +490,10 @@
     "20": 0.3333333333333333,
     "21": 0.2222222222222222,
     "22": 0.2857142857142857,
-    "23": 0.32142857142857145,
-    "24": 0.47619047619047616,
-    "25": 0.42857142857142855,
-    "26": 0.5238095238095238,
+    "23": 0.42857142857142855,
+    "24": 0.32142857142857145,
+    "25": 0.47619047619047616,
+    "26": 0.42857142857142855,
     "27": 0.5,
     "28": 0.6666666666666666,
     "29": 1.0,
