@@ -64,16 +64,6 @@ nothing, so an `&&` chain carries straight on. Every other name in the canonical
 vocabulary fails loudly when it is undefined; that one does not, which is why
 TS-6 names `test:unit`.
 
-## graphify
-
-`graphify-out/` holds a knowledge graph of this repo, rebuilt by CI on every push to `main` and published as a `chore(graphify)` PR.
-
-- Answer codebase and architecture questions with `graphify query "<question>"` first — `graphify path "<A>" "<B>"` for a relationship, `graphify explain "<concept>"` for a concept. Each returns a scoped subgraph, far smaller than the equivalent grep. Which clause a gate enforces, and which gate a clause is enforced by, is exactly the kind of link the graph answers better than a search.
-- `graphify-out/GRAPH_REPORT.md` is the broad-navigation entry point. The payload files behind it are read-blocked in `.claude/settings.json` — go through the query commands instead.
-- The graph is not the clause table. `docs/index.md` is authoritative for what a rule says and what its ID is; the graph tells you where things connect.
-- If a `chore(graphify)` PR is open, the graph you have is behind — get it merged and pulled before reasoning from it.
-- After changing code, `graphify update .` refreshes the graph locally. AST-only, no API cost.
-
 ## Releasing
 
 Signed annotated tags only (`git tag -s`) — the tag ruleset requires signatures,
