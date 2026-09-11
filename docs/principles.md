@@ -103,6 +103,29 @@ Lock-in is itself a rejection reason under this rubric, independent of the
 five criteria above: a supplier that is otherwise acceptable but hard to
 leave has failed on that basis alone.
 
+**Named exclusion: X.** X fails the complicity screen outright — its
+ownership, its platform's own demonstrated conduct, and the governance
+behind its generative-image product are complicity in their own right,
+independent of price. The exclusion is permanent and carries no reopening
+trigger: a future price change answers no part of the reason it was made.
+Naming it does not narrow the screen — an unnamed platform that meets the
+same criterion is excluded on the same basis, without waiting for a
+platform-by-platform decision.
+
+The exclusion reaches every first-party branchLeft channel or property:
+linking to X, embedding X content, branchLeft holding or operating an X
+account, and X serving as a support or status channel for anything
+representing branchLeft.
+
+It does not reach a client of branchLeft's platforms. A tenant's Ghost blog,
+or a bespoke client site, may link to the client's own accounts on any
+platform, X included — the rubric governs branchLeft's own supplier choices,
+not what a client publishes about themselves.
+
+The cross-posting cost case is a secondary argument that happens to agree;
+see the "Tier C" section of
+[ghost-platform-docs's social-distribution doc](https://github.com/branchLeft/ghost-platform-docs/blob/main/15-social-distribution.md).
+
 **Honesty clause.** Legacy use of Google/GCP predates this rubric's
 enforcement and is a tolerated compromise, being actively exited rather than
 defended. A new dependency on it is not accepted regardless of how the
