@@ -122,9 +122,9 @@ or a bespoke client site, may link to the client's own accounts on any
 platform, X included — the rubric governs branchLeft's own supplier choices,
 not what a client publishes about themselves.
 
-The cross-posting cost case is a secondary argument that happens to agree;
-see the "Tier C" section of
-[ghost-platform-docs's social-distribution doc](https://github.com/branchLeft/ghost-platform-docs/blob/main/15-social-distribution.md).
+The cross-posting cost case is a secondary argument that happens to agree,
+detailed in the platform's own architecture documentation rather than
+restated here.
 
 **Honesty clause.** Legacy use of Google/GCP predates this rubric's
 enforcement and is a tolerated compromise, being actively exited rather than
