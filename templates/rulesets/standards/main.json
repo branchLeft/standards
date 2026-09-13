@@ -56,9 +56,9 @@
           {
             "context": "Dogfood the reusable workflow / Standards gates"
           },
-            {
-              "context": "docs-lint / docs-lint"
-            }
+          {
+            "context": "docs-lint / docs-lint"
+          }
         ]
       }
     }

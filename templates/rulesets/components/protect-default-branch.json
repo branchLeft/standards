@@ -47,9 +47,9 @@
           {
             "context": "Lint, Format & Test"
           },
-            {
-              "context": "docs-lint / docs-lint"
-            }
+          {
+            "context": "docs-lint / docs-lint"
+          }
         ]
       }
     }
