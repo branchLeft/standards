@@ -46,7 +46,10 @@
         "required_status_checks": [
           {
             "context": "Lint, Format & Test"
-          }
+          },
+            {
+              "context": "docs-lint / docs-lint"
+            }
         ]
       }
     }

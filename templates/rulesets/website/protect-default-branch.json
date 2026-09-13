@@ -49,7 +49,10 @@
           },
           {
             "context": "End-to-end tests"
-          }
+          },
+            {
+              "context": "docs-lint / docs-lint"
+            }
         ]
       }
     }
