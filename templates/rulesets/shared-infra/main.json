@@ -37,7 +37,9 @@
           { "context": "Validate (edge Caddy config)" },
           { "context": "Test (scripts)" },
           { "context": "Audit (Pulumi secrets + state backends)" },
-          { "context": "Audit (Cloud Armor baseline parity)" }
+          { "context": "Audit (Cloud Armor baseline parity)" },
+          { "context": "Validate (monitoring stack config)" },
+          { "context": "docs-lint / docs-lint" }
         ]
       }
     }

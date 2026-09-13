@@ -32,7 +32,8 @@
           { "context": "Platform type check" },
           { "context": "Type check (provisioning)" },
           { "context": "Tenant type check" },
-          { "context": "Format and lint" }
+          { "context": "Format and lint" },
+          { "context": "docs-lint / docs-lint" }
         ]
       }
     }
