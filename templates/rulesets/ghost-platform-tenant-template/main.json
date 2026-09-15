@@ -30,7 +30,8 @@
         "required_status_checks": [
           { "context": "Committed-secret guard" },
           { "context": "Type check" },
-          { "context": "docs-lint / docs-lint" }
+          { "context": "docs-lint / docs-lint" },
+          { "context": "standards / Standards gates" }
         ]
       }
     }
