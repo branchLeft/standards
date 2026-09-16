@@ -49,6 +49,9 @@
           },
           {
             "context": "docs-lint / docs-lint"
+          },
+          {
+            "context": "standards / Standards gates"
           }
         ]
       }
