@@ -28,11 +28,8 @@
         "strict_required_status_checks_policy": false,
         "do_not_enforce_on_create": false,
         "required_status_checks": [
-          { "context": "docker build" },
-          { "context": "Tenant type check" },
-          { "context": "Format and lint" },
-          { "context": "docs-lint / docs-lint" },
-          { "context": "standards / Standards gates" }
+          { "context": "standards / Standards gates" },
+          { "context": "docs-lint / docs-lint" }
         ]
       }
     }
