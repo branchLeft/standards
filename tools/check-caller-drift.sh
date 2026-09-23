@@ -40,6 +40,8 @@ FLEET_REPOS=(
   shared-infra
   standards
   ghost-tenant-blog
+  content-safety
+  control-plane
 )
 
 # Overridable so --self-test can inject fixture data with no network call —
