@@ -13,6 +13,7 @@
 #   standards-audit.sh [--mode warn|enforce] [--json] [--self-test]
 
 # shellcheck disable=SC2094  # ratchet_finding writes to stdout; the ignore file is only ever read
+# shellcheck disable=SC2016  # the backtick-quoted `auto` is literal markdown text to match, not a command substitution
 
 set -uo pipefail
 
@@ -43,27 +44,44 @@ ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
 COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-3 COV-1"
 
-# Every indexed clause whose docs/index.md Gate column is `review` or
-# `pending` — the ones no tool anywhere in this repo speaks to at all, `auto`
-# clauses this run happens not to cover included. So "zero findings" is never
-# read as "everything was checked": the model-facing headline names the blind
-# spot instead of leaving it implicit. Read from this checkout's own
-# docs/index.md (the tool's own doc, the same default check-clause-index.sh
-# uses) — not from whatever repo standards-audit.sh is auditing, which may
-# carry no docs/ of its own at all.
-not_audited_counts() {
+# Every indexed clause, sorted into exactly one of three buckets so the
+# model-facing headline never reads a measured clause as unwatched, nor an
+# unflipped gate class as enforced:
+#   enforced           — docs/index.md Gate column is `auto`.
+#   measured, not enforced — not `auto`, but named in tools/thresholds.tsv
+#                        (the ADVISORY_GATES readers' own settings file, so
+#                        this is derived from it rather than kept as a second,
+#                        hand-maintained list that could name a clause neither
+#                        array actually reads).
+#   not checked        — everything else: no tool anywhere looks at it.
+# Read from this checkout's own docs/index.md and tools/thresholds.tsv (the
+# tool's own files, the same default check-clause-index.sh uses) — not from
+# whatever repo standards-audit.sh is auditing, which may carry no docs/ or
+# tools/ of its own at all.
+clause_coverage() {
   local docs="$HERE/../docs/index.md"
-  [ -f "$docs" ] || { printf '0\t0\t0\n'; return; }
-  awk -F'|' '
+  local thresholds="$HERE/thresholds.tsv"
+  local measured_csv=""
+  if [ -f "$thresholds" ]; then
+    measured_csv=$(awk -F'\t' '/^[ \t]*#/ || NF < 1 { next } { print $1 }' "$thresholds" \
+      | sort -u | paste -sd, -)
+  fi
+  [ -f "$docs" ] || { printf '0\t0\t0\t%s\n' "$measured_csv"; return; }
+  awk -F'|' -v measured="$measured_csv" '
+    BEGIN {
+      n = split(measured, arr, ",")
+      for (i = 1; i <= n; i++) if (arr[i] != "") is_measured[arr[i]] = 1
+    }
     /^\|/ {
       for (i = 1; i <= NF; i++) { gsub(/^[ \t]+|[ \t]+$/, "", $i); gsub(/`/, "", $i) }
       if ($2 == "ID") next
       if ($2 ~ /^-+$/) next
       if ($2 !~ /^[A-Z]{2,5}-[0-9]{1,3}$/) next
-      if ($4 == "review") review++
-      else if ($4 == "pending") pending++
+      if ($4 == "auto") enforced++
+      else if ($2 in is_measured) measured_n++
+      else not_checked++
     }
-    END { printf "%d\t%d\t%d\n", review + pending, review + 0, pending + 0 }
+    END { printf "%d\t%d\t%d\t%s\n", enforced + 0, measured_n + 0, not_checked + 0, measured }
   ' "$docs"
 }
 
@@ -306,15 +324,24 @@ main() {
   [ "$json" -eq 1 ] || printf 'standards: mode=%s  failures=%d  advisory=%d  exempt=%d  stale=%d\n' \
     "$RATCHET_MODE" "$failures" "$advisory" "$exempt" "$stale"
 
-  # "not audited": docs/index.md clauses no tool anywhere in this repo speaks
-  # to at all (Gate column `review` or `pending`) — printed unconditionally so
-  # a clean run never reads as "everything was checked".
-  local not_audited review_n pending_n
-  IFS=$'\t' read -r not_audited review_n pending_n <<< "$(not_audited_counts)"
-  [ "$json" -eq 1 ] && printf '{"not_audited":%d,"by_gate":{"review":%d,"pending":%d}}\n' \
-    "$not_audited" "$review_n" "$pending_n"
-  [ "$json" -eq 1 ] || printf 'standards: not audited=%d (review=%d, pending=%d) — docs/index.md clauses no tool here speaks to\n' \
-    "$not_audited" "$review_n" "$pending_n"
+  # Clause coverage — printed unconditionally so a clean run never reads as
+  # "everything was checked", and so a clause with an advisory-only reader is
+  # never folded into either "enforced" or "nothing looks at this" (see
+  # clause_coverage() above for the three buckets).
+  local enforced_n measured_n not_checked_n measured_csv
+  IFS=$'\t' read -r enforced_n measured_n not_checked_n measured_csv <<< "$(clause_coverage)"
+  local measured_json="" part first=1
+  if [ -n "$measured_csv" ]; then
+    while IFS= read -r part; do
+      [ -n "$part" ] || continue
+      if [ "$first" -eq 1 ]; then measured_json="\"$part\""; first=0
+      else measured_json="$measured_json,\"$part\""; fi
+    done <<< "$(printf '%s' "$measured_csv" | tr ',' '\n')"
+  fi
+  [ "$json" -eq 1 ] && printf '{"clause_coverage":{"enforced":%d,"measured_not_enforced":%d,"not_checked":%d,"measured_clauses":[%s]}}\n' \
+    "$enforced_n" "$measured_n" "$not_checked_n" "$measured_json"
+  [ "$json" -eq 1 ] || printf 'standards: enforced=%d measured-not-enforced=%d not-checked=%d\n' \
+    "$enforced_n" "$measured_n" "$not_checked_n"
 
   [ "$failures" -eq 0 ]
 }
@@ -443,8 +470,25 @@ EOF
       || { echo "FAIL: standards-audit.sh did not aggregate a CMT-3 finding"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"clause":"COV-1".*"level":"info"' \
       || { echo "FAIL: standards-audit.sh did not aggregate the COV-1 no-data finding"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^{"not_audited":[0-9]\+,"by_gate":{"review":[0-9]\+,"pending":[0-9]\+}}$' \
-      || { echo "FAIL: --json did not emit a well-formed not_audited object"; echo "$out"; exit 1; }
+
+    # Clause coverage is read from this checkout's own docs/index.md and
+    # tools/thresholds.tsv, not the scratch repo above (see clause_coverage()'s
+    # comment) — so the expected numbers here come from independently
+    # re-deriving them with a different-shaped query, not from re-running the
+    # function under test. This is the reviewer's own proof case: CMT-3 is
+    # `review` in docs/index.md, not `auto`, and it has a thresholds.tsv row,
+    # so it must land in "measured, not enforced" — never in "not checked".
+    local exp_enforced exp_total exp_measured exp_not_checked
+    exp_enforced=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`' "$HERE/../docs/index.md")
+    exp_total=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} ' "$HERE/../docs/index.md")
+    exp_measured=$(awk -F'\t' '/^[ \t]*#/ || NF < 1 { next } { print $1 }' "$HERE/thresholds.tsv" | sort -u | wc -l | tr -d ' ')
+    exp_not_checked=$((exp_total - exp_enforced - exp_measured))
+
+    printf '%s' "$out" \
+      | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
+      || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1"\]' \
+      || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here
     # could only come from the CMT-3/COV-1 findings just added — and it must
@@ -453,8 +497,9 @@ EOF
       || { echo "FAIL: an advisory or info finding made the run exit non-zero"; exit 1; }
 
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -qE 'standards: not audited=[0-9]+ \(review=[0-9]+, pending=[0-9]+\)' \
-      || { echo "FAIL: human-readable summary missing the not-audited line"; echo "$out"; exit 1; }
+    printf '%s' "$out" \
+      | grep -qE "standards: enforced=$exp_enforced measured-not-enforced=$exp_measured not-checked=$exp_not_checked" \
+      || { echo "FAIL: human-readable summary missing the three-way clause-coverage line"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -qE '^  CMT-3 +advisory' \
       || { echo "FAIL: findings table did not render CMT-3 as advisory"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -qE '^  COV-1 +info' \
