@@ -13,6 +13,7 @@
 #   standards-audit.sh [--mode warn|enforce] [--json] [--self-test]
 
 # shellcheck disable=SC2094  # ratchet_finding writes to stdout; the ignore file is only ever read
+# shellcheck disable=SC2016  # the backtick-quoted `auto` is literal markdown text to match, not a command substitution
 
 set -uo pipefail
 
@@ -23,13 +24,66 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh)
 
+# No-regret checks: a reader exists, but the
+# clause's gate class in docs/index.md has not moved and its threshold in
+# tools/thresholds.tsv is provisional. Kept out of GATES deliberately — a
+# separate array, a separate loop below, and every finding forced to level
+# "advisory" through ratchet_finding_advisory(), so nothing here can fail a
+# build or change what .github/workflows/standards.yml runs. (That workflow
+# calls GATES's members by name, one at a time; tools/tests/run.sh's
+# `workflow_runs_every_gate` cross-checks the two lists against each other by
+# reading this file's own `GATES=(...)` line, so a member of a differently
+# named array is invisible to that check, by construction rather than luck.)
+ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
+
 # The clauses this run can speak to, listed rather than derived. Grepping the
 # gates under-reports — check-tsconfig emits TS-2 and TS-3 through a helper's
 # TSV rather than a literal `ratchet_finding "TS-2"` — and over-reports, because
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
-COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1"
+COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-3 COV-1"
+
+# Every indexed clause, sorted into exactly one of three buckets so the
+# model-facing headline never reads a measured clause as unwatched, nor an
+# unflipped gate class as enforced:
+#   enforced           — docs/index.md Gate column is `auto`.
+#   measured, not enforced — not `auto`, but named in tools/thresholds.tsv
+#                        (the ADVISORY_GATES readers' own settings file, so
+#                        this is derived from it rather than kept as a second,
+#                        hand-maintained list that could name a clause neither
+#                        array actually reads).
+#   not checked        — everything else: no tool anywhere looks at it.
+# Read from this checkout's own docs/index.md and tools/thresholds.tsv (the
+# tool's own files, the same default check-clause-index.sh uses) — not from
+# whatever repo standards-audit.sh is auditing, which may carry no docs/ or
+# tools/ of its own at all.
+clause_coverage() {
+  local docs="$HERE/../docs/index.md"
+  local thresholds="$HERE/thresholds.tsv"
+  local measured_csv=""
+  if [ -f "$thresholds" ]; then
+    measured_csv=$(awk -F'\t' '/^[ \t]*#/ || NF < 1 { next } { print $1 }' "$thresholds" \
+      | sort -u | paste -sd, -)
+  fi
+  [ -f "$docs" ] || { printf '0\t0\t0\t%s\n' "$measured_csv"; return; }
+  awk -F'|' -v measured="$measured_csv" '
+    BEGIN {
+      n = split(measured, arr, ",")
+      for (i = 1; i <= n; i++) if (arr[i] != "") is_measured[arr[i]] = 1
+    }
+    /^\|/ {
+      for (i = 1; i <= NF; i++) { gsub(/^[ \t]+|[ \t]+$/, "", $i); gsub(/`/, "", $i) }
+      if ($2 == "ID") next
+      if ($2 ~ /^-+$/) next
+      if ($2 !~ /^[A-Z]{2,5}-[0-9]{1,3}$/) next
+      if ($4 == "auto") enforced++
+      else if ($2 in is_measured) measured_n++
+      else not_checked++
+    }
+    END { printf "%d\t%d\t%d\t%s\n", enforced + 0, measured_n + 0, not_checked + 0, measured }
+  ' "$docs"
+}
 
 # ratchet__json emits a fixed field order, so this is a parse rather than a
 # JSON reader: the repo has three consumers with no Node and no jq.
@@ -177,15 +231,29 @@ native_suppressions() {
 render_table() {
   local tsv="$1"
   [ -s "$tsv" ] || { printf '  no findings\n'; return; }
+  # Five levels a finding can carry, ranked worst-first: "error" and
+  # "warning" are ratchet_finding's (mode decides which); "advisory" is
+  # ratchet_finding_advisory's own fixed level, and reads the same as
+  # "warning" — both mean "does not fail the build" — so it shares that
+  # display word; "info" is COV-1's "nothing to read" case, kept visually
+  # distinct from "exempt" so an absent coverage report is never mistaken for
+  # a suppressed one.
   awk -F'\t' '
-    { rank = ($2 == "error") ? 3 : ($2 == "warning") ? 2 : 1
-      if (rank > worst[$1]) { worst[$1] = rank; ev[$1] = $3 ":" $4 }
+    { rank = ($2 == "error")    ? 5 \
+           : ($2 == "warning")  ? 4 \
+           : ($2 == "advisory") ? 3 \
+           : ($2 == "info")     ? 2 \
+           :                      1
+      # $3 (file) is empty for the file-less COV-1 "nothing to read" case —
+      # an evidence pointer of ":0" would read as a real location.
+      if (rank > worst[$1]) { worst[$1] = rank; ev[$1] = ($3 == "") ? "" : ($3 ":" $4) }
       n[$1 SUBSEP rank]++
     }
     END {
       for (c in worst) {
         r = worst[c]
-        s = (r == 3) ? "fail" : (r == 2) ? "advisory" : "exempt"
+        s = (r == 5) ? "fail" : (r == 4) ? "advisory" : (r == 3) ? "advisory" \
+          : (r == 2) ? "info" : "exempt"
         printf "  %-8s %-9s %-5d %s\n", c, s, n[c SUBSEP r], ev[c]
       }
     }' "$tsv" | sort
@@ -218,6 +286,10 @@ main() {
     [ -f "$HERE/$g" ] || { echo "standards-audit: missing gate $HERE/$g" >&2; return 2; }
     bash "$HERE/$g" "${passthru[@]+"${passthru[@]}"}" --json >> "$raw" 2>/dev/null
   done
+  for g in "${ADVISORY_GATES[@]}"; do
+    [ -f "$HERE/$g" ] || { echo "standards-audit: missing gate $HERE/$g" >&2; return 2; }
+    bash "$HERE/$g" "${passthru[@]+"${passthru[@]}"}" --json >> "$raw" 2>/dev/null
+  done
   json_to_tsv < "$raw" > "$tsv"
 
   # Appended after the gates so the staleness test sees a complete finding set.
@@ -242,12 +314,34 @@ main() {
 
   local failures advisory exempt stale
   failures=$(awk -F'\t' '$2 == "error"   { n++ } END { print n + 0 }' "$tsv")
-  advisory=$(awk -F'\t' '$2 == "warning" { n++ } END { print n + 0 }' "$tsv")
+  # "warning" (ratchet_finding, mode-driven) and "advisory"
+  # (ratchet_finding_advisory, always this fixed level) share one tally: both
+  # mean "reported, does not fail the build".
+  advisory=$(awk -F'\t' '$2 == "warning" || $2 == "advisory" { n++ } END { print n + 0 }' "$tsv")
   exempt=$(awk  -F'\t' '$2 == "exempt"   { n++ } END { print n + 0 }' "$tsv")
   stale=$(awk   -F'\t' '$1 == "STD-002" && $2 != "exempt" { n++ } END { print n + 0 }' "$tsv")
 
   [ "$json" -eq 1 ] || printf 'standards: mode=%s  failures=%d  advisory=%d  exempt=%d  stale=%d\n' \
     "$RATCHET_MODE" "$failures" "$advisory" "$exempt" "$stale"
+
+  # Clause coverage — printed unconditionally so a clean run never reads as
+  # "everything was checked", and so a clause with an advisory-only reader is
+  # never folded into either "enforced" or "nothing looks at this" (see
+  # clause_coverage() above for the three buckets).
+  local enforced_n measured_n not_checked_n measured_csv
+  IFS=$'\t' read -r enforced_n measured_n not_checked_n measured_csv <<< "$(clause_coverage)"
+  local measured_json="" part first=1
+  if [ -n "$measured_csv" ]; then
+    while IFS= read -r part; do
+      [ -n "$part" ] || continue
+      if [ "$first" -eq 1 ]; then measured_json="\"$part\""; first=0
+      else measured_json="$measured_json,\"$part\""; fi
+    done <<< "$(printf '%s' "$measured_csv" | tr ',' '\n')"
+  fi
+  [ "$json" -eq 1 ] && printf '{"clause_coverage":{"enforced":%d,"measured_not_enforced":%d,"not_checked":%d,"measured_clauses":[%s]}}\n' \
+    "$enforced_n" "$measured_n" "$not_checked_n" "$measured_json"
+  [ "$json" -eq 1 ] || printf 'standards: enforced=%d measured-not-enforced=%d not-checked=%d\n' \
+    "$enforced_n" "$measured_n" "$not_checked_n"
 
   [ "$failures" -eq 0 ]
 }
@@ -356,6 +450,60 @@ EOF
     git add -A && git commit -qm exempt-std002
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: STD-002 not suppressible by its own exemption"; exit 1; }
+
+    # ADVISORY_GATES are wired into the same aggregate raw stream as GATES: a
+    # genuine CMT-3 finding shows up here at level advisory, and COV-1
+    # reports "info" for a repo with no coverage report — neither changes
+    # whether the run still fails on CI-1 above.
+    {
+      echo 'export function f() {'
+      echo '  /**'
+      for i in $(seq 1 9); do echo "   * narrative line $i"; done
+      echo '   */'
+      echo '  return 1;'
+      echo '}'
+    } > long.ts
+    git add -A && git commit -qm advisory-fixture
+
+    out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"advisory"' \
+      || { echo "FAIL: standards-audit.sh did not aggregate a CMT-3 finding"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"COV-1".*"level":"info"' \
+      || { echo "FAIL: standards-audit.sh did not aggregate the COV-1 no-data finding"; echo "$out"; exit 1; }
+
+    # Clause coverage is read from this checkout's own docs/index.md and
+    # tools/thresholds.tsv, not the scratch repo above (see clause_coverage()'s
+    # comment) — so the expected numbers here come from independently
+    # re-deriving them with a different-shaped query, not from re-running the
+    # function under test. This is the reviewer's own proof case: CMT-3 is
+    # `review` in docs/index.md, not `auto`, and it has a thresholds.tsv row,
+    # so it must land in "measured, not enforced" — never in "not checked".
+    local exp_enforced exp_total exp_measured exp_not_checked
+    exp_enforced=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`' "$HERE/../docs/index.md")
+    exp_total=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} ' "$HERE/../docs/index.md")
+    exp_measured=$(awk -F'\t' '/^[ \t]*#/ || NF < 1 { next } { print $1 }' "$HERE/thresholds.tsv" | sort -u | wc -l | tr -d ' ')
+    exp_not_checked=$((exp_total - exp_enforced - exp_measured))
+
+    printf '%s' "$out" \
+      | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
+      || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1"\]' \
+      || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
+    # By this point in the fixture history every other finding is clean or
+    # self-exempted (see the STD-002 step just above), so a nonzero exit here
+    # could only come from the CMT-3/COV-1 findings just added — and it must
+    # not, because neither is anything but "advisory" or "info".
+    "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
+      || { echo "FAIL: an advisory or info finding made the run exit non-zero"; exit 1; }
+
+    out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" \
+      | grep -qE "standards: enforced=$exp_enforced measured-not-enforced=$exp_measured not-checked=$exp_not_checked" \
+      || { echo "FAIL: human-readable summary missing the three-way clause-coverage line"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE '^  CMT-3 +advisory' \
+      || { echo "FAIL: findings table did not render CMT-3 as advisory"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE '^  COV-1 +info' \
+      || { echo "FAIL: findings table did not render COV-1 as info"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?

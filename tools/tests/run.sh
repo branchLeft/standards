@@ -34,6 +34,12 @@ run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
+# No-regret checks: self-tested like every other gate, but deliberately
+# absent from GATES in standards-audit.sh and from
+# .github/workflows/standards.yml — see standards-audit.sh's ADVISORY_GATES
+# comment.
+run "check-comment-blocks.sh" bash "$TOOLS/check-comment-blocks.sh" --self-test
+run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
 
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"

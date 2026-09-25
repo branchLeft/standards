@@ -33,6 +33,7 @@ RATCHET_ROOT=""
 RATCHET_FAILURES=0
 RATCHET_WARNINGS=0
 RATCHET_EXEMPTED=0
+RATCHET_ADVISORY=0
 
 RATCHET_MODE_FILE=".standards.mode"
 RATCHET_IGNORE_FILE=".standardsignore"
@@ -181,6 +182,40 @@ ratchet__json() {
     "$1" "$2" "${3:-0}" "$4" "$(printf '%s' "$5" | sed 's/\\/\\\\/g; s/"/\\"/g')"
 }
 
+# A finding whose level is always "advisory" — never "error", never "warning"
+# — because it is measured against a provisional setting in
+# tools/thresholds.tsv, not an owner-set gate: the reader exists before the
+# number does, and no consuming repo's build may go red over a threshold
+# nobody has chosen yet. Ratchet mode therefore plays no part in the level
+# this emits, unlike ratchet_finding — only the exemption mechanisms do,
+# because a .standardsignore or inline-allow entry naming the clause is a
+# deliberate, reviewed decision to stop reporting a path, not a side effect
+# of enforce vs warn.
+ratchet_finding_advisory() {
+  local clause="$1" file="$2" line="$3" msg="$4"
+
+  if ratchet_is_exempt "$file" "$clause" || ratchet_is_allowed "$file" "$line" "$clause"; then
+    RATCHET_EXEMPTED=$((RATCHET_EXEMPTED + 1))
+    [ "$RATCHET_JSON" -eq 1 ] && ratchet__json "$clause" "$file" "$line" "exempt" "$msg"
+    return 0
+  fi
+
+  RATCHET_ADVISORY=$((RATCHET_ADVISORY + 1))
+  if [ "$RATCHET_JSON" -eq 1 ]; then
+    ratchet__json "$clause" "$file" "$line" "advisory" "$msg"
+  else
+    printf '::notice file=%s,line=%s::%s %s\n' "$file" "$line" "$clause" "$msg"
+  fi
+}
+
+# Always exits 0 — an advisory-only check has nothing to fail the build with,
+# whatever it found. Prints nothing in --json mode, matching ratchet_summary.
+ratchet_summary_advisory() {
+  [ "$RATCHET_JSON" -eq 0 ] && printf 'standards: advisory=%d (provisional threshold — see tools/thresholds.tsv; never fails the build)\n' \
+    "$RATCHET_ADVISORY"
+  return 0
+}
+
 ratchet_summary() {
   if [ "$RATCHET_JSON" -eq 0 ]; then
     printf 'standards: mode=%s  failures=%d  advisory=%d  exempt=%d\n' \
@@ -257,6 +292,44 @@ ratchet_self_test() {
     printf 'changed\n' >> f.ts
     ratchet_init >/dev/null || exit 3
     ratchet_is_enforced "f.ts" || { echo "FAIL: uncommitted change not enforced in warn"; exit 1; }
+
+    # ratchet_finding_advisory: always "advisory", never promoted by mode, and
+    # never counted toward failures or warnings — the whole point of a
+    # provisional-threshold check. The human-readable ::notice:: path is
+    # exercised end to end by
+    # check-comment-blocks.sh's own self-test, as a separate process — not
+    # here, so this stays a plain `ratchet_init --json` call rather than a
+    # bare `RATCHET_JSON=` assignment written inside this subshell. A static
+    # analyser following sourced files reads that kind of assignment as "set
+    # in a subshell, may be lost" for every other gate that also sources this
+    # library, not only for this test.
+    #
+    # Output goes through a file, not `$(...)`: command substitution forks a
+    # subshell, and RATCHET_ADVISORY incrementing there would never reach this
+    # shell — the counter assertions below would pass by accident on a
+    # function that mutates nothing.
+    ratchet_init --mode enforce --json >/dev/null || exit 3
+    ratchet_finding_advisory "CMT-3" "f.ts" 1 "measured, not eyeballed" > out.json
+    grep -q '"level":"advisory"' out.json \
+      || { echo "FAIL: advisory finding did not report level advisory"; cat out.json; exit 1; }
+    [ "$RATCHET_ADVISORY" -eq 1 ]  || { echo "FAIL: advisory counter did not increment"; exit 1; }
+    [ "$RATCHET_FAILURES" -eq 0 ] || { echo "FAIL: advisory finding counted as a failure"; exit 1; }
+    [ "$RATCHET_WARNINGS" -eq 0 ] || { echo "FAIL: advisory finding counted as a warning"; exit 1; }
+
+    # An exemption still suppresses an advisory finding, at level "exempt" —
+    # naming the clause is a deliberate, reviewed decision, not a side effect
+    # of mode.
+    ratchet_finding_advisory "TS-2" "src/a.ts" 1 "would be exempt" > out.json
+    grep -q '"level":"exempt"' out.json \
+      || { echo "FAIL: exemption did not suppress an advisory finding"; cat out.json; exit 1; }
+    [ "$RATCHET_EXEMPTED" -eq 1 ] || { echo "FAIL: exempted advisory finding not counted"; exit 1; }
+
+    # --json mode: ratchet_summary_advisory prints nothing, the same contract
+    # as ratchet_summary — but always exits 0, unlike ratchet_summary, because
+    # an advisory-only check has nothing to fail the build with.
+    ratchet_summary_advisory > out.txt
+    [ -s out.txt ] && { echo "FAIL: ratchet_summary_advisory printed something in --json mode"; cat out.txt; exit 1; }
+    ratchet_summary_advisory || { echo "FAIL: ratchet_summary_advisory did not exit 0"; exit 1; }
 
     exit 0
   ) || rc=$?

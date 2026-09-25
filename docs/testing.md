@@ -112,15 +112,20 @@ line — and treats the latter as a finding against this clause.
 
 ## COV-1 — changed files meet a floor
 
-`pending`. **Specified below and computed by nothing.** Read the next paragraph
-before relying on any of this.
+`pending`. **A reader exists; nothing gates on it yet.** Read the next
+paragraph before relying on any of this.
 
-No gate in `tools/` reads a coverage report. `@branchleft/vitest-config` produces
-the artefact this clause is defined against, and that is as far as it goes —
-there is no per-file floor being applied to any repo, and a repo can regress
-coverage to zero without a gate noticing. The specification below is what the
-clause will mean once it is implemented; it is not what happens today. Do not
-record work as meeting COV-1 while this line stands.
+`tools/check-coverage.sh` reads `coverage/coverage-final.json` and reports a
+per-file line-coverage percentage against a threshold — but only as an
+advisory finding, run through `tools/standards-audit.sh`'s `ADVISORY_GATES`,
+never as a build failure. The threshold it compares against
+(`tools/thresholds.tsv`, currently 90% line coverage) is a provisional
+placeholder, not the owner-chosen floor, and a repo can still regress
+coverage to zero without anything stopping it. The specification below —
+including the intended 80%/70% floor — is what the clause is meant to mean
+once the owner sets the real number and the gate class moves to `auto`; it is
+not what happens today. Do not record work as meeting COV-1 while this line
+stands.
 
 Once implemented: every source file a branch changes must meet the per-file
 floor. This is the whole point of the ratchet — the legacy tree is advisory, the
@@ -137,6 +142,12 @@ The intended floor is **80% statements / 70% branches**. It is deliberately not
 in `tools/floors.tsv`: that file is read by gates, and a floor sitting there for
 a clause nothing computes is a number that reads as enforced. It moves there in
 the same change that adds the gate.
+
+The provisional reader's threshold (90% _line_ coverage, in
+`tools/thresholds.tsv`) is a different metric and a different number from the
+line above — it is a placeholder to give the reader something to compare
+against before the owner has chosen either, not a revision of this design
+intent.
 
 The intended exemption syntax for trivial glue is
 `standards-allow-next-line COV-1 <reason>`, with a mandatory reason. Note that
