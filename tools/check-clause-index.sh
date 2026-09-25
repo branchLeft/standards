@@ -114,9 +114,8 @@ clause_is_named() {
       --exclude-dir=node_modules --exclude-dir=dist -- 2>/dev/null)
     # tools/thresholds.tsv is excluded for the same reason clause-paths.tsv is
     # just below: it names every clause it carries a setting for by
-    # construction (branchLeft/workspace#1367's no-regret checks), so a
-    # provisional threshold row alone would otherwise read as "an artefact
-    # names this clause" before any reader exists at all.
+    # construction, so a provisional threshold row alone would otherwise read
+    # as "an artefact names this clause" before any reader exists at all.
     hits=$(printf '%s\n' "$hits" | grep -vFx "$ROOT/tools/clause-paths.tsv" \
                                   | grep -vFx "$ROOT/tools/thresholds.tsv")
     [ -n "$hits" ] && return 0
@@ -127,10 +126,10 @@ clause_is_named() {
 # True if tools/thresholds.tsv carries a row for ID whose reason column is
 # marked #provisional. This is the one legitimate way a `pending` clause may
 # be named by a real script under tools/ without that reading as the usual
-# "implemented but the row was never updated" rot: branchLeft/workspace#1367
-# built the reader; #1365's Phase 2 is what flips the gate class once the
-# owner has chosen the real number, in its own reviewed PR — a deliberate,
-# committed, two-step rollout rather than silence.
+# "implemented but the row was never updated" rot: a reader may be built
+# ahead of the gate class moving, provided the owner has not yet chosen the
+# real number and flipping the gate class stays a separate, later, reviewed
+# change — a deliberate, committed, two-step rollout rather than silence.
 clause_has_provisional_reader() {
   local id="$1" file="$ROOT/tools/thresholds.tsv"
   [ -f "$file" ] || return 1
@@ -274,7 +273,7 @@ check_index() {
       pending)
         if clause_is_named "$id" "${ARTEFACT_DIRS[@]}"; then
           if clause_has_provisional_reader "$id"; then
-            echo "::notice::$id is marked \`pending\` with a provisional reader recorded in tools/thresholds.tsv — the gate class moves to \`auto\` once the owner sets a real threshold (branchLeft/workspace#1367)"
+            echo "::notice::$id is marked \`pending\` with a provisional reader recorded in tools/thresholds.tsv — the gate class moves to \`auto\` in a later, separate, reviewed change once the owner sets a real threshold"
           else
             echo "::error::$id is marked \`pending\` but an artefact names it — mark it \`auto\`"
             rc=1
@@ -466,11 +465,11 @@ EOF
     printf '%s' "$out" | grep -q "AA-2 is marked .pending." \
       || { echo "FAIL: stale pending not named"; echo "$out"; exit 1; }
 
-    # branchLeft/workspace#1367: a `pending` clause named by a real artefact
-    # is a notice, not an error, when tools/thresholds.tsv records it as a
-    # deliberate, committed, provisional reader — but still an error the
-    # moment that row is missing or its reason drops the #provisional marker,
-    # so the escape hatch cannot be claimed by accident.
+    # A `pending` clause named by a real artefact is a notice, not an error,
+    # when tools/thresholds.tsv records it as a deliberate, committed,
+    # provisional reader — but still an error the moment that row is missing
+    # or its reason drops the #provisional marker, so the escape hatch cannot
+    # be claimed by accident.
     printf 'AA-2\tsome_setting\t8\t#provisional, see the tracking issue\n' > tools/thresholds.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: provisional reader still exited $grc"; echo "$out"; exit 1; }

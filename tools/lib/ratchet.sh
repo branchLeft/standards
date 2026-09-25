@@ -184,13 +184,13 @@ ratchet__json() {
 
 # A finding whose level is always "advisory" — never "error", never "warning"
 # — because it is measured against a provisional setting in
-# tools/thresholds.tsv, not an owner-set gate. branchLeft/workspace#1367: the
-# reader exists before the number does, and no consuming repo's build may go
-# red over a threshold nobody has chosen yet. Ratchet mode therefore plays no
-# part in the level this emits, unlike ratchet_finding — only the exemption
-# mechanisms do, because a .standardsignore or inline-allow entry naming the
-# clause is a deliberate, reviewed decision to stop reporting a path, not a
-# side effect of enforce vs warn.
+# tools/thresholds.tsv, not an owner-set gate: the reader exists before the
+# number does, and no consuming repo's build may go red over a threshold
+# nobody has chosen yet. Ratchet mode therefore plays no part in the level
+# this emits, unlike ratchet_finding — only the exemption mechanisms do,
+# because a .standardsignore or inline-allow entry naming the clause is a
+# deliberate, reviewed decision to stop reporting a path, not a side effect
+# of enforce vs warn.
 ratchet_finding_advisory() {
   local clause="$1" file="$2" line="$3" msg="$4"
 
@@ -295,8 +295,8 @@ ratchet_self_test() {
 
     # ratchet_finding_advisory: always "advisory", never promoted by mode, and
     # never counted toward failures or warnings — the whole point of a
-    # provisional-threshold check (branchLeft/workspace#1367). The
-    # human-readable ::notice:: path is exercised end to end by
+    # provisional-threshold check. The human-readable ::notice:: path is
+    # exercised end to end by
     # check-comment-blocks.sh's own self-test, as a separate process — not
     # here, so this stays a plain `ratchet_init --json` call rather than a
     # bare `RATCHET_JSON=` assignment written inside this subshell. A static

@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # CMT-3 — the longest unbroken comment block, measured rather than eyeballed.
 #
-# branchLeft/workspace#1367 (Phase 1a of #1365): a reader only. CMT-3 stays
-# `review` in docs/index.md — the threshold below is a provisional setting in
-# tools/thresholds.tsv, not an owner-set floor, so every finding this script
-# emits reports through ratchet_finding_advisory() at level "advisory" and
-# never fails a build. #1365's Phase 2 is what flips the gate class, once the
-# owner has actually chosen the number.
+# A reader only: CMT-3 stays `review` in docs/index.md — the threshold below
+# is a provisional setting in tools/thresholds.tsv, not an owner-set floor,
+# so every finding this script emits reports through
+# ratchet_finding_advisory() at level "advisory" and never fails a build.
+# Flipping the gate class to `auto` is a separate, later, reviewed change,
+# made once the owner has actually chosen the number.
 #
 # Measures the longest run of *consecutive, comment-only* lines per file — not
-# a whole-file comment share. #253's store.ts is 34% comments across the whole
-# file and would clear almost any file-level threshold; its defect is one
-# 61-line block, which only a block-length measure catches.
+# a whole-file comment share. A file whose comments are spread thin across
+# many short blocks can clear almost any file-level threshold while still
+# carrying a single very long block; only a block-length measure catches
+# that shape.
 #
 # Comment-only, by extension:
 #   .ts .tsx .js .mjs .cjs   `//` lines, and every line from an opening `/*`
@@ -158,7 +159,7 @@ main() {
     start=${result##* }
     if [ "${max:-0}" -gt "$threshold" ]; then
       ratchet_finding_advisory "CMT-3" "$f" "${start:-1}" \
-        "longest unbroken comment block is $max lines (provisional threshold $threshold, tools/thresholds.tsv — owner sets the real value in branchLeft/workspace#1366)"
+        "longest unbroken comment block is $max lines (provisional threshold $threshold, tools/thresholds.tsv — the owner sets the real value)"
     fi
   done < <(ratchet_scope_files '\.(ts|tsx|js|mjs|cjs|py|sh)$')
 

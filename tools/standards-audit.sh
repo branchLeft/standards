@@ -23,7 +23,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh)
 
-# No-regret checks (branchLeft/workspace#1367): a reader exists, but the
+# No-regret checks: a reader exists, but the
 # clause's gate class in docs/index.md has not moved and its threshold in
 # tools/thresholds.tsv is provisional. Kept out of GATES deliberately — a
 # separate array, a separate loop below, and every finding forced to level
@@ -215,11 +215,11 @@ render_table() {
   [ -s "$tsv" ] || { printf '  no findings\n'; return; }
   # Five levels a finding can carry, ranked worst-first: "error" and
   # "warning" are ratchet_finding's (mode decides which); "advisory" is
-  # ratchet_finding_advisory's own level (branchLeft/workspace#1367) and
-  # reads the same as "warning" — both mean "does not fail the build" — so it
-  # shares that display word; "info" is COV-1's "nothing to read" case, kept
-  # visually distinct from "exempt" so an absent coverage report is never
-  # mistaken for a suppressed one.
+  # ratchet_finding_advisory's own fixed level, and reads the same as
+  # "warning" — both mean "does not fail the build" — so it shares that
+  # display word; "info" is COV-1's "nothing to read" case, kept visually
+  # distinct from "exempt" so an absent coverage report is never mistaken for
+  # a suppressed one.
   awk -F'\t' '
     { rank = ($2 == "error")    ? 5 \
            : ($2 == "warning")  ? 4 \
@@ -297,8 +297,8 @@ main() {
   local failures advisory exempt stale
   failures=$(awk -F'\t' '$2 == "error"   { n++ } END { print n + 0 }' "$tsv")
   # "warning" (ratchet_finding, mode-driven) and "advisory"
-  # (ratchet_finding_advisory, always this level — branchLeft/workspace#1367)
-  # share one tally: both mean "reported, does not fail the build".
+  # (ratchet_finding_advisory, always this fixed level) share one tally: both
+  # mean "reported, does not fail the build".
   advisory=$(awk -F'\t' '$2 == "warning" || $2 == "advisory" { n++ } END { print n + 0 }' "$tsv")
   exempt=$(awk  -F'\t' '$2 == "exempt"   { n++ } END { print n + 0 }' "$tsv")
   stale=$(awk   -F'\t' '$1 == "STD-002" && $2 != "exempt" { n++ } END { print n + 0 }' "$tsv")
@@ -424,10 +424,10 @@ EOF
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: STD-002 not suppressible by its own exemption"; exit 1; }
 
-    # ADVISORY_GATES (branchLeft/workspace#1367) are wired into the same
-    # aggregate raw stream as GATES: a genuine CMT-3 finding shows up here at
-    # level advisory, and COV-1 reports "info" for a repo with no coverage
-    # report — neither changes whether the run still fails on CI-1 above.
+    # ADVISORY_GATES are wired into the same aggregate raw stream as GATES: a
+    # genuine CMT-3 finding shows up here at level advisory, and COV-1
+    # reports "info" for a repo with no coverage report — neither changes
+    # whether the run still fails on CI-1 above.
     {
       echo 'export function f() {'
       echo '  /**'

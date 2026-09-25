@@ -1,14 +1,14 @@
 # Settings for the no-regret checks: the reader exists, the gate class has
 # not moved. clause<TAB>key<TAB>value<TAB># reason
 #
-# These clauses stay `pending` in docs/index.md — see branchLeft/workspace#1367
-# and #1365. Phase 1a ships the reader only; the owner sets the real number
-# and Phase 2 flips the gate class in its own reviewed PR. Until then every
-# finding these checks emit reports as advisory, never as a failure, so no
-# consuming repo can go red from a number nobody has chosen yet.
+# Both clauses stay `pending` in docs/index.md. A reader is built ahead of
+# the owner choosing the real number and reviewing the gate-class change
+# separately; until then every finding these checks emit reports as
+# advisory, never as a failure, so no consuming repo can go red from a
+# number nobody has chosen yet.
 #
 # A `#provisional` reason is a signal check-clause-index.sh reads: it is what
 # lets a pending clause be named by a real script here without that reading as
 # the usual "implemented but the row was never updated" rot.
-CMT-3	max_comment_block_lines	8	#provisional, owner sets the real value in #1366
-COV-1	min_line_coverage_pct	90	#provisional, owner sets the real value in #1366
+CMT-3	max_comment_block_lines	8	#provisional, the owner sets the real value later
+COV-1	min_line_coverage_pct	90	#provisional, the owner sets the real value later

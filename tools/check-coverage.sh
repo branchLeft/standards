@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # COV-1 — a reader over coverage/coverage-final.json, not yet a gate.
 #
-# branchLeft/workspace#1367 (Phase 1a of #1365): COV-1 stays `pending` in
-# docs/index.md — no gate has ever computed it, and this script does not
-# change that. The threshold below is a provisional setting in
-# tools/thresholds.tsv, not an owner-set floor, so every finding reports
-# through ratchet_finding_advisory() at level "advisory" and never fails a
-# build. Phase 2 is what flips the gate class, once the owner has actually
-# chosen the number.
+# COV-1 stays `pending` in docs/index.md — no gate has ever computed it, and
+# this script does not change that. The threshold below is a provisional
+# setting in tools/thresholds.tsv, not an owner-set floor, so every finding
+# reports through ratchet_finding_advisory() at level "advisory" and never
+# fails a build. Flipping the gate class to `auto` is a separate, later,
+# reviewed change, made once the owner has actually chosen the number.
 #
 # Reads coverage/coverage-final.json — the Istanbul/V8 json reporter's output,
 # which is what @branchleft/vitest-config's `coverage.reporter` includes — if
@@ -100,7 +99,7 @@ main() {
     # awk comparison, not bash arithmetic: pct can carry one decimal place.
     awk -v p="$pct" -v t="$threshold" 'BEGIN { exit !(p < t) }' || continue
     ratchet_finding_advisory "COV-1" "$relfile" 1 \
-      "line coverage ${pct}% is below the provisional ${threshold}% floor (tools/thresholds.tsv — owner sets the real value in branchLeft/workspace#1366)"
+      "line coverage ${pct}% is below the provisional ${threshold}% floor (tools/thresholds.tsv — the owner sets the real value)"
   done <<< "$rows"
 
   ratchet_summary_advisory
