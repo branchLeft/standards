@@ -16,8 +16,9 @@ can express, such as creating database users, lives in tooling or a runbook.
 **Why:** raw SQL ties code to one database dialect, and it escapes the types
 the rest of the code relies on.
 
-**Check plan:** the Drizzle-only SQL check: an ast-grep rule for SQL strings
-and driver calls such as `exec` and `prepare` outside the ORM layer.
+**Check plan:** `tools/check-raw-sql.sh` reads for it now, as advisory only
+until the gate class moves. `tools/check-raw-sql.md` says what it matches and
+what it misses; a parser-based rule replaces it if those misses show up.
 
 ## DB-2 — the `sql` template only when dialect-agnostic
 
@@ -27,8 +28,7 @@ dialect-agnostic. Anything else needs the platform owner's explicit approval.
 **Why:** the template is an escape hatch, and only portable SQL keeps the
 promise the ORM makes.
 
-**Check plan:** the same ast-grep rule, listing every `sql` template use for a
-reviewer.
+**Check plan:** a check listing every `sql` template use for a reviewer.
 
 ## DB-3 — Drizzle, on better-sqlite3 for SQLite
 
