@@ -352,18 +352,25 @@ shared `api-contracts` repo (spec files publishing generated
 TypeScript/Python packages) — not built yet, roadmap in
 [`contract-development.md`](contract-development.md).
 
-## Documentation
+## Documentation — `documentation.md`
 
-Thin by design. The org documentation standard and its mechanical rules
-(DL000–DL011) live elsewhere and are **cited, never restated**:
+The org documentation standard and its mechanical rules (DL000–DL011) live
+elsewhere and are **cited, never restated**:
 
 - `branchLeft/.github` → `docs/DOCUMENTATION-STANDARD.md`
 - `branchLeft/github-workflows` → `tools/docs-lint-rules.md`
 
-| ID    | Rule                                                                      | Gate      | Encoded by |
-| ----- | ------------------------------------------------------------------------- | --------- | ---------- |
-| DOC-1 | Every repo runs the `docs-lint` caller                                    | `pending` | —          |
-| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it | `review`  | —          |
+| ID    | Rule                                                                                          | Gate      | Encoded by |
+| ----- | --------------------------------------------------------------------------------------------- | --------- | ---------- |
+| DOC-1 | Every repo runs the `docs-lint` caller                                                        | `pending` | —          |
+| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it                     | `review`  | —          |
+| DOC-3 | Durable documentation is markdown; HTML is session-only, bar the committed try-it-now designs | `pending` | —          |
+| DOC-4 | Every document is written for one audience, people or agents, and says which                  | `review`  | —          |
+| DOC-5 | Documents for agents are kept apart from documentation for people                             | `review`  | —          |
+| DOC-6 | Documents for people are concise, logically structured and in plain English                   | `review`  | —          |
+| DOC-7 | A stale document is a defect, corrected in the same PR as the change that staled it           | `review`  | —          |
+| DOC-8 | CI checks documents against the code: links, named commands and quoted values                 | `pending` | —          |
+| DOC-9 | Decisions are recorded durably, in one decision-record format shared by every repo            | `pending` | —          |
 
 ## Architecture — `architecture.md`
 
