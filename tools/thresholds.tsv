@@ -1,7 +1,7 @@
 # Settings for the no-regret checks: the reader exists, the gate class has
 # not moved. clause<TAB>key<TAB>value<TAB># reason
 #
-# Both clauses stay `pending` in docs/index.md. A reader is built ahead of
+# These clauses stay `pending` in docs/index.md. A reader is built ahead of
 # the owner choosing the real number and reviewing the gate-class change
 # separately; until then every finding these checks emit reports as
 # advisory, never as a failure, so no consuming repo can go red from a
@@ -12,3 +12,4 @@
 # the usual "implemented but the row was never updated" rot.
 CMT-3	max_comment_block_lines	8	#provisional, the owner sets the real value later
 COV-1	min_line_coverage_pct	90	#provisional, the owner sets the real value later
+DB-1	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
