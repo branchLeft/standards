@@ -135,6 +135,7 @@ STY-1	*.tsx;*.jsx;*.css	[fleet] "a Tailwind pipeline"; styling.md names no path.
 STY-2	*.tsx;*.jsx;*.css	[fleet] same caveat as STY-1
 STY-3	*.tsx;*.jsx;*.css	[fleet] "a published component package"; same extensions as STY-1/2 — the doc gives no path signal that tells an app pipeline from a library package
 STY-4	*.css;index.ts;*/index.ts	[fleet] "a dedicated subpath" from a package's entry point; index.ts is inferred, not named
+STY-5	*.css;*.tsx;*.jsx	[fleet] same extensions as STY-1; the doc names design tokens, not a path
 
 ## React applications — stacks/react-app.md
 APP-1	app/*	[fleet] React Router Framework Mode route/root convention; `app/` evidenced by the workspace CLAUDE.md's own example path, not asserted in react-app.md

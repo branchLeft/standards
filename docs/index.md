@@ -292,6 +292,7 @@ is partitioned. A repo can satisfy either while failing the other.
 | STY-2 | No colour/size literals, no arbitrary values, two utilities owe a class   | `review` | —          |
 | STY-3 | Libraries: BEM under a package namespace is the public styling API        | `review` | —          |
 | STY-4 | A library's CSS ships on a separate entry point                           | `review` | —          |
+| STY-5 | CSS is written so a dark theme would need only design-token changes       | `review` | —          |
 
 Two scopes, one principle: visual decisions live in one designated place, never
 inline in markup. STY-1/STY-2 apply to a Tailwind pipeline; STY-3/STY-4 to a
