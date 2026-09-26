@@ -398,6 +398,16 @@ Thin by design. The org documentation standard and its mechanical rules
 | TYP-4 | Each value takes the most precise type that fits                                               | `review`  | New type annotations in the diff                    |
 | TYP-5 | Type checking runs at maximum strictness, with the floor raised until every repo is there      | `pending` | —                                                   |
 
+## Error handling — `errors.md`
+
+| ID    | Rule                                                                                  | Gate      | Evidence                               |
+| ----- | ------------------------------------------------------------------------------------- | --------- | -------------------------------------- |
+| ERR-1 | Code raises its own named error classes, never a bare built-in error or a string      | `pending` | —                                      |
+| ERR-2 | A docstring lists the errors a function can raise, and a unit test covers each        | `pending` | —                                      |
+| ERR-3 | A caught error is handled deliberately or raised again, never buried                  | `pending` | —                                      |
+| ERR-4 | A public-facing response never shows an internal error verbatim                       | `review`  | Error handling at each public boundary |
+| ERR-5 | An error reaching a service boundary is logged at error level and counted as a metric | `pending` | —                                      |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
