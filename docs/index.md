@@ -344,15 +344,20 @@ is [`ADOPTION.md`](../ADOPTION.md) work, tracked per repo rather than assumed.
 
 ## Contract-driven development — `contract-development.md`
 
-| ID    | Rule                                                                                  | Gate     | Encoded by |
-| ----- | ------------------------------------------------------------------------------------- | -------- | ---------- |
-| CTR-1 | The interface (type, spec file, signature) is authored before its implementation      | `review` | —          |
-| CTR-2 | A cross-service or cross-repo API is a committed spec artefact, not an inferred shape | `review` | —          |
+| ID    | Rule                                                                                                 | Gate      | Encoded by |
+| ----- | ---------------------------------------------------------------------------------------------------- | --------- | ---------- |
+| CTR-1 | The interface (type, spec file, signature) is authored before its implementation                     | `review`  | —          |
+| CTR-2 | A cross-service or cross-repo API is a committed spec artefact, not an inferred shape                | `review`  | —          |
+| CTR-3 | A contract's server and client code are generated from its spec and published as a versioned package | `review`  | —          |
+| CTR-4 | Every HTTP API we serve is defined by an OpenAPI spec in YAML                                        | `pending` | —          |
+| CTR-5 | A contract that isn't HTTP is defined in JSON Schema and published as a versioned package            | `review`  | —          |
+| CTR-6 | A message carries its schema's version, and the receiver validates against it                        | `pending` | —          |
+| CTR-7 | A spec's version bump is computed from its diff against the last published version                   | `pending` | —          |
 
 `CTR-1` is `TEST-5`'s sibling for shape rather than behaviour: the contract
-is agreed first, the implementation fills it in after. `CTR-2` anticipates a
-shared `api-contracts` repo (spec files publishing generated
-TypeScript/Python packages) — not built yet, roadmap in
+is agreed first, the implementation fills it in after. `CTR-2` to `CTR-7`
+set how a contract is written, generated, versioned and published; where
+shared specs will live is in
 [`contract-development.md`](contract-development.md).
 
 ## Documentation — `documentation.md`
