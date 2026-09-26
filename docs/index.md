@@ -144,7 +144,8 @@ the same shape of package but currently have no consumers to record.
 | TEST-3 | Integration tests complement unit tests. Substitution only for a11y and integrated rendering   | `review`  | —          |
 | TEST-4 | Security-sensitive paths require unit coverage regardless of any other clause. Non-exhaustive  | `review`  | —          |
 | TEST-5 | Test-driven development wherever possible: test suite first, seen to fail, then implementation | `review`  | —          |
-| COV-1  | Changed files meet the per-file floor                                                          | `pending` | —          |
+| TEST-6 | Code that is hard to test is a design defect: fix the seam, not the test                       | `review`  | —          |
+| COV-1  | At least 90% of a PR's changed lines are covered, per the test runner's report                 | `pending` | —          |
 | COV-2  | The repo total never drops against the merge base                                              | `pending` | —          |
 
 `TEST-*` are review clauses because none of them can be automated without making

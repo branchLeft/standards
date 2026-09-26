@@ -72,6 +72,7 @@ TEST-2	*	[none] same disclaimer as TEST-1; a ritual test is a shape, not a path
 TEST-3	*	[none] same disclaimer as TEST-1
 TEST-4	*	[none] the nine categories in testing.md are named by what code decides, never by path
 TEST-5	*	[none] same disclaimer as TEST-1
+TEST-6	*	[none] same disclaimer as TEST-1
 COV-1	*	[none] `pending` — measured over whatever coverage.include names, not a path this file can state
 COV-2	*	[none] `pending` — repo-total comparison, not file-scoped
 
