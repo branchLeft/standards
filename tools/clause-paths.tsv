@@ -163,3 +163,13 @@ CTR-2	openapi*.yaml;*/openapi*.yaml;openapi*.json;*/openapi*.json;*.proto;*.sche
 ## Documentation — index.md "Documentation"
 DOC-1	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] "runs the docs-lint caller" is a workflow file; DOC-1 is `pending`, no gate script to copy from
 DOC-2	.docs-lint.mode	[doc] the file the clause names directly
+
+## Architecture — architecture.md
+ARCH-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions
+ARCH-2	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-3	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-4	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-5	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-6	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-7	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-8	*	[none] a directory-layout judgement, not tied to one file type

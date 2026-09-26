@@ -364,6 +364,19 @@ Thin by design. The org documentation standard and its mechanical rules
 | DOC-1 | Every repo runs the `docs-lint` caller                                    | `pending` | —          |
 | DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it | `review`  | —          |
 
+## Architecture — `architecture.md`
+
+| ID     | Rule                                                                                        | Gate      | Evidence                                              |
+| ------ | ------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------- |
+| ARCH-1 | Code is written for a human reader first: a newcomer builds a mental model without an agent | `review`  | The diff's public signatures and file layout          |
+| ARCH-2 | Every logical entity is a class behind an explicit contract, even with one implementation   | `review`  | New classes and the contracts they implement          |
+| ARCH-3 | Variation on evidence: no extension point until a second real use or a named requirement    | `review`  | New generic parameters, option objects and registries |
+| ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | —                                                     |
+| ARCH-5 | No loose functions: utilities are grouped into a module, namespace-imported in TypeScript   | `review`  | New top-level functions and their grouping module     |
+| ARCH-6 | Every outside dependency sits behind an interface and is passed in, so a test can fake it   | `review`  | Constructors and factories in the diff                |
+| ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | —                                                     |
+| ARCH-8 | Each directory holds one clear responsibility                                               | `review`  | New directories in the diff                           |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
