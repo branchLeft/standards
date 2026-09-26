@@ -599,18 +599,19 @@ elsewhere and are **cited, never restated**:
 
 ## Pending — blocked on authorship
 
-These families are declared so the index is the single place to look, and so
-nothing else invents a competing ID scheme in the meantime. Each is written in
-dialogue with the platform owner.
+These are rules planned for existing families that no clause carries yet.
+They are listed so the index is the single place to look, and so nothing else
+invents a competing rule in the meantime. Each is written in dialogue with the
+platform owner.
 
-| Family                  | Doc                                    | Covers                                                                                              |
-| ----------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `SEC-*`, `NAM-*`        | `security.md`, `naming.md`             | Boundaries as constants, resource naming and length budgets                                         |
-| `CON-*`, `SH-*`, `PY-*` | `containers.md`, `shell-and-python.md` | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script |
+| Family  | Doc                   | Not yet authored                                                                 |
+| ------- | --------------------- | -------------------------------------------------------------------------------- |
+| `SEC-*` | `security.md`         | Security boundaries as reviewed constants outside Pulumi (`PUL-6` covers Pulumi) |
+| `SH-*`  | `shell-and-python.md` | Shell strict mode (`set -euo pipefail`) as a required script header              |
 
 `SEC-*` and `DP-*` are deliberately separate families rather than one. `SEC-*`
 is about where a boundary is drawn and whether it can move at runtime; `DP-*`
 is about what happens to personal data on either side of it — how long it is
 kept and how it is destroyed. Retention and erasure are not boundary rules,
-and folding them into a security family would leave the eventual `security.md`
-covering two unrelated questions under one prefix.
+and folding them into a security family would leave `security.md` covering two
+unrelated questions under one prefix.
