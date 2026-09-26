@@ -72,6 +72,12 @@ the corollary on PRIN-1 and the honesty clause on PRIN-4.
 | STD-000 | A suppression must name a clause ID and give a reason. A bare `standards-allow-next-line` is itself a finding | `auto`   | `tools/standards-audit.sh` |
 | STD-001 | An exemption is a CODEOWNERS decision. A PR may not add one to make its own gate pass                         | `review` | —                          |
 | STD-002 | A stale exemption — one matching nothing — is reported and removed                                            | `auto`   | `tools/standards-audit.sh` |
+| STD-003 | These standards govern repos branchLeft owns; a contribution elsewhere follows that project's own             | `review` | —                          |
+
+**STD-003 sets the reach of everything below.** A rule here binds code
+branchLeft writes and owns. Upstream software the estate runs keeps its own
+conventions, and a contribution to another project follows that project's
+standards, because a rule nobody there agreed to is not a standard there.
 
 ## TypeScript
 

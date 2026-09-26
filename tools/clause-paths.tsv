@@ -42,6 +42,7 @@ PRIN-6	*	[none] an agent-authorisation decision — not tied to any file in a di
 STD-000	*	[doc] a `standards-allow-next-line` suppression can be the preceding line of any tracked file
 STD-001	.standardsignore	[doc] exemptions are rows in this file only
 STD-002	.standardsignore	[doc] staleness is computed over this file's rows
+STD-003	*	[none] a statement of scope, not tied to any file
 
 ## TypeScript — tsconfig.md, tools/check-tsconfig.sh
 TS-1	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] check-tsconfig.sh: ratchet_scope_files '(^|/)tsconfig(\.[a-z]+)?\.json$'
