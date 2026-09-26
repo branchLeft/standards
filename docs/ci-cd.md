@@ -176,3 +176,41 @@ exact apply it was written to block.
 
 Prefer parsing structured output (`--json`) over rendered text for the same
 reason.
+
+## CI-12 — every deploy job runs in a protected environment
+
+Every deploy job runs in a protected deployment environment that only the
+default branch may use and that waits for the platform owner's approval.
+Today that is `production`; staging environments may be added where they are
+useful and cost-efficient.
+
+**Why:** a deploy job outside such an environment ships on merge with no
+approval click, bypassing the only human gate.
+
+**Check plan:** `tools/check-workflows.sh` extended so a job that uses deploy
+credentials must declare an `environment`.
+
+## CI-13 — the approval click is the only human step
+
+The approval click is the only human step in any routine change: no local
+applies, no SSH sessions, no hand-run scripts. The narrow, named exceptions —
+where a person genuinely must act because no supplier API exists for the
+step — are IAC-1's exception list, not a judgement call made here. Anything
+not on that list is CI's job.
+
+**Why:** every manual step costs the owner's time and can be done differently
+each time.
+
+**Check plan:** review of deploy procedures against IAC-1's exception list;
+incident entries (`OPS-5`) record any hand-made change outside it.
+
+## CI-14 — every test and gate blocks
+
+Every test suite and quality gate runs in CI and blocks merge. The ratchet's
+`warn` mode ([`ratchet.md`](ratchet.md)) is the one sanctioned softening.
+
+**Why:** correctness and safety matter more than speed, and a gate that can't
+fail is only a report.
+
+**Check plan:** the ruleset audit (`CI-6`) extended so every job in a repo's
+test and standards workflows is a required check.

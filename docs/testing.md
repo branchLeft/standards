@@ -110,44 +110,53 @@ behaviour and edge cases the implementation would plausibly get wrong on a
 first pass, not tests that mirror the implementation's control flow line for
 line — and treats the latter as a finding against this clause.
 
-## COV-1 — changed files meet a floor
+## TEST-6 — hard to test is a design defect
 
-`pending`. **A reader exists; nothing gates on it yet.** Read the next
-paragraph before relying on any of this.
+Code that is hard to test is treated as a design defect. The fix is a better
+seam (`ARCH-6`), not a weaker or skipped test.
 
-`tools/check-coverage.sh` reads `coverage/coverage-final.json` and reports a
-per-file line-coverage percentage against a threshold — but only as an
-advisory finding, run through `tools/standards-audit.sh`'s `ADVISORY_GATES`,
-never as a build failure. The threshold it compares against
-(`tools/thresholds.tsv`, currently 90% line coverage) is a provisional
-placeholder, not the owner-chosen floor, and a repo can still regress
-coverage to zero without anything stopping it. The specification below —
-including the intended 80%/70% floor — is what the clause is meant to mean
-once the owner sets the real number and the gate class moves to `auto`; it is
-not what happens today. Do not record work as meeting COV-1 while this line
-stands.
+**Why:** difficulty testing is the clearest early sign of a missing
+abstraction or tangled responsibilities.
 
-Once implemented: every source file a branch changes must meet the per-file
-floor. This is the whole point of the ratchet — the legacy tree is advisory, the
-code you actually wrote is not — and it is intended to hold **even when the repo
-is in `warn` mode**, which is the one place a coverage clause cannot be deferred.
+**Check plan:** review of skipped tests, and of tests that reach into
+internals, in the diff.
 
-Measured from `coverage/coverage-final.json` intersected with the branch's
-changed-file set. This requires `coverage.include` to be set — without it,
-coverage instruments only files a test already loads, so an untested file is
-absent from the report rather than present at zero, and the average of the files
-that happen to be tested is not a coverage number.
+## COV-1 — 90% of a PR's changed lines are covered
 
-The intended floor is **80% statements / 70% branches**. It is deliberately not
-in `tools/floors.tsv`: that file is read by gates, and a floor sitting there for
-a clause nothing computes is a number that reads as enforced. It moves there in
-the same change that adds the gate.
+`pending`. **A reader exists; nothing gates on it yet.** Read the paragraph on
+today's reader before relying on any of this.
 
-The provisional reader's threshold (90% _line_ coverage, in
-`tools/thresholds.tsv`) is a different metric and a different number from the
-line above — it is a placeholder to give the reader something to compare
-against before the owner has chosen either, not a revision of this design
-intent.
+At least 90% of the lines a PR adds or changes are covered by tests, as
+measured by the coverage report of the test runner that ran them. Unit tests
+are cheap, so coverage should trend towards 100%.
+
+**Why:** the floor falls on the code a PR actually writes, so old files are
+pulled up as they are rewritten, not whenever they are touched.
+
+It is intended to hold **even when the repo is in `warn` mode**. That is the
+whole point of the ratchet — the legacy tree is advisory, the code you
+actually wrote is not — and the one place a coverage clause cannot be
+deferred.
+
+Measured from the runner's report (`coverage/coverage-final.json` for Vitest)
+intersected with the lines the branch changed. This requires
+`coverage.include` to be set — without it, coverage instruments only files a
+test already loads, so an untested file is absent from the report rather than
+present at zero, and the average of the files that happen to be tested is not
+a coverage number.
+
+**Today's reader.** `tools/check-coverage.sh` reads
+`coverage/coverage-final.json` and reports per-file line coverage — every
+file in enforce mode, the branch's changed files in `warn` mode — against the
+provisional 90% in `tools/thresholds.tsv`, as an advisory finding run through
+`tools/standards-audit.sh`'s `ADVISORY_GATES`, never as a build failure. Per-file coverage is a different measure from changed-line
+coverage, and a repo can still regress coverage to zero without anything
+stopping it. Do not record work as meeting COV-1 until the reader measures
+changed lines and the gate class has moved.
+
+The floor is deliberately not in `tools/floors.tsv`: that file is read by
+gates, and a floor sitting there for a clause nothing computes is a number
+that reads as enforced. It moves there in the same change that adds the gate.
 
 The intended exemption syntax for trivial glue is
 `standards-allow-next-line COV-1 <reason>`, with a mandatory reason. Note that
@@ -162,15 +171,22 @@ whose `index.ts` genuinely is a barrel should add it to its own
 `coverageExclude`; a barrel left in and reported at 0% is visible and
 fixable, which a silent exclusion is not.
 
-## COV-2 — the repo total never drops
+**Check plan:** `tools/check-coverage.sh` moved from per-file coverage to the
+PR's changed lines, reading the test runner's own report.
+
+## COV-2 — the repo total never drops, and reaches 90% through the sweeps
 
 `pending`, for the same reason as COV-1 and with the same warning. Compared
-against the merge base, not against a fixed target. Intended value:
-no-regression.
+against the merge base, not against a fixed target until the repo is already
+past it. Intended value: no-regression, converging on 90% overall.
 
-There is deliberately no absolute global percentage. A fixed target blocks
-PRs for debt they did not create and is satisfiable by testing easy code; a
-non-regression check asks only that the direction is right.
+Every repo reaches 90% overall line coverage — the standards sweeps do that
+work, not any single PR. Below 90%, a fixed target from day one would block
+PRs for debt they did not create and is satisfiable by testing whatever's
+easy, so the gate asks only that the total not fall while the sweeps raise
+it. Once a repo's total reaches 90%, that becomes the floor: its total can't
+drop back below 90%, on top of the merge-base comparison that still applies
+above the line.
 
 Expect the reported number to **fall sharply** the first time `coverage.include`
 is set correctly in a repo that never had it — that is the honest denominator

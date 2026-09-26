@@ -30,3 +30,48 @@ break is fixed forward, it is never a reason to leave the alert open.
 
 If the window between the alert appearing and the fix merging exceeds 24
 hours, record it in `ghost-platform-docs/INCIDENTS.md`.
+
+## DEP-5 — permissive licences only, unless approved
+
+Every shipped dependency carries a licence on the permissive allow-list: MIT,
+Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, CC0-1.0 and Python-2.0.
+Anything else, or a licence that can't be identified, needs the platform
+owner's recorded approval.
+
+**Why:** a licence outside the list can bring legal or financial liability we
+haven't chosen to take on.
+
+**Check plan:** Grant, run on every image's software bill of materials
+(`CON-11`) against the allow-list.
+
+## DEP-6 — only needed, mature dependencies
+
+A dependency is added only when it is needed, and only if it is mature: judged
+on its maintainers, age, adoption and backing taken together.
+
+**Why:** every dependency adds to the supply chain an attacker can use, and
+maturity is the best sign it will still be safe next year.
+
+**Check plan:** review of new entries in dependency manifests.
+
+## DEP-7 — the ethics rubric covers dependencies
+
+The supplier ethics rubric ([`PRIN-4`](principles.md)) applies to
+dependencies too. An open-source dependency may be granted an exception,
+because using it pays nothing to whoever publishes it.
+
+**Why:** the rubric decides whom we support, and using open source pays
+nothing to its publisher.
+
+**Check plan:** review of new dependencies published by a company.
+
+## DEP-8 — Dependabot watches everything, digests included
+
+Dependabot tracks every package ecosystem a repo uses, including the image
+digests pinned in Dockerfiles and Compose files.
+
+**Why:** a pinned digest freezes old vulnerabilities along with working code
+unless something moves it forward.
+
+**Check plan:** a check that `.github/dependabot.yml` lists every ecosystem
+the repo's files use, including `docker` and `docker-compose`.

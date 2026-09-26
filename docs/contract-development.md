@@ -39,14 +39,73 @@ protobuf, JSON Schema) rather than a shape a consumer reverse-engineers from
 the producer's implementation or from example payloads. A TypeScript
 `interface` shared only by direct import within one repo satisfies `CTR-1`
 but not this clause once a second repo needs the same shape — at that point
-the shape needs a spec artefact both sides can generate from. See the
-roadmap below.
+the shape needs a spec artefact both sides can generate from. See
+[where specs live](#where-specs-live) below.
 
-## Roadmap
+## CTR-3 — both sides are generated from the spec
 
-A dedicated `api-contracts` repo to hold cross-repo spec files and publish
-generated client/type packages from them is filed as
-[branchLeft/workspace#79](https://github.com/branchLeft/workspace/issues/79)
-on the Miscellaneous board — not started. `CTR-3` (spec lives in
-`api-contracts`, a generated package is the only sanctioned way to consume
-it) is reserved for that repo and will be written once it exists, not before.
+A contract's server and client code are generated from its spec in CI and
+published as a versioned package. Consumers pin a version and upgrade when
+they choose: publish a new spec version, CI publishes the generated packages
+with the bumped version, and each consumer moves its pin.
+
+**Why:** generation ties both sides to the contract, so neither can drift
+from it; with strict types on top, a separate contract test adds little.
+
+**Check plan:** review that a new API's server and client code come from the
+generated package; later, a check that no hand-written type duplicates a
+generated one.
+
+## CTR-4 — every HTTP API has an OpenAPI spec
+
+Every HTTP API we serve is defined by an OpenAPI spec written in YAML. An API
+that imitates a third party's is specified too, for the subset we implement.
+
+**Why:** a contract implied by the code on each side drifts and breaks, while
+a written one can be generated from and compared.
+
+**Check plan:** a check that every module registering HTTP routes has an
+OpenAPI file beside it.
+
+`CTR-2` requires a spec for an API consumed outside its repo; this clause
+extends that to every HTTP API.
+
+## CTR-5 — other contracts use JSON Schema
+
+A contract that isn't HTTP, such as a message, a descriptor or a file passed
+between services, is defined in JSON Schema and published as a versioned
+package, in the same way as an HTTP spec.
+
+**Why:** every contract between areas of code needs a formal schema and a
+semantic version, whatever carries it.
+
+**Check plan:** review of new message and file formats in the diff.
+
+## CTR-6 — a message carries its version
+
+A message carries its schema's semantic version in its body, and the receiver
+validates the message against that version.
+
+**Why:** the receiver can then choose a handling strategy per version and
+stay backward compatible.
+
+**Check plan:** a test per consumer that a message with an unknown or missing
+version is rejected.
+
+## CTR-7 — the version is computed from the spec diff
+
+A spec's version bump is computed by comparing it with the last published
+version and mapping each change to a semantic-version level. A major bump
+needs no approval.
+
+**Why:** consumers get a new version only when they choose to upgrade, so the
+version's job is to be accurate, not to be gated.
+
+**Check plan:** the spec-comparison step in the publishing workflow, with a
+test that a removed field produces a major bump.
+
+## Where specs live
+
+A shared repository for cross-repo specs, publishing generated packages from
+them, is planned but not yet built. Until it exists, a spec lives in the repo
+that serves it, and `CTR-3` applies there.

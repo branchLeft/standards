@@ -189,3 +189,15 @@ committed salt fails from the moment it adopts, in `warn` mode as much as
 effect, not friction to route around: the sanctioned way to remove a committed
 salt is the salt-injected-at-deploy pattern above, not an exemption line — the
 exemption already exists, it just does not live in `.standardsignore`.
+
+## PUL-13 — policy packs guard every preview
+
+Pulumi policy packs run on every preview and refuse, among other things,
+destroying protected core infrastructure and making a bucket public.
+
+**Why:** a policy the engine enforces catches what a reviewer skimming a plan
+misses, and it sits alongside the delete guard (`PUL-10`) rather than
+replacing it.
+
+**Check plan:** policy packs in the preview workflow, each with a test program
+that violates it.

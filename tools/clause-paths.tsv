@@ -42,6 +42,7 @@ PRIN-6	*	[none] an agent-authorisation decision — not tied to any file in a di
 STD-000	*	[doc] a `standards-allow-next-line` suppression can be the preceding line of any tracked file
 STD-001	.standardsignore	[doc] exemptions are rows in this file only
 STD-002	.standardsignore	[doc] staleness is computed over this file's rows
+STD-003	*	[none] a statement of scope, not tied to any file
 
 ## TypeScript — tsconfig.md, tools/check-tsconfig.sh
 TS-1	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] check-tsconfig.sh: ratchet_scope_files '(^|/)tsconfig(\.[a-z]+)?\.json$'
@@ -52,9 +53,12 @@ TS-5	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json;*.ts	[gate]
 TS-6	package.json;*/package.json	[fleet] canonical script names live in package.json; clause is `pending`, no gate script to copy a pattern from
 TS-7	*.ts;*.tsx	[fleet] the reactApp eslint preset's target; tsconfig.md/index.md name no path
 
-## Formatting and linting — index.md "Formatting and linting"
+## Formatting and linting — formatting-and-linting.md
 LINT-1	*.ts;*.tsx;*.js;*.jsx	[fleet] lintable source extensions; no path stated
 FMT-1	*.ts;*.tsx;*.js;*.jsx;*.json;*.md;*.yml;*.yaml	[fleet] @branchleft/prettier-config's usual targets; no path stated
+LINT-2	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where a repo wires its linters and formatters
+LINT-3	eslint.config.*;*/eslint.config.*;package.json;*/package.json;.prettierrc*	[fleet] the configuration files that extend the shared packages
+LINT-4	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] same as LINT-2
 
 ## Shared config files — shared-config.md, templates/manifest.tsv
 SYNC-1	.editorconfig;.nvmrc;.github/CODEOWNERS;.pre-commit-config.yaml	[doc] exactly the four rows templates/manifest.tsv registers today
@@ -63,6 +67,8 @@ SYNC-1	.editorconfig;.nvmrc;.github/CODEOWNERS;.pre-commit-config.yaml	[doc] exa
 CMT-1	*	[none] "a comment" — the doc names no language or extension
 CMT-2	*	[none] same as CMT-1
 CMT-3	*	[none] same as CMT-1
+CMT-4	*	[none] same as CMT-1
+CMT-5	*	[none] same as CMT-1
 
 ## Testing and coverage — testing.md
 TEST-1	*	[none] testing.md is explicit: "the distinction is logic versus declaration, not language or directory"
@@ -70,6 +76,7 @@ TEST-2	*	[none] same disclaimer as TEST-1; a ritual test is a shape, not a path
 TEST-3	*	[none] same disclaimer as TEST-1
 TEST-4	*	[none] the nine categories in testing.md are named by what code decides, never by path
 TEST-5	*	[none] same disclaimer as TEST-1
+TEST-6	*	[none] same disclaimer as TEST-1
 COV-1	*	[none] `pending` — measured over whatever coverage.include names, not a path this file can state
 COV-2	*	[none] `pending` — repo-total comparison, not file-scoped
 
@@ -85,10 +92,17 @@ CI-8	tools/*.sh;tools/*.py;packages/*;templates/*	[fleet] "a script whose pass i
 CI-9	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
 CI-10	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
 CI-11	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] audited via gh api against every fleet repo's live workflow files, not in-repo — check-caller-drift.sh
+CI-12	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] deploy jobs are defined in workflow files
+CI-13	.github/workflows/*.yml;.github/workflows/*.yaml;*.md	[fleet] deploy workflows and the procedures that document them
+CI-14	.github/workflows/*.yml;.github/workflows/*.yaml;templates/rulesets/*	[fleet] the workflows and the ruleset payloads that make their jobs required
 
 ## Dependencies — dependencies.md
 DEP-3	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] common dependency-manifest filenames; dependencies.md describes PR provenance (a Dependabot major bump), not a path
 DEP-4	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3; the alert-vs-bump distinction is PR metadata this tool cannot see
+DEP-5	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum;*Dockerfile;*Dockerfile.*	[fleet] the manifests of DEP-3, plus Dockerfiles, since the check reads each image's bill of materials
+DEP-6	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3
+DEP-7	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3
+DEP-8	.github/dependabot.yml;.github/dependabot.yaml	[doc] the file the clause names
 
 ## Repository settings — repo-settings.md
 REPO-1	templates/rulesets/*	[doc] "committed as payloads under templates/rulesets/<repo>/<name>.json"
@@ -98,6 +112,8 @@ REPO-4	templates/rulesets/*;.github/workflows/*.yml;.github/workflows/*.yaml	[fl
 REPO-5	.github/CODEOWNERS	[doc] "CODEOWNERS must cover..."
 REPO-6	templates/rulesets/*	[doc] same payload location as REPO-1
 REPO-7	templates/rulesets/*;tools/ruleset-apply.sh	[doc] payload location plus the script named throughout the clause's own doc
+REPO-8	*.sh;*.py;*.md;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where a command that disables signing could be written
+REPO-9	*	[none] a repository setting, not a file in a diff
 
 ## Pulumi — stacks/pulumi.md, tools/check-pulumi.sh, tools/check-pulumi-secrets.sh
 PUL-1	*.ts	[gate] check-pulumi.sh: ratchet_scope_files '\.ts$', then content-filtered for a ComponentResource declaration — a path glob cannot replicate the content filter, so this over-matches every .ts file
@@ -112,10 +128,13 @@ PUL-9	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-10	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-11	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-12	Pulumi.*.yaml;*/Pulumi.*.yaml	[gate] check-pulumi-secrets.sh: ratchet_scope_files '(^|/)Pulumi\.[A-Za-z0-9_-]+\.yaml$'
+PUL-13	*.ts;Pulumi.*.yaml;*/Pulumi.*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] programs, stack configuration and the preview workflow
 
 ## Infrastructure operations — infrastructure.md
 IAC-1	*	[none] a CI-403-vs-hand-apply judgement call; infrastructure.md names no path
 IAC-2	*	[none] same disclaimer as IAC-1
+IAC-3	*.ts;Pulumi.*.yaml;*/Pulumi.*.yaml;*compose*.yml;*compose*.yaml	[fleet] infrastructure programs, stack configuration and service definitions
+IAC-4	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the workflows that provision and deliver
 
 ## Data protection — data-protection.md (all eleven `pending`)
 DP-1	*	[none] no path named anywhere in data-protection.md
@@ -135,6 +154,7 @@ STY-1	*.tsx;*.jsx;*.css	[fleet] "a Tailwind pipeline"; styling.md names no path.
 STY-2	*.tsx;*.jsx;*.css	[fleet] same caveat as STY-1
 STY-3	*.tsx;*.jsx;*.css	[fleet] "a published component package"; same extensions as STY-1/2 — the doc gives no path signal that tells an app pipeline from a library package
 STY-4	*.css;index.ts;*/index.ts	[fleet] "a dedicated subpath" from a package's entry point; index.ts is inferred, not named
+STY-5	*.css;*.tsx;*.jsx	[fleet] same extensions as STY-1; the doc names design tokens, not a path
 
 ## React applications — stacks/react-app.md
 APP-1	app/*	[fleet] React Router Framework Mode route/root convention; `app/` evidenced by the workspace CLAUDE.md's own example path, not asserted in react-app.md
@@ -159,7 +179,167 @@ LIB-8	*.test.tsx;*.test.ts	[fleet] "tests import through the package entry point
 ## Contract-driven development — contract-development.md
 CTR-1	*	[none] "applies wherever a boundary is crossed" — no path or language named
 CTR-2	openapi*.yaml;*/openapi*.yaml;openapi*.json;*/openapi*.json;*.proto;*.schema.json	[fleet] contract-development.md names three formats (OpenAPI, protobuf, JSON Schema), not filenames or paths, so the glob is an inference from ecosystem filename convention, not a doc-stated location — hence [fleet], not [doc]. GraphQL is not one of the three named formats and was wrongly conflated with JSON Schema in an earlier draft of this row; no `*.graphql` glob belongs here. The api-contracts repo the clause anticipates does not exist yet, so this row is aspirational either way
+CTR-3	package.json;*/package.json;.github/workflows/*.yml;.github/workflows/*.yaml;openapi*.yaml;*/openapi*.yaml	[fleet] the spec, the publishing workflow and the consumers' pinned versions
+CTR-4	openapi*.yaml;*/openapi*.yaml;*.ts	[fleet] the doc names OpenAPI YAML, not a filename; the glob follows CTR-2's convention, plus route modules
+CTR-5	*.schema.json;*/*.schema.json	[fleet] the doc names JSON Schema, not a filename; the glob follows CTR-2's convention
+CTR-6	*.ts;*.py;*.schema.json	[fleet] message producers, consumers and their schemas
+CTR-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the publishing workflow
 
-## Documentation — index.md "Documentation"
+## Documentation — documentation.md
 DOC-1	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] "runs the docs-lint caller" is a workflow file; DOC-1 is `pending`, no gate script to copy from
 DOC-2	.docs-lint.mode	[doc] the file the clause names directly
+DOC-3	*.md;*.html	[doc] the clause names markdown and HTML
+DOC-4	*.md	[fleet] documents are markdown under DOC-3
+DOC-5	*.md	[fleet] same as DOC-4
+DOC-6	*.md	[fleet] same as DOC-4
+DOC-7	*	[none] a change to any file can make a document stale
+DOC-8	*.md	[fleet] same as DOC-4
+DOC-9	*.md	[fleet] same as DOC-4
+
+## Architecture — architecture.md
+ARCH-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions
+ARCH-2	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-3	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-4	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-5	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-6	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-7	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
+ARCH-8	*	[none] a directory-layout judgement, not tied to one file type
+
+## Naming — naming.md
+NAM-1	*.ts;*.tsx;*.py	[fleet] names in TypeScript and Python source; the doc names no path
+NAM-2	*.ts;*.tsx;*.py	[fleet] same as NAM-1
+NAM-3	*.ts;*.tsx;*.py	[fleet] same as NAM-1
+NAM-4	*.ts;*.tsx;*.py	[fleet] same as NAM-1
+NAM-5	*.ts	[fleet] hosts are declared in Pulumi programs, which are TypeScript in this fleet
+NAM-6	*.ts	[fleet] same as NAM-5
+
+## Types — types.md
+TYP-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions
+TYP-2	*.ts;*.tsx;*.py	[fleet] same as TYP-1
+TYP-3	*.ts;*.tsx;*.py	[fleet] same as TYP-1
+TYP-4	*.ts;*.tsx;*.py	[fleet] same as TYP-1
+TYP-5	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json;pyproject.toml;*/pyproject.toml;mypy.ini;*/mypy.ini	[fleet] where each language sets its checker strictness; the doc names the settings, not the files
+
+## Error handling — errors.md
+ERR-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions
+ERR-2	*.ts;*.tsx;*.py	[fleet] same as ERR-1
+ERR-3	*.ts;*.tsx;*.py	[fleet] same as ERR-1
+ERR-4	*.ts;*.tsx;*.py	[fleet] same as ERR-1
+ERR-5	*.ts;*.tsx;*.py	[fleet] same as ERR-1
+
+## Logging — logging.md
+LOG-1	*.ts;*.tsx;*.py	[fleet] service source; the doc names middleware, not a path
+LOG-2	*.ts;*.tsx;*.py	[fleet] same as LOG-1
+LOG-3	*.yml;*.yaml;*.alloy	[fleet] log shipper and log store configuration; no path stated
+LOG-4	*.ts;*.tsx;*.py;*.yml;*.yaml;*.alloy	[fleet] middleware source plus shipper configuration
+LOG-5	*.yml;*.yaml	[fleet] the log store retention setting; no path stated
+LOG-6	*	[none] a design judgement, not tied to one file
+LOG-7	*.yml;*.yaml	[fleet] recording-rule files; no path stated
+LOG-8	*.yml;*.yaml;*.alloy;*.ts	[fleet] the monitoring stack deployment; no path stated
+
+## Observability and alerting — observability.md
+OBS-1	*.ts;*.tsx;*.py	[fleet] shared middleware in service source; no path stated
+OBS-2	*.yml;*.yaml	[fleet] alert-rule and Alertmanager files; no path stated
+OBS-3	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-4	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-5	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-6	*.yml;*.yaml;*.ini	[fleet] Grafana configuration; no path stated
+OBS-7	*.yml;*.yaml;*.json	[fleet] dashboard and rule files; no path stated
+OBS-8	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-9	*.yml;*.yaml;*.ts	[fleet] Prometheus deployment configuration; no path stated
+OBS-10	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-11	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-12	*.yml;*.yaml;*.ini;Caddyfile;*/Caddyfile	[fleet] Grafana configuration and the edge route; no path stated
+OBS-13	*.yml;*.yaml;*.ts	[fleet] Grafana provisioning; no path stated
+
+## Security — security.md
+SEC-1	*	[none] a design judgement about environments, not one file type
+SEC-2	*	[none] same as SEC-1
+SEC-3	*	[none] same as SEC-1
+SEC-4	*	[none] applies to all shipped code, own logic included; the doc names no path
+SEC-5	*	[none] the exemptions file location is not yet fixed
+SEC-6	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] a scheduled workflow
+SEC-7	.github/workflows/*.yml;.github/workflows/*.yaml;*lock.yaml;*lock.json;*.lock	[fleet] the scan workflow and the lockfiles it reads
+SEC-8	.github/workflows/*.yml;.github/workflows/*.yaml;.pre-commit-config.yaml	[fleet] where the analysers run
+SEC-9	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the file types the clause names
+SEC-10	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where CI installs tools
+
+## Secrets and credentials — credentials.md
+CRED-1	*	[none] an access-path property, not tied to one file
+CRED-2	*.ts;*.yml;*.yaml	[fleet] infrastructure code and deploy workflows; no path stated
+CRED-3	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the jobs that create or rotate secrets
+CRED-4	.github/workflows/*.yml;.github/workflows/*.yaml;*.ts	[fleet] rotation workflows and the secrets declared in infrastructure code
+CRED-5	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled re-mint workflow
+CRED-6	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled drill workflow
+CRED-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where jobs read secrets
+CRED-8	*	[none] an access property recorded outside any repo
+CRED-9	*	[none] same as CRED-8
+CRED-10	*compose*.yml;*compose*.yaml	[fleet] the doc names environment variables and mounted files, which Compose files declare
+CRED-11	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] pre-commit and CI, as the clause names
+
+## Configuration — configuration.md
+CFG-1	*.ts;*.tsx;*.py	[fleet] the schema lives in service source; no path stated
+CFG-2	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml	[doc] the clause names images, which Dockerfiles and Compose files define
+CFG-3	*.ts;*.py;Pulumi.*.yaml;*/Pulumi.*.yaml	[fleet] stack configuration and schema defaults
+CFG-4	*.ts;*.tsx;*.py	[fleet] feature-flag code in service source
+
+## Databases — databases.md
+DB-1	*.ts;*.tsx;*.py;*.sql	[fleet] source and migration files; no path stated
+DB-2	*.ts;*.tsx	[fleet] the `sql` template is a TypeScript construct
+DB-3	package.json;*/package.json;*.ts	[fleet] dependency manifests and TypeScript database code
+DB-4	*.sql;*/migrations/*;*/drizzle/*;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] migration folders and the deploy workflow
+DB-5	*.sql;*/migrations/*;*/drizzle/*	[fleet] migration folders
+DB-6	*.sql;*/migrations/*;*/drizzle/*	[fleet] same as DB-5
+DB-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the CI job that runs the previous release tests
+
+## Containers — containers.md
+CON-1	*Dockerfile;*Dockerfile.*	[doc] the clause names Dockerfiles
+CON-2	*compose*.yml;*compose*.yaml	[doc] the clause names Compose files
+CON-3	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml	[doc] the clause names Dockerfiles and Compose files
+CON-4	*Dockerfile;*Dockerfile.*	[doc] the clause names Dockerfiles
+CON-5	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-6	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-7	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-8	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-9	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-10	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-11	.github/workflows/*.yml;.github/workflows/*.yaml;*Dockerfile;*Dockerfile.*	[fleet] the build workflow and the images it builds
+CON-12	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the build and deploy workflows
+CON-13	*Dockerfile;*Dockerfile.*	[doc] entrypoints live in Dockerfiles
+CON-14	*Dockerfile;*Dockerfile.*;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the health check and the CI job that boots the image
+CON-15	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the deploy workflows
+
+## Shell — shell-and-python.md
+SH-1	*.sh;*.bash	[doc] the clause is about shell scripts
+SH-2	*.md	[fleet] runbooks are markdown; no path stated
+SH-3	*.sh;*.bash;*.py;*.ts	[fleet] new scripts in any of the languages the clause names
+SH-4	*.md	[fleet] commands to copy live in markdown runbooks and docs
+
+## Python — shell-and-python.md
+PY-1	*.py;pyproject.toml;*/pyproject.toml	[doc] Python services
+PY-2	*.py;pyproject.toml;*/pyproject.toml;.pre-commit-config.yaml	[doc] Python source and its checker configuration
+PY-3	pyproject.toml;*/pyproject.toml	[doc] the file the clause names
+
+## Web front ends — stacks/web-frontends.md
+WEB-1	*.html;app/*;package.json;*/package.json	[fleet] a site stack choice shows in its entry files and manifest
+WEB-2	*.html;*.ts;*.tsx;*.js;*.jsx	[fleet] client-side scripts and markup
+WEB-3	*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] browser-test files that call the axe helper
+WEB-4	app/routes/*;*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] route files and the browser tests that cover them, as APP-4
+
+## Operations — operations.md
+OPS-1	*	[none] a property of how changes arrive, not of one file
+OPS-2	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] deploy workflows
+OPS-3	.github/workflows/*.yml;.github/workflows/*.yaml;*compose*.yml;*compose*.yaml	[fleet] deploy workflows and service definitions
+OPS-4	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled drill workflow
+OPS-5	*	[none] entries live in the private operations docs, outside any product repo
+OPS-6	*.md	[fleet] runbooks are markdown
+OPS-7	*	[none] a spending judgement, not tied to one file
+
+## Non-functional requirements — non-functional.md
+NFR-1	*	[none] a product-level requirement, not tied to one file
+NFR-2	*	[none] a product-level requirement, not tied to one file
+NFR-3	*	[none] a product-level requirement, not tied to one file
+NFR-4	*	[none] a product-level requirement, not tied to one file
+NFR-5	*	[none] a product-level requirement, not tied to one file
+NFR-6	*	[none] a product-level requirement, not tied to one file

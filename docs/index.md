@@ -72,6 +72,12 @@ the corollary on PRIN-1 and the honesty clause on PRIN-4.
 | STD-000 | A suppression must name a clause ID and give a reason. A bare `standards-allow-next-line` is itself a finding | `auto`   | `tools/standards-audit.sh` |
 | STD-001 | An exemption is a CODEOWNERS decision. A PR may not add one to make its own gate pass                         | `review` | —                          |
 | STD-002 | A stale exemption — one matching nothing — is reported and removed                                            | `auto`   | `tools/standards-audit.sh` |
+| STD-003 | These standards govern repos branchLeft owns; a contribution elsewhere follows that project's own             | `review` | —                          |
+
+**STD-003 sets the reach of everything below.** A rule here binds code
+branchLeft writes and owns. Upstream software the estate runs keeps its own
+conventions, and a contribution to another project follows that project's
+standards, because a rule nobody there agreed to is not a standard there.
 
 ## TypeScript
 
@@ -99,12 +105,15 @@ nothing runs the rule anywhere it would matter. `Encoded by` is `—` until a
 repo's own lint run is what enforces it; adopting the shared config is tracked
 as [`ADOPTION.md`](../ADOPTION.md) work per repo, not assumed.
 
-## Formatting and linting
+## Formatting and linting — `formatting-and-linting.md`
 
-| ID     | Rule                                                                               | Gate     | Encoded by                    |
-| ------ | ---------------------------------------------------------------------------------- | -------- | ----------------------------- |
-| LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `review` | —                             |
-| FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto`   | `@branchleft/prettier-config` |
+| ID     | Rule                                                                               | Gate      | Encoded by                    |
+| ------ | ---------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `review`  | —                             |
+| FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto`    | `@branchleft/prettier-config` |
+| LINT-2 | Every code-like file is linted and formatted: source, YAML, JSON and Dockerfiles   | `pending` | —                             |
+| LINT-3 | Linters and formatters use the shared configuration, extended only where needed    | `pending` | —                             |
+| LINT-4 | Linting and formatting run in pre-commit and CI, with tools fast enough for both   | `pending` | —                             |
 
 LINT-1 is `review`, not `auto`: `@branchleft/eslint-config` exists and this
 repo dogfoods it, but no other repo in the fleet consumes it — every repo
@@ -127,11 +136,13 @@ the same shape of package but currently have no consumers to record.
 
 ## Code comments — `code-comments.md`
 
-| ID    | Rule                                                                                                                 | Gate      | Evidence                                  |
-| ----- | -------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------- |
-| CMT-1 | A comment states only what the code cannot                                                                           | `review`  | The diff                                  |
-| CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `pending` | —                                         |
-| CMT-3 | A comment needing more than a line or two belongs in a README or doc, with at most a one-line pointer in code        | `review`  | Files where comments exceed ~30% of lines |
+| ID    | Rule                                                                                                                 | Gate      | Evidence                             |
+| ----- | -------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------ |
+| CMT-1 | A comment states only what the code cannot                                                                           | `review`  | The diff                             |
+| CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `pending` | —                                    |
+| CMT-3 | A comment block of 5 to 10 lines warns and 11 or more fails; the narrative moves to a colocated doc                  | `review`  | The comment-block checker's findings |
+| CMT-4 | A file whose comment lines outnumber its code lines fails; docstrings count                                          | `pending` | —                                    |
+| CMT-5 | A docstring says only what the signature can't, and links to the module's colocated doc                              | `review`  | New docstrings in the diff           |
 
 ## Testing and coverage — `testing.md`
 
@@ -142,8 +153,9 @@ the same shape of package but currently have no consumers to record.
 | TEST-3 | Integration tests complement unit tests. Substitution only for a11y and integrated rendering   | `review`  | —          |
 | TEST-4 | Security-sensitive paths require unit coverage regardless of any other clause. Non-exhaustive  | `review`  | —          |
 | TEST-5 | Test-driven development wherever possible: test suite first, seen to fail, then implementation | `review`  | —          |
-| COV-1  | Changed files meet the per-file floor                                                          | `pending` | —          |
-| COV-2  | The repo total never drops against the merge base                                              | `pending` | —          |
+| TEST-6 | Code that is hard to test is a design defect: fix the seam, not the test                       | `review`  | —          |
+| COV-1  | At least 90% of a PR's changed lines are covered, per the test runner's report                 | `pending` | —          |
+| COV-2  | The repo total never drops, and every repo reaches 90% overall through the sweeps              | `pending` | —          |
 
 `TEST-*` are review clauses because none of them can be automated without making
 things worse — a minimum-assertions rule is gamed by three weak assertions, and a
@@ -164,19 +176,22 @@ COV-1 until a gate exists to say so.
 
 ## CI and CD — `ci-cd.md`
 
-| ID    | Rule                                                                            | Gate     | Encoded by                    |
-| ----- | ------------------------------------------------------------------------------- | -------- | ----------------------------- |
-| CI-1  | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment           | `auto`   | `tools/check-workflows.sh`    |
-| CI-2  | Environment values bound, never interpolated into a `run:` body                 | `auto`   | `tools/check-workflows.sh`    |
-| CI-3  | A gate that runs on `pull_request` also runs on push to `main`                  | `auto`   | `tools/check-workflows.sh`    |
-| CI-4  | CI reports, it does not rewrite — no `--fix` or `--write` in a job              | `auto`   | `tools/check-workflows.sh`    |
-| CI-5  | Reusable workflows pinned to an exact tag, never `@main`                        | `auto`   | `tools/check-workflows.sh`    |
-| CI-6  | Required checks agree with the repo's mode and with the job names it emits      | `auto`   | `tools/ruleset-audit.sh`      |
-| CI-7  | A privileged job is gated twice, by mechanisms that do not share a failure mode | `review` | —                             |
-| CI-8  | A script whose pass is load-bearing carries a `--self-test`, run before it      | `review` | —                             |
-| CI-9  | No empty expression where Actions evaluates one, `run:` bodies included         | `auto`   | `tools/check-workflows.sh`    |
-| CI-10 | Every job sets `timeout-minutes`, except reusable-workflow callers              | `auto`   | `tools/check-workflows.sh`    |
-| CI-11 | Every fleet caller's reusable-workflow tag matches the tag last published       | `auto`   | `tools/check-caller-drift.sh` |
+| ID    | Rule                                                                                         | Gate      | Encoded by                    |
+| ----- | -------------------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| CI-1  | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment                        | `auto`    | `tools/check-workflows.sh`    |
+| CI-2  | Environment values bound, never interpolated into a `run:` body                              | `auto`    | `tools/check-workflows.sh`    |
+| CI-3  | A gate that runs on `pull_request` also runs on push to `main`                               | `auto`    | `tools/check-workflows.sh`    |
+| CI-4  | CI reports, it does not rewrite — no `--fix` or `--write` in a job                           | `auto`    | `tools/check-workflows.sh`    |
+| CI-5  | Reusable workflows pinned to an exact tag, never `@main`                                     | `auto`    | `tools/check-workflows.sh`    |
+| CI-6  | Required checks agree with the repo's mode and with the job names it emits                   | `auto`    | `tools/ruleset-audit.sh`      |
+| CI-7  | A privileged job is gated twice, by mechanisms that do not share a failure mode              | `review`  | —                             |
+| CI-8  | A script whose pass is load-bearing carries a `--self-test`, run before it                   | `review`  | —                             |
+| CI-9  | No empty expression where Actions evaluates one, `run:` bodies included                      | `auto`    | `tools/check-workflows.sh`    |
+| CI-10 | Every job sets `timeout-minutes`, except reusable-workflow callers                           | `auto`    | `tools/check-workflows.sh`    |
+| CI-11 | Every fleet caller's reusable-workflow tag matches the tag last published                    | `auto`    | `tools/check-caller-drift.sh` |
+| CI-12 | Every deploy job runs in a protected environment only the default branch may use             | `pending` | —                             |
+| CI-13 | The approval click is the only human step in any routine change; exceptions are IAC-1's list | `review`  | —                             |
+| CI-14 | Every test suite and quality gate runs in CI and blocks merge                                | `pending` | —                             |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state. CI-11 runs the same way, for the same reason — see
@@ -184,10 +199,14 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Dependencies — `dependencies.md`
 
-| ID    | Rule                                                                             | Gate      | Encoded by |
-| ----- | -------------------------------------------------------------------------------- | --------- | ---------- |
-| DEP-3 | A major-version dependency PR is closed unmerged by default                      | `pending` | —          |
-| DEP-4 | A Dependabot security-advisory PR merges the day it appears, regardless of DEP-3 | `pending` | —          |
+| ID    | Rule                                                                                       | Gate      | Encoded by |
+| ----- | ------------------------------------------------------------------------------------------ | --------- | ---------- |
+| DEP-3 | A major-version dependency PR is closed unmerged by default                                | `pending` | —          |
+| DEP-4 | A Dependabot security-advisory PR merges the day it appears, regardless of DEP-3           | `pending` | —          |
+| DEP-5 | Shipped dependencies carry a licence on the permissive allow-list, or the owner's approval | `pending` | —          |
+| DEP-6 | A dependency is added only when needed, and only if it is mature                           | `review`  | —          |
+| DEP-7 | The supplier ethics rubric covers dependencies; open source may be excepted                | `review`  | —          |
+| DEP-8 | Dependabot tracks every ecosystem a repo uses, image digests included                      | `pending` | —          |
 
 ## Repository settings — `repo-settings.md`
 
@@ -200,6 +219,8 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 | REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
 | REPO-6 | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
 | REPO-7 | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
+| REPO-8 | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
+| REPO-9 | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
@@ -207,20 +228,21 @@ has pinned a name rather than a revision.
 
 ## Pulumi — `stacks/pulumi.md`
 
-| ID     | Rule                                                                                  | Gate     | Encoded by                      |
-| ------ | ------------------------------------------------------------------------------------- | -------- | ------------------------------- |
-| PUL-1  | One exported ComponentResource per unit, `<org>:<layer>:<Type>` URN, `super()` first  | `auto`   | `tools/check-pulumi.sh`         |
-| PUL-2  | `registerOutputs()` closes the constructor                                            | `auto`   | `tools/check-pulumi.sh`         |
-| PUL-3  | Every child resource takes `{ parent }`                                               | `auto`   | `tools/check-pulumi.sh`         |
-| PUL-4  | An exported `Args` interface, with its fields documented                              | `auto`   | `tools/check-pulumi.sh`         |
-| PUL-5  | A component never reads a `StackReference`                                            | `auto`   | `tools/check-pulumi.sh`         |
-| PUL-6  | Security boundaries are constants, not stack config                                   | `review` | —                               |
-| PUL-7  | `Input<T>` by default; plain `string` only where needed synchronously                 | `review` | —                               |
-| PUL-8  | One file per concern; `create*` factories take `parent` first                         | `review` | —                               |
-| PUL-9  | Validate once, at construction                                                        | `review` | —                               |
-| PUL-10 | A stack with protected resources carries a three-mode delete guard                    | `review` | —                               |
-| PUL-11 | Resource naming: `<tenant>-<resource>` logical, `<product>-<scope>-<tenant>` physical | `review` | —                               |
-| PUL-12 | A committed `Pulumi.<stack>.yaml` never carries an `encryptionsalt`                   | `auto`   | `tools/check-pulumi-secrets.sh` |
+| ID     | Rule                                                                                         | Gate      | Encoded by                      |
+| ------ | -------------------------------------------------------------------------------------------- | --------- | ------------------------------- |
+| PUL-1  | One exported ComponentResource per unit, `<org>:<layer>:<Type>` URN, `super()` first         | `auto`    | `tools/check-pulumi.sh`         |
+| PUL-2  | `registerOutputs()` closes the constructor                                                   | `auto`    | `tools/check-pulumi.sh`         |
+| PUL-3  | Every child resource takes `{ parent }`                                                      | `auto`    | `tools/check-pulumi.sh`         |
+| PUL-4  | An exported `Args` interface, with its fields documented                                     | `auto`    | `tools/check-pulumi.sh`         |
+| PUL-5  | A component never reads a `StackReference`                                                   | `auto`    | `tools/check-pulumi.sh`         |
+| PUL-6  | Security boundaries are constants, not stack config                                          | `review`  | —                               |
+| PUL-7  | `Input<T>` by default; plain `string` only where needed synchronously                        | `review`  | —                               |
+| PUL-8  | One file per concern; `create*` factories take `parent` first                                | `review`  | —                               |
+| PUL-9  | Validate once, at construction                                                               | `review`  | —                               |
+| PUL-10 | A stack with protected resources carries a three-mode delete guard                           | `review`  | —                               |
+| PUL-11 | Resource naming: `<tenant>-<resource>` logical, `<product>-<scope>-<tenant>` physical        | `review`  | —                               |
+| PUL-12 | A committed `Pulumi.<stack>.yaml` never carries an `encryptionsalt`                          | `auto`    | `tools/check-pulumi-secrets.sh` |
+| PUL-13 | Policy packs run on every preview, refusing destroyed core infrastructure and public buckets | `pending` | —                               |
 
 PUL-3 is scoped to files that declare a ComponentResource or export a factory
 taking a parent. A top-level stack program has no component to parent to, so
@@ -240,13 +262,17 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 
 ## Infrastructure operations — `infrastructure.md`
 
-| ID    | Rule                                                                       | Gate     | Encoded by |
-| ----- | -------------------------------------------------------------------------- | -------- | ---------- |
-| IAC-1 | CI applies; a human applies only what CI's deploy identity cannot          | `review` | —          |
-| IAC-2 | Broadening a deploy identity is never applied by CI — grant, import, merge | `review` | —          |
+| ID    | Rule                                                                                         | Gate      | Encoded by |
+| ----- | -------------------------------------------------------------------------------------------- | --------- | ---------- |
+| IAC-1 | CI applies; a human applies only what CI's identity cannot — the named exception list        | `review`  | —          |
+| IAC-2 | Broadening a deploy identity is never applied by CI — grant, import, merge                   | `review`  | —          |
+| IAC-3 | All infrastructure and deployments are declared in code, as pinned versions plus their shape | `review`  | —          |
+| IAC-4 | Every host is provisioned and every deploy delivered by CI; no path is delivered by hand     | `pending` | —          |
 
 `review` because whether a 403 is genuinely bootstrap-class or a role list
-that should just be widened needs judgement no script can make safely.
+that should just be widened needs judgement no script can make safely. The
+other two named exceptions — minting a supplier token with no API, first
+creation of a project or account — are enumerated, not judged case by case.
 
 ## Data protection — `data-protection.md`
 
@@ -292,6 +318,7 @@ is partitioned. A repo can satisfy either while failing the other.
 | STY-2 | No colour/size literals, no arbitrary values, two utilities owe a class   | `review` | —          |
 | STY-3 | Libraries: BEM under a package namespace is the public styling API        | `review` | —          |
 | STY-4 | A library's CSS ships on a separate entry point                           | `review` | —          |
+| STY-5 | CSS is written so a dark theme would need only design-token changes       | `review` | —          |
 
 Two scopes, one principle: visual decisions live in one designated place, never
 inline in markup. STY-1/STY-2 apply to a Tailwind pipeline; STY-3/STY-4 to a
@@ -340,44 +367,253 @@ is [`ADOPTION.md`](../ADOPTION.md) work, tracked per repo rather than assumed.
 
 ## Contract-driven development — `contract-development.md`
 
-| ID    | Rule                                                                                  | Gate     | Encoded by |
-| ----- | ------------------------------------------------------------------------------------- | -------- | ---------- |
-| CTR-1 | The interface (type, spec file, signature) is authored before its implementation      | `review` | —          |
-| CTR-2 | A cross-service or cross-repo API is a committed spec artefact, not an inferred shape | `review` | —          |
+| ID    | Rule                                                                                                 | Gate      | Encoded by |
+| ----- | ---------------------------------------------------------------------------------------------------- | --------- | ---------- |
+| CTR-1 | The interface (type, spec file, signature) is authored before its implementation                     | `review`  | —          |
+| CTR-2 | A cross-service or cross-repo API is a committed spec artefact, not an inferred shape                | `review`  | —          |
+| CTR-3 | A contract's server and client code are generated from its spec and published as a versioned package | `review`  | —          |
+| CTR-4 | Every HTTP API we serve is defined by an OpenAPI spec in YAML                                        | `pending` | —          |
+| CTR-5 | A contract that isn't HTTP is defined in JSON Schema and published as a versioned package            | `review`  | —          |
+| CTR-6 | A message carries its schema's version, and the receiver validates against it                        | `pending` | —          |
+| CTR-7 | A spec's version bump is computed from its diff against the last published version                   | `pending` | —          |
 
 `CTR-1` is `TEST-5`'s sibling for shape rather than behaviour: the contract
-is agreed first, the implementation fills it in after. `CTR-2` anticipates a
-shared `api-contracts` repo (spec files publishing generated
-TypeScript/Python packages) — not built yet, roadmap in
+is agreed first, the implementation fills it in after. `CTR-2` to `CTR-7`
+set how a contract is written, generated, versioned and published; where
+shared specs will live is in
 [`contract-development.md`](contract-development.md).
 
-## Documentation
+## Documentation — `documentation.md`
 
-Thin by design. The org documentation standard and its mechanical rules
-(DL000–DL011) live elsewhere and are **cited, never restated**:
+The org documentation standard and its mechanical rules (DL000–DL011) live
+elsewhere and are **cited, never restated**:
 
 - `branchLeft/.github` → `docs/DOCUMENTATION-STANDARD.md`
 - `branchLeft/github-workflows` → `tools/docs-lint-rules.md`
 
-| ID    | Rule                                                                      | Gate      | Encoded by |
-| ----- | ------------------------------------------------------------------------- | --------- | ---------- |
-| DOC-1 | Every repo runs the `docs-lint` caller                                    | `pending` | —          |
-| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it | `review`  | —          |
+| ID    | Rule                                                                                          | Gate      | Encoded by |
+| ----- | --------------------------------------------------------------------------------------------- | --------- | ---------- |
+| DOC-1 | Every repo runs the `docs-lint` caller                                                        | `pending` | —          |
+| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it                     | `review`  | —          |
+| DOC-3 | Durable documentation is markdown; HTML is session-only, bar the committed try-it-now designs | `pending` | —          |
+| DOC-4 | Every document is written for one audience, people or agents, and says which                  | `review`  | —          |
+| DOC-5 | Documents for agents are kept apart from documentation for people                             | `review`  | —          |
+| DOC-6 | Documents for people are concise, logically structured and in plain English                   | `review`  | —          |
+| DOC-7 | A stale document is a defect, corrected in the same PR as the change that staled it           | `review`  | —          |
+| DOC-8 | CI checks documents against the code: links, named commands and quoted values                 | `pending` | —          |
+| DOC-9 | Decisions are recorded durably, in one decision-record format shared by every repo            | `pending` | —          |
+
+## Architecture — `architecture.md`
+
+| ID     | Rule                                                                                        | Gate      | Evidence                                              |
+| ------ | ------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------- |
+| ARCH-1 | Code is written for a human reader first: a newcomer builds a mental model without an agent | `review`  | The diff's public signatures and file layout          |
+| ARCH-2 | Every logical entity is a class behind an explicit contract, even with one implementation   | `review`  | New classes and the contracts they implement          |
+| ARCH-3 | Variation on evidence: no extension point until a second real use or a named requirement    | `review`  | New generic parameters, option objects and registries |
+| ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | —                                                     |
+| ARCH-5 | No loose functions: utilities are grouped into a module, namespace-imported in TypeScript   | `review`  | New top-level functions and their grouping module     |
+| ARCH-6 | Every outside dependency sits behind an interface and is passed in, so a test can fake it   | `review`  | Constructors and factories in the diff                |
+| ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | —                                                     |
+| ARCH-8 | Each directory holds one clear responsibility                                               | `review`  | New directories in the diff                           |
+
+## Naming — `naming.md`
+
+| ID    | Rule                                                                           | Gate      | Evidence                    |
+| ----- | ------------------------------------------------------------------------------ | --------- | --------------------------- |
+| NAM-1 | Whole words; an abbreviation only when it is the domain's own word             | `pending` | —                           |
+| NAM-2 | Each language's naming and casing conventions, enforced by its linter          | `pending` | —                           |
+| NAM-3 | Code implementing a design pattern names it (`TenantFactory`, `RetryStrategy`) | `review`  | New class names in the diff |
+| NAM-4 | Booleans read as questions, functions as verbs, classes as nouns               | `review`  | New names in the diff       |
+| NAM-5 | A host is named `<role><n>`                                                    | `pending` | —                           |
+| NAM-6 | Every cloud resource carries labels naming the repo and stack that own it      | `pending` | —                           |
+
+## Types — `types.md`
+
+| ID    | Rule                                                                                           | Gate      | Evidence                                            |
+| ----- | ---------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
+| TYP-1 | No `any` or `unknown` (`Any` in Python), except `unknown` parsed at once with a schema library | `pending` | —                                                   |
+| TYP-2 | Every signature states every parameter type and its return type explicitly                     | `pending` | —                                                   |
+| TYP-3 | A variable whose type is not obvious carries an explicit annotation                            | `review`  | New variables initialised from calls or expressions |
+| TYP-4 | Each value takes the most precise type that fits                                               | `review`  | New type annotations in the diff                    |
+| TYP-5 | Type checking runs at maximum strictness, with the floor raised until every repo is there      | `pending` | —                                                   |
+
+## Error handling — `errors.md`
+
+| ID    | Rule                                                                                  | Gate      | Evidence                               |
+| ----- | ------------------------------------------------------------------------------------- | --------- | -------------------------------------- |
+| ERR-1 | Code raises its own named error classes, never a bare built-in error or a string      | `pending` | —                                      |
+| ERR-2 | A docstring lists the errors a function can raise, and a unit test covers each        | `pending` | —                                      |
+| ERR-3 | A caught error is handled deliberately or raised again, never buried                  | `pending` | —                                      |
+| ERR-4 | A public-facing response never shows an internal error verbatim                       | `review`  | Error handling at each public boundary |
+| ERR-5 | An error reaching a service boundary is logged at error level and counted as a metric | `pending` | —                                      |
+
+## Logging — `logging.md`
+
+| ID    | Rule                                                                                        | Gate      | Evidence                                                 |
+| ----- | ------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------- |
+| LOG-1 | Every service logs through one shared layer, registered as top-level middleware             | `review`  | Each service's entrypoint                                |
+| LOG-2 | Each log line is one JSON object with the common fields, plus free fields                   | `pending` | —                                                        |
+| LOG-3 | The log store indexes only `service`, `host`, `environment` and `level`                     | `pending` | —                                                        |
+| LOG-4 | No secrets or personal data in logs; redacted at the source and again by the shipper        | `pending` | —                                                        |
+| LOG-5 | Raw logs are kept 30 days                                                                   | `pending` | —                                                        |
+| LOG-6 | Logging is not audit: a system needing an audit trail builds one as its own feature         | `review`  | Designs of portals where customers or administrators act |
+| LOG-7 | Every service gets aggregate metrics derived from its logs automatically                    | `pending` | —                                                        |
+| LOG-8 | Logs go through Grafana Alloy into a self-hosted Grafana Loki; VictoriaLogs is the fallback | `review`  | The monitoring stack's deployment code                   |
+
+## Observability and alerting — `observability.md`
+
+| ID     | Rule                                                                                                              | Gate      | Evidence                      |
+| ------ | ----------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| OBS-1  | Every service exposes rate, errors and duration per endpoint, from shared middleware                              | `pending` | —                             |
+| OBS-2  | Only core-service downtime, critical host health, a failed rollback, a missed heartbeat and full log storage page | `pending` | —                             |
+| OBS-3  | A page goes to phone push and email together, at any hour                                                         | `pending` | —                             |
+| OBS-4  | Alert email reaches at least one mailbox hosted outside the estate                                                | `review`  | The alert receiver list       |
+| OBS-5  | The monitoring is watched from outside by a heartbeat that pages when missed                                      | `pending` | —                             |
+| OBS-6  | Prometheus with Alertmanager is the only alert engine                                                             | `pending` | —                             |
+| OBS-7  | Dashboards and alert rules are code that CI loads; nothing is edited in the web UI                                | `pending` | —                             |
+| OBS-8  | Every alert rule has a promtool test and a one-line "what to do" note                                             | `pending` | —                             |
+| OBS-9  | Raw metrics are kept 30 days; aggregate series 2 years, in a second Prometheus                                    | `pending` | —                             |
+| OBS-10 | Monitoring storage emails at 70%, a projected fill, stopped logs or failing deletes                               | `pending` | —                             |
+| OBS-11 | Gradual degradation alerts by email before it becomes downtime                                                    | `pending` | —                             |
+| OBS-12 | Grafana is published through the edge over TLS, with its own login only                                           | `pending` | —                             |
+| OBS-13 | Named Grafana accounts; the bootstrap admin password is generated by CI                                           | `review`  | The Grafana provisioning code |
+
+## Security — `security.md`
+
+| ID     | Rule                                                                                              | Gate      | Evidence                                                  |
+| ------ | ------------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------- |
+| SEC-1  | A trust boundary is enforced physically: a lower-trust environment cannot reach a higher one      | `review`  | Credentials and network rules granted to each environment |
+| SEC-2  | Every service is hardened to the standard baseline, and further where risk justifies it           | `review`  | The diff, read against the OWASP Top 10                   |
+| SEC-3  | Security wins over speed unless the slowdown is noticeable to users                               | `review`  | Changes trading a security control for speed              |
+| SEC-4  | A critical or high vulnerability blocks shipped code; in development-only code it warns           | `pending` | —                                                         |
+| SEC-5  | An unfixable critical or high finding needs a reasoned exemption that expires in 30 days          | `pending` | —                                                         |
+| SEC-6  | Live images are re-scanned nightly; a new critical or high finding files an urgent issue          | `pending` | —                                                         |
+| SEC-7  | Grype scans lockfiles on every PR and `main`, and every built image                               | `pending` | —                                                         |
+| SEC-8  | Static security analysis on every PR: CodeQL public, Opengrep private, linter rules in pre-commit | `pending` | —                                                         |
+| SEC-9  | KICS scans Dockerfiles, Compose files and workflows; hadolint lints Dockerfiles                   | `pending` | —                                                         |
+| SEC-10 | Scanners are installed by pinned version and verified checksum                                    | `pending` | —                                                         |
+
+## Secrets and credentials — `credentials.md`
+
+| ID      | Rule                                                                                       | Gate      | Evidence                                                 |
+| ------- | ------------------------------------------------------------------------------------------ | --------- | -------------------------------------------------------- |
+| CRED-1  | The platform owner always has a break-glass path to every resource, working with CI down   | `review`  | Changes to any access path                               |
+| CRED-2  | A secret that can be generated is generated by CI and never seen by a person               | `review`  | New secrets in the diff and where their values come from |
+| CRED-3  | Only data-protecting secrets are escrowed, by CI, encrypted to the owner's escrow keys     | `pending` | —                                                        |
+| CRED-4  | Every generated secret has a scheduled rotation that waits only for the approval click     | `pending` | —                                                        |
+| CRED-5  | A supplier token no API can create is narrowed, split per project and re-minted yearly     | `pending` | —                                                        |
+| CRED-6  | CI files a recurring drill to decrypt a test secret with each escrow key                   | `pending` | —                                                        |
+| CRED-7  | CI credentials are deploy-environment secrets, never repository-wide secrets               | `pending` | —                                                        |
+| CRED-8  | The owner's SSH key and two-factor logins are hardware-backed                              | `review`  | The access inventory in the operations docs              |
+| CRED-9  | The password manager holds personal logins only, no machine secret                         | `review`  | The password manager's contents, at each drill           |
+| CRED-10 | Services read secrets from mounted files, not plain environment variables, where supported | `pending` | —                                                        |
+| CRED-11 | gitleaks runs in pre-commit and CI in every repo; any finding fails                        | `pending` | —                                                        |
+
+## Configuration — `configuration.md`
+
+| ID    | Rule                                                                                                  | Gate      | Evidence                           |
+| ----- | ----------------------------------------------------------------------------------------------------- | --------- | ---------------------------------- |
+| CFG-1 | A service validates its configuration against a typed schema at start and refuses to start if invalid | `pending` | —                                  |
+| CFG-2 | Configuration is injected from outside, never baked into an image or committed                        | `pending` | —                                  |
+| CFG-3 | Each configuration value has exactly one source of truth                                              | `review`  | New configuration keys in the diff |
+| CFG-4 | A missing optional value turns its feature off, never on                                              | `review`  | New feature flags and their tests  |
+
+## Databases — `databases.md`
+
+| ID   | Rule                                                                                     | Gate      | Evidence                             |
+| ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------ |
+| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `pending` | —                                    |
+| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff |
+| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | —                                    |
+| DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                    |
+| DB-5 | Schema changes follow expand/contract, so the previous release keeps working             | `pending` | —                                    |
+| DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                    |
+| DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                    |
+
+## Containers — `containers.md`
+
+| ID     | Rule                                                                                            | Gate      | Evidence                                |
+| ------ | ----------------------------------------------------------------------------------------------- | --------- | --------------------------------------- |
+| CON-1  | Our own services build on Docker Hardened Images; the fallback is Debian slim, hardened         | `pending` | —                                       |
+| CON-2  | Third-party applications use the upstream official image as it comes                            | `review`  | New third-party images in Compose files |
+| CON-3  | Every image reference is `name:tag@sha256:digest`                                               | `pending` | —                                       |
+| CON-4  | Images run as a numeric non-root user; exceptions are listed with a reason                      | `pending` | —                                       |
+| CON-5  | The root filesystem is read-only; writable paths are named volumes or `tmpfs`                   | `pending` | —                                       |
+| CON-6  | All capabilities dropped and added back by name; no new privileges, never privileged, no socket | `pending` | —                                       |
+| CON-7  | Only the edge publishes ports to the internet                                                   | `pending` | —                                       |
+| CON-8  | A service that doesn't need the internet sits on an internal network                            | `pending` | —                                       |
+| CON-9  | Every other service declares its egress, enforced deny-by-default on the host                   | `pending` | —                                       |
+| CON-10 | Memory, CPU and process limits, set from observed behaviour at rest and under load              | `pending` | —                                       |
+| CON-11 | CI produces and attaches a software bill of materials for every image                           | `pending` | —                                       |
+| CON-12 | CI signs every image, and the host verifies the signature before deploying                      | `pending` | —                                       |
+| CON-13 | One process per container, logging JSON to standard output                                      | `review`  | Dockerfile entrypoints                  |
+| CON-14 | Every image has a health check that CI exercises by booting it                                  | `pending` | —                                       |
+| CON-15 | The digest CI built and scanned is the digest that runs                                         | `pending` | —                                       |
+
+## Shell — `shell-and-python.md`
+
+| ID   | Rule                                                                                        | Gate      | Evidence                                 |
+| ---- | ------------------------------------------------------------------------------------------- | --------- | ---------------------------------------- |
+| SH-1 | Shell is allowed only with tests to the same standard as other code, and a clean shellcheck | `pending` | —                                        |
+| SH-2 | A runbook may use shell for a manual task; a step an agent runs is still manual             | `review`  | Shell in runbooks versus shell elsewhere |
+| SH-3 | Beyond basic commands, use a typed language and a tool's own SDK, not subprocess calls      | `review`  | New scripts in the diff                  |
+| SH-4 | A command meant to be copied never contains an unfilled placeholder                         | `pending` | —                                        |
+
+## Python — `shell-and-python.md`
+
+| ID   | Rule                                                                           | Gate      | Evidence                                      |
+| ---- | ------------------------------------------------------------------------------ | --------- | --------------------------------------------- |
+| PY-1 | Services are TypeScript; Python only when a library it needs forces the choice | `review`  | A new Python service and the library it names |
+| PY-2 | Python runs strict mypy and ruff in pre-commit and CI                          | `pending` | —                                             |
+| PY-3 | Every Python project declares its minimum version, and its checkers target it  | `pending` | —                                             |
+
+## Web front ends — `stacks/web-frontends.md`
+
+| ID    | Rule                                                                                  | Gate      | Evidence                                      |
+| ----- | ------------------------------------------------------------------------------------- | --------- | --------------------------------------------- |
+| WEB-1 | No interactive features: a static site. Otherwise React Router v7, server-rendered    | `review`  | A new site's choice of stack                  |
+| WEB-2 | HTML and CSS first; JavaScript only where clearly needed, enhancing progressively     | `review`  | New client-side scripts in the diff           |
+| WEB-3 | A WCAG AA violation fails the build; an AAA finding warns                             | `pending` | —                                             |
+| WEB-4 | Axe runs after each navigation and interaction, on every route, inside existing tests | `review`  | New routes and interactions against the tests |
+
+## Operations — `operations.md`
+
+| ID    | Rule                                                                                                      | Gate      | Evidence                                                            |
+| ----- | --------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------- |
+| OPS-1 | Every production change arrives through CI; a hand-made emergency change is redone within a day           | `review`  | Incident entries and the CI change that replaced each hand-made one |
+| OPS-2 | Every deploy has a health check with a grace period and an automatic rollback                             | `pending` | —                                                                   |
+| OPS-3 | Blue/green deploys wherever possible; the mail server is exempt while it runs only mail                   | `review`  | Each service's deploy design                                        |
+| OPS-4 | Backups are proven by a CI restore drill, weekly and on change, that checks the data                      | `pending` | —                                                                   |
+| OPS-5 | After every incident or out-of-routine change, an agent the owner started writes an operations-docs entry | `review`  | Incident issues and their linked entries                            |
+| OPS-6 | A repeated manual step is automated, not written up as a runbook                                          | `review`  | New runbooks and why their steps can't be automated                 |
+| OPS-7 | Capacity is sized from measured load, not estimates                                                       | `review`  | Proposals to spend on capacity                                      |
+
+## Non-functional requirements — `non-functional.md`
+
+| ID    | Rule                                                                                    | Gate     | Evidence                                    |
+| ----- | --------------------------------------------------------------------------------------- | -------- | ------------------------------------------- |
+| NFR-1 | Security, accessibility, ethics and honest sustainability claims are never traded       | `review` | Design documents, for how each floor is met |
+| NFR-2 | Availability, performance and cost are set per product, and the position is recorded    | `review` | Design documents and the recorded position  |
+| NFR-3 | A design leaning on low cost must not block a later move to availability or performance | `review` | Design documents for cost-leaning products  |
+| NFR-4 | Sustainability is measured and published, as fully as possible                          | `review` | Published figures and their measurements    |
+| NFR-5 | Everything public-facing is accessible, not only web pages                              | `review` | New public-facing output                    |
+| NFR-6 | Once a service has objectives, we hold ourselves to them and report a miss openly       | `review` | Incident entries                            |
 
 ## Pending — blocked on authorship
 
-These families are declared so the index is the single place to look, and so
-nothing else invents a competing ID scheme in the meantime. Each is written in
-dialogue with the platform owner.
+These are rules planned for existing families that no clause carries yet.
+They are listed so the index is the single place to look, and so nothing else
+invents a competing rule in the meantime. Each is written in dialogue with the
+platform owner.
 
-| Family                  | Doc                                    | Covers                                                                                              |
-| ----------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `SEC-*`, `NAM-*`        | `security.md`, `naming.md`             | Boundaries as constants, resource naming and length budgets                                         |
-| `CON-*`, `SH-*`, `PY-*` | `containers.md`, `shell-and-python.md` | Entrypoint fail-closed, tag+digest pinning, `set -euo pipefail`, the three-mode self-testing script |
+| Family  | Doc                   | Not yet authored                                                                 |
+| ------- | --------------------- | -------------------------------------------------------------------------------- |
+| `SEC-*` | `security.md`         | Security boundaries as reviewed constants outside Pulumi (`PUL-6` covers Pulumi) |
+| `SH-*`  | `shell-and-python.md` | Shell strict mode (`set -euo pipefail`) as a required script header              |
 
 `SEC-*` and `DP-*` are deliberately separate families rather than one. `SEC-*`
 is about where a boundary is drawn and whether it can move at runtime; `DP-*`
 is about what happens to personal data on either side of it — how long it is
 kept and how it is destroyed. Retention and erasure are not boundary rules,
-and folding them into a security family would leave the eventual `security.md`
-covering two unrelated questions under one prefix.
+and folding them into a security family would leave `security.md` covering two
+unrelated questions under one prefix.

@@ -64,3 +64,14 @@ A component package exports its CSS through a dedicated subpath, built from a
 CSS-only entry that is never imported by the JavaScript entry. Otherwise every
 consumer pulls the stylesheet into their bundle whether they use it or not, and
 a consumer with their own styling cannot opt out.
+
+## STY-5 — a dark theme needs only token changes
+
+CSS is written so that adding a dark theme would need changes to the design
+tokens and nothing else.
+
+**Why:** if theming is hard, visual decisions have leaked out of the one place
+they belong.
+
+**Check plan:** review of new colour values outside the token files; `STY-2`'s
+ban on literals does most of the work.

@@ -125,6 +125,27 @@ missing status-check rules for as long as they had been missing — while also
 reporting the same server-side field as drift on nine of nine repos, so it was
 red everywhere and read nowhere. A control that always fires is not a control.
 
+## REPO-8 — commits are signed, always
+
+Every commit is signed, and signing is never switched off to get a commit past
+a block.
+
+**Why:** an unsigned commit turns a failed control into an administrator's
+bypass of branch protection.
+
+**Check plan:** `REPO-1`'s ruleset already requires signatures; a grep of
+scripts and docs for commands that disable signing.
+
+## REPO-9 — secret scanning on every public repo
+
+Every public repo has GitHub secret scanning and push protection switched on.
+
+**Why:** push protection stops a secret before it is published, at no cost on
+a public repo.
+
+**Check plan:** `tools/ruleset-audit.sh` extended to read each repo's security
+and analysis settings.
+
 ## Applying is privileged
 
 `ruleset-apply.sh` is the platform owner's to run. Prepare the command, run
