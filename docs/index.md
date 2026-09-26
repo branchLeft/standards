@@ -528,6 +528,15 @@ Thin by design. The org documentation standard and its mechanical rules
 | PY-2 | Python runs strict mypy and ruff in pre-commit and CI                          | `pending` | —                                             |
 | PY-3 | Every Python project declares its minimum version, and its checkers target it  | `pending` | —                                             |
 
+## Web front ends — `stacks/web-frontends.md`
+
+| ID    | Rule                                                                                  | Gate      | Evidence                                      |
+| ----- | ------------------------------------------------------------------------------------- | --------- | --------------------------------------------- |
+| WEB-1 | No interactive features: a static site. Otherwise React Router v7, server-rendered    | `review`  | A new site's choice of stack                  |
+| WEB-2 | HTML and CSS first; JavaScript only where clearly needed, enhancing progressively     | `review`  | New client-side scripts in the diff           |
+| WEB-3 | A WCAG AA violation fails the build; an AAA finding warns                             | `pending` | —                                             |
+| WEB-4 | Axe runs after each navigation and interaction, on every route, inside existing tests | `review`  | New routes and interactions against the tests |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so

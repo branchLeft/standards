@@ -288,3 +288,9 @@ SH-4	*.md	[fleet] commands to copy live in markdown runbooks and docs
 PY-1	*.py;pyproject.toml;*/pyproject.toml	[doc] Python services
 PY-2	*.py;pyproject.toml;*/pyproject.toml;.pre-commit-config.yaml	[doc] Python source and its checker configuration
 PY-3	pyproject.toml;*/pyproject.toml	[doc] the file the clause names
+
+## Web front ends — stacks/web-frontends.md
+WEB-1	*.html;app/*;package.json;*/package.json	[fleet] a site stack choice shows in its entry files and manifest
+WEB-2	*.html;*.ts;*.tsx;*.js;*.jsx	[fleet] client-side scripts and markup
+WEB-3	*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] browser-test files that call the axe helper
+WEB-4	app/routes/*;*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] route files and the browser tests that cover them, as APP-4
