@@ -408,6 +408,19 @@ Thin by design. The org documentation standard and its mechanical rules
 | ERR-4 | A public-facing response never shows an internal error verbatim                       | `review`  | Error handling at each public boundary |
 | ERR-5 | An error reaching a service boundary is logged at error level and counted as a metric | `pending` | —                                      |
 
+## Logging — `logging.md`
+
+| ID    | Rule                                                                                        | Gate      | Evidence                                                 |
+| ----- | ------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------- |
+| LOG-1 | Every service logs through one shared layer, registered as top-level middleware             | `review`  | Each service's entrypoint                                |
+| LOG-2 | Each log line is one JSON object with the common fields, plus free fields                   | `pending` | —                                                        |
+| LOG-3 | The log store indexes only `service`, `host`, `environment` and `level`                     | `pending` | —                                                        |
+| LOG-4 | No secrets or personal data in logs; redacted at the source and again by the shipper        | `pending` | —                                                        |
+| LOG-5 | Raw logs are kept 30 days                                                                   | `pending` | —                                                        |
+| LOG-6 | Logging is not audit: a system needing an audit trail builds one as its own feature         | `review`  | Designs of portals where customers or administrators act |
+| LOG-7 | Every service gets aggregate metrics derived from its logs automatically                    | `pending` | —                                                        |
+| LOG-8 | Logs go through Grafana Alloy into a self-hosted Grafana Loki; VictoriaLogs is the fallback | `review`  | The monitoring stack's deployment code                   |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so

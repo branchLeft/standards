@@ -195,3 +195,13 @@ ERR-2	*.ts;*.tsx;*.py	[fleet] same as ERR-1
 ERR-3	*.ts;*.tsx;*.py	[fleet] same as ERR-1
 ERR-4	*.ts;*.tsx;*.py	[fleet] same as ERR-1
 ERR-5	*.ts;*.tsx;*.py	[fleet] same as ERR-1
+
+## Logging — logging.md
+LOG-1	*.ts;*.tsx;*.py	[fleet] service source; the doc names middleware, not a path
+LOG-2	*.ts;*.tsx;*.py	[fleet] same as LOG-1
+LOG-3	*.yml;*.yaml;*.alloy	[fleet] log shipper and log store configuration; no path stated
+LOG-4	*.ts;*.tsx;*.py;*.yml;*.yaml;*.alloy	[fleet] middleware source plus shipper configuration
+LOG-5	*.yml;*.yaml	[fleet] the log store retention setting; no path stated
+LOG-6	*	[none] a design judgement, not tied to one file
+LOG-7	*.yml;*.yaml	[fleet] recording-rule files; no path stated
+LOG-8	*.yml;*.yaml;*.alloy;*.ts	[fleet] the monitoring stack deployment; no path stated
