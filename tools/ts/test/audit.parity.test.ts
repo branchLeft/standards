@@ -1,15 +1,8 @@
-// Two things at once, both required by branchLeft/workspace#1421:
-//
-// 1. Every assertion `standards-audit.sh --self-test` makes, ported to run
-//    against the TypeScript `Audit` instead of the bash function.
-// 2. Direct parity: the bash script and the TypeScript audit, run on the
-//    same scratch fixture, must produce byte-identical output.
-//
-// `--mode enforce` makes every tracked file enforced regardless of git
-// history, so each fixture below is built as its own scratch repo rather
-// than as commits layered on one repo — the two are equivalent under
-// enforce, and independent fixtures make each assertion's setup legible on
-// its own.
+// Every assertion `standards-audit.sh --self-test` makes, ported to run
+// against the TypeScript `Audit`, plus a direct parity check: bash and
+// TypeScript on the same fixture must produce byte-identical output.
+// `--mode enforce` is history-independent, so each fixture is its own
+// scratch repo rather than commits layered on one.
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

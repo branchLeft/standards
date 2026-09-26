@@ -6,7 +6,7 @@ import type { ProcessRunner } from './processRunner.ts';
 /**
  * Adapts an existing `tools/*.sh` gate so it runs unchanged through the
  * TypeScript audit — every gate in `standards-audit.sh`'s `GATES` and
- * `ADVISORY_GATES` arrays until branchLeft/workspace#1422 ports them.
+ * `ADVISORY_GATES` arrays, until each is ported natively.
  */
 export class BashGate implements Gate {
   readonly id: string;

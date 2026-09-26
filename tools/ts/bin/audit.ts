@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // TypeScript entry point for the standards audit. Runs alongside
 // `tools/standards-audit.sh` — CI and the pre-commit hooks still call the
-// bash script; switching them over is branchLeft/workspace#1422.
+// bash script until every gate below has a native TypeScript equivalent.
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Audit } from '../src/audit.ts';
@@ -71,8 +71,8 @@ function main(): void {
     new BashGate(name, join(TOOLS_ROOT, name), clauses, advisory, processRunner);
 
   // Clauses are informational on this adapter — BashGate defers to each
-  // script's own findings — so an empty list costs nothing until #1422 names
-  // each gate's clauses for a native implementation.
+  // script's own findings — so an empty list costs nothing while the gates
+  // stay bash.
   const gates = GATE_NAMES.map((name) => gateAt(name, false, []));
   const advisoryGates = ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, []));
 

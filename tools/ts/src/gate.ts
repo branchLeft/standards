@@ -7,8 +7,8 @@ export interface GateContext {
 }
 
 /**
- * One audit check. `BashGate` is the only implementation until the gates
- * named in branchLeft/workspace#1422 are ported natively.
+ * One audit check. `BashGate` is the only implementation while every gate
+ * still runs as a bash script.
  */
 export interface Gate {
   readonly id: string;
