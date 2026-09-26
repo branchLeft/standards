@@ -210,6 +210,8 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 | REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
 | REPO-6 | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
 | REPO-7 | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
+| REPO-8 | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
+| REPO-9 | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`

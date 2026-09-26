@@ -108,6 +108,8 @@ REPO-4	templates/rulesets/*;.github/workflows/*.yml;.github/workflows/*.yaml	[fl
 REPO-5	.github/CODEOWNERS	[doc] "CODEOWNERS must cover..."
 REPO-6	templates/rulesets/*	[doc] same payload location as REPO-1
 REPO-7	templates/rulesets/*;tools/ruleset-apply.sh	[doc] payload location plus the script named throughout the clause's own doc
+REPO-8	*.sh;*.py;*.md;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where a command that disables signing could be written
+REPO-9	*	[none] a repository setting, not a file in a diff
 
 ## Pulumi — stacks/pulumi.md, tools/check-pulumi.sh, tools/check-pulumi-secrets.sh
 PUL-1	*.ts	[gate] check-pulumi.sh: ratchet_scope_files '\.ts$', then content-filtered for a ComponentResource declaration — a path glob cannot replicate the content filter, so this over-matches every .ts file
