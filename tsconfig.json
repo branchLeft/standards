@@ -1,5 +1,9 @@
 {
+  "_comment": "allowImportingTsExtensions: tools/ts runs unbuilt, directly under node's type-stripping, which requires the .ts extension on every relative import.",
   "extends": ["@branchleft/tsconfig/strict-2.json", "@branchleft/tsconfig/react-app.json"],
-  "include": ["packages/*/src/**/*.ts", "vitest.config.ts"],
+  "compilerOptions": {
+    "allowImportingTsExtensions": true
+  },
+  "include": ["packages/*/src/**/*.ts", "vitest.config.ts", "tools/ts/**/*.ts"],
   "exclude": ["node_modules", "**/dist"]
 }

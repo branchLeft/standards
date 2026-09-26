@@ -5,6 +5,15 @@ import { defineStandardTest } from '@branchleft/vitest-config';
 // defineStandardTest fails the run loudly rather than quietly changing what
 // gets measured.
 export default defineStandardTest({
-  coverageInclude: ['packages/*/src/**/*.ts'],
-  testInclude: ['packages/*/src/**/*.test.ts'],
+  coverageInclude: ['packages/*/src/**/*.ts', 'tools/ts/**/*.ts'],
+  coverageExclude: [
+    '**/*.test.{ts,tsx}',
+    '**/*.spec.{ts,tsx}',
+    '**/*.stories.{ts,tsx}',
+    '**/*.d.ts',
+    '**/node_modules/**',
+    '**/dist/**',
+    'tools/ts/bin/**',
+  ],
+  testInclude: ['packages/*/src/**/*.test.ts', 'tools/ts/**/*.test.ts'],
 });
