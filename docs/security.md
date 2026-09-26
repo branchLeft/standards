@@ -131,8 +131,8 @@ any repo or anywhere public. Decisions are published instead (`DOC-9`,
 `PRIN-1`).
 
 **Why:** they carry operational detail that can't be reliably scrubbed, such
-as host and tenant names, and sometimes a secret pasted mid-session.
-Operational hygiene and security come before openness here.
+as host and tenant names. Operational hygiene and security come before
+openness here.
 
 **Check plan:** `CRED-11`'s secret scan, plus a path rule refusing transcript
 and memory files in any repo.
