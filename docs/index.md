@@ -479,6 +479,18 @@ Thin by design. The org documentation standard and its mechanical rules
 | CFG-3 | Each configuration value has exactly one source of truth                                              | `review`  | New configuration keys in the diff |
 | CFG-4 | A missing optional value turns its feature off, never on                                              | `review`  | New feature flags and their tests  |
 
+## Databases — `databases.md`
+
+| ID   | Rule                                                                                     | Gate      | Evidence                             |
+| ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------ |
+| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `pending` | —                                    |
+| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff |
+| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | —                                    |
+| DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                    |
+| DB-5 | Schema changes follow expand/contract, so the previous release keeps working             | `pending` | —                                    |
+| DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                    |
+| DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                    |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so

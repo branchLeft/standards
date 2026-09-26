@@ -251,3 +251,12 @@ CFG-1	*.ts;*.tsx;*.py	[fleet] the schema lives in service source; no path stated
 CFG-2	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml	[doc] the clause names images, which Dockerfiles and Compose files define
 CFG-3	*.ts;*.py;Pulumi.*.yaml;*/Pulumi.*.yaml	[fleet] stack configuration and schema defaults
 CFG-4	*.ts;*.tsx;*.py	[fleet] feature-flag code in service source
+
+## Databases — databases.md
+DB-1	*.ts;*.tsx;*.py;*.sql	[fleet] source and migration files; no path stated
+DB-2	*.ts;*.tsx	[fleet] the `sql` template is a TypeScript construct
+DB-3	package.json;*/package.json;*.ts	[fleet] dependency manifests and TypeScript database code
+DB-4	*.sql;*/migrations/*;*/drizzle/*;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] migration folders and the deploy workflow
+DB-5	*.sql;*/migrations/*;*/drizzle/*	[fleet] migration folders
+DB-6	*.sql;*/migrations/*;*/drizzle/*	[fleet] same as DB-5
+DB-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the CI job that runs the previous release tests
