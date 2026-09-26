@@ -122,6 +122,7 @@ PUL-9	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-10	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-11	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-12	Pulumi.*.yaml;*/Pulumi.*.yaml	[gate] check-pulumi-secrets.sh: ratchet_scope_files '(^|/)Pulumi\.[A-Za-z0-9_-]+\.yaml$'
+PUL-13	*.ts;Pulumi.*.yaml;*/Pulumi.*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] programs, stack configuration and the preview workflow
 
 ## Infrastructure operations — infrastructure.md
 IAC-1	*	[none] a CI-403-vs-hand-apply judgement call; infrastructure.md names no path
