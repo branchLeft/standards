@@ -277,3 +277,9 @@ CON-12	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the build and de
 CON-13	*Dockerfile;*Dockerfile.*	[doc] entrypoints live in Dockerfiles
 CON-14	*Dockerfile;*Dockerfile.*;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the health check and the CI job that boots the image
 CON-15	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the deploy workflows
+
+## Shell — shell-and-python.md
+SH-1	*.sh;*.bash	[doc] the clause is about shell scripts
+SH-2	*.md	[fleet] runbooks are markdown; no path stated
+SH-3	*.sh;*.bash;*.py;*.ts	[fleet] new scripts in any of the languages the clause names
+SH-4	*.md	[fleet] commands to copy live in markdown runbooks and docs

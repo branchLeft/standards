@@ -511,6 +511,15 @@ Thin by design. The org documentation standard and its mechanical rules
 | CON-14 | Every image has a health check that CI exercises by booting it                                  | `pending` | —                                       |
 | CON-15 | The digest CI built and scanned is the digest that runs                                         | `pending` | —                                       |
 
+## Shell — `shell-and-python.md`
+
+| ID   | Rule                                                                                        | Gate      | Evidence                                 |
+| ---- | ------------------------------------------------------------------------------------------- | --------- | ---------------------------------------- |
+| SH-1 | Shell is allowed only with tests to the same standard as other code, and a clean shellcheck | `pending` | —                                        |
+| SH-2 | A runbook may use shell for a manual task; a step an agent runs is still manual             | `review`  | Shell in runbooks versus shell elsewhere |
+| SH-3 | Beyond basic commands, use a typed language and a tool's own SDK, not subprocess calls      | `review`  | New scripts in the diff                  |
+| SH-4 | A command meant to be copied never contains an unfilled placeholder                         | `pending` | —                                        |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
