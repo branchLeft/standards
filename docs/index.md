@@ -155,7 +155,7 @@ the same shape of package but currently have no consumers to record.
 | TEST-5 | Test-driven development wherever possible: test suite first, seen to fail, then implementation | `review`  | —          |
 | TEST-6 | Code that is hard to test is a design defect: fix the seam, not the test                       | `review`  | —          |
 | COV-1  | At least 90% of a PR's changed lines are covered, per the test runner's report                 | `pending` | —          |
-| COV-2  | The repo total never drops against the merge base                                              | `pending` | —          |
+| COV-2  | The repo total never drops, and every repo reaches 90% overall through the sweeps              | `pending` | —          |
 
 `TEST-*` are review clauses because none of them can be automated without making
 things worse — a minimum-assertions rule is gamed by three weak assertions, and a

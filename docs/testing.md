@@ -174,15 +174,19 @@ fixable, which a silent exclusion is not.
 **Check plan:** `tools/check-coverage.sh` moved from per-file coverage to the
 PR's changed lines, reading the test runner's own report.
 
-## COV-2 — the repo total never drops
+## COV-2 — the repo total never drops, and reaches 90% through the sweeps
 
 `pending`, for the same reason as COV-1 and with the same warning. Compared
-against the merge base, not against a fixed target. Intended value:
-no-regression.
+against the merge base, not against a fixed target until the repo is already
+past it. Intended value: no-regression, converging on 90% overall.
 
-There is deliberately no absolute global percentage. A fixed target blocks
-PRs for debt they did not create and is satisfiable by testing easy code; a
-non-regression check asks only that the direction is right.
+Every repo reaches 90% overall line coverage — the standards sweeps do that
+work, not any single PR. Below 90%, a fixed target from day one would block
+PRs for debt they did not create and is satisfiable by testing whatever's
+easy, so the gate asks only that the total not fall while the sweeps raise
+it. Once a repo's total reaches 90%, that becomes the floor: its total can't
+drop back below 90%, on top of the merge-base comparison that still applies
+above the line.
 
 Expect the reported number to **fall sharply** the first time `coverage.include`
 is set correctly in a repo that never had it — that is the honest denominator
