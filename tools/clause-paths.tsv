@@ -43,6 +43,7 @@ STD-000	*	[doc] a `standards-allow-next-line` suppression can be the preceding l
 STD-001	.standardsignore	[doc] exemptions are rows in this file only
 STD-002	.standardsignore	[doc] staleness is computed over this file's rows
 STD-003	*	[none] a statement of scope, not tied to any file
+STD-004	*	[none] a rule about rules, not tied to any file
 
 ## TypeScript — tsconfig.md, tools/check-tsconfig.sh
 TS-1	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] check-tsconfig.sh: ratchet_scope_files '(^|/)tsconfig(\.[a-z]+)?\.json$'
@@ -114,6 +115,7 @@ REPO-6	templates/rulesets/*	[doc] same payload location as REPO-1
 REPO-7	templates/rulesets/*;tools/ruleset-apply.sh	[doc] payload location plus the script named throughout the clause's own doc
 REPO-8	*.sh;*.py;*.md;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where a command that disables signing could be written
 REPO-9	*	[none] a repository setting, not a file in a diff
+REPO-10	*	[none] commit and pull request metadata, not a file
 
 ## Pulumi — stacks/pulumi.md, tools/check-pulumi.sh, tools/check-pulumi-secrets.sh
 PUL-1	*.ts	[gate] check-pulumi.sh: ratchet_scope_files '\.ts$', then content-filtered for a ComponentResource declaration — a path glob cannot replicate the content filter, so this over-matches every .ts file
@@ -148,6 +150,7 @@ DP-8	*	[none] same as DP-1
 DP-9	*	[none] same as DP-1
 DP-10	*	[none] same as DP-1
 DP-11	*	[none] same as DP-1
+DP-12	*.ts;*.tsx;*.py;*.sql	[fleet] where personal-data fields are declared
 
 ## Styling — stacks/styling.md
 STY-1	*.tsx;*.jsx;*.css	[fleet] "a Tailwind pipeline"; styling.md names no path. Cannot be distinguished from STY-3/4 by glob alone — see PR description
@@ -195,6 +198,7 @@ DOC-6	*.md	[fleet] same as DOC-4
 DOC-7	*	[none] a change to any file can make a document stale
 DOC-8	*.md	[fleet] same as DOC-4
 DOC-9	*.md	[fleet] same as DOC-4
+DOC-10	*.md	[fleet] same as DOC-4
 
 ## Architecture — architecture.md
 ARCH-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions
@@ -264,6 +268,9 @@ SEC-7	.github/workflows/*.yml;.github/workflows/*.yaml;*lock.yaml;*lock.json;*.l
 SEC-8	.github/workflows/*.yml;.github/workflows/*.yaml;.pre-commit-config.yaml	[fleet] where the analysers run
 SEC-9	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the file types the clause names
 SEC-10	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where CI installs tools
+SEC-11	*	[fleet] any file added to a repo
+SEC-12	*	[fleet] network connections, stores and backups in any file
+SEC-13	*	[fleet] credentials and keys in any file
 
 ## Secrets and credentials — credentials.md
 CRED-1	*	[none] an access-path property, not tied to one file
@@ -343,3 +350,9 @@ NFR-3	*	[none] a product-level requirement, not tied to one file
 NFR-4	*	[none] a product-level requirement, not tied to one file
 NFR-5	*	[none] a product-level requirement, not tied to one file
 NFR-6	*	[none] a product-level requirement, not tied to one file
+PROD-1	*	[none] a product-level requirement, not tied to one file
+PROD-2	*	[none] a product-level requirement, not tied to one file
+PROD-3	*	[none] a product-level requirement, not tied to one file
+PROD-4	*	[none] a product-level requirement, not tied to one file
+PROD-5	*	[none] a product-level requirement, not tied to one file
+PROD-6	*	[none] a product-level requirement, not tied to one file
