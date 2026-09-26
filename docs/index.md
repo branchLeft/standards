@@ -491,6 +491,26 @@ Thin by design. The org documentation standard and its mechanical rules
 | DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                    |
 | DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                    |
 
+## Containers — `containers.md`
+
+| ID     | Rule                                                                                            | Gate      | Evidence                                |
+| ------ | ----------------------------------------------------------------------------------------------- | --------- | --------------------------------------- |
+| CON-1  | Our own services build on Docker Hardened Images; the fallback is Debian slim, hardened         | `pending` | —                                       |
+| CON-2  | Third-party applications use the upstream official image as it comes                            | `review`  | New third-party images in Compose files |
+| CON-3  | Every image reference is `name:tag@sha256:digest`                                               | `pending` | —                                       |
+| CON-4  | Images run as a numeric non-root user; exceptions are listed with a reason                      | `pending` | —                                       |
+| CON-5  | The root filesystem is read-only; writable paths are named volumes or `tmpfs`                   | `pending` | —                                       |
+| CON-6  | All capabilities dropped and added back by name; no new privileges, never privileged, no socket | `pending` | —                                       |
+| CON-7  | Only the edge publishes ports to the internet                                                   | `pending` | —                                       |
+| CON-8  | A service that doesn't need the internet sits on an internal network                            | `pending` | —                                       |
+| CON-9  | Every other service declares its egress, enforced deny-by-default on the host                   | `pending` | —                                       |
+| CON-10 | Memory, CPU and process limits, set from observed behaviour at rest and under load              | `pending` | —                                       |
+| CON-11 | CI produces and attaches a software bill of materials for every image                           | `pending` | —                                       |
+| CON-12 | CI signs every image, and the host verifies the signature before deploying                      | `pending` | —                                       |
+| CON-13 | One process per container, logging JSON to standard output                                      | `review`  | Dockerfile entrypoints                  |
+| CON-14 | Every image has a health check that CI exercises by booting it                                  | `pending` | —                                       |
+| CON-15 | The digest CI built and scanned is the digest that runs                                         | `pending` | —                                       |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so

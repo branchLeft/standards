@@ -260,3 +260,20 @@ DB-4	*.sql;*/migrations/*;*/drizzle/*;.github/workflows/*.yml;.github/workflows/
 DB-5	*.sql;*/migrations/*;*/drizzle/*	[fleet] migration folders
 DB-6	*.sql;*/migrations/*;*/drizzle/*	[fleet] same as DB-5
 DB-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the CI job that runs the previous release tests
+
+## Containers — containers.md
+CON-1	*Dockerfile;*Dockerfile.*	[doc] the clause names Dockerfiles
+CON-2	*compose*.yml;*compose*.yaml	[doc] the clause names Compose files
+CON-3	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml	[doc] the clause names Dockerfiles and Compose files
+CON-4	*Dockerfile;*Dockerfile.*	[doc] the clause names Dockerfiles
+CON-5	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-6	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-7	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-8	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-9	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-10	*compose*.yml;*compose*.yaml	[doc] a runtime setting that Compose files declare
+CON-11	.github/workflows/*.yml;.github/workflows/*.yaml;*Dockerfile;*Dockerfile.*	[fleet] the build workflow and the images it builds
+CON-12	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the build and deploy workflows
+CON-13	*Dockerfile;*Dockerfile.*	[doc] entrypoints live in Dockerfiles
+CON-14	*Dockerfile;*Dockerfile.*;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the health check and the CI job that boots the image
+CON-15	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the deploy workflows
