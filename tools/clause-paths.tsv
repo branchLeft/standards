@@ -304,3 +304,11 @@ OPS-4	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled dri
 OPS-5	*	[none] entries live in the private operations docs, outside any product repo
 OPS-6	*.md	[fleet] runbooks are markdown
 OPS-7	*	[none] a spending judgement, not tied to one file
+
+## Non-functional requirements — non-functional.md
+NFR-1	*	[none] a product-level requirement, not tied to one file
+NFR-2	*	[none] a product-level requirement, not tied to one file
+NFR-3	*	[none] a product-level requirement, not tied to one file
+NFR-4	*	[none] a product-level requirement, not tied to one file
+NFR-5	*	[none] a product-level requirement, not tied to one file
+NFR-6	*	[none] a product-level requirement, not tied to one file

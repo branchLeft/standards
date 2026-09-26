@@ -550,6 +550,17 @@ Thin by design. The org documentation standard and its mechanical rules
 | OPS-6 | A repeated manual step is automated, not written up as a runbook                                | `review`  | New runbooks and why their steps can't be automated                 |
 | OPS-7 | Capacity is sized from measured load, not estimates                                             | `review`  | Proposals to spend on capacity                                      |
 
+## Non-functional requirements — `non-functional.md`
+
+| ID    | Rule                                                                                    | Gate     | Evidence                                    |
+| ----- | --------------------------------------------------------------------------------------- | -------- | ------------------------------------------- |
+| NFR-1 | Security, accessibility, ethics and honest sustainability claims are never traded       | `review` | Design documents, for how each floor is met |
+| NFR-2 | Availability, performance and cost are set per product, and the position is recorded    | `review` | Design documents and the recorded position  |
+| NFR-3 | A design leaning on low cost must not block a later move to availability or performance | `review` | Design documents for cost-leaning products  |
+| NFR-4 | Sustainability is measured and published, as fully as possible                          | `review` | Published figures and their measurements    |
+| NFR-5 | Everything public-facing is accessible, not only web pages                              | `review` | New public-facing output                    |
+| NFR-6 | Once a service has objectives, we hold ourselves to them and report a miss openly       | `review` | Incident entries                            |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
