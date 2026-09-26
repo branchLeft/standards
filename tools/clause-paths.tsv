@@ -245,3 +245,9 @@ CRED-8	*	[none] an access property recorded outside any repo
 CRED-9	*	[none] same as CRED-8
 CRED-10	*compose*.yml;*compose*.yaml	[fleet] the doc names environment variables and mounted files, which Compose files declare
 CRED-11	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] pre-commit and CI, as the clause names
+
+## Configuration — configuration.md
+CFG-1	*.ts;*.tsx;*.py	[fleet] the schema lives in service source; no path stated
+CFG-2	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml	[doc] the clause names images, which Dockerfiles and Compose files define
+CFG-3	*.ts;*.py;Pulumi.*.yaml;*/Pulumi.*.yaml	[fleet] stack configuration and schema defaults
+CFG-4	*.ts;*.tsx;*.py	[fleet] feature-flag code in service source

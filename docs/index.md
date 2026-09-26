@@ -470,6 +470,15 @@ Thin by design. The org documentation standard and its mechanical rules
 | CRED-10 | Services read secrets from mounted files, not plain environment variables, where supported | `pending` | —                                                        |
 | CRED-11 | gitleaks runs in pre-commit and CI in every repo; any finding fails                        | `pending` | —                                                        |
 
+## Configuration — `configuration.md`
+
+| ID    | Rule                                                                                                  | Gate      | Evidence                           |
+| ----- | ----------------------------------------------------------------------------------------------------- | --------- | ---------------------------------- |
+| CFG-1 | A service validates its configuration against a typed schema at start and refuses to start if invalid | `pending` | —                                  |
+| CFG-2 | Configuration is injected from outside, never baked into an image or committed                        | `pending` | —                                  |
+| CFG-3 | Each configuration value has exactly one source of truth                                              | `review`  | New configuration keys in the diff |
+| CFG-4 | A missing optional value turns its feature off, never on                                              | `review`  | New feature flags and their tests  |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
