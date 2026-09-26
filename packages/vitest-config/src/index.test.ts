@@ -80,7 +80,10 @@ describe('defineStandardTest', () => {
           .replace(/\*\*\//g, '(?:.*/)?')
           .replace(/\*\*/g, '.*')
           .replace(/\*/g, '[^/]*')
-          .replace(/\{([^}]+)\}/g, (_match, opts: string) => `(?:${opts.split(',').join('|')})`)}$`
+          .replace(
+            /\{([^}]+)\}/g,
+            (_match, options: string) => `(?:${options.split(',').join('|')})`
+          )}$`
       );
     const { coverage } = defineStandardTest().test!;
     expect(coverage!.exclude!.some((glob) => globToRegExp(glob).test('src/index.ts'))).toBe(false);

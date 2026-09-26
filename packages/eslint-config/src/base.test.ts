@@ -10,7 +10,8 @@ import { reactApp } from './reactApp.js';
 // ordinary source file — the only value a repo will ever experience.
 const effective = (config: typeof base, rule: string): unknown =>
   config.reduce<unknown>(
-    (acc, block) => (!block.files && block.rules?.[rule] !== undefined ? block.rules[rule] : acc),
+    (accumulator, block) =>
+      !block.files && block.rules?.[rule] !== undefined ? block.rules[rule] : accumulator,
     undefined
   );
 
