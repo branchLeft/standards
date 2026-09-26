@@ -205,3 +205,18 @@ LOG-5	*.yml;*.yaml	[fleet] the log store retention setting; no path stated
 LOG-6	*	[none] a design judgement, not tied to one file
 LOG-7	*.yml;*.yaml	[fleet] recording-rule files; no path stated
 LOG-8	*.yml;*.yaml;*.alloy;*.ts	[fleet] the monitoring stack deployment; no path stated
+
+## Observability and alerting — observability.md
+OBS-1	*.ts;*.tsx;*.py	[fleet] shared middleware in service source; no path stated
+OBS-2	*.yml;*.yaml	[fleet] alert-rule and Alertmanager files; no path stated
+OBS-3	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-4	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-5	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-6	*.yml;*.yaml;*.ini	[fleet] Grafana configuration; no path stated
+OBS-7	*.yml;*.yaml;*.json	[fleet] dashboard and rule files; no path stated
+OBS-8	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-9	*.yml;*.yaml;*.ts	[fleet] Prometheus deployment configuration; no path stated
+OBS-10	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-11	*.yml;*.yaml	[fleet] same as OBS-2
+OBS-12	*.yml;*.yaml;*.ini;Caddyfile;*/Caddyfile	[fleet] Grafana configuration and the edge route; no path stated
+OBS-13	*.yml;*.yaml;*.ts	[fleet] Grafana provisioning; no path stated
