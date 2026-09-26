@@ -52,9 +52,12 @@ TS-5	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json;*.ts	[gate]
 TS-6	package.json;*/package.json	[fleet] canonical script names live in package.json; clause is `pending`, no gate script to copy a pattern from
 TS-7	*.ts;*.tsx	[fleet] the reactApp eslint preset's target; tsconfig.md/index.md name no path
 
-## Formatting and linting — index.md "Formatting and linting"
+## Formatting and linting — formatting-and-linting.md
 LINT-1	*.ts;*.tsx;*.js;*.jsx	[fleet] lintable source extensions; no path stated
 FMT-1	*.ts;*.tsx;*.js;*.jsx;*.json;*.md;*.yml;*.yaml	[fleet] @branchleft/prettier-config's usual targets; no path stated
+LINT-2	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where a repo wires its linters and formatters
+LINT-3	eslint.config.*;*/eslint.config.*;package.json;*/package.json;.prettierrc*	[fleet] the configuration files that extend the shared packages
+LINT-4	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] same as LINT-2
 
 ## Shared config files — shared-config.md, templates/manifest.tsv
 SYNC-1	.editorconfig;.nvmrc;.github/CODEOWNERS;.pre-commit-config.yaml	[doc] exactly the four rows templates/manifest.tsv registers today

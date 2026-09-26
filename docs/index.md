@@ -99,12 +99,15 @@ nothing runs the rule anywhere it would matter. `Encoded by` is `—` until a
 repo's own lint run is what enforces it; adopting the shared config is tracked
 as [`ADOPTION.md`](../ADOPTION.md) work per repo, not assumed.
 
-## Formatting and linting
+## Formatting and linting — `formatting-and-linting.md`
 
-| ID     | Rule                                                                               | Gate     | Encoded by                    |
-| ------ | ---------------------------------------------------------------------------------- | -------- | ----------------------------- |
-| LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `review` | —                             |
-| FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto`   | `@branchleft/prettier-config` |
+| ID     | Rule                                                                               | Gate      | Encoded by                    |
+| ------ | ---------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| LINT-1 | The tree lints clean. CI runs the non-mutating `lint:check`; `--fix` is for humans | `review`  | —                             |
+| FMT-1  | The tree is Prettier-clean under the shared config                                 | `auto`    | `@branchleft/prettier-config` |
+| LINT-2 | Every code-like file is linted and formatted: source, YAML, JSON and Dockerfiles   | `pending` | —                             |
+| LINT-3 | Linters and formatters use the shared configuration, extended only where needed    | `pending` | —                             |
+| LINT-4 | Linting and formatting run in pre-commit and CI, with tools fast enough for both   | `pending` | —                             |
 
 LINT-1 is `review`, not `auto`: `@branchleft/eslint-config` exists and this
 repo dogfoods it, but no other repo in the fleet consumes it — every repo
