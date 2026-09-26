@@ -232,3 +232,16 @@ SEC-7	.github/workflows/*.yml;.github/workflows/*.yaml;*lock.yaml;*lock.json;*.l
 SEC-8	.github/workflows/*.yml;.github/workflows/*.yaml;.pre-commit-config.yaml	[fleet] where the analysers run
 SEC-9	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the file types the clause names
 SEC-10	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where CI installs tools
+
+## Secrets and credentials — credentials.md
+CRED-1	*	[none] an access-path property, not tied to one file
+CRED-2	*.ts;*.yml;*.yaml	[fleet] infrastructure code and deploy workflows; no path stated
+CRED-3	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the jobs that create or rotate secrets
+CRED-4	.github/workflows/*.yml;.github/workflows/*.yaml;*.ts	[fleet] rotation workflows and the secrets declared in infrastructure code
+CRED-5	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled re-mint workflow
+CRED-6	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled drill workflow
+CRED-7	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where jobs read secrets
+CRED-8	*	[none] an access property recorded outside any repo
+CRED-9	*	[none] same as CRED-8
+CRED-10	*compose*.yml;*compose*.yaml	[fleet] the doc names environment variables and mounted files, which Compose files declare
+CRED-11	.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] pre-commit and CI, as the clause names
