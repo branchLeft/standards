@@ -6,11 +6,19 @@ full typing, explicitly stated.
 
 ## TYP-1 — no `any`, and `unknown` only where it is parsed at once
 
-No `any` or `unknown` in TypeScript, and no `Any` in Python. The one exception
-is `unknown` holding untrusted input that is immediately parsed with a schema
-library into a known type: zod's `safeParse` in TypeScript, pydantic in
-Python. Code that genuinely cannot be written without one carries a
-`standards-allow-next-line TYP-1 <reason>` suppression.
+No `any` or `unknown` in TypeScript, and no `Any` in Python. The one case
+where `unknown` is correct, not merely tolerated, is untrusted input at a
+boundary, held as `unknown` for exactly as long as it takes to parse it with
+a schema library into a known type: zod's `safeParse` in TypeScript,
+pydantic in Python.
+
+Code that genuinely cannot be written without `any` or `unknown` outside that
+case uses this repo's one suppression mechanism rather than a TYP-1-specific
+exception: `STD-000` requires every suppression to name its clause and give a
+reason, and here that is a `standards-allow-next-line TYP-1 <reason>` stating
+why a typed alternative doesn't exist. A suppression is an application of
+`STD-000`, reviewed the same way as any other clause's — "it was faster" is
+not a reason `STD-000` accepts, and neither is it one this clause accepts.
 
 **Why:** an `any` switches the type checker off for everything it touches,
 while a value parsed at the boundary is typed everywhere after it.
