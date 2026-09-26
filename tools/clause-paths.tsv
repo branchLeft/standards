@@ -126,6 +126,8 @@ PUL-12	Pulumi.*.yaml;*/Pulumi.*.yaml	[gate] check-pulumi-secrets.sh: ratchet_sco
 ## Infrastructure operations — infrastructure.md
 IAC-1	*	[none] a CI-403-vs-hand-apply judgement call; infrastructure.md names no path
 IAC-2	*	[none] same disclaimer as IAC-1
+IAC-3	*.ts;Pulumi.*.yaml;*/Pulumi.*.yaml;*compose*.yml;*compose*.yaml	[fleet] infrastructure programs, stack configuration and service definitions
+IAC-4	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the workflows that provision and deliver
 
 ## Data protection — data-protection.md (all eleven `pending`)
 DP-1	*	[none] no path named anywhere in data-protection.md

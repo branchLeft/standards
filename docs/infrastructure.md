@@ -37,3 +37,26 @@ apply it" — a deployer that could grant itself new permissions would no longer
 be bounded by anything CI enforces, the same reason `serviceAccounts.ts`
 withholds `resourcemanager.projects.setIamPolicy` from every deployer in the
 fleet.
+
+## IAC-3 — everything is declared in code
+
+All infrastructure and deployments are declared in code, as pinned versions
+plus the shape they deploy onto. Nothing is created by hand except where a
+supplier offers no API for it.
+
+**Why:** declared infrastructure can be reviewed, rebuilt and compared;
+infrastructure made by hand can only be remembered.
+
+**Check plan:** review; each stack's preview shows no drift. Later, a
+scheduled drift check comparing live state with each stack.
+
+## IAC-4 — CI delivers everything
+
+Every host is provisioned, and every deploy delivered, by CI. Deploy
+credentials are held only by CI, and no path is delivered by hand.
+
+**Why:** a path delivered by hand depends on a person's time and a laptop's
+credentials.
+
+**Check plan:** an audit of each repo's deploy paths that fails on any path
+delivered by hand.

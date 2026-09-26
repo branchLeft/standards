@@ -250,10 +250,12 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 
 ## Infrastructure operations — `infrastructure.md`
 
-| ID    | Rule                                                                       | Gate     | Encoded by |
-| ----- | -------------------------------------------------------------------------- | -------- | ---------- |
-| IAC-1 | CI applies; a human applies only what CI's deploy identity cannot          | `review` | —          |
-| IAC-2 | Broadening a deploy identity is never applied by CI — grant, import, merge | `review` | —          |
+| ID    | Rule                                                                                         | Gate      | Encoded by |
+| ----- | -------------------------------------------------------------------------------------------- | --------- | ---------- |
+| IAC-1 | CI applies; a human applies only what CI's deploy identity cannot                            | `review`  | —          |
+| IAC-2 | Broadening a deploy identity is never applied by CI — grant, import, merge                   | `review`  | —          |
+| IAC-3 | All infrastructure and deployments are declared in code, as pinned versions plus their shape | `review`  | —          |
+| IAC-4 | Every host is provisioned and every deploy delivered by CI; no path is delivered by hand     | `pending` | —          |
 
 `review` because whether a 403 is genuinely bootstrap-class or a role list
 that should just be widened needs judgement no script can make safely.
