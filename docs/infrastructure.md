@@ -29,6 +29,22 @@ resource it just created. After that apply, the next CI run must report
 CI. Widening the deployer's roles instead is IAC-2's territory, and it trades
 away a security property on purpose — never a default a merge falls into.
 
+**This is the exception list the approval click (`CI-13`) otherwise closes
+off.** Beyond a stack's own deploy-identity 403, exactly two other shapes of
+step have no API to automate:
+
+- **Minting a supplier token in a console that offers no API for it.** The
+  token has to exist before anything — including CI — can read it back, so a
+  person clicks it into being once.
+- **First creation of a new project or account with a supplier.** The
+  project or account is the prerequisite every later API call, including the
+  one that would create the resources inside it, depends on.
+
+Each of these, and bootstrap above, carries its own runbook. The list stays
+short on purpose: a step earns a place on it only because the supplier
+genuinely offers no API for it, never because automating it was inconvenient,
+and anything that becomes automatable is automated and drops off the list.
+
 ## IAC-2 — broadening a deploy identity is never applied by CI
 
 Grant the permission out-of-band first, under a human's own credentials;

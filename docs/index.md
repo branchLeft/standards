@@ -176,22 +176,22 @@ COV-1 until a gate exists to say so.
 
 ## CI and CD — `ci-cd.md`
 
-| ID    | Rule                                                                             | Gate      | Encoded by                    |
-| ----- | -------------------------------------------------------------------------------- | --------- | ----------------------------- |
-| CI-1  | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment            | `auto`    | `tools/check-workflows.sh`    |
-| CI-2  | Environment values bound, never interpolated into a `run:` body                  | `auto`    | `tools/check-workflows.sh`    |
-| CI-3  | A gate that runs on `pull_request` also runs on push to `main`                   | `auto`    | `tools/check-workflows.sh`    |
-| CI-4  | CI reports, it does not rewrite — no `--fix` or `--write` in a job               | `auto`    | `tools/check-workflows.sh`    |
-| CI-5  | Reusable workflows pinned to an exact tag, never `@main`                         | `auto`    | `tools/check-workflows.sh`    |
-| CI-6  | Required checks agree with the repo's mode and with the job names it emits       | `auto`    | `tools/ruleset-audit.sh`      |
-| CI-7  | A privileged job is gated twice, by mechanisms that do not share a failure mode  | `review`  | —                             |
-| CI-8  | A script whose pass is load-bearing carries a `--self-test`, run before it       | `review`  | —                             |
-| CI-9  | No empty expression where Actions evaluates one, `run:` bodies included          | `auto`    | `tools/check-workflows.sh`    |
-| CI-10 | Every job sets `timeout-minutes`, except reusable-workflow callers               | `auto`    | `tools/check-workflows.sh`    |
-| CI-11 | Every fleet caller's reusable-workflow tag matches the tag last published        | `auto`    | `tools/check-caller-drift.sh` |
-| CI-12 | Every deploy job runs in a protected environment only the default branch may use | `pending` | —                             |
-| CI-13 | The approval click is the only human step in a deploy                            | `review`  | —                             |
-| CI-14 | Every test suite and quality gate runs in CI and blocks merge                    | `pending` | —                             |
+| ID    | Rule                                                                                         | Gate      | Encoded by                    |
+| ----- | -------------------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| CI-1  | Actions pinned to a 40-character commit SHA with a `# vX.Y.Z` comment                        | `auto`    | `tools/check-workflows.sh`    |
+| CI-2  | Environment values bound, never interpolated into a `run:` body                              | `auto`    | `tools/check-workflows.sh`    |
+| CI-3  | A gate that runs on `pull_request` also runs on push to `main`                               | `auto`    | `tools/check-workflows.sh`    |
+| CI-4  | CI reports, it does not rewrite — no `--fix` or `--write` in a job                           | `auto`    | `tools/check-workflows.sh`    |
+| CI-5  | Reusable workflows pinned to an exact tag, never `@main`                                     | `auto`    | `tools/check-workflows.sh`    |
+| CI-6  | Required checks agree with the repo's mode and with the job names it emits                   | `auto`    | `tools/ruleset-audit.sh`      |
+| CI-7  | A privileged job is gated twice, by mechanisms that do not share a failure mode              | `review`  | —                             |
+| CI-8  | A script whose pass is load-bearing carries a `--self-test`, run before it                   | `review`  | —                             |
+| CI-9  | No empty expression where Actions evaluates one, `run:` bodies included                      | `auto`    | `tools/check-workflows.sh`    |
+| CI-10 | Every job sets `timeout-minutes`, except reusable-workflow callers                           | `auto`    | `tools/check-workflows.sh`    |
+| CI-11 | Every fleet caller's reusable-workflow tag matches the tag last published                    | `auto`    | `tools/check-caller-drift.sh` |
+| CI-12 | Every deploy job runs in a protected environment only the default branch may use             | `pending` | —                             |
+| CI-13 | The approval click is the only human step in any routine change; exceptions are IAC-1's list | `review`  | —                             |
+| CI-14 | Every test suite and quality gate runs in CI and blocks merge                                | `pending` | —                             |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state. CI-11 runs the same way, for the same reason — see
@@ -264,13 +264,15 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 
 | ID    | Rule                                                                                         | Gate      | Encoded by |
 | ----- | -------------------------------------------------------------------------------------------- | --------- | ---------- |
-| IAC-1 | CI applies; a human applies only what CI's deploy identity cannot                            | `review`  | —          |
+| IAC-1 | CI applies; a human applies only what CI's identity cannot — the named exception list        | `review`  | —          |
 | IAC-2 | Broadening a deploy identity is never applied by CI — grant, import, merge                   | `review`  | —          |
 | IAC-3 | All infrastructure and deployments are declared in code, as pinned versions plus their shape | `review`  | —          |
 | IAC-4 | Every host is provisioned and every deploy delivered by CI; no path is delivered by hand     | `pending` | —          |
 
 `review` because whether a 403 is genuinely bootstrap-class or a role list
-that should just be widened needs judgement no script can make safely.
+that should just be widened needs judgement no script can make safely. The
+other two named exceptions — minting a supplier token with no API, first
+creation of a project or account — are enumerated, not judged case by case.
 
 ## Data protection — `data-protection.md`
 

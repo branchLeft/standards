@@ -192,14 +192,17 @@ credentials must declare an `environment`.
 
 ## CI-13 — the approval click is the only human step
 
-The approval click is the only human step in a deploy. There are no local
-applies, no SSH sessions and no hand-run scripts.
+The approval click is the only human step in any routine change: no local
+applies, no SSH sessions, no hand-run scripts. The narrow, named exceptions —
+where a person genuinely must act because no supplier API exists for the
+step — are IAC-1's exception list, not a judgement call made here. Anything
+not on that list is CI's job.
 
 **Why:** every manual step costs the owner's time and can be done differently
 each time.
 
-**Check plan:** review of deploy procedures; incident entries (`OPS-5`) record
-any hand-made change.
+**Check plan:** review of deploy procedures against IAC-1's exception list;
+incident entries (`OPS-5`) record any hand-made change outside it.
 
 ## CI-14 — every test and gate blocks
 
