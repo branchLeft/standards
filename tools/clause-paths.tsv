@@ -181,3 +181,10 @@ NAM-3	*.ts;*.tsx;*.py	[fleet] same as NAM-1
 NAM-4	*.ts;*.tsx;*.py	[fleet] same as NAM-1
 NAM-5	*.ts	[fleet] hosts are declared in Pulumi programs, which are TypeScript in this fleet
 NAM-6	*.ts	[fleet] same as NAM-5
+
+## Types — types.md
+TYP-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions
+TYP-2	*.ts;*.tsx;*.py	[fleet] same as TYP-1
+TYP-3	*.ts;*.tsx;*.py	[fleet] same as TYP-1
+TYP-4	*.ts;*.tsx;*.py	[fleet] same as TYP-1
+TYP-5	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json;pyproject.toml;*/pyproject.toml;mypy.ini;*/mypy.ini	[fleet] where each language sets its checker strictness; the doc names the settings, not the files

@@ -388,6 +388,16 @@ Thin by design. The org documentation standard and its mechanical rules
 | NAM-5 | A host is named `<role><n>`                                                    | `pending` | —                           |
 | NAM-6 | Every cloud resource carries labels naming the repo and stack that own it      | `pending` | —                           |
 
+## Types — `types.md`
+
+| ID    | Rule                                                                                           | Gate      | Evidence                                            |
+| ----- | ---------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
+| TYP-1 | No `any` or `unknown` (`Any` in Python), except `unknown` parsed at once with a schema library | `pending` | —                                                   |
+| TYP-2 | Every signature states every parameter type and its return type explicitly                     | `pending` | —                                                   |
+| TYP-3 | A variable whose type is not obvious carries an explicit annotation                            | `review`  | New variables initialised from calls or expressions |
+| TYP-4 | Each value takes the most precise type that fits                                               | `review`  | New type annotations in the diff                    |
+| TYP-5 | Type checking runs at maximum strictness, with the floor raised until every repo is there      | `pending` | —                                                   |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
