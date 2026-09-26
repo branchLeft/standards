@@ -295,3 +295,12 @@ WEB-1	*.html;app/*;package.json;*/package.json	[fleet] a site stack choice shows
 WEB-2	*.html;*.ts;*.tsx;*.js;*.jsx	[fleet] client-side scripts and markup
 WEB-3	*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] browser-test files that call the axe helper
 WEB-4	app/routes/*;*.spec.ts;*.spec.tsx;*.test.ts;*.test.tsx	[fleet] route files and the browser tests that cover them, as APP-4
+
+## Operations — operations.md
+OPS-1	*	[none] a property of how changes arrive, not of one file
+OPS-2	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] deploy workflows
+OPS-3	.github/workflows/*.yml;.github/workflows/*.yaml;*compose*.yml;*compose*.yaml	[fleet] deploy workflows and service definitions
+OPS-4	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] the scheduled drill workflow
+OPS-5	*	[none] entries live in the private operations docs, outside any product repo
+OPS-6	*.md	[fleet] runbooks are markdown
+OPS-7	*	[none] a spending judgement, not tied to one file

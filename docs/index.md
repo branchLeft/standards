@@ -538,6 +538,18 @@ Thin by design. The org documentation standard and its mechanical rules
 | WEB-3 | A WCAG AA violation fails the build; an AAA finding warns                             | `pending` | —                                             |
 | WEB-4 | Axe runs after each navigation and interaction, on every route, inside existing tests | `review`  | New routes and interactions against the tests |
 
+## Operations — `operations.md`
+
+| ID    | Rule                                                                                            | Gate      | Evidence                                                            |
+| ----- | ----------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------- |
+| OPS-1 | Every production change arrives through CI; a hand-made emergency change is redone within a day | `review`  | Incident entries and the CI change that replaced each hand-made one |
+| OPS-2 | Every deploy has a health check with a grace period and an automatic rollback                   | `pending` | —                                                                   |
+| OPS-3 | Blue/green deploys wherever possible; the mail server is exempt while it runs only mail         | `review`  | Each service's deploy design                                        |
+| OPS-4 | Backups are proven by a CI restore drill, weekly and on change, that checks the data            | `pending` | —                                                                   |
+| OPS-5 | After every incident or out-of-routine change, an agent writes an operations-docs entry         | `review`  | Incident issues and their linked entries                            |
+| OPS-6 | A repeated manual step is automated, not written up as a runbook                                | `review`  | New runbooks and why their steps can't be automated                 |
+| OPS-7 | Capacity is sized from measured load, not estimates                                             | `review`  | Proposals to spend on capacity                                      |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so
