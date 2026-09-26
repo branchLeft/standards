@@ -46,15 +46,22 @@ command line in subprocess calls keeps shell's weaknesses in another language.
 
 ### SH-4 — no unfilled placeholders in commands to copy
 
-A command meant to be copied and pasted never contains an unfilled
-placeholder. An unknown value is read into a shell variable first
-(`read -rs NAME; export NAME`), and the command uses the variable.
+This clause is scoped by context, not blanket. A fenced shell block meant to
+be copied and pasted verbatim never contains an unfilled placeholder: an
+unknown value is read into a shell variable first (`read -rs NAME; export
+NAME`), and the command uses the variable (`$NAME`). Prose, templates and
+legal documents are a different context and keep `[ALL_CAPS]` placeholders —
+nobody pastes a contract clause or a template paragraph into a terminal, and
+an all-caps bracketed token reads unambiguously as "fill this in" in running
+text.
 
-**Why:** a placeholder pasted by mistake runs with a wrong value, and a secret
-typed into a command line lands in the shell's history.
+**Why:** a placeholder pasted by mistake into a shell runs with a wrong
+value, and a secret typed into a command line lands in the shell's history.
+Neither risk exists in prose.
 
 **Check plan:** a docs-lint rule for placeholder-shaped tokens inside fenced
-shell blocks.
+shell blocks meant to be copied — not inside prose, templates or legal
+documents, where `[ALL_CAPS]` stays correct.
 
 ## Python
 
