@@ -578,15 +578,15 @@ elsewhere and are **cited, never restated**:
 
 ## Operations — `operations.md`
 
-| ID    | Rule                                                                                            | Gate      | Evidence                                                            |
-| ----- | ----------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------- |
-| OPS-1 | Every production change arrives through CI; a hand-made emergency change is redone within a day | `review`  | Incident entries and the CI change that replaced each hand-made one |
-| OPS-2 | Every deploy has a health check with a grace period and an automatic rollback                   | `pending` | —                                                                   |
-| OPS-3 | Blue/green deploys wherever possible; the mail server is exempt while it runs only mail         | `review`  | Each service's deploy design                                        |
-| OPS-4 | Backups are proven by a CI restore drill, weekly and on change, that checks the data            | `pending` | —                                                                   |
-| OPS-5 | After every incident or out-of-routine change, an agent writes an operations-docs entry         | `review`  | Incident issues and their linked entries                            |
-| OPS-6 | A repeated manual step is automated, not written up as a runbook                                | `review`  | New runbooks and why their steps can't be automated                 |
-| OPS-7 | Capacity is sized from measured load, not estimates                                             | `review`  | Proposals to spend on capacity                                      |
+| ID    | Rule                                                                                                      | Gate      | Evidence                                                            |
+| ----- | --------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------- |
+| OPS-1 | Every production change arrives through CI; a hand-made emergency change is redone within a day           | `review`  | Incident entries and the CI change that replaced each hand-made one |
+| OPS-2 | Every deploy has a health check with a grace period and an automatic rollback                             | `pending` | —                                                                   |
+| OPS-3 | Blue/green deploys wherever possible; the mail server is exempt while it runs only mail                   | `review`  | Each service's deploy design                                        |
+| OPS-4 | Backups are proven by a CI restore drill, weekly and on change, that checks the data                      | `pending` | —                                                                   |
+| OPS-5 | After every incident or out-of-routine change, an agent the owner started writes an operations-docs entry | `review`  | Incident issues and their linked entries                            |
+| OPS-6 | A repeated manual step is automated, not written up as a runbook                                          | `review`  | New runbooks and why their steps can't be automated                 |
+| OPS-7 | Capacity is sized from measured load, not estimates                                                       | `review`  | Proposals to spend on capacity                                      |
 
 ## Non-functional requirements — `non-functional.md`
 

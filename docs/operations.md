@@ -57,7 +57,8 @@ that fails on an empty restore.
 
 After every incident and every out-of-routine change, an agent writes a short
 entry in the operations docs: what happened, how it was noticed, the fix, and
-how to prevent it.
+how to prevent it. It writes the entry in a session the owner starts; an
+incident never starts an agent by itself.
 
 **Why:** runbooks can't cover every case, so knowledge about running the
 estate has to build up somewhere.
