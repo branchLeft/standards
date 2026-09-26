@@ -63,6 +63,8 @@ SYNC-1	.editorconfig;.nvmrc;.github/CODEOWNERS;.pre-commit-config.yaml	[doc] exa
 CMT-1	*	[none] "a comment" — the doc names no language or extension
 CMT-2	*	[none] same as CMT-1
 CMT-3	*	[none] same as CMT-1
+CMT-4	*	[none] same as CMT-1
+CMT-5	*	[none] same as CMT-1
 
 ## Testing and coverage — testing.md
 TEST-1	*	[none] testing.md is explicit: "the distinction is logic versus declaration, not language or directory"

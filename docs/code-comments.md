@@ -21,6 +21,9 @@ people's names, no "verified live on `<date>`" logs, no decision-history prose.
 That context belongs in the PR description, a RUNBOOK, or an architecture doc —
 never in an inline comment.
 
+The same goes for motivation. Why an approach was chosen lives in markdown, a
+decision record or the issue tracker; the code carries the implementation.
+
 Backlog IDs are a specific case of this and the one that recurs. The backlogs
 live at a workspace root that no repo tracks, so a backlog reference in shipped
 source is dangling for every reader — including external contributors on the
@@ -33,14 +36,40 @@ The rule is enforced mechanically by the documentation linter, which means this
 paragraph cannot name an example of the thing it forbids — it would report
 itself.
 
-## CMT-3 — length is a signal about location
+## CMT-3 — a long comment moves to a doc
 
-A comment that needs more than a line or two probably belongs in a README or a
-doc, with at most a one-line pointer left in code.
+A comment block of 5 to 10 lines warns, and a block of 11 lines or more fails.
+Docstrings count. The narrative moves to the module's colocated markdown file
+(`store.md` beside `store.ts`) or its folder's README, and the code keeps a
+one-line pointer.
 
-A source file whose comments substantially outweigh its code has become a design
-document with an implementation attached. The prose stops being maintained with
-the code around it, and the two drift silently — which is worse than either the
-comment or the code being wrong on its own, because each vouches for the other.
+**Why:** long prose between lines of code hides the code from its reader and
+stops being maintained with it.
+
+**Check plan:** `tools/check-comment-blocks.sh`, with its threshold moved to
+these values when the gate class changes.
 
 Move the narrative, keep the constraint.
+
+## CMT-4 — comments never outnumber code
+
+A file whose comment lines outnumber its code lines fails. Docstrings count as
+comment lines.
+
+**Why:** such a file has become a design document with an implementation
+attached, and the prose drifts from the code it describes, each vouching for
+the other.
+
+**Check plan:** the comment-block checker extended with a per-file ratio.
+
+## CMT-5 — a docstring says what the signature can't
+
+A docstring says what the code does beyond what its signature or interface
+already says, such as its behaviour, the errors it raises (`ERR-2`) and units.
+Where the module has a colocated markdown file, the docstring links to it by
+relative path.
+
+**Why:** the signature already speaks for itself, and anything longer than a
+docstring belongs in the linked document.
+
+**Check plan:** review of new docstrings in the diff.
