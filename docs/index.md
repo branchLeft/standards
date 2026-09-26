@@ -377,6 +377,17 @@ Thin by design. The org documentation standard and its mechanical rules
 | ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | —                                                     |
 | ARCH-8 | Each directory holds one clear responsibility                                               | `review`  | New directories in the diff                           |
 
+## Naming — `naming.md`
+
+| ID    | Rule                                                                           | Gate      | Evidence                    |
+| ----- | ------------------------------------------------------------------------------ | --------- | --------------------------- |
+| NAM-1 | Whole words; an abbreviation only when it is the domain's own word             | `pending` | —                           |
+| NAM-2 | Each language's naming and casing conventions, enforced by its linter          | `pending` | —                           |
+| NAM-3 | Code implementing a design pattern names it (`TenantFactory`, `RetryStrategy`) | `review`  | New class names in the diff |
+| NAM-4 | Booleans read as questions, functions as verbs, classes as nouns               | `review`  | New names in the diff       |
+| NAM-5 | A host is named `<role><n>`                                                    | `pending` | —                           |
+| NAM-6 | Every cloud resource carries labels naming the repo and stack that own it      | `pending` | —                           |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so

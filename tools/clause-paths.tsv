@@ -173,3 +173,11 @@ ARCH-5	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
 ARCH-6	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
 ARCH-7	*.ts;*.tsx;*.py	[fleet] same as ARCH-1
 ARCH-8	*	[none] a directory-layout judgement, not tied to one file type
+
+## Naming — naming.md
+NAM-1	*.ts;*.tsx;*.py	[fleet] names in TypeScript and Python source; the doc names no path
+NAM-2	*.ts;*.tsx;*.py	[fleet] same as NAM-1
+NAM-3	*.ts;*.tsx;*.py	[fleet] same as NAM-1
+NAM-4	*.ts;*.tsx;*.py	[fleet] same as NAM-1
+NAM-5	*.ts	[fleet] hosts are declared in Pulumi programs, which are TypeScript in this fleet
+NAM-6	*.ts	[fleet] same as NAM-5
