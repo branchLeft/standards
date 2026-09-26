@@ -9,8 +9,8 @@ export const errors: Linter.Config[] = [
       // ESLint's own name; kept over its typescript-eslint successor because
       // it's the exact rule the clause names.
       'no-throw-literal': 'error',
-      // The dropped-promise half of this idea needs type info this untyped
-      // floor lacks — asserted in typeChecked.ts instead.
+      // Catches an empty catch. Dropped promises need type information, so
+      // no-floating-promises lives in typeChecked.ts.
       'no-empty': 'error',
       // Only checks a function that already carries a JSDoc block; it does
       // not, on its own, require every function to have one.
