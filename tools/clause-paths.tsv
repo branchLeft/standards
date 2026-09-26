@@ -88,6 +88,9 @@ CI-8	tools/*.sh;tools/*.py;packages/*;templates/*	[fleet] "a script whose pass i
 CI-9	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
 CI-10	.github/workflows/*.yml;.github/workflows/*.yaml	[gate] same pattern as CI-1, same script
 CI-11	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] audited via gh api against every fleet repo's live workflow files, not in-repo — check-caller-drift.sh
+CI-12	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] deploy jobs are defined in workflow files
+CI-13	.github/workflows/*.yml;.github/workflows/*.yaml;*.md	[fleet] deploy workflows and the procedures that document them
+CI-14	.github/workflows/*.yml;.github/workflows/*.yaml;templates/rulesets/*	[fleet] the workflows and the ruleset payloads that make their jobs required
 
 ## Dependencies — dependencies.md
 DEP-3	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] common dependency-manifest filenames; dependencies.md describes PR provenance (a Dependabot major bump), not a path
