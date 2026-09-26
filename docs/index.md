@@ -520,6 +520,14 @@ Thin by design. The org documentation standard and its mechanical rules
 | SH-3 | Beyond basic commands, use a typed language and a tool's own SDK, not subprocess calls      | `review`  | New scripts in the diff                  |
 | SH-4 | A command meant to be copied never contains an unfilled placeholder                         | `pending` | —                                        |
 
+## Python — `shell-and-python.md`
+
+| ID   | Rule                                                                           | Gate      | Evidence                                      |
+| ---- | ------------------------------------------------------------------------------ | --------- | --------------------------------------------- |
+| PY-1 | Services are TypeScript; Python only when a library it needs forces the choice | `review`  | A new Python service and the library it names |
+| PY-2 | Python runs strict mypy and ruff in pre-commit and CI                          | `pending` | —                                             |
+| PY-3 | Every Python project declares its minimum version, and its checkers target it  | `pending` | —                                             |
+
 ## Pending — blocked on authorship
 
 These families are declared so the index is the single place to look, and so

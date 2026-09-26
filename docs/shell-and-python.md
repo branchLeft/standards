@@ -55,3 +55,38 @@ typed into a command line lands in the shell's history.
 
 **Check plan:** a docs-lint rule for placeholder-shaped tokens inside fenced
 shell blocks.
+
+## Python
+
+### PY-1 — TypeScript for services, Python when a library needs it
+
+Services are written in TypeScript. A deployed service is written in Python
+only when a library it needs forces that choice.
+
+**Why:** one service language keeps the stack small, and Python earns its
+place where its libraries are the best tool for the job.
+
+**Check plan:** review; a new Python service names the library that requires
+it.
+
+### PY-2 — Python gets the same rigour
+
+Python code runs mypy in strict mode, and ruff for linting and formatting, in
+pre-commit and CI, with every signature annotated (`TYP-2`).
+
+**Why:** Python used for services or tooling is software like any other, and
+dynamic typing is no excuse for untyped code.
+
+**Check plan:** a check that each Python project configures strict mypy and
+ruff, and that CI runs both.
+
+### PY-3 — a declared minimum version
+
+Every Python project declares its minimum Python version (`requires-python`),
+and ruff and mypy target that version.
+
+**Why:** a checker aimed at the wrong version passes code that fails at
+runtime.
+
+**Check plan:** a check that `pyproject.toml` sets `requires-python` and that
+ruff's `target-version` and mypy's `python_version` match it.

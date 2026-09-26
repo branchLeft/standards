@@ -283,3 +283,8 @@ SH-1	*.sh;*.bash	[doc] the clause is about shell scripts
 SH-2	*.md	[fleet] runbooks are markdown; no path stated
 SH-3	*.sh;*.bash;*.py;*.ts	[fleet] new scripts in any of the languages the clause names
 SH-4	*.md	[fleet] commands to copy live in markdown runbooks and docs
+
+## Python — shell-and-python.md
+PY-1	*.py;pyproject.toml;*/pyproject.toml	[doc] Python services
+PY-2	*.py;pyproject.toml;*/pyproject.toml;.pre-commit-config.yaml	[doc] Python source and its checker configuration
+PY-3	pyproject.toml;*/pyproject.toml	[doc] the file the clause names
