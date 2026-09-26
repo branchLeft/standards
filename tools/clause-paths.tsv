@@ -92,6 +92,10 @@ CI-11	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] audited via gh ap
 ## Dependencies — dependencies.md
 DEP-3	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] common dependency-manifest filenames; dependencies.md describes PR provenance (a Dependabot major bump), not a path
 DEP-4	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3; the alert-vs-bump distinction is PR metadata this tool cannot see
+DEP-5	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum;*Dockerfile;*Dockerfile.*	[fleet] the manifests of DEP-3, plus Dockerfiles, since the check reads each image's bill of materials
+DEP-6	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3
+DEP-7	package.json;*/package.json;pnpm-lock.yaml;*/pnpm-lock.yaml;package-lock.json;*/package-lock.json;requirements*.txt;*/requirements*.txt;go.mod;*/go.mod;go.sum;*/go.sum	[fleet] same manifests as DEP-3
+DEP-8	.github/dependabot.yml;.github/dependabot.yaml	[doc] the file the clause names
 
 ## Repository settings — repo-settings.md
 REPO-1	templates/rulesets/*	[doc] "committed as payloads under templates/rulesets/<repo>/<name>.json"

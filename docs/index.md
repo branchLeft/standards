@@ -187,10 +187,14 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Dependencies — `dependencies.md`
 
-| ID    | Rule                                                                             | Gate      | Encoded by |
-| ----- | -------------------------------------------------------------------------------- | --------- | ---------- |
-| DEP-3 | A major-version dependency PR is closed unmerged by default                      | `pending` | —          |
-| DEP-4 | A Dependabot security-advisory PR merges the day it appears, regardless of DEP-3 | `pending` | —          |
+| ID    | Rule                                                                                       | Gate      | Encoded by |
+| ----- | ------------------------------------------------------------------------------------------ | --------- | ---------- |
+| DEP-3 | A major-version dependency PR is closed unmerged by default                                | `pending` | —          |
+| DEP-4 | A Dependabot security-advisory PR merges the day it appears, regardless of DEP-3           | `pending` | —          |
+| DEP-5 | Shipped dependencies carry a licence on the permissive allow-list, or the owner's approval | `pending` | —          |
+| DEP-6 | A dependency is added only when needed, and only if it is mature                           | `review`  | —          |
+| DEP-7 | The supplier ethics rubric covers dependencies; open source may be excepted                | `review`  | —          |
+| DEP-8 | Dependabot tracks every ecosystem a repo uses, image digests included                      | `pending` | —          |
 
 ## Repository settings — `repo-settings.md`
 
