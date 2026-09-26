@@ -220,3 +220,15 @@ OBS-10	*.yml;*.yaml	[fleet] same as OBS-2
 OBS-11	*.yml;*.yaml	[fleet] same as OBS-2
 OBS-12	*.yml;*.yaml;*.ini;Caddyfile;*/Caddyfile	[fleet] Grafana configuration and the edge route; no path stated
 OBS-13	*.yml;*.yaml;*.ts	[fleet] Grafana provisioning; no path stated
+
+## Security — security.md
+SEC-1	*	[none] a design judgement about environments, not one file type
+SEC-2	*	[none] same as SEC-1
+SEC-3	*	[none] same as SEC-1
+SEC-4	*	[none] applies to all shipped code, own logic included; the doc names no path
+SEC-5	*	[none] the exemptions file location is not yet fixed
+SEC-6	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] a scheduled workflow
+SEC-7	.github/workflows/*.yml;.github/workflows/*.yaml;*lock.yaml;*lock.json;*.lock	[fleet] the scan workflow and the lockfiles it reads
+SEC-8	.github/workflows/*.yml;.github/workflows/*.yaml;.pre-commit-config.yaml	[fleet] where the analysers run
+SEC-9	*Dockerfile;*Dockerfile.*;*compose*.yml;*compose*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the file types the clause names
+SEC-10	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] where CI installs tools
