@@ -61,10 +61,10 @@ self_test() {
     cd "$tmp" || exit 2
     ratchet_scratch_repo_init || exit 2
 
-    printf '// see branchLeft/workspace#1429 for the sign-off\nexport const a = 1;\n' > hit.ts
+    printf '// see example-org/example-repo#12 for the sign-off\nexport const a = 1;\n' > hit.ts
     printf '// pin: user/repo#1.2.3, a dependency tag, not an issue\nexport const b = 1;\n' > version.ts
     printf '// nothing here references anywhere\nexport const c = 1;\n' > clean.ts
-    printf '#!/usr/bin/env bash\n# tracked in branchLeft/workspace#42\necho hi\n' > hit.sh
+    printf '#!/usr/bin/env bash\n# tracked in example-org/example-repo#7\necho hi\n' > hit.sh
 
     git add -A && git commit -qm init
 
@@ -72,7 +72,7 @@ self_test() {
 
     printf '%s' "$out" | grep -q '"clause":"CMT-2","file":"hit.ts","line":1,"level":"error"' \
       || { echo "FAIL: hit.ts not caught"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"hit.ts".*workspace#1429' \
+    printf '%s' "$out" | grep -q '"file":"hit.ts".*example-repo#12' \
       || { echo "FAIL: hit.ts message did not carry the matched reference"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"file":"version.ts"' \
       && { echo "FAIL: a dotted-version dependency pin was flagged"; echo "$out"; exit 1; }
