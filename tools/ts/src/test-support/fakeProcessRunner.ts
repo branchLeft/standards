@@ -19,8 +19,8 @@ export class FakeProcessRunner implements ProcessRunner {
     this.result = result;
   }
 
-  run(command: string, args: readonly string[], cwd: string): ProcessResult {
-    this.calls.push({ command, args, cwd });
+  run(command: string, commandArguments: readonly string[], cwd: string): ProcessResult {
+    this.calls.push({ command, args: commandArguments, cwd });
     return this.result;
   }
 }

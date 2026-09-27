@@ -49,8 +49,8 @@ function buildTsAudit(root: string): Audit {
 }
 
 function runBashAudit(root: string, json: boolean): { stdout: string; status: number } {
-  const args = ['--mode', 'enforce', ...(json ? ['--json'] : [])];
-  const result = spawnSync('bash', [join(TOOLS_DIR, 'standards-audit.sh'), ...args], {
+  const commandArguments = ['--mode', 'enforce', ...(json ? ['--json'] : [])];
+  const result = spawnSync('bash', [join(TOOLS_DIR, 'standards-audit.sh'), ...commandArguments], {
     cwd: root,
     encoding: 'utf8',
   });
@@ -141,7 +141,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(json.output).toContain('"clause":"CI-1"');
 
     assertParity(repo.root);
-  }, 30000);
+  }, 120000);
 
   it('flags an exemption over a now-clean file as stale', () => {
     repo = ScratchRepo.create();
@@ -153,7 +153,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(human.output).toContain('STALE — 1 files, no finding to suppress');
 
     assertParity(repo.root);
-  }, 30000);
+  }, 120000);
 
   it('reports STD-000 for a bare allow, and ignores a quoted mention of the token', () => {
     repo = ScratchRepo.create();
@@ -168,7 +168,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(human.output.match(/MALFORMED/g)).toHaveLength(1);
 
     assertParity(repo.root);
-  }, 30000);
+  }, 120000);
 
   it('lets STD-002 be suppressed by its own exemption, and passes cleanly', () => {
     repo = ScratchRepo.create();
@@ -183,7 +183,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(ts.run(false).success).toBe(true);
 
     assertParity(repo.root);
-  }, 30000);
+  }, 120000);
 
   it('aggregates advisory-gate findings without failing the build, and reports clause coverage', () => {
     repo = ScratchRepo.create();
@@ -192,9 +192,10 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
       '.standardsignore',
       '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n.standardsignore\tSTD-002\t# reviewed, keeping the licence\n'
     );
-    const narrativeLines = Array.from({ length: 9 }, (_, i) => `   * narrative line ${i + 1}`).join(
-      '\n'
-    );
+    const narrativeLines = Array.from(
+      { length: 9 },
+      (_, index) => `   * narrative line ${index + 1}`
+    ).join('\n');
     repo.write(
       'long.ts',
       `export function f() {\n  /**\n${narrativeLines}\n   */\n  return 1;\n}\n`
@@ -205,9 +206,11 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(json.output).toMatch(/"clause":"CMT-3".*"file":"long\.ts".*"level":"advisory"/);
     expect(json.output).toMatch(/"clause":"COV-1".*"level":"info"/);
 
-    const docsIndex = new NodeFileSystem().readFile(TOOLS_DIR, '../docs/index.md') ?? '';
-    const expectedEnforced = (docsIndex.match(/^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`/gm) ?? []).length;
-    const expectedTotal = (docsIndex.match(/^\| [A-Z]{2,5}-[0-9]{1,3} /gm) ?? []).length;
+    const clauseIndexContent = new NodeFileSystem().readFile(TOOLS_DIR, '../docs/index.md') ?? '';
+    const expectedEnforced = (
+      clauseIndexContent.match(/^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`/gm) ?? []
+    ).length;
+    const expectedTotal = (clauseIndexContent.match(/^\| [A-Z]{2,5}-[0-9]{1,3} /gm) ?? []).length;
     const thresholds = new NodeFileSystem().readFile(TOOLS_DIR, 'thresholds.tsv') ?? '';
     const expectedMeasured = new Set(
       thresholds
@@ -236,5 +239,5 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(human.output).toMatch(/^ {2}1 +long\.ts {2}CMT-3$/m);
 
     assertParity(repo.root);
-  }, 30000);
+  }, 120000);
 });

@@ -24,41 +24,41 @@ const GATE_NAMES = [
 ];
 const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh', 'check-raw-sql.sh'];
 
-interface Args {
+interface CliOptions {
   readonly mode?: RatchetMode | undefined;
   readonly json: boolean;
 }
 
-function parseArgs(argv: readonly string[]): Args {
+function parseCliOptions(argv: readonly string[]): CliOptions {
   let mode: RatchetMode | undefined;
   let json = false;
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === '--json') {
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (argument === '--json') {
       json = true;
-    } else if (arg === '--mode') {
-      i += 1;
-      const value = argv[i];
+    } else if (argument === '--mode') {
+      index += 1;
+      const value = argv[index];
       if (value !== 'warn' && value !== 'enforce') {
         throw new Error(`standards-audit: --mode must be 'warn' or 'enforce', got '${value}'`);
       }
       mode = value;
     } else {
-      throw new Error(`standards-audit: unknown option ${arg}`);
+      throw new Error(`standards-audit: unknown option ${argument}`);
     }
   }
   return { mode, json };
 }
 
 function main(): void {
-  const args = parseArgs(process.argv.slice(2));
+  const options = parseCliOptions(process.argv.slice(2));
   const git = new NodeGitClient();
   const fs = new NodeFileSystem();
   const processRunner = new NodeProcessRunner();
 
   let ratchet: Ratchet;
   try {
-    ratchet = Ratchet.init(git, fs, process.cwd(), { mode: args.mode });
+    ratchet = Ratchet.init(git, fs, process.cwd(), { mode: options.mode });
   } catch (error) {
     if (error instanceof RatchetInitError) {
       process.stderr.write(`standards: ${error.message}\n`);
@@ -87,7 +87,7 @@ function main(): void {
     '../docs/index.md',
     'thresholds.tsv'
   );
-  const report = audit.run(args.json);
+  const report = audit.run(options.json);
   process.stdout.write(report.output);
   process.exitCode = report.success ? 0 : 1;
 }

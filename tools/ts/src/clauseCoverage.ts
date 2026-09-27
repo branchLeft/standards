@@ -53,20 +53,20 @@ function readIndexRow(line: string): { id: string; gate: string } | undefined {
 export function readClauseCoverage(
   fs: FileSystemPort,
   toolsRoot: string,
-  docsIndexRelativeToTools: string,
+  clauseIndexRelativeToTools: string,
   thresholdsRelativeToTools: string
 ): ClauseCoverage {
   const measuredClauses = readMeasuredClauses(fs.readFile(toolsRoot, thresholdsRelativeToTools));
   const measured = new Set(measuredClauses);
-  const docs = fs.readFile(toolsRoot, docsIndexRelativeToTools);
-  if (docs === undefined) {
+  const indexContent = fs.readFile(toolsRoot, clauseIndexRelativeToTools);
+  if (indexContent === undefined) {
     return { enforced: 0, measuredNotEnforced: 0, notChecked: 0, measuredClauses };
   }
 
   let enforced = 0;
   let measuredNotEnforced = 0;
   let notChecked = 0;
-  for (const line of docs.split('\n')) {
+  for (const line of indexContent.split('\n')) {
     const row = readIndexRow(line);
     if (!row) {
       continue;

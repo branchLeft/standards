@@ -31,8 +31,12 @@ export class BashGate implements Gate {
   }
 
   run(context: GateContext): readonly Finding[] {
-    const args = ['--mode', context.mode, '--json'];
-    const result = this.processRunner.run('bash', [this.scriptPath, ...args], context.root);
+    const commandArguments = ['--mode', context.mode, '--json'];
+    const result = this.processRunner.run(
+      'bash',
+      [this.scriptPath, ...commandArguments],
+      context.root
+    );
     return result.stdout
       .split('\n')
       .filter((line) => line.length > 0)

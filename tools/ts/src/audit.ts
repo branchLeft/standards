@@ -83,7 +83,7 @@ export class Audit {
   private readonly gates: readonly Gate[];
   private readonly advisoryGates: readonly Gate[];
   private readonly toolsRoot: string;
-  private readonly docsIndexPath: string;
+  private readonly clauseIndexPath: string;
   private readonly thresholdsPath: string;
   private readonly coveredClauses: ReadonlySet<string>;
 
@@ -95,7 +95,7 @@ export class Audit {
     gates: readonly Gate[],
     advisoryGates: readonly Gate[],
     toolsRoot: string,
-    docsIndexPath: string,
+    clauseIndexPath: string,
     thresholdsPath: string,
     coveredClauses: ReadonlySet<string> = COVERED_CLAUSES
   ) {
@@ -105,7 +105,7 @@ export class Audit {
     this.gates = gates;
     this.advisoryGates = advisoryGates;
     this.toolsRoot = toolsRoot;
-    this.docsIndexPath = docsIndexPath;
+    this.clauseIndexPath = clauseIndexPath;
     this.thresholdsPath = thresholdsPath;
     this.coveredClauses = coveredClauses;
   }
@@ -170,7 +170,7 @@ export class Audit {
     const coverage = readClauseCoverage(
       this.fs,
       this.toolsRoot,
-      this.docsIndexPath,
+      this.clauseIndexPath,
       this.thresholdsPath
     );
     const totals = countTotals(findings);

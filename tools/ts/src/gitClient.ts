@@ -17,9 +17,9 @@ export interface GitClient {
   headShortSha(cwd: string): string;
 }
 
-function runGit(cwd: string, args: readonly string[]): string | undefined {
+function runGit(cwd: string, commandArguments: readonly string[]): string | undefined {
   try {
-    return execFileSync('git', args, {
+    return execFileSync('git', commandArguments, {
       cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],

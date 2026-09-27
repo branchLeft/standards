@@ -69,7 +69,7 @@ describe('renderTopFiles', () => {
   });
 
   it('caps the list at the top ten files', () => {
-    const findings = Array.from({ length: 12 }, (_, i) => finding({ file: `f${i}.ts` }));
+    const findings = Array.from({ length: 12 }, (_, index) => finding({ file: `f${index}.ts` }));
     const rows = renderTopFiles(findings).trimEnd().split('\n');
     expect(rows).toHaveLength(10);
   });
