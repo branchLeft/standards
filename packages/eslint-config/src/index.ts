@@ -1,5 +1,6 @@
 export { architecture } from './architecture.js';
 export { base } from './base.js';
+export { database } from './database.js';
 export { errors } from './errors.js';
 export { react } from './react.js';
 export { reactApp, type ReactAppOptions } from './reactApp.js';

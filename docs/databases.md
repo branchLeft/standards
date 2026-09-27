@@ -16,9 +16,9 @@ can express, such as creating database users, lives in tooling or a runbook.
 **Why:** raw SQL ties code to one database dialect, and it escapes the types
 the rest of the code relies on.
 
-**Check plan:** `tools/check-raw-sql.sh` reads for it now, as advisory only
-until the gate class moves. `tools/check-raw-sql.md` says what it matches and
-what it misses; a parser-based rule replaces it if those misses show up.
+**Check plan:** `tools/check-raw-sql.sh` reads for it, and is a gate.
+`tools/check-raw-sql.md` says what it matches and what it misses; a
+parser-based rule replaces it if those misses show up in practice.
 
 ## DB-2 — the `sql` template only when dialect-agnostic
 
@@ -39,7 +39,9 @@ TypeScript code uses Drizzle ORM. A SQLite store uses Drizzle's
 that keeps a store synchronous, so its API and transactions keep their shape.
 
 **Check plan:** a dependency check that TypeScript database code imports only
-`drizzle-orm` and `better-sqlite3`.
+`drizzle-orm` and `better-sqlite3` — `@branchleft/eslint-config`'s `database`
+preset, a `no-restricted-imports` rule naming every other database client.
+Pending until a consuming repo's own lint run is what enforces it.
 
 ## DB-4 — the schema ships with the release
 
@@ -49,7 +51,11 @@ deploy. A database's schema is part of the release that uses it.
 **Why:** code and schema that ship separately drift apart.
 
 **Check plan:** a CI step that runs `drizzle-kit generate` and fails if it
-produces a new migration, proving the committed migrations match the schema.
+produces a new migration, proving the committed migrations match the schema —
+`tools/ts/src/schemaDriftGate.ts`, wired into the TypeScript audit only. Fails
+closed: a non-zero exit, a missing binary or no output all report as unable
+to verify, never as silence. Pending until the owner reviews it running
+against a real consumer.
 
 ## DB-5 — expand, then contract
 
@@ -62,7 +68,11 @@ in a later release, once nothing runs the old code.
 both versions must work against the same schema at the same time.
 
 **Check plan:** a migration check that flags a drop or rename anywhere but a
-contract migration.
+contract migration — `tools/ts/src/migrationClassifierGate.ts`, classifying
+each migration in the ORM's migration folder by its content, since no
+contract-naming convention exists to read instead. Pending, wired into the
+TypeScript audit only. `tools/ts/src/migrationClassifier.md` says what it
+treats as neutral and where it still needs a reviewer's judgement.
 
 ## DB-6 — each migration is purely one or the other
 
@@ -72,7 +82,7 @@ Each migration is purely an expand or purely a contract, never both.
 it runs, one of the two versions breaks.
 
 **Check plan:** the same migration check, classifying each migration and
-failing a mixed one.
+failing a mixed one. Pending, alongside DB-5.
 
 ## DB-7 — CI proves the previous release still works
 

@@ -22,7 +22,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/ratchet.sh
 . "$HERE/lib/ratchet.sh"
 
-GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh)
+GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh check-raw-sql.sh)
 
 # No-regret checks: a reader exists, but the
 # clause's gate class in docs/index.md has not moved and its threshold in
@@ -34,7 +34,7 @@ GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets
 # `workflow_runs_every_gate` cross-checks the two lists against each other by
 # reading this file's own `GATES=(...)` line, so a member of a differently
 # named array is invisible to that check, by construction rather than luck.)
-ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh check-raw-sql.sh)
+ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
 
 # The clauses this run can speak to, listed rather than derived. Grepping the
 # gates under-reports — check-tsconfig emits TS-2 and TS-3 through a helper's
@@ -492,16 +492,23 @@ EOF
     # function under test. This is the reviewer's own proof case: CMT-3 is
     # `review` in docs/index.md, not `auto`, and it has a thresholds.tsv row,
     # so it must land in "measured, not enforced" — never in "not checked".
-    local exp_enforced exp_total exp_measured exp_not_checked
+    local exp_enforced exp_total exp_measured exp_not_checked exp_auto_ids exp_thresh_ids
     exp_enforced=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`' "$HERE/../docs/index.md")
     exp_total=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} ' "$HERE/../docs/index.md")
-    exp_measured=$(awk -F'\t' '/^[ \t]*#/ || NF < 1 { next } { print $1 }' "$HERE/thresholds.tsv" | sort -u | wc -l | tr -d ' ')
+    # A clause named in thresholds.tsv that has since gone `auto` (DB-1) counts
+    # as enforced, not measured — the same priority clause_coverage() gives
+    # `auto` over a thresholds.tsv row, so the two counts stay disjoint.
+    exp_auto_ids=$(grep -E '^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`' "$HERE/../docs/index.md" \
+      | sed -E 's/^\| ([A-Z]{2,5}-[0-9]{1,3}) .*/\1/' | sort -u)
+    exp_thresh_ids=$(awk -F'\t' '/^[ \t]*#/ || NF < 1 { next } { print $1 }' "$HERE/thresholds.tsv" | sort -u)
+    exp_measured=$(comm -23 <(printf '%s\n' "$exp_thresh_ids") <(printf '%s\n' "$exp_auto_ids") \
+      | grep -c .)
     exp_not_checked=$((exp_total - exp_enforced - exp_measured))
 
     printf '%s' "$out" \
       | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
       || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1","DB-1"\]' \
+    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1","DB-1","DB-4","DB-5","DB-6"\]' \
       || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here

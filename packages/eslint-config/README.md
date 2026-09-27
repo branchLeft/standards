@@ -59,3 +59,10 @@ Those two rules live only here, not in the `pulumi` preset. A type-aware rule
 without parser services does not degrade to a weaker check — it throws part-way
 through the lint run, so a repo composing `base + pulumi` alone would get a
 stack trace rather than a result.
+
+## `database`'s import ban cannot see a dynamically-built module spec
+
+It flags a static `import`, a plain `require(...)`/`import(...)` string, and
+one with no interpolation as a template literal, but a spec built at runtime —
+`require('p' + 'g')`, ``require(`${name}`)``, or one read from a variable —
+is not statically resolvable and passes unflagged.

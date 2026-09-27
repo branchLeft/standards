@@ -1,15 +1,22 @@
 # Settings for the no-regret checks: the reader exists, the gate class has
 # not moved. clause<TAB>key<TAB>value<TAB># reason
 #
-# These clauses stay `pending` in docs/index.md. A reader is built ahead of
-# the owner choosing the real number and reviewing the gate-class change
-# separately; until then every finding these checks emit reports as
+# Most of these clauses stay `pending` in docs/index.md. A reader is built
+# ahead of the owner choosing the real number and reviewing the gate-class
+# change separately; until then every finding these checks emit reports as
 # advisory, never as a failure, so no consuming repo can go red from a
 # number nobody has chosen yet.
 #
 # A `#provisional` reason is a signal check-clause-index.sh reads: it is what
 # lets a pending clause be named by a real script here without that reading as
-# the usual "implemented but the row was never updated" rot.
+# the usual "implemented but the row was never updated" rot. DB-1 is the one
+# row without it: its gate class moved to `auto`, so its setting is no longer
+# a placeholder ahead of a decision — it is the decision, reviewed with the
+# gate-class change itself, the same review the `#provisional` marker exists
+# to avoid needing for everything else here.
 CMT-3	max_comment_block_lines	8	#provisional, the owner sets the real value later
 COV-1	min_line_coverage_pct	90	#provisional, the owner sets the real value later
-DB-1	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
+DB-1	orm_migration_dirs	drizzle	# migration folder names DB-1, DB-5 and DB-6 all treat as the ORM's own
+DB-4	config_file_names	drizzle.config.ts,drizzle.config.js,drizzle.config.mjs,drizzle.config.cjs	#provisional, a reader only until the owner moves the gate class
+DB-5	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
+DB-6	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class

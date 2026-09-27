@@ -3,8 +3,8 @@
 For people maintaining or extending the standards tools.
 
 `check-raw-sql.sh` reads for [DB-1](../docs/databases.md#db-1--never-raw-sql),
-never raw SQL. It is advisory: every finding reports at level `advisory` and
-never fails a build, until the owner moves DB-1's gate class from `pending`.
+never raw SQL. It is a gate: a finding on an enforced file fails the build,
+through the same ratchet every other gate uses (`tools/lib/ratchet.sh`).
 
 ## What it reports
 

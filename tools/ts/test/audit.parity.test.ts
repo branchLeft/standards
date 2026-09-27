@@ -22,8 +22,9 @@ const GATE_NAMES = [
   'check-pulumi.sh',
   'check-pulumi-secrets.sh',
   'standards-sync.sh',
+  'check-raw-sql.sh',
 ];
-const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh', 'check-raw-sql.sh'];
+const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh'];
 
 function buildTsAudit(root: string): Audit {
   const git = new NodeGitClient();
@@ -207,23 +208,33 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(json.output).toMatch(/"clause":"COV-1".*"level":"info"/);
 
     const clauseIndexContent = new NodeFileSystem().readFile(TOOLS_DIR, '../docs/index.md') ?? '';
-    const expectedEnforced = (
-      clauseIndexContent.match(/^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`/gm) ?? []
-    ).length;
+    const autoRows = clauseIndexContent.match(/^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`/gm) ?? [];
+    const expectedEnforced = autoRows.length;
+    // A clause named in thresholds.tsv that has since gone `auto` (DB-1) counts
+    // as enforced, not measured — clause_coverage() gives `auto` priority over
+    // a thresholds.tsv row, so the two counts stay disjoint.
+    const isDefined = (value: string | undefined): value is string => value !== undefined;
+    const autoClauseIds = new Set(
+      autoRows.map((row) => row.match(/[A-Z]{2,5}-[0-9]{1,3}/)?.[0]).filter(isDefined)
+    );
     const expectedTotal = (clauseIndexContent.match(/^\| [A-Z]{2,5}-[0-9]{1,3} /gm) ?? []).length;
     const thresholds = new NodeFileSystem().readFile(TOOLS_DIR, 'thresholds.tsv') ?? '';
-    const expectedMeasured = new Set(
+    const thresholdClauseIds = new Set(
       thresholds
         .split('\n')
         .filter((line) => line.trim() !== '' && !line.trim().startsWith('#'))
         .map((line) => line.split('\t')[0])
-    ).size;
+        .filter(isDefined)
+    );
+    const expectedMeasured = [...thresholdClauseIds].filter((id) => !autoClauseIds.has(id)).length;
     const expectedNotChecked = expectedTotal - expectedEnforced - expectedMeasured;
 
     expect(json.output).toContain(
       `{"clause_coverage":{"enforced":${expectedEnforced},"measured_not_enforced":${expectedMeasured},"not_checked":${expectedNotChecked}`
     );
-    expect(json.output).toContain('"measured_clauses":["CMT-3","COV-1","DB-1"]');
+    expect(json.output).toContain(
+      '"measured_clauses":["CMT-3","COV-1","DB-1","DB-4","DB-5","DB-6"]'
+    );
 
     const ts = buildTsAudit(repo.root);
     expect(ts.run(false).success).toBe(true);
