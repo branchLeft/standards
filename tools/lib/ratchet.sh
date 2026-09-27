@@ -1,22 +1,6 @@
 #!/usr/bin/env bash
-# Shared ratchet mechanism for every standards gate.
-#
-# Sourced, not executed. Consumers set their own shell options; this library
-# deliberately does not set `-e`, because a gate must keep scanning after a
-# failing grep rather than abort on the first non-match.
-#
-# No runtime dependencies beyond bash + grep + awk + git, because three of the
-# repos this runs in have no package.json and no Node.
-#
-# Contract:
-#   ratchet_init [--mode warn|enforce] [--json] [FILE...]
-#   ratchet_scope_files <extension-regex>   -> newline-separated existing paths
-#   ratchet_finding <clause> <file> <line> <message>
-#   ratchet_summary                          -> prints totals, returns exit code
-#
-# A finding on a file outside the enforced set is emitted as a warning and does
-# not affect the exit code. That is the whole ratchet: the legacy tree is
-# advisory, the code this branch touched is not.
+# Shared ratchet mechanism for every standards gate. Sourced, not executed.
+# Contract, dependencies and the enforced-vs-advisory split: ratchet.md.
 
 # shellcheck shell=bash
 
@@ -177,6 +161,27 @@ ratchet_finding() {
   fi
 }
 
+# A finding that always reports at level "warning" — never promoted to
+# "error", whatever the mode or whether the file is enforced. For a clause
+# whose own text names a warning band that never fails the build (CMT-3's 5
+# to 10 lines), unlike ratchet_finding's mode-driven error/warning split.
+ratchet_finding_warn() {
+  local clause="$1" file="$2" line="$3" msg="$4"
+
+  if ratchet_is_exempt "$file" "$clause" || ratchet_is_allowed "$file" "$line" "$clause"; then
+    RATCHET_EXEMPTED=$((RATCHET_EXEMPTED + 1))
+    [ "$RATCHET_JSON" -eq 1 ] && ratchet__json "$clause" "$file" "$line" "exempt" "$msg"
+    return 0
+  fi
+
+  RATCHET_WARNINGS=$((RATCHET_WARNINGS + 1))
+  if [ "$RATCHET_JSON" -eq 1 ]; then
+    ratchet__json "$clause" "$file" "$line" "warning" "$msg"
+  else
+    printf '::warning file=%s,line=%s::%s %s\n' "$file" "$line" "$clause" "$msg"
+  fi
+}
+
 ratchet__json() {
   printf '{"clause":"%s","file":"%s","line":%s,"level":"%s","message":"%s"}\n' \
     "$1" "$2" "${3:-0}" "$4" "$(printf '%s' "$5" | sed 's/\\/\\\\/g; s/"/\\"/g')"
@@ -293,21 +298,10 @@ ratchet_self_test() {
     ratchet_init >/dev/null || exit 3
     ratchet_is_enforced "f.ts" || { echo "FAIL: uncommitted change not enforced in warn"; exit 1; }
 
-    # ratchet_finding_advisory: always "advisory", never promoted by mode, and
-    # never counted toward failures or warnings — the whole point of a
-    # provisional-threshold check. The human-readable ::notice:: path is
-    # exercised end to end by
-    # check-comment-blocks.sh's own self-test, as a separate process — not
-    # here, so this stays a plain `ratchet_init --json` call rather than a
-    # bare `RATCHET_JSON=` assignment written inside this subshell. A static
-    # analyser following sourced files reads that kind of assignment as "set
-    # in a subshell, may be lost" for every other gate that also sources this
-    # library, not only for this test.
-    #
-    # Output goes through a file, not `$(...)`: command substitution forks a
-    # subshell, and RATCHET_ADVISORY incrementing there would never reach this
-    # shell — the counter assertions below would pass by accident on a
-    # function that mutates nothing.
+    # ratchet_finding_advisory: always "advisory", never promoted by mode.
+    # ::notice:: itself is exercised by check-coverage.sh's own self-test;
+    # here a file (not `$(...)`) carries output out of this `--json` call, so
+    # RATCHET_ADVISORY lands in this shell, not a subshell's own copy.
     ratchet_init --mode enforce --json >/dev/null || exit 3
     ratchet_finding_advisory "CMT-3" "f.ts" 1 "measured, not eyeballed" > out.json
     grep -q '"level":"advisory"' out.json \
@@ -316,13 +310,27 @@ ratchet_self_test() {
     [ "$RATCHET_FAILURES" -eq 0 ] || { echo "FAIL: advisory finding counted as a failure"; exit 1; }
     [ "$RATCHET_WARNINGS" -eq 0 ] || { echo "FAIL: advisory finding counted as a warning"; exit 1; }
 
+    # ratchet_finding_warn: always "warning", counted toward RATCHET_WARNINGS,
+    # never RATCHET_FAILURES — even on an enforced file in enforce mode, the
+    # one case ratchet_finding itself would promote to "error".
+    ratchet_finding_warn "CMT-3" "f.ts" 1 "5 to 10 lines" > out.json
+    grep -q '"level":"warning"' out.json \
+      || { echo "FAIL: forced-warning finding did not report level warning"; cat out.json; exit 1; }
+    [ "$RATCHET_WARNINGS" -eq 1 ]  || { echo "FAIL: forced-warning counter did not increment"; exit 1; }
+    [ "$RATCHET_FAILURES" -eq 0 ] || { echo "FAIL: forced-warning finding counted as a failure"; exit 1; }
+
+    ratchet_finding_warn "TS-2" "src/a.ts" 1 "would be exempt" > out.json
+    grep -q '"level":"exempt"' out.json \
+      || { echo "FAIL: exemption did not suppress a forced-warning finding"; cat out.json; exit 1; }
+
     # An exemption still suppresses an advisory finding, at level "exempt" —
     # naming the clause is a deliberate, reviewed decision, not a side effect
     # of mode.
     ratchet_finding_advisory "TS-2" "src/a.ts" 1 "would be exempt" > out.json
     grep -q '"level":"exempt"' out.json \
       || { echo "FAIL: exemption did not suppress an advisory finding"; cat out.json; exit 1; }
-    [ "$RATCHET_EXEMPTED" -eq 1 ] || { echo "FAIL: exempted advisory finding not counted"; exit 1; }
+    # 2, not 1: the forced-warning exemption just above already counted one.
+    [ "$RATCHET_EXEMPTED" -eq 2 ] || { echo "FAIL: exempted advisory finding not counted"; exit 1; }
 
     # --json mode: ratchet_summary_advisory prints nothing, the same contract
     # as ratchet_summary — but always exits 0, unlike ratchet_summary, because

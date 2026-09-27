@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Audit } from '../src/audit.ts';
 import { BashGate } from '../src/bashGate.ts';
+import { CommentRatioGate } from '../src/commentRatioGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
@@ -13,10 +14,14 @@ import { NodeProcessRunner } from '../src/processRunner.ts';
 import { Ratchet } from '../src/ratchet.ts';
 import { RatchetInitError } from '../src/ratchetInitError.ts';
 import { SchemaDriftGate } from '../src/schemaDriftGate.ts';
+import { WorkItemReferenceGate } from '../src/workItemReferenceGate.ts';
 import type { RatchetMode } from '../src/ratchet.ts';
 
 const TOOLS_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
+// check-work-item-refs.sh is retired — CMT-2 runs only as WorkItemReferenceGate
+// below, alongside CMT-4's CommentRatioGate. check-comment-blocks.sh keeps
+// CMT-3, its only remaining clause.
 const GATE_NAMES = [
   'check-tsconfig.sh',
   'check-workflows.sh',
@@ -24,8 +29,9 @@ const GATE_NAMES = [
   'check-pulumi-secrets.sh',
   'standards-sync.sh',
   'check-raw-sql.sh',
+  'check-comment-blocks.sh',
 ];
-const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh'];
+const ADVISORY_GATE_NAMES = ['check-coverage.sh'];
 
 interface CliOptions {
   readonly mode?: RatchetMode | undefined;
@@ -82,6 +88,8 @@ function main(): void {
     ...ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, [])),
     new SchemaDriftGate(ratchet, fs, processRunner, TOOLS_ROOT),
     new MigrationClassifierGate(ratchet, fs, TOOLS_ROOT),
+    new CommentRatioGate(ratchet, fs, TOOLS_ROOT),
+    new WorkItemReferenceGate(ratchet, fs, TOOLS_ROOT),
   ];
 
   const audit = new Audit(

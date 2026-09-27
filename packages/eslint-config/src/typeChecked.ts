@@ -1,17 +1,9 @@
 import tseslint from 'typescript-eslint';
 import type { Linter } from 'eslint';
 
-/**
- * Type-aware rules. Opt-in, and deliberately not part of `base`.
- *
- * This is a cliff, not a step. Turning it on produces a large one-time batch of
- * fixes, roughly doubles lint time, and fails outright on root-level config
- * files that belong to no tsconfig — hence `allowDefaultProject`, without which
- * `projectService` is unusable in practice.
- *
- * `projectService: true` is what lets one config serve several programs with
- * separate tsconfigs without a per-repo `project:` array.
- */
+/** Type-aware rules. Opt-in, deliberately not part of `base` — a cliff, not a
+ * step. Why, and what `allowDefaultProject`/`projectService` are for:
+ * typeChecked.md. */
 export function typeChecked(
   allowDefaultProject: readonly string[] = ['*.js', '*.ts', '*.mjs', '*.cjs']
 ): Linter.Config[] {

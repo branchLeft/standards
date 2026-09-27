@@ -15,9 +15,9 @@ import type { ClauseCoverage } from './clauseCoverage.ts';
  * The clauses this run can speak to, listed rather than derived — grepping
  * the gates under- and over-reports, for the same reasons documented on
  * `standards-audit.sh`'s `COVERED`. Kept in sync with that file by hand,
- * except DB-4, DB-5 and DB-6: native TypeScript gates with no bash
- * equivalent, so only this runner covers them — an intentional difference,
- * not drift.
+ * except CMT-2, CMT-4, DB-4, DB-5 and DB-6: native TypeScript gates with no
+ * bash equivalent, so only this runner covers them — an intentional
+ * difference, not drift.
  */
 export const COVERED_CLAUSES: ReadonlySet<string> = new Set([
   'STD-000',
@@ -39,7 +39,9 @@ export const COVERED_CLAUSES: ReadonlySet<string> = new Set([
   'PUL-5',
   'PUL-12',
   'SYNC-1',
+  'CMT-2',
   'CMT-3',
+  'CMT-4',
   'COV-1',
   'DB-1',
   'DB-4',

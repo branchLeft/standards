@@ -23,8 +23,9 @@ const GATE_NAMES = [
   'check-pulumi-secrets.sh',
   'standards-sync.sh',
   'check-raw-sql.sh',
+  'check-comment-blocks.sh',
 ];
-const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh'];
+const ADVISORY_GATE_NAMES = ['check-coverage.sh'];
 
 function buildTsAudit(root: string): Audit {
   const git = new NodeGitClient();
@@ -186,25 +187,33 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     assertParity(repo.root);
   }, 120000);
 
-  it('aggregates advisory-gate findings without failing the build, and reports clause coverage', () => {
+  it('aggregates a non-failing gate finding without failing the build, and reports clause coverage', () => {
     repo = ScratchRepo.create();
     repo.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
     repo.write(
       '.standardsignore',
       '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n.standardsignore\tSTD-002\t# reviewed, keeping the licence\n'
     );
+    // 6 narrative lines -> an 8-line block, inside CMT-3's 5-to-10 warn band
+    // (never fails, whatever the mode) rather than its 11-or-more fail band.
+    // Padded with extra code lines so CMT-4's ratio stays clean too — this
+    // fixture is testing CMT-3's warn band, not CMT-4.
     const narrativeLines = Array.from(
-      { length: 9 },
+      { length: 6 },
       (_, index) => `   * narrative line ${index + 1}`
+    ).join('\n');
+    const padLines = Array.from(
+      { length: 6 },
+      (_, index) => `export const pad${index} = ${index};`
     ).join('\n');
     repo.write(
       'long.ts',
-      `export function f() {\n  /**\n${narrativeLines}\n   */\n  return 1;\n}\n`
+      `export function f() {\n  /**\n${narrativeLines}\n   */\n  return 1;\n}\n${padLines}\n`
     );
     repo.commit('init');
 
     const json = buildTsAudit(repo.root).run(true);
-    expect(json.output).toMatch(/"clause":"CMT-3".*"file":"long\.ts".*"level":"advisory"/);
+    expect(json.output).toMatch(/"clause":"CMT-3".*"file":"long\.ts".*"level":"warning"/);
     expect(json.output).toMatch(/"clause":"COV-1".*"level":"info"/);
 
     const clauseIndexContent = new NodeFileSystem().readFile(TOOLS_DIR, '../docs/index.md') ?? '';
@@ -233,7 +242,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
       `{"clause_coverage":{"enforced":${expectedEnforced},"measured_not_enforced":${expectedMeasured},"not_checked":${expectedNotChecked}`
     );
     expect(json.output).toContain(
-      '"measured_clauses":["CMT-3","COV-1","DB-1","DB-4","DB-5","DB-6"]'
+      '"measured_clauses":["CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-4","DB-5","DB-6"]'
     );
 
     const ts = buildTsAudit(repo.root);

@@ -1,16 +1,7 @@
 #!/usr/bin/env bash
-# The aggregate audit — every file-based `auto` gate in one run, plus the
-# exemption inventory that STD-002 requires.
-#
-# CI-6 and the REPO-* family are deliberately absent. They read live ruleset
-# state through `gh api`, which is a network call and a credential a pre-commit
-# run cannot assume; `ruleset-audit.sh` owns them and runs separately.
-#
-# Runs against the repository it is invoked from, not against this one, so a
-# consumer calls it by absolute path from its own worktree.
-#
-# Usage:
-#   standards-audit.sh [--mode warn|enforce] [--json] [--self-test]
+# The aggregate audit — every file-based `auto` gate, plus the STD-002
+# exemption inventory. CI-6/REPO-* are deliberately absent: standards-audit.md.
+# Usage: standards-audit.sh [--mode warn|enforce] [--json] [--self-test]
 
 # shellcheck disable=SC2094  # ratchet_finding writes to stdout; the ignore file is only ever read
 # shellcheck disable=SC2016  # the backtick-quoted `auto` is literal markdown text to match, not a command substitution
@@ -22,19 +13,12 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/ratchet.sh
 . "$HERE/lib/ratchet.sh"
 
-GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh check-raw-sql.sh)
+GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh check-raw-sql.sh check-comment-blocks.sh)
 
-# No-regret checks: a reader exists, but the
-# clause's gate class in docs/index.md has not moved and its threshold in
-# tools/thresholds.tsv is provisional. Kept out of GATES deliberately — a
-# separate array, a separate loop below, and every finding forced to level
-# "advisory" through ratchet_finding_advisory(), so nothing here can fail a
-# build or change what .github/workflows/standards.yml runs. (That workflow
-# calls GATES's members by name, one at a time; tools/tests/run.sh's
-# `workflow_runs_every_gate` cross-checks the two lists against each other by
-# reading this file's own `GATES=(...)` line, so a member of a differently
-# named array is invisible to that check, by construction rather than luck.)
-ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
+# No-regret check: a reader with a provisional threshold, kept out of GATES
+# so it can never fail a build. Why, and the cross-check that enforces the
+# split: standards-audit.md.
+ADVISORY_GATES=(check-coverage.sh)
 
 # The clauses this run can speak to, listed rather than derived. Grepping the
 # gates under-reports — check-tsconfig emits TS-2 and TS-3 through a helper's
@@ -42,22 +26,12 @@ ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
+# CMT-2 and CMT-4 are deliberately absent — TypeScript-only now, per the
+# `audit.ts` COVERED_CLAUSES comment.
 COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-3 COV-1 DB-1"
 
-# Every indexed clause, sorted into exactly one of three buckets so the
-# model-facing headline never reads a measured clause as unwatched, nor an
-# unflipped gate class as enforced:
-#   enforced           — docs/index.md Gate column is `auto`.
-#   measured, not enforced — not `auto`, but named in tools/thresholds.tsv
-#                        (the ADVISORY_GATES readers' own settings file, so
-#                        this is derived from it rather than kept as a second,
-#                        hand-maintained list that could name a clause neither
-#                        array actually reads).
-#   not checked        — everything else: no tool anywhere looks at it.
-# Read from this checkout's own docs/index.md and tools/thresholds.tsv (the
-# tool's own files, the same default check-clause-index.sh uses) — not from
-# whatever repo standards-audit.sh is auditing, which may carry no docs/ or
-# tools/ of its own at all.
+# Every indexed clause, sorted into enforced/measured/not-checked, read from
+# this checkout's own docs and thresholds, not the audited repo's: standards-audit.md.
 clause_coverage() {
   local docs="$HERE/../docs/index.md"
   local thresholds="$HERE/thresholds.tsv"
@@ -465,22 +439,26 @@ EOF
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: STD-002 not suppressible by its own exemption"; exit 1; }
 
-    # ADVISORY_GATES are wired into the same aggregate raw stream as GATES: a
-    # genuine CMT-3 finding shows up here at level advisory, and COV-1
-    # reports "info" for a repo with no coverage report — neither changes
-    # whether the run still fails on CI-1 above.
+    # A CMT-3 finding in the warn band (5 to 10 lines) shows up here at level
+    # warning — a real GATES member, but this particular fixture never fails
+    # the build — and COV-1 (still an ADVISORY_GATES member) reports "info"
+    # for a repo with no coverage report. Neither changes whether the run
+    # still fails on CI-1 above.
     {
       echo 'export function f() {'
       echo '  /**'
-      for i in $(seq 1 9); do echo "   * narrative line $i"; done
+      for i in $(seq 1 6); do echo "   * narrative line $i"; done
       echo '   */'
       echo '  return 1;'
       echo '}'
+      # Padding so code lines still outnumber comment lines — this fixture is
+      # testing CMT-3's warn band, not CMT-4's ratio.
+      for i in $(seq 1 6); do echo "export const pad$i = $i;"; done
     } > long.ts
-    git add -A && git commit -qm advisory-fixture
+    git add -A && git commit -qm warning-fixture
 
     out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"advisory"' \
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"warning"' \
       || { echo "FAIL: standards-audit.sh did not aggregate a CMT-3 finding"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"clause":"COV-1".*"level":"info"' \
       || { echo "FAIL: standards-audit.sh did not aggregate the COV-1 no-data finding"; echo "$out"; exit 1; }
@@ -489,9 +467,7 @@ EOF
     # tools/thresholds.tsv, not the scratch repo above (see clause_coverage()'s
     # comment) — so the expected numbers here come from independently
     # re-deriving them with a different-shaped query, not from re-running the
-    # function under test. This is the reviewer's own proof case: CMT-3 is
-    # `review` in docs/index.md, not `auto`, and it has a thresholds.tsv row,
-    # so it must land in "measured, not enforced" — never in "not checked".
+    # function under test.
     local exp_enforced exp_total exp_measured exp_not_checked exp_auto_ids exp_thresh_ids
     exp_enforced=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} .*`auto`' "$HERE/../docs/index.md")
     exp_total=$(grep -cE '^\| [A-Z]{2,5}-[0-9]{1,3} ' "$HERE/../docs/index.md")
@@ -508,14 +484,14 @@ EOF
     printf '%s' "$out" \
       | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
       || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1","DB-1","DB-4","DB-5","DB-6"\]' \
+    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-4","DB-5","DB-6"\]' \
       || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here
     # could only come from the CMT-3/COV-1 findings just added — and it must
-    # not, because neither is anything but "advisory" or "info".
+    # not, because neither is anything but "warning" or "info".
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
-      || { echo "FAIL: an advisory or info finding made the run exit non-zero"; exit 1; }
+      || { echo "FAIL: a warning or info finding made the run exit non-zero"; exit 1; }
 
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" \
