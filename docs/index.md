@@ -73,11 +73,16 @@ the corollary on PRIN-1 and the honesty clause on PRIN-4.
 | STD-001 | An exemption is a CODEOWNERS decision. A PR may not add one to make its own gate pass                         | `review` | —                          |
 | STD-002 | A stale exemption — one matching nothing — is reported and removed                                            | `auto`   | `tools/standards-audit.sh` |
 | STD-003 | These standards govern repos branchLeft owns; a contribution elsewhere follows that project's own             | `review` | —                          |
+| STD-004 | A rule is enforced only by a mechanism, a technical control or a check; a rule with neither is a gap to build | `review` | —                          |
 
 **STD-003 sets the reach of everything below.** A rule here binds code
 branchLeft writes and owns. Upstream software the estate runs keeps its own
 conventions, and a contribution to another project follows that project's
 standards, because a rule nobody there agreed to is not a standard there.
+
+**STD-004 is how a rule becomes real.** A written policy is not a control,
+and a standard nothing checks is not enforced. Where a rule has neither, the
+finding is to build the control or the check, never to go and look by hand.
 
 ## TypeScript
 
@@ -210,17 +215,18 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Repository settings — `repo-settings.md`
 
-| ID     | Rule                                                                                | Gate      | Encoded by               |
-| ------ | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
-| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
-| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
-| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
-| REPO-4 | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
-| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
-| REPO-6 | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
-| REPO-7 | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
-| REPO-8 | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
-| REPO-9 | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
+| ID      | Rule                                                                                | Gate      | Encoded by               |
+| ------- | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
+| REPO-1  | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
+| REPO-2  | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
+| REPO-3  | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
+| REPO-4  | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
+| REPO-5  | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
+| REPO-6  | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
+| REPO-7  | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
+| REPO-8  | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
+| REPO-9  | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
+| REPO-10 | Every agent-written commit and pull request says so                                 | `pending` | —                        |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
@@ -289,6 +295,7 @@ creation of a project or account — are enumerated, not judged case by case.
 | DP-9  | A breach route fast enough to preserve the reporting deadline that applies        | `pending` | —          |
 | DP-10 | Third parties touching personal data are registered and transfer-assessed         | `pending` | —          |
 | DP-11 | Offboarding executes a tested deletion for every row of the record                | `pending` | —          |
+| DP-12 | A service collects only the personal data a named use needs                       | `review`  | —          |
 
 Every clause lands `pending`, and the honest reading of that is the one in
 the Columns section above: the rules are binding prose and nothing checks
@@ -391,17 +398,18 @@ elsewhere and are **cited, never restated**:
 - `branchLeft/.github` → `docs/DOCUMENTATION-STANDARD.md`
 - `branchLeft/github-workflows` → `tools/docs-lint-rules.md`
 
-| ID    | Rule                                                                                          | Gate      | Encoded by |
-| ----- | --------------------------------------------------------------------------------------------- | --------- | ---------- |
-| DOC-1 | Every repo runs the `docs-lint` caller                                                        | `pending` | —          |
-| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it                     | `review`  | —          |
-| DOC-3 | Durable documentation is markdown; HTML is session-only, bar the committed try-it-now designs | `pending` | —          |
-| DOC-4 | Every document is written for one audience, people or agents, and says which                  | `review`  | —          |
-| DOC-5 | Documents for agents are kept apart from documentation for people                             | `review`  | —          |
-| DOC-6 | Documents for people are concise, logically structured and in plain English                   | `review`  | —          |
-| DOC-7 | A stale document is a defect, corrected in the same PR as the change that staled it           | `review`  | —          |
-| DOC-8 | CI checks documents against the code: links, named commands and quoted values                 | `pending` | —          |
-| DOC-9 | Decisions are recorded durably, in one decision-record format shared by every repo            | `pending` | —          |
+| ID     | Rule                                                                                          | Gate      | Encoded by |
+| ------ | --------------------------------------------------------------------------------------------- | --------- | ---------- |
+| DOC-1  | Every repo runs the `docs-lint` caller                                                        | `pending` | —          |
+| DOC-2  | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it                     | `review`  | —          |
+| DOC-3  | Durable documentation is markdown; HTML is session-only, bar the committed try-it-now designs | `pending` | —          |
+| DOC-4  | Every document is written for one audience, people or agents, and says which                  | `review`  | —          |
+| DOC-5  | Documents for agents are kept apart from documentation for people                             | `review`  | —          |
+| DOC-6  | Documents for people are concise, logically structured and in plain English                   | `review`  | —          |
+| DOC-7  | A stale document is a defect, corrected in the same PR as the change that staled it           | `review`  | —          |
+| DOC-8  | CI checks documents against the code: links, named commands and quoted values                 | `pending` | —          |
+| DOC-9  | Decisions are recorded durably, in one decision-record format shared by every repo            | `pending` | —          |
+| DOC-10 | A document marks who drafted it, and agents never rewrite text the owner wrote                | `pending` | —          |
 
 ## Architecture — `architecture.md`
 
@@ -492,6 +500,9 @@ elsewhere and are **cited, never restated**:
 | SEC-8  | Static security analysis on every PR: CodeQL public, Opengrep private, linter rules in pre-commit | `pending` | —                                                         |
 | SEC-9  | KICS scans Dockerfiles, Compose files and workflows; hadolint lints Dockerfiles                   | `pending` | —                                                         |
 | SEC-10 | Scanners are installed by pinned version and verified checksum                                    | `pending` | —                                                         |
+| SEC-11 | Agent prompts, transcripts and memory are never published                                         | `pending` | —                                                         |
+| SEC-12 | Data is encrypted in transit on every hop, private links included, and at rest in every store     | `review`  | New network connections, stores and backups in the diff   |
+| SEC-13 | No credential or key is shared between tenants, so one tenant's compromise reaches no other       | `review`  | Credentials, keys and stores more than one tenant uses    |
 
 ## Secrets and credentials — `credentials.md`
 
@@ -598,6 +609,21 @@ elsewhere and are **cited, never restated**:
 | NFR-4 | Sustainability is measured and published, as fully as possible                          | `review` | Published figures and their measurements    |
 | NFR-5 | Everything public-facing is accessible, not only web pages                              | `review` | New public-facing output                    |
 | NFR-6 | Once a service has objectives, we hold ourselves to them and report a miss openly       | `review` | Incident entries                            |
+
+## Product — `product.md`
+
+What we build for customers, rather than how the code is written. Each is the
+platform owner's decision. `eleven-factors.md` maps these and other clauses to
+the Eleven Factors, and records where we depart from them.
+
+| ID     | Rule                                                                                             | Gate     | Evidence                                      |
+| ------ | ------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------- |
+| PROD-1 | A new site starts with reader tracking off; the publisher turns it on knowingly                  | `review` | New sites' default settings                   |
+| PROD-2 | A publisher can always leave with all their content and members; self-hosting is not a goal      | `review` | Export paths and their formats                |
+| PROD-3 | Private by default, with no dark patterns and no engagement mechanics                            | `review` | New reader-facing features and their defaults |
+| PROD-4 | Security and accessibility are in every plan, never a paid upgrade                               | `review` | Plan and pricing definitions                  |
+| PROD-5 | No generative AI in the product; automated processing that affects people is disclosed           | `review` | New automated processing and its disclosure   |
+| PROD-6 | A shared platform service sits behind a defined contract, and reads site content only if it must | `review` | Contracts between shared services and sites   |
 
 ## Pending — blocked on authorship
 
