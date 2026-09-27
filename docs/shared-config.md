@@ -20,11 +20,11 @@ are compared.
 `tools/standards-sync.sh`. Three comparison modes, chosen per template in the
 manifest:
 
-| Mode        | Means                                                                          | For                        |
-| ----------- | ------------------------------------------------------------------------------- | -------------------------- |
-| `identical` | byte-for-byte                                                                    | `.nvmrc`, `.editorconfig`  |
-| `contains`  | every non-blank, non-comment template line appears in the target                | `.pre-commit-config.yaml`  |
-| `suffix`    | the template's non-blank, non-comment lines are the target's own last such lines, in order | `CODEOWNERS`   |
+| Mode        | Means                                                                                      | For                       |
+| ----------- | ------------------------------------------------------------------------------------------ | ------------------------- |
+| `identical` | byte-for-byte                                                                              | `.nvmrc`, `.editorconfig` |
+| `contains`  | every non-blank, non-comment template line appears in the target                           | `.pre-commit-config.yaml` |
+| `suffix`    | the template's non-blank, non-comment lines are the target's own last such lines, in order | `CODEOWNERS`              |
 
 `identical` is deliberately unforgiving about whitespace. A version pin that
 differs from the template only in a trailing newline is drift that no review UI
