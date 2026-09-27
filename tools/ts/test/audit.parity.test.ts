@@ -242,7 +242,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
       `{"clause_coverage":{"enforced":${expectedEnforced},"measured_not_enforced":${expectedMeasured},"not_checked":${expectedNotChecked}`
     );
     expect(json.output).toContain(
-      '"measured_clauses":["ARCH-4","ARCH-7","CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-3","DB-4","DB-5","DB-6","ERR-1","ERR-2","ERR-3","NAM-1","NAM-2","PY-2","PY-3","TYP-1","TYP-2","TYP-5"]'
+      '"measured_clauses":["ARCH-4","ARCH-7","CI-12","CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-3","DB-4","DB-5","DB-6","DEP-8","ERR-1","ERR-2","ERR-3","LINT-2","LINT-4","NAM-1","NAM-2","OPS-2","PY-2","PY-3","REPO-8","TYP-1","TYP-2","TYP-5"]'
     );
 
     const ts = buildTsAudit(repo.root);

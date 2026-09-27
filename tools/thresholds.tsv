@@ -37,3 +37,9 @@ PY-2	ruff_config_filenames	ruff.toml,.ruff.toml	#provisional, a reader only unti
 PY-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 PY-3	pyproject_filename	pyproject.toml	#provisional, a reader only until the owner moves the gate class
 TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	#provisional, a reader only until the owner moves the gate class
+CI-12	deploy_secret_substrings	DEPLOY,PULUMI,HCLOUD,SSH_KEY	#provisional, the owner sets the real deploy-secret vocabulary later
+OPS-2	deploy_job_name_substrings	deploy	#provisional, the owner sets the real deploy-job vocabulary later
+DEP-8	dependabot_config_file	.github/dependabot.yml	#provisional, a reader only until the owner moves the gate class
+REPO-8	disable_signing_patterns	commit.gpgsign=false,commit.gpgsign false,--no-gpg-sign	#provisional, the owner extends the pattern list later
+LINT-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
+LINT-4	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
