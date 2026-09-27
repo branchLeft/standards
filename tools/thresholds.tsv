@@ -23,3 +23,7 @@ DB-1	orm_migration_dirs	drizzle	# migration folder names DB-1, DB-5 and DB-6 all
 DB-4	config_file_names	drizzle.config.ts,drizzle.config.js,drizzle.config.mjs,drizzle.config.cjs	#provisional, a reader only until the owner moves the gate class
 DB-5	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
 DB-6	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
+PY-2	ruff_config_filenames	ruff.toml,.ruff.toml	#provisional, a reader only until the owner moves the gate class
+PY-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
+PY-3	pyproject_filename	pyproject.toml	#provisional, a reader only until the owner moves the gate class
+TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	#provisional, a reader only until the owner moves the gate class

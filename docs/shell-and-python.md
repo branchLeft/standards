@@ -97,3 +97,34 @@ runtime.
 
 **Check plan:** a check that `pyproject.toml` sets `requires-python` and that
 ruff's `target-version` and mypy's `python_version` match it.
+
+## The shared ruff and mypy configuration
+
+`templates/ruff.toml` and `templates/mypy.ini`, synced through `SYNC-1` like
+`.pre-commit-config.yaml`, are how PY-2 gets a consistent rule set rather than
+each repo hand-rolling one. Each rule selection traces to a clause rather
+than being a taste choice:
+
+| Selection                           | Clause | Why                                                           |
+| ----------------------------------- | ------ | ------------------------------------------------------------- |
+| ruff `TRY`                          | ERR-1  | own named error types; `TRY002` bans a bare `raise Exception` |
+| ruff `BLE`                          | ERR-3  | a caught error is never silently discarded                    |
+| ruff `DOC`                          | ERR-2  | a docstring lists what a function raises (`DOC501`)           |
+| ruff `N`                            | NAM-2  | pep8-naming, each language's own casing convention            |
+| ruff `ANN`                          | TYP-2  | every signature fully typed; `ANN401` alone is TYP-1          |
+| ruff `S`                            | SEC-8  | flake8-bandit static security rules, run in pre-commit        |
+| mypy `strict = True`                | TYP-5  | maximum strictness; includes TYP-2's `disallow_untyped_defs`  |
+| mypy `disallow_any_explicit = True` | TYP-1  | strict mode alone does not ban an explicit `Any`              |
+
+ARCH-4 (one class per file) and ARCH-7 (cognitive complexity) are in this
+work's scope but not in the ruff config: their own check plans name an
+ast-grep rule and `complexipy` respectively, neither of which is a ruff or
+mypy setting.
+
+`target-version` and `python_version` are deliberately not in the shared
+template — PY-3 requires them to match each project's own `requires-python`,
+which differs per repo. Ruff infers `target-version` from `requires-python`
+when it is unset, so the template omits it entirely; mypy has no equivalent
+inference, so each repo appends its own `python_version` line under `[mypy]`,
+after the synced block. `tools/ts/src/pythonConfigGate.ts` checks both
+directly against `requires-python`, independently of `SYNC-1`.

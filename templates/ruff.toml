@@ -1,0 +1,8 @@
+# Shared branchLeft Python lint policy (SYNC-1). `target-version` is left
+# unset on purpose — ruff infers it from `requires-python` in the consuming
+# repo's own pyproject.toml, and PY-3's check reads that field directly.
+# Rationale per rule set: branchLeft/standards docs/shell-and-python.md.
+line-length = 100
+
+[lint]
+extend-select = ["TRY", "BLE", "DOC", "N", "ANN", "S"]

@@ -20,3 +20,5 @@ editorconfig	.editorconfig	identical
 nvmrc	.nvmrc	identical
 codeowners	.github/CODEOWNERS	suffix
 pre-commit-config.yaml	.pre-commit-config.yaml	contains
+ruff.toml	.ruff.toml	contains
+mypy.ini	mypy.ini	contains
