@@ -59,12 +59,14 @@ tidiness. An unpinned hook set changes underneath you and rewrites files in a
 commit nobody reviewed, which is the same class of problem as an unpinned
 action.
 
-`CODEOWNERS` shares exactly one line, the catch-all. Escape hatches —
-`.standardsignore`, `.standards.mode`, `.docs-lint.mode`, `tools/floors.tsv` —
-are deliberately outside the shared set, because a rule naming a path the repo
-does not have reads as coverage while matching nothing, and CODEOWNERS reports
-no error for it. Requiring the line per repo is the job of a check that first
-asks whether the repo has that escape hatch.
+`CODEOWNERS` shares the escape hatches `REPO-5` names: `.standardsignore`,
+`.standards.mode`, `.docs-lint*`, `tools/floors.tsv` and `.github/`. There is no
+catch-all. Owning the whole tree made code-owner review a review of every PR by
+the owner, which an agent reviewer can never satisfy, since GitHub doesn't let
+an App be a code owner. Owning the hatches keeps what matters: an exemption stays
+the owner's decision (`STD-001`). A line for a hatch the repo doesn't have yet is
+still coverage, not a false claim, because a PR that creates the file needs the
+owner's review.
 
 **`.gitignore` has no template, and that is a decision rather than an omission.**
 The shared content is close to empty once the spellings are compared: the fleet
