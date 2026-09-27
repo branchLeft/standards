@@ -11,7 +11,7 @@ repos this runs in have no package.json and no Node.
 
 ## Contract
 
-```
+```text
 ratchet_init [--mode warn|enforce] [--json] [FILE...]
 ratchet_scope_files <extension-regex>   -> newline-separated existing paths
 ratchet_finding <clause> <file> <line> <message>

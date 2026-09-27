@@ -11,7 +11,7 @@ Every invocation says so in its own output, not only in this doc.
 
 ## Usage
 
-```
+```bash
 clauses-in-scope.sh
 ```
 
@@ -20,7 +20,7 @@ Diff against the ratchet's own merge-base (`origin/main`, falling back to
 logic, reused rather than re-derived, so this can never compute a different
 changed-file set than the gates do.
 
-```
+```bash
 clauses-in-scope.sh --files FILE
 ```
 
@@ -28,13 +28,13 @@ A newline-separated list of changed paths read from `FILE` (`-` = stdin)
 instead of asking git for one — for a caller that already has a diff
 (`gh pr diff --name-only`, a CI event payload) or a synthetic one.
 
-```
+```bash
 clauses-in-scope.sh --root DIR
 ```
 
 Read `tools/clause-paths.tsv` and `docs/index.md` from `DIR` instead of this
 script's own repo. Exists for `--self-test`'s isolated fixture.
 
-```
+```bash
 clauses-in-scope.sh --self-test
 ```

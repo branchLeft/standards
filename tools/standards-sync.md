@@ -14,7 +14,7 @@ runtime a repo never runs is worse than pinning none.
 
 ## Usage
 
-```
+```bash
 standards-sync.sh [--mode warn|enforce] [--json] [--templates DIR]
 standards-sync.sh --apply [--templates DIR]
 standards-sync.sh --self-test

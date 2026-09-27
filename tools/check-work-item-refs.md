@@ -1,7 +1,7 @@
 # check-work-item-refs.sh
 
-CMT-2 says a comment never carries a development-process reference. Backlog
-ids (`S10`, `B22`, `Q52`) in source comments are already caught by
+CMT-2 says a comment never carries a development-process reference. The
+letter-prefixed backlog id shape in source comments is already caught by
 `branchLeft/github-workflows`'s `docs-lint` (rule DL009, `both` scope — it
 extracts comment-only lines from `.ts/.tsx/.js/.jsx/.mjs/.cjs/.py/.sh/.bash/
 .yml/.yaml/.tf` the same way this repo's own `code_scannable()` does). DL009
