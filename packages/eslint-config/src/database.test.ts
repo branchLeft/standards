@@ -52,4 +52,25 @@ describe('database', () => {
   it('does not flag an unrelated require(...) call', () => {
     expect(reportedSyntax("const path = require('node:path');\n")).toBe(false);
   });
+
+  it('flags require(...) of a restricted package spelled as a template literal', () => {
+    expect(reportedSyntax('const { Client } = require(`pg`);\n')).toBe(true);
+  });
+
+  it('flags a dynamic import(...) of a restricted package spelled as a template literal', () => {
+    expect(reportedSyntax('async function f() { await import(`pg`); }\n')).toBe(true);
+  });
+
+  it('does not flag a template-literal require(...) of an allowed package', () => {
+    expect(reportedSyntax('const Database = require(`better-sqlite3`);\n')).toBe(false);
+  });
+
+  it('does not flag a template-literal dynamic import(...) of an allowed package', () => {
+    expect(reportedSyntax('async function f() { await import(`drizzle-orm`); }\n')).toBe(false);
+  });
+
+  it('does not flag a template literal with an interpolation, even naming a restricted package', () => {
+    // Not statically resolvable — see database.ts's own note on this limit.
+    expect(reportedSyntax('const name = "pg"; require(`${name}`);\n')).toBe(false);
+  });
 });

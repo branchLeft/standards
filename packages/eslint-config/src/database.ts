@@ -23,8 +23,9 @@ const REASON = 'Database access goes through drizzle-orm (better-sqlite3 for SQL
 
 // `no-restricted-imports` only inspects static `import`/`export` syntax, so a
 // `require(...)` call or a dynamic `import(...)` reaches the same package
-// unflagged. These two selectors close that: one per restricted package, for
-// each call shape.
+// unflagged. These selectors cover require() and import() with a plain string
+// or an interpolation-free template literal; a spec built at runtime is not
+// statically resolvable (see the package README).
 function restrictedSyntaxEntries(
   packages: readonly string[]
 ): readonly { selector: string; message: string }[] {
@@ -36,6 +37,14 @@ function restrictedSyntaxEntries(
     {
       selector: `ImportExpression[source.value="${name}"]`,
       message: `${REASON} (blocked: import('${name}'))`,
+    },
+    {
+      selector: `CallExpression[callee.name='require'] > TemplateLiteral.arguments[expressions.length=0][quasis.0.value.cooked="${name}"]`,
+      message: `${REASON} (blocked: require(\`${name}\`))`,
+    },
+    {
+      selector: `ImportExpression > TemplateLiteral.source[expressions.length=0][quasis.0.value.cooked="${name}"]`,
+      message: `${REASON} (blocked: import(\`${name}\`))`,
     },
   ]);
 }
