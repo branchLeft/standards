@@ -17,24 +17,32 @@ are compared.
 
 ## SYNC-1 — a shared config file matches its template
 
-`tools/standards-sync.sh`. Two comparison modes, chosen per template in the
+`tools/standards-sync.sh`. Three comparison modes, chosen per template in the
 manifest:
 
-| Mode        | Means                                                            | For                                     |
-| ----------- | ---------------------------------------------------------------- | --------------------------------------- |
-| `identical` | byte-for-byte                                                    | `.nvmrc`, `.editorconfig`               |
-| `contains`  | every non-blank, non-comment template line appears in the target | `CODEOWNERS`, `.pre-commit-config.yaml` |
+| Mode        | Means                                                                                      | For                       |
+| ----------- | ------------------------------------------------------------------------------------------ | ------------------------- |
+| `identical` | byte-for-byte                                                                              | `.nvmrc`, `.editorconfig` |
+| `contains`  | every non-blank, non-comment template line appears in the target                           | `.pre-commit-config.yaml` |
+| `suffix`    | the template's non-blank, non-comment lines are the target's own last such lines, in order | `CODEOWNERS`              |
 
 `identical` is deliberately unforgiving about whitespace. A version pin that
 differs from the template only in a trailing newline is drift that no review UI
 renders, and the tools reading these files are not all equally tolerant of it.
 
-`contains` exists because a repo legitimately adds to those two: its own
-reviewers for a subtree, a `pnpm lint` hook that only makes sense locally. What
-it may not do is drop a shared line. The check is line-wise rather
-than block-wise for the same reason — the shared lines are interleaved with
-local ones, and requiring a contiguous block would force an ordering that means
-nothing.
+`contains` exists because a repo legitimately adds its own hooks to
+`.pre-commit-config.yaml` after the shared set. What it may not do is drop a
+shared line. The check is line-wise rather than block-wise for the same
+reason — a repo's hooks interleave with the shared ones, and requiring a
+contiguous block would force an ordering that means nothing there.
+
+`suffix` exists because CODEOWNERS is a different shape: GitHub applies the
+LAST matching pattern in the file, regardless of specificity, so where the
+shared lines sit relative to a repo's own is the entire mechanism, not a
+cosmetic detail. A repo may add its own lines above the shared block; it may
+not add anything below it or between its entries, because either would let a
+later or narrower pattern quietly take over an escape hatch. `contains` cannot
+see this — it only checks that a line is present somewhere, not where.
 
 **This is a drift clause, not an adoption one.** A repo that does not have the
 file is not reported. Which repo needs which file is a per-repo decision on the
@@ -59,12 +67,19 @@ tidiness. An unpinned hook set changes underneath you and rewrites files in a
 commit nobody reviewed, which is the same class of problem as an unpinned
 action.
 
-`CODEOWNERS` shares exactly one line, the catch-all. Escape hatches —
-`.standardsignore`, `.standards.mode`, `.docs-lint.mode`, `tools/floors.tsv` —
-are deliberately outside the shared set, because a rule naming a path the repo
-does not have reads as coverage while matching nothing, and CODEOWNERS reports
-no error for it. Requiring the line per repo is the job of a check that first
-asks whether the repo has that escape hatch.
+`CODEOWNERS` shares the escape hatches `REPO-5` names: `.standardsignore`,
+`.standards.mode`, `.docs-lint*`, `tools/floors.tsv` and `.github/`. There is no
+catch-all. Owning the whole tree made code-owner review a review of every PR by
+the owner, which an agent reviewer can never satisfy, since GitHub doesn't let
+an App be a code owner. Owning the hatches keeps what matters: an exemption stays
+the owner's decision (`STD-001`). A line for a hatch the repo doesn't have yet is
+still coverage, not a false claim, because a PR that creates the file needs the
+owner's review.
+
+These lines must also stay last in the file, which is why SYNC-1 checks
+CODEOWNERS as `suffix`, not `contains`: a repo that adds its own trailing
+catch-all after the shared lines would silently become the effective owner of
+every hatch, and a presence-only check would report no drift at all.
 
 **`.gitignore` has no template, and that is a decision rather than an omission.**
 The shared content is close to empty once the spellings are compared: the fleet

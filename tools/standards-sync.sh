@@ -67,6 +67,28 @@ first_missing_line() {
   return 1
 }
 
+# A file's non-blank, non-comment lines, one per line.
+content_lines() {
+  local f="$1" line
+  while IFS= read -r line; do
+    case "$line" in ''|\#*) continue ;; esac
+    printf '%s\n' "$line"
+  done < "$f"
+}
+
+# Whether the template's content lines are the target's own last content
+# lines, in order — what CODEOWNERS needs, since GitHub applies the LAST
+# matching pattern regardless of specificity.
+suffix_ok() {
+  local tpl="$1" target="$2" tpl_lines target_lines n tail
+  tpl_lines=$(content_lines "$tpl")
+  [ -z "$tpl_lines" ] && return 0
+  target_lines=$(content_lines "$target")
+  n=$(printf '%s\n' "$tpl_lines" | grep -c .)
+  tail=$(printf '%s\n' "$target_lines" | tail -n "$n")
+  [ "$tail" = "$tpl_lines" ]
+}
+
 check_entry() {
   local name="$1" path="$2" comparison="$3"
   local tpl="$TEMPLATES/$name" missing
@@ -87,6 +109,10 @@ check_entry() {
         ratchet_finding "SYNC-1" "$path" 1 \
           "does not contain the shared line '$missing' from templates/$name"
       fi
+      ;;
+    suffix)
+      suffix_ok "$tpl" "$path" || ratchet_finding "SYNC-1" "$path" 1 \
+        "templates/$name's lines must be $path's final lines — GitHub applies the last matching CODEOWNERS pattern, so anything after or between them can silently take ownership"
       ;;
     *)
       echo "::error::templates/$name has unknown comparison '$comparison'" >&2; return 2 ;;
@@ -120,6 +146,15 @@ apply_entry() {
         printf '  add     %s: %s\n' "$path" "$missing"
       else
         printf '  ok      %s\n' "$path"
+      fi
+      ;;
+    suffix)
+      # Same reasoning as `contains`, plus a human has to choose where a
+      # misplaced line moves to, not this tool.
+      if suffix_ok "$TEMPLATES/$name" "$path"; then
+        printf '  ok      %s\n' "$path"
+      else
+        printf '  reorder %s: templates/%s lines must be the file'"'"'s last\n' "$path" "$name"
       fi
       ;;
   esac
@@ -254,9 +289,72 @@ self_test() {
   return "$rc"
 }
 
+# `suffix` proves the property `contains` cannot see: CODEOWNERS applies the
+# LAST matching pattern, so a repo may add lines above the shared ones but not
+# below or between them, or a later pattern silently takes over the hatch.
+self_test_suffix() {
+  local tmp rc=0
+  tmp=$(mktemp -d) || return 2
+  (
+    cd "$tmp" || exit 2
+    ratchet_scratch_repo_init || exit 2
+
+    mkdir -p tpl .github
+    printf '/.standardsignore @admin\n/.docs-lint*      @admin\n' > tpl/codeowners
+    printf 'codeowners\t.github/CODEOWNERS\tsuffix\n' > tpl/manifest.tsv
+
+    gate() { out=$("$CHECK_SCRIPT" --templates "$tmp/tpl" --mode enforce 2>&1); grc=$?; }
+
+    # Repo lines above, shared lines last: passes.
+    printf '/apps/ @team\n/.standardsignore @admin\n/.docs-lint*      @admin\n' \
+      > .github/CODEOWNERS
+    git add -A && git commit -qm above
+    gate
+    [ "$grc" -eq 0 ] \
+      || { echo "FAIL: suffix — repo lines above tree exited $grc"; echo "$out"; exit 1; }
+
+    # A trailing catch-all after the shared lines: fails. `contains` cannot
+    # see this — every shared line is still present.
+    printf '/apps/ @team\n/.standardsignore @admin\n/.docs-lint*      @admin\n* @team\n' \
+      > .github/CODEOWNERS
+    git add -A && git commit -qm catchall
+    gate
+    [ "$grc" -eq 1 ] \
+      || { echo "FAIL: suffix — trailing catch-all exited $grc, expected 1"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE 'file=\.github/CODEOWNERS.*SYNC-1' \
+      || { echo "FAIL: suffix — trailing catch-all not reported"; echo "$out"; exit 1; }
+
+    # A repo line inserted between the shared ones: fails.
+    printf '/apps/ @team\n/.standardsignore @admin\n/local/ @team\n/.docs-lint*      @admin\n' \
+      > .github/CODEOWNERS
+    git add -A && git commit -qm inserted
+    gate
+    [ "$grc" -eq 1 ] \
+      || { echo "FAIL: suffix — inserted repo line exited $grc, expected 1"; echo "$out"; exit 1; }
+
+    # Shared lines last again, restored: passes.
+    printf '/apps/ @team\n/local/ @team\n/.standardsignore @admin\n/.docs-lint*      @admin\n' \
+      > .github/CODEOWNERS
+    git add -A && git commit -qm restored
+    gate
+    [ "$grc" -eq 0 ] \
+      || { echo "FAIL: suffix — restored tree exited $grc"; echo "$out"; exit 1; }
+
+    exit 0
+  ) || rc=$?
+  rm -rf "$tmp"
+  [ "$rc" -eq 0 ] && echo "standards-sync.sh: suffix self-test passed"
+  return "$rc"
+}
+
 CHECK_SCRIPT="$HERE/standards-sync.sh"
 
 case "${1:-}" in
-  --self-test) self_test; exit $? ;;
+  --self-test)
+    rc=0
+    self_test || rc=1
+    self_test_suffix || rc=1
+    exit "$rc"
+    ;;
   *) main "$@" ;;
 esac
