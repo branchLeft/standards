@@ -30,16 +30,17 @@ run "check-pulumi.sh"      bash "$TOOLS/check-pulumi.sh" --self-test
 run "check-pulumi-secrets.sh" bash "$TOOLS/check-pulumi-secrets.sh" --self-test
 run "standards-sync.sh"    bash "$TOOLS/standards-sync.sh" --self-test
 run "check-raw-sql.sh"     bash "$TOOLS/check-raw-sql.sh" --self-test
+run "check-comment-blocks.sh" bash "$TOOLS/check-comment-blocks.sh" --self-test
+run "check-work-item-refs.sh" bash "$TOOLS/check-work-item-refs.sh" --self-test
 run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
-# No-regret checks: self-tested like every other gate, but deliberately
+# check-coverage.sh: self-tested like every other gate, but deliberately
 # absent from GATES in standards-audit.sh and from
 # .github/workflows/standards.yml — see standards-audit.sh's ADVISORY_GATES
 # comment.
-run "check-comment-blocks.sh" bash "$TOOLS/check-comment-blocks.sh" --self-test
 run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
 
 echo "docs:"

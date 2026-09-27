@@ -9,12 +9,13 @@
 #
 # A `#provisional` reason is a signal check-clause-index.sh reads: it is what
 # lets a pending clause be named by a real script here without that reading as
-# the usual "implemented but the row was never updated" rot. DB-1 is the one
-# row without it: its gate class moved to `auto`, so its setting is no longer
-# a placeholder ahead of a decision — it is the decision, reviewed with the
-# gate-class change itself, the same review the `#provisional` marker exists
-# to avoid needing for everything else here.
-CMT-3	max_comment_block_lines	8	#provisional, the owner sets the real value later
+# the usual "implemented but the row was never updated" rot. CMT-3 and DB-1
+# are the rows without it: their gate class moved to `auto`, so their setting
+# is no longer a placeholder ahead of a decision — it is the decision,
+# reviewed with the gate-class change itself, the same review the
+# `#provisional` marker exists to avoid needing for everything else here.
+CMT-3	warn_min_lines	5	# signed-off value, reviewed with the CMT-3 gate-class change
+CMT-3	fail_min_lines	11	# signed-off value, reviewed with the CMT-3 gate-class change
 COV-1	min_line_coverage_pct	90	#provisional, the owner sets the real value later
 DB-1	orm_migration_dirs	drizzle	# migration folder names DB-1, DB-5 and DB-6 all treat as the ORM's own
 DB-4	config_file_names	drizzle.config.ts,drizzle.config.js,drizzle.config.mjs,drizzle.config.cjs	#provisional, a reader only until the owner moves the gate class

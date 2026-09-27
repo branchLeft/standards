@@ -24,8 +24,10 @@ const GATE_NAMES = [
   'check-pulumi-secrets.sh',
   'standards-sync.sh',
   'check-raw-sql.sh',
+  'check-comment-blocks.sh',
+  'check-work-item-refs.sh',
 ];
-const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh'];
+const ADVISORY_GATE_NAMES = ['check-coverage.sh'];
 
 interface CliOptions {
   readonly mode?: RatchetMode | undefined;

@@ -141,13 +141,13 @@ the same shape of package but currently have no consumers to record.
 
 ## Code comments — `code-comments.md`
 
-| ID    | Rule                                                                                                                 | Gate      | Evidence                             |
-| ----- | -------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------ |
-| CMT-1 | A comment states only what the code cannot                                                                           | `review`  | The diff                             |
-| CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `pending` | —                                    |
-| CMT-3 | A comment block of 5 to 10 lines warns and 11 or more fails; the narrative moves to a colocated doc                  | `review`  | The comment-block checker's findings |
-| CMT-4 | A file whose comment lines outnumber its code lines fails; docstrings count                                          | `pending` | —                                    |
-| CMT-5 | A docstring says only what the signature can't, and links to the module's colocated doc                              | `review`  | New docstrings in the diff           |
+| ID    | Rule                                                                                                                 | Gate     | Evidence                                            |
+| ----- | -------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------- |
+| CMT-1 | A comment states only what the code cannot                                                                           | `review` | The diff                                            |
+| CMT-2 | No development-process references: no ticket or story IDs, no names, no dated verification logs, no decision history | `auto`   | `docs-lint` DL009 + `tools/check-work-item-refs.sh` |
+| CMT-3 | A comment block of 5 to 10 lines warns and 11 or more fails; the narrative moves to a colocated doc                  | `auto`   | `tools/check-comment-blocks.sh`                     |
+| CMT-4 | A file whose comment lines outnumber its code lines fails; docstrings count                                          | `auto`   | `tools/check-comment-blocks.sh`                     |
+| CMT-5 | A docstring says only what the signature can't, and links to the module's colocated doc                              | `review` | New docstrings in the diff                          |
 
 ## Testing and coverage — `testing.md`
 

@@ -32,9 +32,13 @@ no access to any backlog. PR titles, PR bodies and commit messages are the right
 place for the ID: that is metadata, not shipped code, and it is genuinely useful
 for traceability.
 
-The rule is enforced mechanically by the documentation linter, which means this
+The rule is enforced mechanically. The documentation linter's DL009 covers
+backlog-style ids, in both markdown and source comments; `tools/check-work-item-refs.sh`
+covers the one shape DL009 does not, a cross-repo issue or PR reference. This
 paragraph cannot name an example of the thing it forbids — it would report
 itself.
+
+**Check plan:** `docs-lint` (DL009) plus `tools/check-work-item-refs.sh`.
 
 ## CMT-3 — a long comment moves to a doc
 
@@ -46,8 +50,7 @@ one-line pointer.
 **Why:** long prose between lines of code hides the code from its reader and
 stops being maintained with it.
 
-**Check plan:** `tools/check-comment-blocks.sh`, with its threshold moved to
-these values when the gate class changes.
+**Check plan:** `tools/check-comment-blocks.sh`, at these signed-off values.
 
 Move the narrative, keep the constraint.
 
