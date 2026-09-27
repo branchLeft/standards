@@ -95,6 +95,45 @@ describe('PythonConfigGate', () => {
     );
   });
 
+  it('reports TYP-5 for a standalone mypy.ini with two [mypy] sections, not "not strict"', () => {
+    const { fs, files } = cleanRepo();
+    fs.set(
+      ROOT,
+      'pyproject.toml',
+      '[project]\nname = "svc"\nrequires-python = ">=3.11"\n\n[tool.ruff]\ntarget-version = "py311"\n'
+    );
+    fs.set(
+      ROOT,
+      'mypy.ini',
+      '[mypy]\nstrict = True\ndisallow_any_explicit = True\n\n[mypy]\nstrict = False\n'
+    );
+    const allFiles = [...files, 'mypy.ini'];
+    const findings = buildGate(fs, allFiles).run({ root: ROOT, mode: 'enforce' });
+    const typFindings = findings.filter((finding) => finding.clause === 'TYP-5');
+    expect(typFindings).toHaveLength(1);
+    expect(typFindings[0]?.message).toContain('more than one [mypy] section');
+    expect(
+      findings.some((finding) => finding.message === 'mypy is not configured in strict mode')
+    ).toBe(false);
+  });
+
+  it('reports nothing for a standalone mypy.ini with python_version appended in the same section', () => {
+    const { fs, files } = cleanRepo();
+    fs.set(
+      ROOT,
+      'pyproject.toml',
+      '[project]\nname = "svc"\nrequires-python = ">=3.11"\n\n[tool.ruff]\ntarget-version = "py311"\n'
+    );
+    fs.set(
+      ROOT,
+      'mypy.ini',
+      '[mypy]\nstrict = True\ndisallow_any_explicit = True\npython_version = 3.11\n'
+    );
+    const allFiles = [...files, 'mypy.ini'];
+    const findings = buildGate(fs, allFiles).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(0);
+  });
+
   it('reports PY-3 when ruff target-version disagrees with requires-python', () => {
     const { fs, files } = cleanRepo();
     fs.set(

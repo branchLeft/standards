@@ -9,6 +9,8 @@ import {
 import type { PythonConfigSources } from './pythonConfig.ts';
 import type { PythonProject } from './pythonProjectDiscovery.ts';
 import { discoverPythonProjects } from './pythonProjectDiscovery.ts';
+import type { PythonTool } from './pythonToolInvocation.ts';
+import { preCommitRunsTool, workflowRunsTool } from './pythonToolInvocation.ts';
 import type { Ratchet } from './ratchet.ts';
 import { readThresholdSetting, splitThresholdList } from './thresholdSettings.ts';
 
@@ -16,6 +18,7 @@ const DEFAULT_RUFF_FILENAMES: readonly string[] = ['ruff.toml', '.ruff.toml'];
 const DEFAULT_MYPY_FILENAMES: readonly string[] = ['mypy.ini', 'setup.cfg'];
 const DEFAULT_PRECOMMIT_FILE = '.pre-commit-config.yaml';
 const WORKFLOW_PATTERN = /^\.github\/workflows\/.*\.ya?ml$/;
+const PYTHON_TOOLS: readonly PythonTool[] = ['ruff', 'mypy'];
 
 function joinPath(directory: string, name: string): string {
   return directory === '' ? name : `${directory}/${name}`;
@@ -133,6 +136,19 @@ export class PythonConfigGate implements Gate {
           'no mypy configuration for this Python project'
         )
       );
+    } else if (config.mypyHasDuplicateSection) {
+      // Verified against real mypy 1.19.0: a second `[mypy]` header anywhere
+      // in the file makes mypy silently discard every setting in it (a
+      // non-fatal "section already exists" warning, not an error), so
+      // whatever `mypyStrict` found in the text is not actually applied.
+      findings.push(
+        this.ratchet.findingAdvisory(
+          'TYP-5',
+          file,
+          1,
+          'mypy config has more than one [mypy] section — mypy silently drops all settings from a file shaped like this and runs unstricted; merge them into one [mypy] section'
+        )
+      );
     } else if (!config.mypyStrict) {
       findings.push(
         this.ratchet.findingAdvisory('TYP-5', file, 1, 'mypy is not configured in strict mode')
@@ -204,7 +220,7 @@ export class PythonConfigGate implements Gate {
         ),
       ];
     }
-    const missing = ['ruff', 'mypy'].filter((tool) => !content.toLowerCase().includes(tool));
+    const missing = PYTHON_TOOLS.filter((tool) => !preCommitRunsTool(content, tool));
     if (missing.length > 0) {
       return [
         this.ratchet.findingAdvisory(
@@ -230,11 +246,12 @@ export class PythonConfigGate implements Gate {
         ),
       ];
     }
-    const combined = workflows
-      .map((workflow) => this.fs.readFile(this.ratchet.root, workflow) ?? '')
-      .join('\n')
-      .toLowerCase();
-    const missing = ['ruff', 'mypy'].filter((tool) => !combined.includes(tool));
+    const contents = workflows.map(
+      (workflow) => this.fs.readFile(this.ratchet.root, workflow) ?? ''
+    );
+    const missing = PYTHON_TOOLS.filter(
+      (tool) => !contents.some((content) => workflowRunsTool(content, tool))
+    );
     if (missing.length > 0) {
       return [
         this.ratchet.findingAdvisory(

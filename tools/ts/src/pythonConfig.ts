@@ -6,6 +6,8 @@ export interface PythonProjectConfig {
   readonly hasMypyConfig: boolean;
   readonly mypyStrict: boolean;
   readonly mypyPythonVersion: string | undefined;
+  /** A standalone `mypy.ini`/`setup.cfg` with more than one `[mypy]` header — see `parsePythonProjectConfig`. */
+  readonly mypyHasDuplicateSection: boolean;
 }
 
 /** The raw text of each place a project's configuration can live. */
@@ -21,6 +23,7 @@ const REQUIRES_PYTHON = /requires-python\s*=\s*"([^"]+)"/;
 const RUFF_TARGET_VERSION = /target-version\s*=\s*"([^"]+)"/;
 const MYPY_STRICT = /^\s*strict\s*=\s*(true|True)\s*$/m;
 const MYPY_PYTHON_VERSION = /python_version\s*=\s*"?([0-9]+\.[0-9]+)"?/;
+const MYPY_SECTION_HEADER = /^\s*\[mypy\]\s*$/gm;
 
 // Everything from a `[tool.<prefix>...]` heading up to the next `[...]`
 // heading — a plain line scan rather than a real TOML parser, like
@@ -66,7 +69,23 @@ export function parsePythonProjectConfig(sources: PythonConfigSources): PythonPr
     hasMypyConfig,
     mypyStrict: hasMypyConfig && MYPY_STRICT.test(mypyText),
     mypyPythonVersion: hasMypyConfig ? MYPY_PYTHON_VERSION.exec(mypyText)?.[1] : undefined,
+    mypyHasDuplicateSection: hasMypyDuplicateSection(sources.mypyConfigText),
   };
+}
+
+// mypy (real-world verified, mypy 1.19.0): a second `[mypy]` header anywhere
+// in a standalone `mypy.ini`/`setup.cfg` — before, after, position makes no
+// difference — makes mypy discard the file's settings entirely and run with
+// its untyped defaults, printing only a non-fatal "section already exists"
+// warning. `pyproject.toml`'s `[tool.mypy]` can't have this shape: TOML
+// rejects a duplicate table outright (a hard parse error), the same
+// protection `ruff.toml`'s `[lint]` has — so this check only applies to a
+// standalone ini file.
+function hasMypyDuplicateSection(mypyConfigText: string | undefined): boolean {
+  if (mypyConfigText === undefined) {
+    return false;
+  }
+  return (mypyConfigText.match(MYPY_SECTION_HEADER) ?? []).length > 1;
 }
 
 /**

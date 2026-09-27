@@ -21,6 +21,7 @@ describe('parsePythonProjectConfig', () => {
       hasMypyConfig: false,
       mypyStrict: false,
       mypyPythonVersion: undefined,
+      mypyHasDuplicateSection: false,
     });
   });
 
@@ -70,6 +71,29 @@ describe('parsePythonProjectConfig', () => {
     const config = parsePythonProjectConfig({ ...EMPTY, pyprojectText });
     expect(config.ruffTargetVersion).toBe('py39');
     expect(config.mypyStrict).toBe(true);
+  });
+
+  it('flags a standalone mypy.ini with two [mypy] headers, verified as the real defect against mypy 1.19.0', () => {
+    const mypyConfigText =
+      '[mypy]\nstrict = True\ndisallow_any_explicit = True\n\n[mypy]\nstrict = False\n';
+    expect(parsePythonProjectConfig({ ...EMPTY, mypyConfigText }).mypyHasDuplicateSection).toBe(
+      true
+    );
+  });
+
+  it('does not flag a single [mypy] section with python_version appended after the shared lines', () => {
+    const mypyConfigText =
+      '[mypy]\nstrict = True\ndisallow_any_explicit = True\npython_version = 3.11\n';
+    const config = parsePythonProjectConfig({ ...EMPTY, mypyConfigText });
+    expect(config.mypyHasDuplicateSection).toBe(false);
+    expect(config.mypyStrict).toBe(true);
+  });
+
+  it('never flags a duplicate section from pyproject.toml, which cannot have one (a TOML parse error)', () => {
+    const pyprojectText = '[tool.mypy]\nstrict = true\n';
+    expect(parsePythonProjectConfig({ ...EMPTY, pyprojectText }).mypyHasDuplicateSection).toBe(
+      false
+    );
   });
 });
 
