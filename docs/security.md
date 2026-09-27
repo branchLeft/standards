@@ -123,3 +123,31 @@ code, and a scanner runs with the pipeline's credentials.
 
 **Check plan:** `tools/check-workflows.sh` extended to flag a tool download
 with no checksum verification.
+
+## SEC-11 — agent working records are never published
+
+Agent prompts, session transcripts and agent memory are never published, in
+any repo or anywhere public. Decisions are published instead (`DOC-9`,
+`PRIN-1`).
+
+**Why:** they carry operational detail that can't be reliably scrubbed, such
+as host and tenant names. Operational hygiene and security come before
+openness here.
+
+**Check plan:** `CRED-11`'s secret scan, plus a path rule refusing transcript
+and memory files in any repo.
+
+## SEC-12 — encrypted in transit and at rest
+
+Data is encrypted in transit on every network hop, private network links
+included, and at rest in every store and every backup.
+
+**Why:** a private network is still a boundary other people administer, and a
+store or backup that leaks unencrypted leaks everything in it.
+
+## SEC-13 — tenants share no keys
+
+No credential or encryption key is shared between tenants, so one tenant's
+compromise reaches no other tenant's data.
+
+**Why:** it limits a breach to the one customer it started with.
