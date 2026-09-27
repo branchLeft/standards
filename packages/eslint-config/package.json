@@ -39,9 +39,11 @@
     "typescript-eslint": "^8.70.0"
   },
   "peerDependencies": {
-    "eslint": "^9.0.0 || ^10.0.0"
+    "eslint": "^9.0.0 || ^10.0.0",
+    "eslint-plugin-sonarjs": "4.2.1"
   },
   "devDependencies": {
-    "@branchleft/tsconfig": "workspace:*"
+    "@branchleft/tsconfig": "workspace:*",
+    "eslint-plugin-sonarjs": "4.2.1"
   }
 }
