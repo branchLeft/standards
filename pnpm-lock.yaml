@@ -20,6 +20,9 @@ importers:
       '@branchleft/vitest-config':
         specifier: workspace:*
         version: link:packages/vitest-config
+      '@types/node':
+        specifier: ^26.0.0
+        version: 26.6.2
       '@vitest/coverage-v8':
         specifier: ^5.0.0
         version: 5.0.1(vitest@5.0.1)
