@@ -1,8 +1,7 @@
 # Target: .github/CODEOWNERS
 #
-# The shared set is the escape hatches, the files that grant exemptions, not
-# the whole tree, so code-owner review gates exemptions rather than every PR. A
-# line for a hatch the repo lacks still works: a PR creating it needs the owner.
+# The shared set is the escape hatches, not the whole tree. Keep these lines
+# last — GitHub applies the LAST matching pattern, so a repo's own go above.
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin

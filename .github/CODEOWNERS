@@ -1,11 +1,13 @@
 # This file names only the escape hatches REPO-5 defines, so code-owner
-# review gates exemptions (REPO-5, STD-001), not every PR.
+# review gates exemptions (REPO-5, STD-001), not every PR. The shared lines
+# from templates/codeowners stay last: GitHub applies the LAST matching
+# pattern, so this repo's own lines go above them, never after.
 
+/tools/thresholds.tsv    @branchLeft/branchleft-admin
+/templates/rulesets/     @branchLeft/branchleft-admin
+/docs/                   @branchLeft/branchleft-admin
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
 /tools/floors.tsv        @branchLeft/branchleft-admin
-/tools/thresholds.tsv    @branchLeft/branchleft-admin
-/templates/rulesets/     @branchLeft/branchleft-admin
-/docs/                   @branchLeft/branchleft-admin
 /.github/                @branchLeft/branchleft-admin
