@@ -20,9 +20,19 @@ CMT-3	fail_min_lines	11	# signed-off value, reviewed with the CMT-3 gate-class c
 CMT-4	scan_extensions	ts,tsx,js,mjs,cjs,py,sh	#provisional, a reader only until the owner moves the gate class
 COV-1	min_line_coverage_pct	90	#provisional, the owner sets the real value later
 DB-1	orm_migration_dirs	drizzle	# migration folder names DB-1, DB-5 and DB-6 all treat as the ORM's own
+DB-3	eslint_rule	no-restricted-imports,no-restricted-syntax	#provisional, a reader only until the owner moves the gate class
 DB-4	config_file_names	drizzle.config.ts,drizzle.config.js,drizzle.config.mjs,drizzle.config.cjs	#provisional, a reader only until the owner moves the gate class
 DB-5	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
 DB-6	orm_migration_dirs	drizzle	#provisional, a reader only until the owner moves the gate class
+ARCH-4	eslint_rule	max-classes-per-file	#provisional, a reader only until the owner moves the gate class
+ARCH-7	eslint_rule	sonarjs/cognitive-complexity	#provisional, a reader only until the owner moves the gate class
+ERR-1	eslint_rule	no-throw-literal	#provisional, a reader only until the owner moves the gate class
+ERR-2	eslint_rule	jsdoc/require-throws	#provisional, a reader only until the owner moves the gate class
+ERR-3	eslint_rule	no-empty,@typescript-eslint/no-floating-promises	#provisional, a reader only until the owner moves the gate class
+NAM-1	eslint_rule	unicorn/name-replacements	#provisional, a reader only until the owner moves the gate class
+NAM-2	eslint_rule	@typescript-eslint/naming-convention	#provisional, a reader only until the owner moves the gate class
+TYP-1	eslint_rule	@typescript-eslint/no-explicit-any	#provisional, a reader only until the owner moves the gate class
+TYP-2	eslint_rule	@typescript-eslint/explicit-function-return-type,@typescript-eslint/explicit-module-boundary-types	#provisional, a reader only until the owner moves the gate class
 PY-2	ruff_config_filenames	ruff.toml,.ruff.toml	#provisional, a reader only until the owner moves the gate class
 PY-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 PY-3	pyproject_filename	pyproject.toml	#provisional, a reader only until the owner moves the gate class

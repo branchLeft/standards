@@ -418,42 +418,42 @@ elsewhere and are **cited, never restated**:
 | ARCH-1 | Code is written for a human reader first: a newcomer builds a mental model without an agent | `review`  | The diff's public signatures and file layout          |
 | ARCH-2 | Every logical entity is a class behind an explicit contract, even with one implementation   | `review`  | New classes and the contracts they implement          |
 | ARCH-3 | Variation on evidence: no extension point until a second real use or a named requirement    | `review`  | New generic parameters, option objects and registries |
-| ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | `@branchleft/eslint-config`                           |
+| ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | `@branchleft/eslint-config` (`EslintGate`)            |
 | ARCH-5 | No loose functions: utilities are grouped into a module, namespace-imported in TypeScript   | `review`  | New top-level functions and their grouping module     |
 | ARCH-6 | Every outside dependency sits behind an interface and is passed in, so a test can fake it   | `review`  | Constructors and factories in the diff                |
-| ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | `@branchleft/eslint-config`                           |
+| ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | `@branchleft/eslint-config` (`EslintGate`)            |
 | ARCH-8 | Each directory holds one clear responsibility                                               | `review`  | New directories in the diff                           |
 
 ## Naming — `naming.md`
 
-| ID    | Rule                                                                           | Gate      | Evidence                    |
-| ----- | ------------------------------------------------------------------------------ | --------- | --------------------------- |
-| NAM-1 | Whole words; an abbreviation only when it is the domain's own word             | `pending` | `@branchleft/eslint-config` |
-| NAM-2 | Each language's naming and casing conventions, enforced by its linter          | `pending` | `@branchleft/eslint-config` |
-| NAM-3 | Code implementing a design pattern names it (`TenantFactory`, `RetryStrategy`) | `review`  | New class names in the diff |
-| NAM-4 | Booleans read as questions, functions as verbs, classes as nouns               | `review`  | New names in the diff       |
-| NAM-5 | A host is named `<role><n>`                                                    | `pending` | —                           |
-| NAM-6 | Every cloud resource carries labels naming the repo and stack that own it      | `pending` | —                           |
+| ID    | Rule                                                                           | Gate      | Evidence                                   |
+| ----- | ------------------------------------------------------------------------------ | --------- | ------------------------------------------ |
+| NAM-1 | Whole words; an abbreviation only when it is the domain's own word             | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| NAM-2 | Each language's naming and casing conventions, enforced by its linter          | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| NAM-3 | Code implementing a design pattern names it (`TenantFactory`, `RetryStrategy`) | `review`  | New class names in the diff                |
+| NAM-4 | Booleans read as questions, functions as verbs, classes as nouns               | `review`  | New names in the diff                      |
+| NAM-5 | A host is named `<role><n>`                                                    | `pending` | —                                          |
+| NAM-6 | Every cloud resource carries labels naming the repo and stack that own it      | `pending` | —                                          |
 
 ## Types — `types.md`
 
 | ID    | Rule                                                                                           | Gate      | Evidence                                            |
 | ----- | ---------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
-| TYP-1 | No `any` or `unknown` (`Any` in Python), except `unknown` parsed at once with a schema library | `pending` | `@branchleft/eslint-config`                         |
-| TYP-2 | Every signature states every parameter type and its return type explicitly                     | `pending` | `@branchleft/eslint-config`                         |
+| TYP-1 | No `any` or `unknown` (`Any` in Python), except `unknown` parsed at once with a schema library | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
+| TYP-2 | Every signature states every parameter type and its return type explicitly                     | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
 | TYP-3 | A variable whose type is not obvious carries an explicit annotation                            | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | Each value takes the most precise type that fits                                               | `review`  | New type annotations in the diff                    |
 | TYP-5 | Type checking runs at maximum strictness, with the floor raised until every repo is there      | `pending` | —                                                   |
 
 ## Error handling — `errors.md`
 
-| ID    | Rule                                                                                  | Gate      | Evidence                               |
-| ----- | ------------------------------------------------------------------------------------- | --------- | -------------------------------------- |
-| ERR-1 | Code raises its own named error classes, never a bare built-in error or a string      | `pending` | `@branchleft/eslint-config`            |
-| ERR-2 | A docstring lists the errors a function can raise, and a unit test covers each        | `pending` | `@branchleft/eslint-config`            |
-| ERR-3 | A caught error is handled deliberately or raised again, never buried                  | `pending` | `@branchleft/eslint-config`            |
-| ERR-4 | A public-facing response never shows an internal error verbatim                       | `review`  | Error handling at each public boundary |
-| ERR-5 | An error reaching a service boundary is logged at error level and counted as a metric | `pending` | —                                      |
+| ID    | Rule                                                                                  | Gate      | Evidence                                   |
+| ----- | ------------------------------------------------------------------------------------- | --------- | ------------------------------------------ |
+| ERR-1 | Code raises its own named error classes, never a bare built-in error or a string      | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| ERR-2 | A docstring lists the errors a function can raise, and a unit test covers each        | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| ERR-3 | A caught error is handled deliberately or raised again, never buried                  | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| ERR-4 | A public-facing response never shows an internal error verbatim                       | `review`  | Error handling at each public boundary     |
+| ERR-5 | An error reaching a service boundary is logged at error level and counted as a metric | `pending` | —                                          |
 
 ## Logging — `logging.md`
 
@@ -531,15 +531,15 @@ elsewhere and are **cited, never restated**:
 
 ## Databases — `databases.md`
 
-| ID   | Rule                                                                                     | Gate      | Evidence                             |
-| ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------ |
-| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `auto`    | `tools/check-raw-sql.sh`             |
-| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff |
-| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | —                                    |
-| DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                    |
-| DB-5 | Schema changes follow expand/contract, so the previous release keeps working             | `pending` | —                                    |
-| DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                    |
-| DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                    |
+| ID   | Rule                                                                                     | Gate      | Evidence                                   |
+| ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------------ |
+| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `auto`    | `tools/check-raw-sql.sh`                   |
+| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff       |
+| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                          |
+| DB-5 | Schema changes follow expand/contract, so the previous release keeps working             | `pending` | —                                          |
+| DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                          |
+| DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                          |
 
 ## Containers — `containers.md`
 

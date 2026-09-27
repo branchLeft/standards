@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { Audit } from '../src/audit.ts';
 import { BashGate } from '../src/bashGate.ts';
 import { CommentRatioGate } from '../src/commentRatioGate.ts';
+import { EslintGate } from '../src/eslintGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
@@ -92,6 +93,7 @@ function main(): void {
     new PythonConfigGate(ratchet, fs, TOOLS_ROOT),
     new CommentRatioGate(ratchet, fs, TOOLS_ROOT),
     new WorkItemReferenceGate(ratchet, fs, TOOLS_ROOT),
+    new EslintGate(ratchet, fs, processRunner),
   ];
 
   const audit = new Audit(
