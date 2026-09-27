@@ -2,6 +2,10 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 import type { Linter } from 'eslint';
+import { architecture } from './architecture.js';
+import { errors } from './errors.js';
+import { naming } from './naming.js';
+import { types } from './types.js';
 
 /**
  * The floor every branchLeft repo shares, and what LINT-1 means in practice:
@@ -16,6 +20,12 @@ import type { Linter } from 'eslint';
 export const base: Linter.Config[] = [
   js.configs.recommended,
   ...(tseslint.configs.recommended as Linter.Config[]),
+  // Fleet-wide code quality, not one stack — same reason js.configs.recommended
+  // sits here rather than in a stack preset.
+  ...architecture,
+  ...errors,
+  ...naming,
+  ...types,
   {
     rules: {
       // The base JS rule cannot see TypeScript-only constructs and mis-flags

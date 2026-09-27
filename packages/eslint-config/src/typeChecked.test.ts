@@ -1,3 +1,5 @@
+import { Linter } from 'eslint';
+import tseslint from 'typescript-eslint';
 import { describe, expect, it } from 'vitest';
 import { typeChecked } from './typeChecked.js';
 
@@ -35,5 +37,31 @@ describe('typeChecked', () => {
     const allowed = allowedDefaultProjects(typeChecked(caller));
     caller.push('mutated');
     expect(allowed).toEqual(['*.mts']);
+  });
+
+  describe('no-floating-promises', () => {
+    // A dropped promise needs a real type checker to catch. `['*.ts']` runs
+    // it against a virtual filename via the same default-project path a
+    // repo's own root config files use.
+    const linter = new Linter();
+    const config: Linter.Config[] = [
+      { files: ['**/*.ts'], languageOptions: { parser: tseslint.parser } },
+      ...typeChecked(['*.ts']),
+    ];
+    const reported = (code: string): boolean =>
+      linter
+        .verify(code, config, 'x.ts')
+        .some((message) => message.ruleId === '@typescript-eslint/no-floating-promises');
+
+    it('flags a promise that is neither awaited nor handled', () => {
+      const code = 'async function f(): Promise<void> {}\nfunction g(): void {\n  f();\n}\n';
+      expect(reported(code)).toBe(true);
+    });
+
+    it('does not flag an awaited promise', () => {
+      const code =
+        'async function f(): Promise<void> {}\nasync function g(): Promise<void> {\n  await f();\n}\n';
+      expect(reported(code)).toBe(false);
+    });
   });
 });

@@ -84,3 +84,16 @@ it.
 
 **Check plan:** a check that decision records follow the shared template, once
 the template exists.
+
+## DOC-10 — a document marks who drafted it
+
+A document marks who drafted its text. Text the owner wrote or approved
+carries an owner marker, and an agent never rewrites, condenses or deletes it.
+Agent-drafted text is marked as agent-drafted. Either way, every document is
+reviewed by a person before it merges, and its content comes from the owner's
+direction: the marker records who drafted the words, not who decided them.
+
+**Why:** it protects the owner's own words from being reworded, and tells a
+reader how a text came to be.
+
+**Check plan:** a docs-lint rule, once the marker syntax is settled.

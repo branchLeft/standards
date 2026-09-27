@@ -27,6 +27,14 @@ export function typeChecked(
       },
     },
     {
+      // Already 'error' in recommendedTypeChecked above; reasserted so this
+      // half of the errors family can't be lost to an upstream default
+      // changing silently.
+      rules: {
+        '@typescript-eslint/no-floating-promises': 'error',
+      },
+    },
+    {
       // Type information is not available for these, and asking for it is what
       // makes projectService fail rather than degrade.
       files: ['**/*.js', '**/*.mjs', '**/*.cjs'],

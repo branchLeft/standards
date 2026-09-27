@@ -289,3 +289,13 @@ a plan, and the gap is only noticed when someone needs it urgently — which is
 the worst moment to be writing it. An estate that guards against accidental
 deletion still needs a deliberate, audited deletion path; this clause
 requires that path to exist, and the guards to stay standing around it.
+
+## DP-12 — collect only what a named use needs
+
+A service collects and keeps only the personal data a named use needs. Data
+with no named use is not collected. Named uses include what Ghost needs to run
+a publication, and what we need to know about prospective and current
+customers.
+
+**Why:** data we never hold can't leak, and can't need erasing later. The rule
+rules out collecting data in case it turns out useful.
