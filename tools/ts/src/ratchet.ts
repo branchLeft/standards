@@ -2,12 +2,15 @@ import type { FileSystemPort } from './fileSystemPort.ts';
 import type { GitClient } from './gitClient.ts';
 import type { Finding, FindingLevel } from './finding.ts';
 import * as Glob from './glob.ts';
+import { RatchetInitError } from './ratchetInitError.ts';
 
 export type RatchetMode = 'warn' | 'enforce';
 
 const MODE_FILE = '.standards.mode';
 const IGNORE_FILE = '.standardsignore';
-const ALLOW_TOKEN = 'standards-allow-next-line';
+
+/** Exported so `exemptionInventory` and tests build the token from one source, not a repeated literal. */
+export const ALLOW_TOKEN = 'standards-allow-next-line';
 
 export interface RatchetOptions {
   readonly mode?: RatchetMode | undefined;
@@ -22,9 +25,6 @@ export interface RatchetSummary {
   readonly exempt: number;
   readonly advisory: number;
 }
-
-/** Thrown for the same conditions that make `ratchet_init` print to stderr and return 2. */
-export class RatchetInitError extends Error {}
 
 function readMode(
   fs: FileSystemPort,

@@ -12,7 +12,7 @@ import { BashGate } from '../src/bashGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
-import { Ratchet } from '../src/ratchet.ts';
+import { ALLOW_TOKEN, Ratchet } from '../src/ratchet.ts';
 import { ScratchRepo } from '../src/test-support/scratchRepo.ts';
 
 const TOOLS_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -159,7 +159,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     repo = ScratchRepo.create();
     repo.write(
       '.github/workflows/allow.yml',
-      'name: Doc\n# standards-allow-next-line\n# write it as `standards-allow-next-line <CLAUSE-ID> <reason>`\non:\n  pull_request:\n'
+      `name: Doc\n# ${ALLOW_TOKEN}\n# write it as \`${ALLOW_TOKEN} <CLAUSE-ID> <reason>\`\non:\n  pull_request:\n`
     );
     repo.commit('init');
 

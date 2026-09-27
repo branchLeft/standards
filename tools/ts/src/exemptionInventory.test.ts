@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FakeFileSystem } from './test-support/fakeFileSystem.ts';
 import { FakeGitClient } from './test-support/fakeGitClient.ts';
-import { Ratchet } from './ratchet.ts';
+import { ALLOW_TOKEN, Ratchet } from './ratchet.ts';
 import { auditExemptions } from './exemptionInventory.ts';
 import type { Finding } from './finding.ts';
 
@@ -69,7 +69,7 @@ describe('auditExemptions — .standardsignore rows', () => {
 describe('auditExemptions — inline allows', () => {
   it('flags a bare allow as STD-000 malformed', () => {
     const fs = new FakeFileSystem();
-    fs.set(ROOT, 'a.ts', 'x\n// standards-allow-next-line\ny\n');
+    fs.set(ROOT, 'a.ts', `x\n// ${ALLOW_TOKEN}\ny\n`);
     const ratchet = makeRatchet(fs, ['a.ts']);
     const result = auditExemptions(ratchet, fs, ROOT, ['a.ts'], [], isCovered);
     expect(result.inventory[0]).toContain('MALFORMED — suppresses nothing');
@@ -78,7 +78,7 @@ describe('auditExemptions — inline allows', () => {
 
   it('does not treat a quoted mention of the token as a suppression', () => {
     const fs = new FakeFileSystem();
-    fs.set(ROOT, 'a.md', 'write it as `standards-allow-next-line <CLAUSE> <reason>`\n');
+    fs.set(ROOT, 'a.md', `write it as \`${ALLOW_TOKEN} <CLAUSE> <reason>\`\n`);
     const ratchet = makeRatchet(fs, ['a.md']);
     const result = auditExemptions(ratchet, fs, ROOT, ['a.md'], [], isCovered);
     expect(result.inventory).toHaveLength(0);
@@ -87,7 +87,7 @@ describe('auditExemptions — inline allows', () => {
 
   it('reports "live" when the guarded line still emits the exempted finding', () => {
     const fs = new FakeFileSystem();
-    fs.set(ROOT, 'a.ts', 'x\n// standards-allow-next-line CI-1 because reasons\ny\n');
+    fs.set(ROOT, 'a.ts', `x\n// ${ALLOW_TOKEN} CI-1 because reasons\ny\n`);
     const ratchet = makeRatchet(fs, ['a.ts']);
     const currentFindings: Finding[] = [
       { clause: 'CI-1', file: 'a.ts', line: 3, level: 'exempt', message: 'm' },
@@ -99,7 +99,7 @@ describe('auditExemptions — inline allows', () => {
 
   it('flags a stale inline allow whose guarded line no longer offends', () => {
     const fs = new FakeFileSystem();
-    fs.set(ROOT, 'a.ts', 'x\n// standards-allow-next-line CI-1 because reasons\ny\n');
+    fs.set(ROOT, 'a.ts', `x\n// ${ALLOW_TOKEN} CI-1 because reasons\ny\n`);
     const ratchet = makeRatchet(fs, ['a.ts']);
     const result = auditExemptions(ratchet, fs, ROOT, ['a.ts'], [], isCovered);
     expect(result.inventory[0]).toContain('STALE — the line below it is clean');
@@ -108,7 +108,7 @@ describe('auditExemptions — inline allows', () => {
 
   it('reports "unverified" for a clause not gated here', () => {
     const fs = new FakeFileSystem();
-    fs.set(ROOT, 'a.ts', 'x\n// standards-allow-next-line SOME-1 because reasons\ny\n');
+    fs.set(ROOT, 'a.ts', `x\n// ${ALLOW_TOKEN} SOME-1 because reasons\ny\n`);
     const ratchet = makeRatchet(fs, ['a.ts']);
     const result = auditExemptions(ratchet, fs, ROOT, ['a.ts'], [], isCovered);
     expect(result.inventory[0]).toContain('unverified — not gated here');

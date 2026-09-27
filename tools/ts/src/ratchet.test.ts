@@ -3,7 +3,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FakeFileSystem } from './test-support/fakeFileSystem.ts';
 import { FakeGitClient } from './test-support/fakeGitClient.ts';
-import { Ratchet, RatchetInitError } from './ratchet.ts';
+import { ALLOW_TOKEN, Ratchet } from './ratchet.ts';
+import { RatchetInitError } from './ratchetInitError.ts';
 import * as Glob from './glob.ts';
 
 const ROOT = '/repo';
@@ -47,9 +48,9 @@ describe('Ratchet exemptions', () => {
     fs.set(
       ROOT,
       'f.ts',
-      'line one\n// standards-allow-next-line TS-9 because the base has no equivalent\nline three\n'
+      `line one\n// ${ALLOW_TOKEN} TS-9 because the base has no equivalent\nline three\n`
     );
-    fs.set(ROOT, 'g.ts', 'x\n// standards-allow-next-line TS-9\ny\n');
+    fs.set(ROOT, 'g.ts', `x\n// ${ALLOW_TOKEN} TS-9\ny\n`);
   });
 
   function ratchet(mode: 'warn' | 'enforce' = 'enforce'): Ratchet {

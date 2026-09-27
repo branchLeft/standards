@@ -1,10 +1,9 @@
 import type { Finding } from './finding.ts';
 import type { FileSystemPort } from './fileSystemPort.ts';
-import type { Ratchet } from './ratchet.ts';
+import { ALLOW_TOKEN, type Ratchet } from './ratchet.ts';
 import * as Glob from './glob.ts';
 
 const IGNORE_FILE = '.standardsignore';
-const ALLOW_TOKEN = 'standards-allow-next-line';
 const ALLOW_LINE_PATTERN = new RegExp(`${ALLOW_TOKEN}\\s+([A-Z]{2,5}-[0-9]{1,3})\\s+[A-Za-z0-9]`);
 const QUOTED_MENTION_PATTERN = new RegExp('[`\'"]' + ALLOW_TOKEN);
 

@@ -9,7 +9,8 @@ import { BashGate } from '../src/bashGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
-import { Ratchet, RatchetInitError } from '../src/ratchet.ts';
+import { Ratchet } from '../src/ratchet.ts';
+import { RatchetInitError } from '../src/ratchetInitError.ts';
 import type { RatchetMode } from '../src/ratchet.ts';
 
 const TOOLS_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
