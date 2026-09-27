@@ -1,9 +1,12 @@
 # dockerfile.ts
 
 A line-based Dockerfile parser, not a build-system reimplementation. It joins
-`\`-continued lines, splits instructions into keyword and raw argument text,
-and groups instructions into stages at each `FROM`, tracking `AS name` for
-multi-stage references.
+`\`-continued lines (a `#`-prefixed line mid-continuation contributes nothing
+but doesn't end the continuation either — BuildKit's own behaviour), splits
+instructions into keyword and raw argument text, and groups instructions into
+stages at each `FROM`, tracking `AS name` for multi-stage references and
+stripping any leading `--flag`/`--flag=value` tokens (`--platform=...` being
+the one actually seen in the fleet) before reading the image reference.
 
 ## What it doesn't handle
 

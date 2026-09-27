@@ -1,5 +1,5 @@
-import type { YamlMapNode, YamlNode } from './composeYaml.ts';
-import { asMap, mapGet, scalarList, scalarValue } from './composeYaml.ts';
+import type { YamlMapNode, YamlNode, YamlSeqItem } from './composeYaml.ts';
+import { asMap, asSeq, mapGet, scalarList, scalarValue } from './composeYaml.ts';
 
 export interface ComposeService {
   readonly name: string;
@@ -70,14 +70,46 @@ export interface PortBinding {
   readonly hostAddress: string | undefined;
 }
 
+function shortSyntaxPort(value: string, line: number): PortBinding {
+  const parts = value.split(':');
+  // "80", "8080:80" and "10.20.2.20:8080:80" are the three shapes; only
+  // the three-part form names a host address at all.
+  const hostAddress = parts.length === 3 ? parts[0] : undefined;
+  return { raw: value, line, hostAddress };
+}
+
+// The long (map) syntax: `- target: 80\n  published: 8080\n  host_ip: ...`.
+// `host_ip` absent binds every interface, same as short syntax with no
+// host prefix.
+function longSyntaxPort(map: YamlMapNode, line: number): PortBinding {
+  const hostIp = scalarValue(mapGet(map, 'host_ip')?.value);
+  const published = scalarValue(mapGet(map, 'published')?.value);
+  const target = scalarValue(mapGet(map, 'target')?.value);
+  const hostAddress = typeof hostIp === 'string' ? hostIp : undefined;
+  const raw = [hostIp, published, target]
+    .filter((part): part is string | number => part !== undefined && part !== null)
+    .join(':');
+  return { raw: raw === '' ? `target ${String(target ?? '?')}` : raw, line, hostAddress };
+}
+
+function portBindingFromItem(item: YamlSeqItem): PortBinding | undefined {
+  if (item.value.kind === 'scalar') {
+    return shortSyntaxPort(String(item.value.value ?? ''), item.line);
+  }
+  if (item.value.kind === 'map') {
+    return longSyntaxPort(item.value, item.line);
+  }
+  return undefined;
+}
+
 export function servicePorts(service: ComposeService): readonly PortBinding[] {
-  return scalarList(mapGet(service.node, 'ports')?.value).map(({ value, line }) => {
-    const parts = value.split(':');
-    // "80", "8080:80" and "10.20.2.20:8080:80" are the three shapes; only
-    // the three-part form names a host address at all.
-    const hostAddress = parts.length === 3 ? parts[0] : undefined;
-    return { raw: value, line, hostAddress };
-  });
+  const seq = asSeq(mapGet(service.node, 'ports')?.value);
+  if (seq === undefined) {
+    return [];
+  }
+  return seq.items
+    .map((item) => portBindingFromItem(item))
+    .filter((binding): binding is PortBinding => binding !== undefined);
 }
 
 /** True when a port's host address is loopback or a private (RFC1918) range — never the public internet. */

@@ -31,6 +31,13 @@ all binds every interface and fails. The `edge_service_names` threshold
 (default `edge`) exempts the one front-door service by name; there's no way
 to identify "the edge" from Compose shape alone.
 
+`servicePorts` (`composeModel.ts`) reads both the short string syntax
+(`"8080:80"`) and the long map syntax (`- target: 80`, `published: 8080`,
+`host_ip: ...`) — a service publishing a port only through the long form
+used to be invisible to this check entirely, since the shape isn't a
+sequence of scalars. Long syntax with no `host_ip` binds every interface,
+same as short syntax with no host prefix.
+
 ## What this doesn't cover
 
 "A test of the generated firewall rules" (CON-9's second half) needs a

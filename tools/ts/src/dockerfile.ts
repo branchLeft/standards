@@ -18,21 +18,40 @@ export interface DockerStage {
 
 const CONTINUATION_SUFFIX = /\\\s*$/;
 const FROM_AS_PATTERN = /^(\S+)(?:\s+AS\s+(\S+))?/i;
+// One or more `--flag` or `--flag=value` tokens, e.g. `--platform=linux/amd64`
+// ahead of `FROM`'s image argument.
+const LEADING_FLAGS_PATTERN = /^(?:--[\w-]+(?:=\S+)?\s+)+/;
 
+function stripLeadingFlags(instructionArguments: string): string {
+  return instructionArguments.replace(LEADING_FLAGS_PATTERN, '');
+}
+
+// Comments and continuations interact: a `#`-prefixed line in the middle of
+// a `\`-continued instruction contributes nothing, but — unlike a comment
+// ending a real instruction — it does not end the continuation either.
+// BuildKit ignores such lines and keeps joining; treating them as a hard
+// stop (as a naive per-line check would) splits the rest of the shell
+// command into a bogus new "instruction".
 function joinContinuations(content: string): readonly { text: string; line: number }[] {
   const rawLines = content.split('\n');
   const joined: { text: string; line: number }[] = [];
   let buffer = '';
   let startLine = 0;
+  let continuing = false;
   for (let index = 0; index < rawLines.length; index += 1) {
     const raw = rawLines[index] ?? '';
+    const trimmed = raw.trim();
+    if (continuing && trimmed.startsWith('#')) {
+      continue;
+    }
     if (buffer === '') {
       startLine = index + 1;
     }
     const withoutContinuation = raw.replace(CONTINUATION_SUFFIX, '');
-    const continues = CONTINUATION_SUFFIX.test(raw) && !raw.trim().startsWith('#');
+    const lineContinues = CONTINUATION_SUFFIX.test(raw) && !trimmed.startsWith('#');
     buffer += (buffer === '' ? '' : ' ') + withoutContinuation.trim();
-    if (!continues) {
+    continuing = lineContinues;
+    if (!lineContinues) {
       joined.push({ text: buffer, line: startLine });
       buffer = '';
     }
@@ -67,10 +86,11 @@ export function parseDockerfile(content: string): readonly DockerStage[] {
       if (current) {
         stages.push(current);
       }
-      const match = FROM_AS_PATTERN.exec(instructionArguments);
+      const fromArguments = stripLeadingFlags(instructionArguments);
+      const match = FROM_AS_PATTERN.exec(fromArguments);
       current = {
         name: match?.[2],
-        baseImage: match?.[1] ?? instructionArguments,
+        baseImage: match?.[1] ?? fromArguments,
         fromLine: line,
         instructions: [],
       };

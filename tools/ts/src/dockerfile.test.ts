@@ -62,4 +62,28 @@ describe('parseDockerfile', () => {
   it('returns no stages for content with no FROM', () => {
     expect(parseDockerfile('# just a comment\n')).toEqual([]);
   });
+
+  it('strips a --platform flag before taking the base image', () => {
+    const stages = parseDockerfile('FROM --platform=linux/amd64 debian:bookworm-slim');
+    expect(stages[0]?.baseImage).toBe('debian:bookworm-slim');
+  });
+
+  it('strips a --platform flag and still captures the AS name', () => {
+    const stages = parseDockerfile('FROM --platform=linux/amd64 node:20 AS build');
+    expect(stages[0]?.baseImage).toBe('node:20');
+    expect(stages[0]?.name).toBe('build');
+  });
+
+  it('does not corrupt a multi-line RUN that has a comment line mid-continuation', () => {
+    const content = [
+      'FROM debian:bookworm-slim',
+      'RUN apt-get update \\',
+      '    # upgrade first',
+      '    && apt-get install -y curl',
+    ].join('\n');
+    const stages = parseDockerfile(content);
+    expect(stages[0]?.instructions).toHaveLength(1);
+    expect(stages[0]?.instructions[0]?.keyword).toBe('RUN');
+    expect(stages[0]?.instructions[0]?.args).toBe('apt-get update && apt-get install -y curl');
+  });
 });

@@ -67,4 +67,68 @@ describe('parseYaml', () => {
     expect(parseYaml('')).toBeUndefined();
     expect(parseYaml('\n\n')).toBeUndefined();
   });
+
+  it('does not lose top-level keys that follow an anchored block', () => {
+    // The idiomatic shared-hardening idiom: an anchor declared before
+    // `services:`, with nothing else on the anchor's own line — the shape
+    // that PR review found silently truncated the whole rest of the
+    // document.
+    const content = [
+      'x-common: &common',
+      '  restart: unless-stopped',
+      '',
+      'services:',
+      '  web:',
+      '    image: nginx:1',
+    ].join('\n');
+    const root = asMap(parseYaml(content));
+    const services = asMap(mapGet(root, 'services')?.value);
+    expect(services).toBeDefined();
+    const web = asMap(mapGet(services, 'web')?.value);
+    expect(scalarValue(mapGet(web, 'image')?.value)).toBe('nginx:1');
+  });
+
+  it('resolves an anchor value through a later alias', () => {
+    const content = ['x-common: &common', '  restart: unless-stopped', 'restart2: *common'].join(
+      '\n'
+    );
+    const root = asMap(parseYaml(content));
+    const aliased = asMap(mapGet(root, 'restart2')?.value);
+    expect(scalarValue(mapGet(aliased, 'restart')?.value)).toBe('unless-stopped');
+  });
+
+  it('merges a `<<: *anchor` key into the surrounding map without dropping sibling keys', () => {
+    const content = [
+      'x-common: &common',
+      '  restart: unless-stopped',
+      '  read_only: true',
+      '',
+      'services:',
+      '  web:',
+      '    <<: *common',
+      '    image: nginx:1',
+    ].join('\n');
+    const root = asMap(parseYaml(content));
+    const services = asMap(mapGet(root, 'services')?.value);
+    const web = asMap(mapGet(services, 'web')?.value);
+    expect(scalarValue(mapGet(web, 'restart')?.value)).toBe('unless-stopped');
+    expect(scalarValue(mapGet(web, 'read_only')?.value)).toBe(true);
+    expect(scalarValue(mapGet(web, 'image')?.value)).toBe('nginx:1');
+  });
+
+  it("lets an explicit key override the merged anchor's value for the same key", () => {
+    const content = [
+      'x-common: &common',
+      '  restart: unless-stopped',
+      '',
+      'services:',
+      '  web:',
+      '    <<: *common',
+      '    restart: always',
+    ].join('\n');
+    const root = asMap(parseYaml(content));
+    const services = asMap(mapGet(root, 'services')?.value);
+    const web = asMap(mapGet(services, 'web')?.value);
+    expect(scalarValue(mapGet(web, 'restart')?.value)).toBe('always');
+  });
 });

@@ -1,8 +1,10 @@
 /**
  * A small YAML subset parser for Compose files: block maps, block
- * sequences, flow sequences (`[a, b]`) and scalars, each carrying the
- * source line it started on. No anchors, no multi-document streams, no
- * block scalars (`|`/`>`), no flow mappings — see composeYaml.md.
+ * sequences, flow sequences (`[a, b]`) and scalars, plus anchors (`&name`),
+ * aliases (`*name`) and merge keys (`<<: *name`) in block context — each
+ * node carrying the source line it started on. No multi-document streams,
+ * no block scalars (`|`/`>`), no flow mappings, no alias/anchor support
+ * inside a flow sequence — see composeYaml.md.
  */
 export type YamlScalar = string | number | boolean | null;
 
@@ -206,7 +208,115 @@ interface Cursor {
   index: number;
 }
 
-function parseSeq(lines: readonly Line[], cursor: Cursor, indent: number): YamlSeqNode {
+/** `anchor name -> the node it was attached to`, for resolving later aliases and merge keys. */
+type Anchors = Map<string, YamlNode>;
+
+// A leading `&name` tag on a value, e.g. `x-common: &common`. The tag itself
+// carries no value — what follows (inline, or a deeper-indented block) is
+// what gets recorded under `name`.
+const ANCHOR_TAG_PATTERN = /^&([\w-]+)\s*/;
+// A bare alias reference, e.g. `restart: *common` or `- *common`. Must be
+// the entire (trimmed) value — an alias mid-scalar is not a thing YAML does.
+const ALIAS_PATTERN = /^\*([\w-]+)$/;
+
+function resolveAlias(token: string, anchors: Anchors): YamlNode | undefined {
+  const match = ALIAS_PATTERN.exec(token.trim());
+  return match ? anchors.get(match[1] ?? '') : undefined;
+}
+
+function isMergeKeyLine(content: string): boolean {
+  const colonIndex = findKeyColon(content);
+  return colonIndex !== -1 && unquote(content.slice(0, colonIndex).trim()) === '<<';
+}
+
+/** `<<: *name` or `<<: [*a, *b]` — the map(s) a merge key splices in. Anything else resolves to nothing. */
+function resolveMergeSources(rest: string, anchors: Anchors): readonly YamlMapNode[] {
+  const trimmed = rest.trim();
+  const tokens = trimmed.startsWith('[')
+    ? splitFlowItems(trimmed.replace(/^\[/, '').replace(/\]$/, ''))
+    : [trimmed];
+  return tokens
+    .map((token) => resolveAlias(token, anchors))
+    .filter((node): node is YamlMapNode => node?.kind === 'map');
+}
+
+/**
+ * Own (explicit) keys always win over merged ones; among merge sources
+ * themselves, the first-listed source wins a key collision — both match
+ * standard YAML merge-key semantics.
+ */
+function finalizeMapEntries(
+  own: readonly YamlMapEntry[],
+  merged: readonly YamlMapEntry[]
+): readonly YamlMapEntry[] {
+  const ownKeys = new Set(own.map((entry) => entry.key));
+  return [...own, ...merged.filter((entry) => !ownKeys.has(entry.key))];
+}
+
+// Resolves one map entry's value: an anchor tag (registering it once
+// resolved), a bare alias, a nested block (empty rest, deeper-indented
+// lines follow), or a plain scalar/flow value.
+function resolveEntryValue(
+  rest: string,
+  lineNumber: number,
+  lines: readonly Line[],
+  cursor: Cursor,
+  ownIndent: number,
+  anchors: Anchors
+): YamlNode {
+  const anchorMatch = ANCHOR_TAG_PATTERN.exec(rest);
+  if (anchorMatch) {
+    const name = anchorMatch[1] ?? '';
+    const remainder = rest.slice(anchorMatch[0].length);
+    const node = resolveBlockOrScalar(remainder, lineNumber, lines, cursor, ownIndent, anchors);
+    anchors.set(name, node);
+    return node;
+  }
+  const alias = resolveAlias(rest, anchors);
+  if (alias) {
+    return alias;
+  }
+  return resolveBlockOrScalar(rest, lineNumber, lines, cursor, ownIndent, anchors);
+}
+
+function resolveBlockOrScalar(
+  rest: string,
+  lineNumber: number,
+  lines: readonly Line[],
+  cursor: Cursor,
+  ownIndent: number,
+  anchors: Anchors
+): YamlNode {
+  if (rest !== '') {
+    return parseScalarOrFlow(rest, lineNumber);
+  }
+  const next = lines[cursor.index];
+  if (next && next.indent > ownIndent) {
+    return parseNode(lines, cursor, next.indent, anchors);
+  }
+  return { kind: 'scalar', value: null, line: lineNumber };
+}
+
+function parseSeqItemValue(
+  rest: string,
+  lineNumber: number,
+  lines: readonly Line[],
+  cursor: Cursor,
+  indent: number,
+  anchors: Anchors
+): YamlNode {
+  if (rest !== '' && findKeyColon(rest) !== -1) {
+    return parseInlineMapItem(lines, cursor, indent, rest, lineNumber, anchors);
+  }
+  return resolveEntryValue(rest, lineNumber, lines, cursor, indent, anchors);
+}
+
+function parseSeq(
+  lines: readonly Line[],
+  cursor: Cursor,
+  indent: number,
+  anchors: Anchors
+): YamlSeqNode {
   const startLine = lines[cursor.index]?.number ?? 0;
   const items: YamlSeqItem[] = [];
   while (cursor.index < lines.length) {
@@ -216,24 +326,8 @@ function parseSeq(lines: readonly Line[], cursor: Cursor, indent: number): YamlS
     }
     const rest = line.content === '-' ? '' : line.content.slice(2);
     cursor.index += 1;
-    if (rest === '') {
-      const next = lines[cursor.index];
-      if (next && next.indent > indent) {
-        items.push({ value: parseNode(lines, cursor, next.indent), line: line.number });
-      } else {
-        items.push({
-          value: { kind: 'scalar', value: null, line: line.number },
-          line: line.number,
-        });
-      }
-    } else if (findKeyColon(rest) !== -1) {
-      items.push({
-        value: parseInlineMapItem(lines, cursor, indent, rest, line.number),
-        line: line.number,
-      });
-    } else {
-      items.push({ value: parseScalarOrFlow(rest, line.number), line: line.number });
-    }
+    const value = parseSeqItemValue(rest, line.number, lines, cursor, indent, anchors);
+    items.push({ value, line: line.number });
   }
   return { kind: 'seq', items, line: startLine };
 }
@@ -246,21 +340,43 @@ function parseInlineMapItem(
   cursor: Cursor,
   indent: number,
   firstRest: string,
-  firstLine: number
+  firstLine: number,
+  anchors: Anchors
 ): YamlMapNode {
   const virtualIndent = indent + 2;
-  const entries: YamlMapEntry[] = [
-    ...parseMapLineEntry(firstRest, firstLine, lines, cursor, virtualIndent),
-  ];
+  const own: YamlMapEntry[] = [];
+  const merged: YamlMapEntry[] = [];
+  const mergedSeen = new Set<string>();
+  accumulateMapEntries(
+    firstRest,
+    firstLine,
+    lines,
+    cursor,
+    virtualIndent,
+    anchors,
+    own,
+    merged,
+    mergedSeen
+  );
   while (cursor.index < lines.length) {
     const line = lines[cursor.index];
     if (line === undefined || line.indent !== virtualIndent || isSeqLine(line.content)) {
       break;
     }
     cursor.index += 1;
-    entries.push(...parseMapLineEntry(line.content, line.number, lines, cursor, virtualIndent));
+    accumulateMapEntries(
+      line.content,
+      line.number,
+      lines,
+      cursor,
+      virtualIndent,
+      anchors,
+      own,
+      merged,
+      mergedSeen
+    );
   }
-  return { kind: 'map', entries, line: firstLine };
+  return { kind: 'map', entries: finalizeMapEntries(own, merged), line: firstLine };
 }
 
 // Parses one already-consumed `key: value` line, descending into a nested
@@ -271,7 +387,8 @@ function parseMapLineEntry(
   lineNumber: number,
   lines: readonly Line[],
   cursor: Cursor,
-  ownIndent: number
+  ownIndent: number,
+  anchors: Anchors
 ): readonly YamlMapEntry[] {
   const colonIndex = findKeyColon(content);
   if (colonIndex === -1) {
@@ -279,51 +396,100 @@ function parseMapLineEntry(
   }
   const key = unquote(content.slice(0, colonIndex).trim());
   const rest = content.slice(colonIndex + 1).trim();
-  if (rest !== '') {
-    return [{ key, value: parseScalarOrFlow(rest, lineNumber), line: lineNumber }];
-  }
-  const next = lines[cursor.index];
-  if (next && next.indent > ownIndent) {
-    return [{ key, value: parseNode(lines, cursor, next.indent), line: lineNumber }];
-  }
-  return [{ key, value: { kind: 'scalar', value: null, line: lineNumber }, line: lineNumber }];
+  const value = resolveEntryValue(rest, lineNumber, lines, cursor, ownIndent, anchors);
+  return [{ key, value, line: lineNumber }];
 }
 
-function parseMap(lines: readonly Line[], cursor: Cursor, indent: number): YamlMapNode {
+// Routes one already-consumed map-body line to either the merge-key buffer
+// (`<<: *name`, spliced in with lower priority than explicit keys) or the
+// ordinary entry buffer. Shared by parseMap and parseInlineMapItem so both
+// apply the same own-overrides-merged resolution.
+function accumulateMapEntries(
+  content: string,
+  lineNumber: number,
+  lines: readonly Line[],
+  cursor: Cursor,
+  ownIndent: number,
+  anchors: Anchors,
+  own: YamlMapEntry[],
+  merged: YamlMapEntry[],
+  mergedSeen: Set<string>
+): void {
+  if (isMergeKeyLine(content)) {
+    const colonIndex = findKeyColon(content);
+    const rest = content.slice(colonIndex + 1).trim();
+    for (const source of resolveMergeSources(rest, anchors)) {
+      for (const entry of source.entries) {
+        if (!mergedSeen.has(entry.key)) {
+          mergedSeen.add(entry.key);
+          merged.push(entry);
+        }
+      }
+    }
+    return;
+  }
+  own.push(...parseMapLineEntry(content, lineNumber, lines, cursor, ownIndent, anchors));
+}
+
+function parseMap(
+  lines: readonly Line[],
+  cursor: Cursor,
+  indent: number,
+  anchors: Anchors
+): YamlMapNode {
   const startLine = lines[cursor.index]?.number ?? 0;
-  const entries: YamlMapEntry[] = [];
+  const own: YamlMapEntry[] = [];
+  const merged: YamlMapEntry[] = [];
+  const mergedSeen = new Set<string>();
   while (cursor.index < lines.length) {
     const line = lines[cursor.index];
     if (line === undefined || line.indent !== indent || isSeqLine(line.content)) {
       break;
     }
     cursor.index += 1;
-    entries.push(...parseMapLineEntry(line.content, line.number, lines, cursor, indent));
+    accumulateMapEntries(
+      line.content,
+      line.number,
+      lines,
+      cursor,
+      indent,
+      anchors,
+      own,
+      merged,
+      mergedSeen
+    );
   }
-  return { kind: 'map', entries, line: startLine };
+  return { kind: 'map', entries: finalizeMapEntries(own, merged), line: startLine };
 }
 
 function isSeqLine(content: string): boolean {
   return content === '-' || content.startsWith('- ');
 }
 
-function parseNode(lines: readonly Line[], cursor: Cursor, indent: number): YamlNode {
+function parseNode(
+  lines: readonly Line[],
+  cursor: Cursor,
+  indent: number,
+  anchors: Anchors
+): YamlNode {
   const line = lines[cursor.index];
   if (line === undefined) {
     return { kind: 'scalar', value: null, line: 0 };
   }
   if (isSeqLine(line.content)) {
-    return parseSeq(lines, cursor, indent);
+    return parseSeq(lines, cursor, indent, anchors);
   }
   if (findKeyColon(line.content) !== -1) {
-    return parseMap(lines, cursor, indent);
+    return parseMap(lines, cursor, indent, anchors);
   }
   // A bare value line, indented under a `key:` with nothing after the
   // colon — a flow collection wrapped onto its own line, e.g. `test:` then
-  // `[ 'CMD', ... ]` beneath it. Not a `key: value` pair, so it consumes
-  // just this one (possibly flow-joined) line rather than recursing as a map.
+  // `[ 'CMD', ... ]` beneath it, or a lone alias. Not a `key: value` pair,
+  // so it consumes just this one (possibly flow-joined) line rather than
+  // recursing as a map.
   cursor.index += 1;
-  return parseScalarOrFlow(line.content, line.number);
+  const alias = resolveAlias(line.content, anchors);
+  return alias ?? parseScalarOrFlow(line.content, line.number);
 }
 
 /** Parses Compose-shaped YAML. Returns `undefined` for empty content. */
@@ -332,8 +498,9 @@ export function parseYaml(content: string): YamlNode | undefined {
   if (lines.length === 0) {
     return undefined;
   }
+  const anchors: Anchors = new Map();
   const cursor: Cursor = { index: 0 };
-  return parseNode(lines, cursor, lines[0]?.indent ?? 0);
+  return parseNode(lines, cursor, lines[0]?.indent ?? 0, anchors);
 }
 
 export function asMap(node: YamlNode | undefined): YamlMapNode | undefined {

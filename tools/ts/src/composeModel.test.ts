@@ -92,4 +92,33 @@ describe('composeModel', () => {
     expect(ports[0]?.hostAddress).toBeUndefined();
     expect(ports[1]?.hostAddress).toBe('10.20.2.20');
   });
+
+  it('parses the long (map) port syntax, host_ip included', () => {
+    const root = parseYaml(
+      [
+        'services:',
+        '  app:',
+        '    ports:',
+        '      - target: 80',
+        '        published: 8080',
+        '        host_ip: 10.20.2.20',
+      ].join('\n')
+    );
+    const [service] = listServices(root);
+    const ports = service ? servicePorts(service) : [];
+    expect(ports).toHaveLength(1);
+    expect(ports[0]?.hostAddress).toBe('10.20.2.20');
+  });
+
+  it('treats the long port syntax with no host_ip as bound to every interface', () => {
+    const root = parseYaml(
+      ['services:', '  app:', '    ports:', '      - target: 80', '        published: 8080'].join(
+        '\n'
+      )
+    );
+    const [service] = listServices(root);
+    const ports = service ? servicePorts(service) : [];
+    expect(ports).toHaveLength(1);
+    expect(ports[0]?.hostAddress).toBeUndefined();
+  });
 });
