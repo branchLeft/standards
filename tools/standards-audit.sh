@@ -34,7 +34,7 @@ GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets
 # `workflow_runs_every_gate` cross-checks the two lists against each other by
 # reading this file's own `GATES=(...)` line, so a member of a differently
 # named array is invisible to that check, by construction rather than luck.)
-ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
+ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh check-raw-sql.sh)
 
 # The clauses this run can speak to, listed rather than derived. Grepping the
 # gates under-reports — check-tsconfig emits TS-2 and TS-3 through a helper's
@@ -42,7 +42,7 @@ ADVISORY_GATES=(check-comment-blocks.sh check-coverage.sh)
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
-COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-3 COV-1"
+COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-3 COV-1 DB-1"
 
 # Every indexed clause, sorted into exactly one of three buckets so the
 # model-facing headline never reads a measured clause as unwatched, nor an
@@ -259,6 +259,18 @@ render_table() {
     }' "$tsv" | sort
 }
 
+# Where a sweep starts: the ten files with the most open findings, and the clauses each breaks.
+render_files() {
+  local tsv="$1"
+  awk -F'\t' '$2 != "exempt" && $3 != "" {
+      n[$3]++
+      if (index(" " c[$3] " ", " " $1 " ") == 0) c[$3] = (c[$3] == "" ? $1 : c[$3] " " $1)
+    }
+    END { for (f in n) printf "%d\t%s\t%s\n", n[f], f, c[f] }' "$tsv" \
+    | sort -t "$(printf '\t')" -k1,1nr -k2,2 | head -n 10 \
+    | awk -F'\t' '{ printf "  %-5d %s  %s\n", $1, $2, $3 }'
+}
+
 main() {
   local mode_args=() json=0
   while [ $# -gt 0 ]; do
@@ -305,6 +317,8 @@ main() {
       "$RATCHET_MODE"
     printf 'findings\n'
     render_table "$tsv"
+    printf '\nfiles, most findings first\n'
+    [ -s "$tsv" ] && render_files "$tsv" | grep . || printf '  none\n'
     printf '\nexemptions\n'
     if [ -s "$inv" ]; then sort "$inv"; else printf '    none\n'; fi
     printf '\nnative suppressions\n'
@@ -487,7 +501,7 @@ EOF
     printf '%s' "$out" \
       | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
       || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1"\]' \
+    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1","DB-1"\]' \
       || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here
@@ -504,6 +518,8 @@ EOF
       || { echo "FAIL: findings table did not render CMT-3 as advisory"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -qE '^  COV-1 +info' \
       || { echo "FAIL: findings table did not render COV-1 as info"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE '^  1 +long\.ts  CMT-3$' \
+      || { echo "FAIL: the by-file rollup did not list long.ts with its clause"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?

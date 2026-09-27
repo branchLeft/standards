@@ -40,6 +40,7 @@ run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
 # comment.
 run "check-comment-blocks.sh" bash "$TOOLS/check-comment-blocks.sh" --self-test
 run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
+run "check-raw-sql.sh"     bash "$TOOLS/check-raw-sql.sh" --self-test
 
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
