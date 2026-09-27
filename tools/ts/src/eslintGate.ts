@@ -46,6 +46,12 @@ const CONFIG_NAMES: readonly string[] = [
 
 const ESLINT_BINARY = 'node_modules/.bin/eslint';
 
+// How far up from the repo root to look for a hoisted `eslint` binary, the
+// same direction node's own module resolution walks (`node_modules`, then the
+// parent's `node_modules`, and so on). Generous enough for any real workspace
+// nesting; cheap to check even when it finds nothing.
+const MAX_ANCESTOR_LEVELS = 6;
+
 interface EslintMessage {
   readonly ruleId?: string | null;
   readonly line?: number;
@@ -91,16 +97,32 @@ export class EslintGate implements Gate {
     return CONFIG_NAMES.some((name) => this.fs.exists(this.ratchet.root, name));
   }
 
+  // The way node itself would resolve `eslint`: `node_modules/.bin/eslint` at
+  // the repo root, then each ancestor's `node_modules/.bin/eslint` in turn,
+  // for a workspace that hoists it above where the audit runs.
   private isInstalled(): boolean {
-    return this.fs.exists(this.ratchet.root, ESLINT_BINARY);
+    for (let depth = 0; depth <= MAX_ANCESTOR_LEVELS; depth += 1) {
+      const path = `${'../'.repeat(depth)}${ESLINT_BINARY}`;
+      if (this.fs.exists(this.ratchet.root, path)) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  // No config, or no locally installed eslint binary: reports nothing rather
-  // than guessing at a global install or downloading one via npx — a repo
-  // that has not adopted ESLint is not evidence of anything, good or bad.
+  // No config: reports nothing — a repo that has not adopted ESLint is not
+  // evidence of anything, good or bad. Config present but no resolvable
+  // eslint binary is a different case entirely: an audit step that runs
+  // before `install`, or a broken environment, would otherwise pass every
+  // lint-encoded clause clean by never having checked it — the exact "all
+  // clear needs a control case" failure. That fails closed instead, the same
+  // as an unparsable run.
   run(_context: GateContext): readonly Finding[] {
-    if (!this.hasConfig() || !this.isInstalled()) {
+    if (!this.hasConfig()) {
       return [];
+    }
+    if (!this.isInstalled()) {
+      return this.unverifiedFindings('config found but eslint is not installed');
     }
 
     const result = this.processRunner.run(
@@ -117,10 +139,10 @@ export class EslintGate implements Gate {
     try {
       parsed = JSON.parse(stdout);
     } catch {
-      return this.unverifiedFindings('could not parse eslint --format json output');
+      return this.unverifiedFindings('output could not be parsed as JSON');
     }
     if (!Array.isArray(parsed)) {
-      return this.unverifiedFindings('eslint --format json output was not an array');
+      return this.unverifiedFindings('output was not a JSON array');
     }
 
     return this.findingsFromResults(parsed);
@@ -161,12 +183,13 @@ export class EslintGate implements Gate {
     return filePath.startsWith(root) ? filePath.slice(root.length) : filePath;
   }
 
-  // Fails closed: unparsable or empty output could as easily hide a real
-  // finding as report a clean run, so every clause this gate could have
-  // spoken to is marked unverified rather than silently passing.
+  // Fails closed: a missing binary, empty output or unparsable output could
+  // as easily hide a real finding as report a clean run, so every clause this
+  // gate could have spoken to is marked unverified rather than silently
+  // passing.
   private unverifiedFindings(reason: string): readonly Finding[] {
     return this.clauses.map((clause) =>
-      this.ratchet.findingAdvisory(clause, '.', 1, `could not verify eslint findings: ${reason}`)
+      this.ratchet.findingAdvisory(clause, '.', 1, `could not run ESLint: ${reason}`)
     );
   }
 }

@@ -29,21 +29,33 @@ clause is broader than any single rule; `DB-3` collects both selectors the
 database preset uses (`no-restricted-imports` for the plain import block,
 `no-restricted-syntax` for `require`/dynamic `import`).
 
-## No config, or no local install
+## No config: report nothing. Config but no eslint: fail closed
 
 Checked before anything runs: a set of default config filenames
-(`eslint.config.{js,mjs,cjs,ts}`, then the legacy `.eslintrc*` names), and
-`node_modules/.bin/eslint`. Either missing and the gate reports nothing — a
-repo that has not adopted ESLint, or that resolves it from somewhere this
-gate does not check (a hoisted monorepo root, a global install), is not
-evidence of anything, good or bad. It never falls back to letting `npx`
-download `eslint` on demand.
+(`eslint.config.{js,mjs,cjs,ts}`, then the legacy `.eslintrc*` names). None
+present and the gate reports nothing — a repo that has not adopted ESLint is
+not evidence of anything, good or bad.
+
+A config _is_ present, though, the gate must find a runnable `eslint`, and it
+resolves the binary the way node's own module resolution would: it looks for
+`node_modules/.bin/eslint` at the repo root, then at each ancestor directory
+in turn, for a monorepo that hoists the install above where the audit runs.
+It never falls back to letting `npx` download `eslint` on demand — that would
+run whatever version happens to be latest, not the repo's own pinned one.
+
+If the binary is not resolvable anywhere in that walk, the gate fails closed
+rather than reporting nothing. Silent success here would be a false clean: an
+audit step that runs before `install`, or a broken environment, would pass
+every one of the ten lint-encoded clauses simply because it never checked
+them — the "an all clear needs a control case" failure. A repo with no
+config was never asked the question; a repo with a config but no eslint was
+asked and could not answer, and those are not the same thing.
 
 ## Fail closed
 
-An empty stdout, output that does not parse as JSON, or JSON that is not an
-array all mean the same thing: this run could not verify any of the ten
-clauses. Rather than passing silently, the gate reports one advisory finding
-per clause it covers, each saying so — the same "unable to verify is not the
-same as clean" rule `schemaDriftGate.ts` follows for a single clause, applied
-across all ten here.
+A missing eslint binary, an empty stdout, output that does not parse as
+JSON, or JSON that is not an array all mean the same thing: this run could
+not verify any of the ten clauses. Rather than passing silently, the gate
+reports one advisory finding per clause it covers, each saying so — the same
+"unable to verify is not the same as clean" rule `schemaDriftGate.ts` follows
+for a single clause, applied across all ten here.

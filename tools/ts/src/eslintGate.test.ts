@@ -38,12 +38,45 @@ describe('EslintGate', () => {
     expect(processRunner.calls).toHaveLength(0);
   });
 
-  it('reports nothing when eslint is not installed locally', () => {
+  it('fails closed when a config exists but eslint is not installed anywhere resolvable', () => {
     const fs = new FakeFileSystem();
     fs.set(ROOT, 'eslint.config.js', 'export default [];\n');
     const processRunner = new FakeProcessRunner({ stdout: CLEAN_FILE, status: 0 });
     const gate = new EslintGate(buildRatchet(fs), fs, processRunner);
-    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    // A config with no installed eslint must never read as a clean run — an
+    // audit step running before `install` would otherwise pass every
+    // lint-encoded clause it never actually checked.
+    expect(findings.length).toBe(gate.clauses.length);
+    expect(findings.every((finding) => finding.level === 'advisory')).toBe(true);
+    expect(findings[0]?.message).toBe(
+      'could not run ESLint: config found but eslint is not installed'
+    );
+    expect(processRunner.calls).toHaveLength(0);
+  });
+
+  it('resolves eslint hoisted above the repo root, the way node would', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'eslint.config.js', 'export default [];\n');
+    // Two levels up — a monorepo hoisting the binary above this checkout.
+    fs.set(ROOT, '../../node_modules/.bin/eslint', '#!/usr/bin/env node\n');
+    const processRunner = new FakeProcessRunner({ stdout: CLEAN_FILE, status: 0 });
+    const gate = new EslintGate(buildRatchet(fs), fs, processRunner);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(0);
+    expect(processRunner.calls).toHaveLength(1);
+  });
+
+  it('gives up and fails closed once the ancestor walk is exhausted', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'eslint.config.js', 'export default [];\n');
+    // Nine levels up is past MAX_ANCESTOR_LEVELS — never found.
+    fs.set(ROOT, `${'../'.repeat(9)}node_modules/.bin/eslint`, '#!/usr/bin/env node\n');
+    const processRunner = new FakeProcessRunner({ stdout: CLEAN_FILE, status: 0 });
+    const gate = new EslintGate(buildRatchet(fs), fs, processRunner);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings.length).toBe(gate.clauses.length);
+    expect(findings[0]?.message).toContain('eslint is not installed');
     expect(processRunner.calls).toHaveLength(0);
   });
 
@@ -171,7 +204,7 @@ describe('EslintGate', () => {
       new EslintGate(buildRatchet(fs), fs, processRunner).clauses.length
     );
     expect(findings.every((finding) => finding.level === 'advisory')).toBe(true);
-    expect(findings[0]?.message).toContain('could not verify eslint findings');
+    expect(findings[0]?.message).toContain('could not run ESLint');
     expect(findings[0]?.message).toContain('exited 2 with no output');
   });
 
@@ -182,7 +215,7 @@ describe('EslintGate', () => {
     const gate = new EslintGate(buildRatchet(fs), fs, processRunner);
     const findings = gate.run({ root: ROOT, mode: 'enforce' });
     expect(findings.length).toBe(10);
-    expect(findings[0]?.message).toContain('could not parse eslint --format json output');
+    expect(findings[0]?.message).toBe('could not run ESLint: output could not be parsed as JSON');
   });
 
   it('fails closed with a finding per clause when the output is valid JSON but not an array', () => {
@@ -192,7 +225,7 @@ describe('EslintGate', () => {
     const gate = new EslintGate(buildRatchet(fs), fs, processRunner);
     const findings = gate.run({ root: ROOT, mode: 'enforce' });
     expect(findings.length).toBe(10);
-    expect(findings[0]?.message).toContain('output was not an array');
+    expect(findings[0]?.message).toBe('could not run ESLint: output was not a JSON array');
   });
 
   it('exposes the ten clauses it can speak to, sorted and de-duplicated', () => {
