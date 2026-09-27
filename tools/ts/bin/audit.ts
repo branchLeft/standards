@@ -12,6 +12,7 @@ import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
+import { PythonConfigGate } from '../src/pythonConfigGate.ts';
 import { Ratchet } from '../src/ratchet.ts';
 import { RatchetInitError } from '../src/ratchetInitError.ts';
 import { SchemaDriftGate } from '../src/schemaDriftGate.ts';
@@ -89,6 +90,7 @@ function main(): void {
     ...ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, [])),
     new SchemaDriftGate(ratchet, fs, processRunner, TOOLS_ROOT),
     new MigrationClassifierGate(ratchet, fs, TOOLS_ROOT),
+    new PythonConfigGate(ratchet, fs, TOOLS_ROOT),
     new CommentRatioGate(ratchet, fs, TOOLS_ROOT),
     new WorkItemReferenceGate(ratchet, fs, TOOLS_ROOT),
     new EslintGate(ratchet, fs, processRunner),

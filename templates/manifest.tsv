@@ -12,6 +12,15 @@
 #              this: GitHub applies the last matching pattern, so position is
 #              the whole mechanism, not just presence.
 #
+# mypy.ini stays on `contains`, not `suffix`, despite carrying the same kind
+# of risk CODEOWNERS does — a real mypy 1.19.0 run (docs/shell-and-python.md)
+# showed that a second `[mypy]` header makes mypy silently drop every setting
+# in the file, in EITHER position, not just a later one; `suffix` would
+# therefore give no real protection while also blocking the one place a repo
+# needs to add its own line (`python_version`, inside the same section, never
+# a new header). `tools/ts/src/pythonConfigGate.ts`'s PythonConfigGate is
+# what actually catches a duplicate `[mypy]` header, mechanically.
+#
 # A template file that is not listed here is a hard error, not a finding — an
 # unregistered template is enforced by nothing and says so nowhere.
 #
@@ -20,3 +29,5 @@ editorconfig	.editorconfig	identical
 nvmrc	.nvmrc	identical
 codeowners	.github/CODEOWNERS	suffix
 pre-commit-config.yaml	.pre-commit-config.yaml	contains
+ruff.toml	.ruff.toml	contains
+mypy.ini	mypy.ini	contains

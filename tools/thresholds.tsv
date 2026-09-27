@@ -32,4 +32,8 @@ ERR-3	eslint_rule	no-empty,@typescript-eslint/no-floating-promises	#provisional,
 NAM-1	eslint_rule	unicorn/name-replacements	#provisional, a reader only until the owner moves the gate class
 NAM-2	eslint_rule	@typescript-eslint/naming-convention	#provisional, a reader only until the owner moves the gate class
 TYP-1	eslint_rule	@typescript-eslint/no-explicit-any	#provisional, a reader only until the owner moves the gate class
-TYP-2	eslint_rule	@typescript-eslint/explicit-function-return-type,explicit-module-boundary-types	#provisional, a reader only until the owner moves the gate class
+TYP-2	eslint_rule	@typescript-eslint/explicit-function-return-type,@typescript-eslint/explicit-module-boundary-types	#provisional, a reader only until the owner moves the gate class
+PY-2	ruff_config_filenames	ruff.toml,.ruff.toml	#provisional, a reader only until the owner moves the gate class
+PY-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
+PY-3	pyproject_filename	pyproject.toml	#provisional, a reader only until the owner moves the gate class
+TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	#provisional, a reader only until the owner moves the gate class
