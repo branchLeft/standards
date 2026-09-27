@@ -533,7 +533,7 @@ elsewhere and are **cited, never restated**:
 
 | ID   | Rule                                                                                     | Gate      | Evidence                             |
 | ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------ |
-| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `pending` | —                                    |
+| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `auto`    | `tools/check-raw-sql.sh`             |
 | DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff |
 | DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | —                                    |
 | DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                    |

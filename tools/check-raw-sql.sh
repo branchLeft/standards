@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DB-1: raw SQL outside the ORM, found by the shape of a string. Advisory only.
+# DB-1: raw SQL outside the ORM, found by the shape of a string.
 # What counts as SQL, and what this misses: tools/check-raw-sql.md.
 #
 # Usage:
@@ -81,18 +81,18 @@ main() {
     case "$f" in
       *.sql)
         in_orm_dir "$f" "$dirs" \
-          || ratchet_finding_advisory "DB-1" "$f" 1 \
+          || ratchet_finding "DB-1" "$f" 1 \
             "SQL file outside the ORM's migration folder ($dirs)"
         continue ;;
       *.py) style=py ;;
       *) style=c ;;
     esac
     while IFS=$'\t' read -r ln snippet; do
-      ratchet_finding_advisory "DB-1" "$f" "$ln" "raw SQL outside the ORM: $snippet"
+      ratchet_finding "DB-1" "$f" "$ln" "raw SQL outside the ORM: $snippet"
     done < <(sql_strings "$f" "$style")
   done < <(ratchet_scope_files '\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|sql)$')
 
-  ratchet_summary_advisory
+  ratchet_summary
 }
 
 # --- self-test -------------------------------------------------------------
@@ -145,7 +145,7 @@ EOF
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     expect() {
-      printf '%s' "$out" | grep -q "\"file\":\"$1\",\"line\":$2,\"level\":\"advisory\"" \
+      printf '%s' "$out" | grep -q "\"file\":\"$1\",\"line\":$2,\"level\":\"error\"" \
         || { echo "FAIL: $3"; echo "$out"; exit 1; }
     }
     refuse() {
@@ -172,7 +172,7 @@ EOF
       || { echo "FAIL: expected exactly 7 DB-1 findings"; echo "$out"; exit 1; }
 
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
-      || { echo "FAIL: advisory findings made the run exit non-zero"; exit 1; }
+      && { echo "FAIL: raw-SQL findings did not fail the build"; exit 1; }
 
     printf 'db/*\tDB-1\t# seed data, loaded by a runbook\n' > .standardsignore
     git add -A && git commit -qm exempt
@@ -182,13 +182,11 @@ EOF
         || { echo "FAIL: $4"; echo "$out"; exit 1; }
     }
     expect_level db/seed.sql 1 exempt ".standardsignore did not exempt db/seed.sql"
-    expect_level src/store.ts 5 advisory "exempting db/ silenced an unrelated file"
+    expect_level src/store.ts 5 error "exempting db/ silenced an unrelated file"
 
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q '::notice.*DB-1' \
-      || { echo "FAIL: human-readable output did not use ::notice::"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '::(error|warning)' \
-      && { echo "FAIL: human-readable output used a failing annotation level"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '::error.*DB-1' \
+      || { echo "FAIL: human-readable output did not use ::error::"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?

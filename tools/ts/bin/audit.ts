@@ -8,9 +8,11 @@ import { Audit } from '../src/audit.ts';
 import { BashGate } from '../src/bashGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
+import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
 import { Ratchet } from '../src/ratchet.ts';
 import { RatchetInitError } from '../src/ratchetInitError.ts';
+import { SchemaDriftGate } from '../src/schemaDriftGate.ts';
 import type { RatchetMode } from '../src/ratchet.ts';
 
 const TOOLS_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -21,8 +23,9 @@ const GATE_NAMES = [
   'check-pulumi.sh',
   'check-pulumi-secrets.sh',
   'standards-sync.sh',
+  'check-raw-sql.sh',
 ];
-const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh', 'check-raw-sql.sh'];
+const ADVISORY_GATE_NAMES = ['check-comment-blocks.sh', 'check-coverage.sh'];
 
 interface CliOptions {
   readonly mode?: RatchetMode | undefined;
@@ -75,7 +78,11 @@ function main(): void {
   // script's own findings — so an empty list costs nothing while the gates
   // stay bash.
   const gates = GATE_NAMES.map((name) => gateAt(name, false, []));
-  const advisoryGates = ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, []));
+  const advisoryGates = [
+    ...ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, [])),
+    new SchemaDriftGate(ratchet, fs, processRunner, TOOLS_ROOT),
+    new MigrationClassifierGate(ratchet, fs, TOOLS_ROOT),
+  ];
 
   const audit = new Audit(
     ratchet,
