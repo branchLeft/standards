@@ -31,7 +31,6 @@ run "check-pulumi-secrets.sh" bash "$TOOLS/check-pulumi-secrets.sh" --self-test
 run "standards-sync.sh"    bash "$TOOLS/standards-sync.sh" --self-test
 run "check-raw-sql.sh"     bash "$TOOLS/check-raw-sql.sh" --self-test
 run "check-comment-blocks.sh" bash "$TOOLS/check-comment-blocks.sh" --self-test
-run "check-work-item-refs.sh" bash "$TOOLS/check-work-item-refs.sh" --self-test
 run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test

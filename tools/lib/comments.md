@@ -1,8 +1,8 @@
 # Comment-line classification
 
-Shared by `check-comment-blocks.sh` (CMT-3, CMT-4) and `check-work-item-refs.sh`
-(CMT-2), so the three checks can never disagree about what counts as a comment
-line.
+CMT-3's own reader, `check-comment-blocks.sh`. CMT-2 and CMT-4 moved to
+TypeScript (`tools/ts/src/commentClassifier.ts`, a faithful port) — see that
+file's own doc for why, and for the two gates built on it.
 
 Comment-only, by extension:
 
@@ -30,6 +30,3 @@ flags aligned with the file's own line numbers (blank-filled, the same trick
 A caller wanting a summary (longest run, total comment lines) reduces the
 flags itself — see `check-comment-blocks.sh`'s `flags_summary()` — rather than
 this file growing a second layer of aggregation only one caller used.
-
-`comment_only_text FILE STYLE` prints the file back with every non-comment
-line blanked, line count preserved — what `check-work-item-refs.sh` greps.

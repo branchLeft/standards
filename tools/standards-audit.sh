@@ -13,7 +13,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/ratchet.sh
 . "$HERE/lib/ratchet.sh"
 
-GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh check-raw-sql.sh check-comment-blocks.sh check-work-item-refs.sh)
+GATES=(check-tsconfig.sh check-workflows.sh check-pulumi.sh check-pulumi-secrets.sh standards-sync.sh check-raw-sql.sh check-comment-blocks.sh)
 
 # No-regret check: a reader with a provisional threshold, kept out of GATES
 # so it can never fail a build. Why, and the cross-check that enforces the
@@ -26,7 +26,9 @@ ADVISORY_GATES=(check-coverage.sh)
 # a gate's header names the clause it deliberately leaves to another tool. The
 # set decides only whether an unused exemption reads as stale or as unverified,
 # so a wrong entry mislabels an inventory row; it never changes a verdict.
-COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-2 CMT-3 CMT-4 COV-1 DB-1"
+# CMT-2 and CMT-4 are deliberately absent — TypeScript-only now, per the
+# `audit.ts` COVERED_CLAUSES comment.
+COVERED="STD-000 TS-2 TS-3 TS-4 TS-5 CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10 PUL-1 PUL-2 PUL-3 PUL-4 PUL-5 PUL-12 SYNC-1 CMT-3 COV-1 DB-1"
 
 # Every indexed clause, sorted into enforced/measured/not-checked, read from
 # this checkout's own docs and thresholds, not the audited repo's: standards-audit.md.
@@ -482,7 +484,7 @@ EOF
     printf '%s' "$out" \
       | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
       || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-3","COV-1","DB-1","DB-4","DB-5","DB-6"\]' \
+    printf '%s' "$out" | grep -q '"measured_clauses":\["CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-4","DB-5","DB-6"\]' \
       || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here

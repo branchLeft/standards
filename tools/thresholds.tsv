@@ -14,8 +14,10 @@
 # is no longer a placeholder ahead of a decision — it is the decision,
 # reviewed with the gate-class change itself, the same review the
 # `#provisional` marker exists to avoid needing for everything else here.
+CMT-2	scan_extensions	ts,tsx,js,mjs,cjs,py,sh	#provisional, a reader only until the owner moves the gate class
 CMT-3	warn_min_lines	5	# signed-off value, reviewed with the CMT-3 gate-class change
 CMT-3	fail_min_lines	11	# signed-off value, reviewed with the CMT-3 gate-class change
+CMT-4	scan_extensions	ts,tsx,js,mjs,cjs,py,sh	#provisional, a reader only until the owner moves the gate class
 COV-1	min_line_coverage_pct	90	#provisional, the owner sets the real value later
 DB-1	orm_migration_dirs	drizzle	# migration folder names DB-1, DB-5 and DB-6 all treat as the ORM's own
 DB-4	config_file_names	drizzle.config.ts,drizzle.config.js,drizzle.config.mjs,drizzle.config.cjs	#provisional, a reader only until the owner moves the gate class

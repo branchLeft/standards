@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Comment-line classification shared by CMT-2/CMT-3/CMT-4. Sourced, not
-# executed. Details and the extension-to-style mapping: tools/lib/comments.md.
+# Comment-line classification — CMT-3's own reader in bash; CMT-2 and CMT-4
+# moved to tools/ts/src/commentClassifier.ts. Sourced, not executed.
+# Details and the extension-to-style mapping: tools/lib/comments.md.
 
 # shellcheck shell=bash
 
@@ -83,19 +84,4 @@ comment_flags_hash_style() {
       print iscomment
     }
   ' "$file"
-}
-
-# The file's own comment lines, one output line per input line, non-comment
-# lines blanked so the line count — and therefore every line number a caller
-# reports — never shifts. `style` is whatever comment_style_for printed.
-comment_only_text() {
-  local file="$1" style="$2" flags
-  case "$style" in
-    c)      flags=$(comment_flags_c_style "$file") ;;
-    pyhash) flags=$(comment_flags_hash_style "$file" 1) ;;
-    hash)   flags=$(comment_flags_hash_style "$file" 0) ;;
-    *) return 1 ;;
-  esac
-  awk 'NR == FNR { flag[FNR] = $0; next } { print (flag[FNR] == "1") ? $0 : "" }' \
-    <(printf '%s\n' "$flags") "$file"
 }

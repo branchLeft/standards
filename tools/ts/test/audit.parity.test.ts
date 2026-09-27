@@ -24,7 +24,6 @@ const GATE_NAMES = [
   'standards-sync.sh',
   'check-raw-sql.sh',
   'check-comment-blocks.sh',
-  'check-work-item-refs.sh',
 ];
 const ADVISORY_GATE_NAMES = ['check-coverage.sh'];
 
@@ -243,7 +242,7 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
       `{"clause_coverage":{"enforced":${expectedEnforced},"measured_not_enforced":${expectedMeasured},"not_checked":${expectedNotChecked}`
     );
     expect(json.output).toContain(
-      '"measured_clauses":["CMT-3","COV-1","DB-1","DB-4","DB-5","DB-6"]'
+      '"measured_clauses":["CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-4","DB-5","DB-6"]'
     );
 
     const ts = buildTsAudit(repo.root);
