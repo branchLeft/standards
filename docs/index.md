@@ -421,7 +421,7 @@ elsewhere and are **cited, never restated**:
 | ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | `@branchleft/eslint-config`                           |
 | ARCH-5 | No loose functions: utilities are grouped into a module, namespace-imported in TypeScript   | `review`  | New top-level functions and their grouping module     |
 | ARCH-6 | Every outside dependency sits behind an interface and is passed in, so a test can fake it   | `review`  | Constructors and factories in the diff                |
-| ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | —                                                     |
+| ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | `@branchleft/eslint-config`                           |
 | ARCH-8 | Each directory holds one clear responsibility                                               | `review`  | New directories in the diff                           |
 
 ## Naming — `naming.md`
