@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 /**
  * One class per file — `docs/architecture.md`. `max-classes-per-file` counts
@@ -8,9 +9,18 @@ import type { Linter } from 'eslint';
 export const architecture: Linter.Config[] = [
   {
     rules: {
-      // Cognitive complexity has no rule here: the only ESLint package for
-      // it, eslint-plugin-sonarjs, is LGPL-3.0-only and needs owner approval.
       'max-classes-per-file': ['error', 1],
+    },
+  },
+  {
+    // Cognitive complexity, capped at 15 — `docs/architecture.md`. The owner
+    // approved the LGPL-3.0-only `eslint-plugin-sonarjs` on the condition it
+    // is never shipped: it is a peerDependency here, installed as a
+    // devDependency by each consuming repo, never a `dependency` of this
+    // package.
+    plugins: { sonarjs },
+    rules: {
+      'sonarjs/cognitive-complexity': ['error', 15],
     },
   },
 ];

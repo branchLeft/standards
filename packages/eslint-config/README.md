@@ -36,6 +36,14 @@ TypeScript-only constructs and mis-flags them: a parameter in a function type,
 `(open: boolean) => void`, reads to it as an unused variable. Running both
 produces duplicate reports and one wrong one.
 
+## `eslint-plugin-sonarjs` is a peerDependency, not a dependency
+
+The cognitive-complexity rule in `architecture` needs `eslint-plugin-sonarjs`,
+licensed LGPL-3.0-only. The owner approved it as a dev-time lint tool only, on
+the condition this package never redistributes it: it is declared as a
+peerDependency here, and each consuming repo installs it as its own
+devDependency.
+
 ## `typeChecked` is opt-in
 
 It is a cliff rather than a step: a large one-time batch of fixes, roughly
