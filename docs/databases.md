@@ -52,8 +52,10 @@ deploy. A database's schema is part of the release that uses it.
 
 **Check plan:** a CI step that runs `drizzle-kit generate` and fails if it
 produces a new migration, proving the committed migrations match the schema —
-`tools/ts/src/schemaDriftGate.ts`, wired into the TypeScript audit only.
-Pending until the owner reviews it running against a real consumer.
+`tools/ts/src/schemaDriftGate.ts`, wired into the TypeScript audit only. Fails
+closed: a non-zero exit, a missing binary or no output all report as unable
+to verify, never as silence. Pending until the owner reviews it running
+against a real consumer.
 
 ## DB-5 — expand, then contract
 
@@ -69,7 +71,8 @@ both versions must work against the same schema at the same time.
 contract migration — `tools/ts/src/migrationClassifierGate.ts`, classifying
 each migration in the ORM's migration folder by its content, since no
 contract-naming convention exists to read instead. Pending, wired into the
-TypeScript audit only.
+TypeScript audit only. `tools/ts/src/migrationClassifier.md` says what it
+treats as neutral and where it still needs a reviewer's judgement.
 
 ## DB-6 — each migration is purely one or the other
 

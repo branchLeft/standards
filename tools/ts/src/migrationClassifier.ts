@@ -4,7 +4,7 @@ export type MigrationClassification = 'expand' | 'contract' | 'mixed' | 'empty';
 export interface ClassifiedStatement {
   readonly text: string;
   readonly startLine: number;
-  readonly kind: 'add' | 'drop-or-rename' | 'other';
+  readonly kind: 'add' | 'drop-or-rename' | 'neutral' | 'other';
 }
 
 export interface MigrationClassificationResult {
@@ -15,74 +15,109 @@ export interface MigrationClassificationResult {
   readonly mixedStatements: readonly ClassifiedStatement[];
 }
 
-// Strips `--` line comments (the `--> statement-breakpoint` marker included)
-// and `/* */` block comments, then splits on `;` into statements, each
-// carrying the line it started on.
-export function splitStatementsWithLines(
-  source: string
-): readonly { text: string; startLine: number }[] {
-  const lines = source.split('\n');
-  const statements: { text: string; startLine: number }[] = [];
-  let buffer = '';
-  let startLine = 0;
-  let inBlockComment = false;
+interface RawStatement {
+  readonly text: string;
+  readonly startLine: number;
+}
 
-  for (let index = 0; index < lines.length; index += 1) {
-    let line = lines[index] ?? '';
+interface CleanedLine {
+  readonly text: string;
+  readonly inBlockComment: boolean;
+}
 
-    if (inBlockComment) {
-      const end = line.indexOf('*/');
-      if (end === -1) {
-        continue;
-      }
-      line = line.slice(end + 2);
-      inBlockComment = false;
+// A block comment already open on entry: consumes up to its close, or the
+// whole line if it doesn't close here.
+function continueBlockComment(line: string): CleanedLine {
+  const end = line.indexOf('*/');
+  return end === -1
+    ? { text: '', inBlockComment: true }
+    : { text: line.slice(end + 2), inBlockComment: false };
+}
+
+// Every `/* */` span opened and closed within one line, repeated until none remain.
+function stripBlockComments(line: string): CleanedLine {
+  let text = line;
+  for (;;) {
+    const start = text.indexOf('/*');
+    if (start === -1) {
+      return { text, inBlockComment: false };
     }
-
-    for (;;) {
-      const start = line.indexOf('/*');
-      if (start === -1) {
-        break;
-      }
-      const end = line.indexOf('*/', start + 2);
-      if (end === -1) {
-        line = line.slice(0, start);
-        inBlockComment = true;
-        break;
-      }
-      line = line.slice(0, start) + line.slice(end + 2);
+    const end = text.indexOf('*/', start + 2);
+    if (end === -1) {
+      return { text: text.slice(0, start), inBlockComment: true };
     }
+    text = text.slice(0, start) + text.slice(end + 2);
+  }
+}
 
-    const dashIndex = line.indexOf('--');
-    if (dashIndex !== -1) {
-      line = line.slice(0, dashIndex);
-    }
+// `--` to end of line, the `--> statement-breakpoint` marker included.
+function stripLineComment(line: string): string {
+  const dashIndex = line.indexOf('--');
+  return dashIndex === -1 ? line : line.slice(0, dashIndex);
+}
 
-    const trimmed = line.trim();
-    if (trimmed === '') {
-      continue;
-    }
-    if (buffer === '') {
-      startLine = index + 1;
-    }
-    buffer = buffer === '' ? trimmed : `${buffer} ${trimmed}`;
+function cleanLine(line: string, inBlockComment: boolean): CleanedLine {
+  const opened = inBlockComment
+    ? continueBlockComment(line)
+    : { text: line, inBlockComment: false };
+  if (opened.inBlockComment) {
+    return opened;
+  }
+  const closed = stripBlockComments(opened.text);
+  return { text: stripLineComment(closed.text), inBlockComment: closed.inBlockComment };
+}
 
-    let semicolon = buffer.indexOf(';');
+// Accumulates cleaned lines into `;`-terminated statements, each carrying the
+// line it started on. A separate object rather than closures over the loop in
+// `splitStatementsWithLines`, so that function stays a single, simple pass.
+class StatementAccumulator {
+  private readonly statements: RawStatement[] = [];
+  private buffer = '';
+  private startLine = 0;
+
+  addLine(text: string, lineNumber: number): void {
+    if (text === '') {
+      return;
+    }
+    if (this.buffer === '') {
+      this.startLine = lineNumber;
+    }
+    this.buffer = this.buffer === '' ? text : `${this.buffer} ${text}`;
+    this.flushCompleteStatements(lineNumber);
+  }
+
+  private flushCompleteStatements(lineNumber: number): void {
+    let semicolon = this.buffer.indexOf(';');
     while (semicolon !== -1) {
-      const statementText = buffer.slice(0, semicolon).trim();
+      const statementText = this.buffer.slice(0, semicolon).trim();
       if (statementText !== '') {
-        statements.push({ text: statementText, startLine });
+        this.statements.push({ text: statementText, startLine: this.startLine });
       }
-      buffer = buffer.slice(semicolon + 1).trim();
-      startLine = index + 1;
-      semicolon = buffer.indexOf(';');
+      this.buffer = this.buffer.slice(semicolon + 1).trim();
+      this.startLine = lineNumber;
+      semicolon = this.buffer.indexOf(';');
     }
   }
 
-  if (buffer.trim() !== '') {
-    statements.push({ text: buffer.trim(), startLine });
+  finish(): readonly RawStatement[] {
+    if (this.buffer.trim() !== '') {
+      this.statements.push({ text: this.buffer.trim(), startLine: this.startLine });
+    }
+    return this.statements;
   }
-  return statements;
+}
+
+/** Strips comments and breakpoints, then splits on `;` into statements with their start line. */
+export function splitStatementsWithLines(source: string): readonly RawStatement[] {
+  const accumulator = new StatementAccumulator();
+  let inBlockComment = false;
+  const lines = source.split('\n');
+  for (let index = 0; index < lines.length; index += 1) {
+    const cleaned = cleanLine(lines[index] ?? '', inBlockComment);
+    inBlockComment = cleaned.inBlockComment;
+    accumulator.addLine(cleaned.text.trim(), index + 1);
+  }
+  return accumulator.finish();
 }
 
 /** Splits `body` on commas that are not inside parentheses. */
@@ -109,6 +144,17 @@ function splitTopLevelCommas(body: string): readonly string[] {
   return parts;
 }
 
+// Wrapper and data statements: a rebuild's `PRAGMA`, a transaction's
+// `BEGIN`/`COMMIT`, a backfill's `INSERT`/`UPDATE`/`DELETE`/`SELECT`. None
+// change the schema, so none affect expand vs contract — `migrationClassifier.md`.
+function isNeutralStatement(upper: string): boolean {
+  return (
+    /^PRAGMA\b/.test(upper) ||
+    /^(BEGIN|COMMIT|ROLLBACK)\b/.test(upper) ||
+    /^(INSERT|UPDATE|DELETE|SELECT)\b/.test(upper)
+  );
+}
+
 function classifyKind(upper: string): ClassifiedStatement['kind'] {
   if (/^CREATE\s+(TABLE|(UNIQUE\s+)?INDEX)\b/.test(upper)) {
     return 'add';
@@ -121,6 +167,9 @@ function classifyKind(upper: string): ClassifiedStatement['kind'] {
   }
   if (/^ALTER\s+TABLE\b.*\b(DROP\s+COLUMN|RENAME)\b/.test(upper)) {
     return 'drop-or-rename';
+  }
+  if (isNeutralStatement(upper)) {
+    return 'neutral';
   }
   return 'other';
 }
@@ -157,26 +206,34 @@ export function classifyStatements(sql: string): readonly ClassifiedStatement[] 
   }));
 }
 
-// EXPAND: every statement only adds. CONTRACT: every statement only drops or
-// renames. Anything else is MIXED. Within an EXPAND migration, an added
-// `NOT NULL` column with no `DEFAULT` is reported as `missingDefaults`.
+// EXPAND: every non-neutral statement only adds. CONTRACT: only drops or
+// renames. An unrecognised statement, or a mix of the two, is MIXED — a
+// table-rebuild still qualifies, see `migrationClassifier.md`. Within an
+// EXPAND migration, an added `NOT NULL` column with no `DEFAULT` is reported.
 export function classifyMigration(sql: string): MigrationClassificationResult {
   const statements = classifyStatements(sql);
   if (statements.length === 0) {
     return { classification: 'empty', missingDefaults: [], mixedStatements: [] };
   }
 
-  const firstStatement = statements[0] as ClassifiedStatement;
-  if (firstStatement.kind === 'other') {
-    return { classification: 'mixed', missingDefaults: [], mixedStatements: [firstStatement] };
+  const other = statements.find((statement) => statement.kind === 'other');
+  if (other) {
+    return { classification: 'mixed', missingDefaults: [], mixedStatements: [other] };
   }
-  const conflicting = statements.find((statement) => statement.kind !== firstStatement.kind);
+
+  const structural = statements.filter((statement) => statement.kind !== 'neutral');
+  if (structural.length === 0) {
+    return { classification: 'expand', missingDefaults: [], mixedStatements: [] };
+  }
+
+  const firstKind = (structural[0] as ClassifiedStatement).kind;
+  const conflicting = structural.find((statement) => statement.kind !== firstKind);
   if (conflicting) {
     return { classification: 'mixed', missingDefaults: [], mixedStatements: [conflicting] };
   }
 
-  if (firstStatement.kind === 'add') {
-    const missingDefaults = statements.filter((statement) =>
+  if (firstKind === 'add') {
+    const missingDefaults = structural.filter((statement) =>
       addsColumnMissingDefault(statement.text, statement.text.toUpperCase())
     );
     return { classification: 'expand', missingDefaults, mixedStatements: [] };

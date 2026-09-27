@@ -49,6 +49,9 @@ export class SchemaDriftGate implements Gate {
     return this.configNames().find((name) => this.fs.exists(this.ratchet.root, name));
   }
 
+  // Fails closed: a non-zero exit (drizzle-kit missing, npx unreachable, a
+  // bad config) or no output at all is reported as unable to verify, never
+  // as silence — silence there would read as "no drift" and pass.
   run(_context: GateContext): readonly Finding[] {
     const configFile = this.findConfigFile();
     if (configFile === undefined) {
@@ -60,7 +63,14 @@ export class SchemaDriftGate implements Gate {
       ['drizzle-kit', 'generate', '--config', configFile],
       this.ratchet.root
     );
-    if (result.status !== 0 || NO_DRIFT_MARKER.test(result.stdout)) {
+
+    if (result.status !== 0) {
+      return [this.unverifiedFinding(configFile, `drizzle-kit generate exited ${result.status}`)];
+    }
+    if (result.stdout.trim() === '') {
+      return [this.unverifiedFinding(configFile, 'no output from drizzle-kit generate')];
+    }
+    if (NO_DRIFT_MARKER.test(result.stdout)) {
       return [];
     }
 
@@ -72,5 +82,14 @@ export class SchemaDriftGate implements Gate {
         'drizzle-kit generate produced a new migration — the committed migrations do not match the schema'
       ),
     ];
+  }
+
+  private unverifiedFinding(configFile: string, reason: string): Finding {
+    return this.ratchet.findingAdvisory(
+      'DB-4',
+      configFile,
+      1,
+      `could not verify schema drift: ${reason}`
+    );
   }
 }

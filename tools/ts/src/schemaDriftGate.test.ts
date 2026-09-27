@@ -48,12 +48,51 @@ describe('SchemaDriftGate', () => {
     expect(findings[0]?.level).toBe('advisory');
   });
 
-  it('reports nothing when the command fails to run', () => {
+  it('fails closed with a finding when the command exits non-zero', () => {
     const fs = new FakeFileSystem();
     fs.set(ROOT, 'drizzle.config.ts', 'export default {};\n');
     const processRunner = new FakeProcessRunner({ stdout: 'error: config invalid', status: 1 });
     const gate = new SchemaDriftGate(buildRatchet(fs), fs, processRunner, TOOLS_ROOT);
-    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.clause).toBe('DB-4');
+    expect(findings[0]?.message).toBe(
+      'could not verify schema drift: drizzle-kit generate exited 1'
+    );
+  });
+
+  it('fails closed with a finding when the binary is missing (mapped to a non-zero exit)', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle.config.ts', 'export default {};\n');
+    // NodeProcessRunner maps spawnSync's null status (e.g. ENOENT) to 1 —
+    // exercised here at the FakeProcessRunner boundary this gate depends on.
+    const processRunner = new FakeProcessRunner({ stdout: '', status: 1 });
+    const gate = new SchemaDriftGate(buildRatchet(fs), fs, processRunner, TOOLS_ROOT);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('could not verify schema drift');
+  });
+
+  it('fails closed with a finding when the command exits zero with no output', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle.config.ts', 'export default {};\n');
+    const processRunner = new FakeProcessRunner({ stdout: '', status: 0 });
+    const gate = new SchemaDriftGate(buildRatchet(fs), fs, processRunner, TOOLS_ROOT);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toBe(
+      'could not verify schema drift: no output from drizzle-kit generate'
+    );
+  });
+
+  it('fails closed with a finding when the command exits zero with only whitespace', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle.config.ts', 'export default {};\n');
+    const processRunner = new FakeProcessRunner({ stdout: '   \n', status: 0 });
+    const gate = new SchemaDriftGate(buildRatchet(fs), fs, processRunner, TOOLS_ROOT);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('no output from drizzle-kit generate');
   });
 
   it('uses a custom config_file_names threshold setting', () => {
