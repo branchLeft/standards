@@ -30,15 +30,15 @@ if (!coveragePath || !root) {
 let raw;
 try {
   raw = JSON.parse(readFileSync(coveragePath, 'utf8'));
-} catch (err) {
-  process.stderr.write(`coverage-lines: could not read ${coveragePath}: ${err.message}\n`);
+} catch (error) {
+  process.stderr.write(`coverage-lines: could not read ${coveragePath}: ${error.message}\n`);
   process.exit(2);
 }
 
 const rootWithSlash = root.endsWith('/') ? root : `${root}/`;
 
 for (const [absPath, fileCov] of Object.entries(raw)) {
-  const relPath = absPath.startsWith(rootWithSlash)
+  const relativePath = absPath.startsWith(rootWithSlash)
     ? absPath.slice(rootWithSlash.length)
     : absPath.replace(/^\/+/, '');
 
@@ -57,5 +57,5 @@ for (const [absPath, fileCov] of Object.entries(raw)) {
   if (total === 0) continue;
   const covered = [...lineCovered.values()].filter(Boolean).length;
   const pct = Math.round((covered / total) * 1000) / 10;
-  process.stdout.write(`${relPath}\t${pct}\n`);
+  process.stdout.write(`${relativePath}\t${pct}\n`);
 }

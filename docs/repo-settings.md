@@ -146,6 +146,17 @@ a public repo.
 **Check plan:** `tools/ruleset-audit.sh` extended to read each repo's security
 and analysis settings.
 
+## REPO-10 — agent work says so
+
+Every commit an agent writes carries a co-author trailer naming the model, and
+every pull request an agent raises says it was generated.
+
+**Why:** people reading the history are owed an accurate account of who wrote
+what.
+
+**Check plan:** a CI check that every commit in a pull request raised by an
+agent identity carries the trailer.
+
 ## Applying is privileged
 
 `ruleset-apply.sh` is the platform owner's to run. Prepare the command, run

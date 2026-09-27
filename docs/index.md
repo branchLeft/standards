@@ -73,11 +73,16 @@ the corollary on PRIN-1 and the honesty clause on PRIN-4.
 | STD-001 | An exemption is a CODEOWNERS decision. A PR may not add one to make its own gate pass                         | `review` | —                          |
 | STD-002 | A stale exemption — one matching nothing — is reported and removed                                            | `auto`   | `tools/standards-audit.sh` |
 | STD-003 | These standards govern repos branchLeft owns; a contribution elsewhere follows that project's own             | `review` | —                          |
+| STD-004 | A rule is enforced only by a mechanism, a technical control or a check; a rule with neither is a gap to build | `review` | —                          |
 
 **STD-003 sets the reach of everything below.** A rule here binds code
 branchLeft writes and owns. Upstream software the estate runs keeps its own
 conventions, and a contribution to another project follows that project's
 standards, because a rule nobody there agreed to is not a standard there.
+
+**STD-004 is how a rule becomes real.** A written policy is not a control,
+and a standard nothing checks is not enforced. Where a rule has neither, the
+finding is to build the control or the check, never to go and look by hand.
 
 ## TypeScript
 
@@ -210,17 +215,18 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Repository settings — `repo-settings.md`
 
-| ID     | Rule                                                                                | Gate      | Encoded by               |
-| ------ | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
-| REPO-1 | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
-| REPO-2 | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
-| REPO-3 | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
-| REPO-4 | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
-| REPO-5 | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
-| REPO-6 | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
-| REPO-7 | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
-| REPO-8 | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
-| REPO-9 | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
+| ID      | Rule                                                                                | Gate      | Encoded by               |
+| ------- | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
+| REPO-1  | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
+| REPO-2  | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
+| REPO-3  | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
+| REPO-4  | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
+| REPO-5  | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
+| REPO-6  | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
+| REPO-7  | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
+| REPO-8  | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
+| REPO-9  | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
+| REPO-10 | Every agent-written commit and pull request says so                                 | `pending` | —                        |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
@@ -289,6 +295,7 @@ creation of a project or account — are enumerated, not judged case by case.
 | DP-9  | A breach route fast enough to preserve the reporting deadline that applies        | `pending` | —          |
 | DP-10 | Third parties touching personal data are registered and transfer-assessed         | `pending` | —          |
 | DP-11 | Offboarding executes a tested deletion for every row of the record                | `pending` | —          |
+| DP-12 | A service collects only the personal data a named use needs                       | `review`  | —          |
 
 Every clause lands `pending`, and the honest reading of that is the one in
 the Columns section above: the rules are binding prose and nothing checks
@@ -391,17 +398,18 @@ elsewhere and are **cited, never restated**:
 - `branchLeft/.github` → `docs/DOCUMENTATION-STANDARD.md`
 - `branchLeft/github-workflows` → `tools/docs-lint-rules.md`
 
-| ID    | Rule                                                                                          | Gate      | Encoded by |
-| ----- | --------------------------------------------------------------------------------------------- | --------- | ---------- |
-| DOC-1 | Every repo runs the `docs-lint` caller                                                        | `pending` | —          |
-| DOC-2 | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it                     | `review`  | —          |
-| DOC-3 | Durable documentation is markdown; HTML is session-only, bar the committed try-it-now designs | `pending` | —          |
-| DOC-4 | Every document is written for one audience, people or agents, and says which                  | `review`  | —          |
-| DOC-5 | Documents for agents are kept apart from documentation for people                             | `review`  | —          |
-| DOC-6 | Documents for people are concise, logically structured and in plain English                   | `review`  | —          |
-| DOC-7 | A stale document is a defect, corrected in the same PR as the change that staled it           | `review`  | —          |
-| DOC-8 | CI checks documents against the code: links, named commands and quoted values                 | `pending` | —          |
-| DOC-9 | Decisions are recorded durably, in one decision-record format shared by every repo            | `pending` | —          |
+| ID     | Rule                                                                                          | Gate      | Encoded by |
+| ------ | --------------------------------------------------------------------------------------------- | --------- | ---------- |
+| DOC-1  | Every repo runs the `docs-lint` caller                                                        | `pending` | —          |
+| DOC-2  | A repo whose `.docs-lint.mode` says `warn` has a backlog item to leave it                     | `review`  | —          |
+| DOC-3  | Durable documentation is markdown; HTML is session-only, bar the committed try-it-now designs | `pending` | —          |
+| DOC-4  | Every document is written for one audience, people or agents, and says which                  | `review`  | —          |
+| DOC-5  | Documents for agents are kept apart from documentation for people                             | `review`  | —          |
+| DOC-6  | Documents for people are concise, logically structured and in plain English                   | `review`  | —          |
+| DOC-7  | A stale document is a defect, corrected in the same PR as the change that staled it           | `review`  | —          |
+| DOC-8  | CI checks documents against the code: links, named commands and quoted values                 | `pending` | —          |
+| DOC-9  | Decisions are recorded durably, in one decision-record format shared by every repo            | `pending` | —          |
+| DOC-10 | A document marks who drafted it, and agents never rewrite text the owner wrote                | `pending` | —          |
 
 ## Architecture — `architecture.md`
 
@@ -410,7 +418,7 @@ elsewhere and are **cited, never restated**:
 | ARCH-1 | Code is written for a human reader first: a newcomer builds a mental model without an agent | `review`  | The diff's public signatures and file layout          |
 | ARCH-2 | Every logical entity is a class behind an explicit contract, even with one implementation   | `review`  | New classes and the contracts they implement          |
 | ARCH-3 | Variation on evidence: no extension point until a second real use or a named requirement    | `review`  | New generic parameters, option objects and registries |
-| ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | —                                                     |
+| ARCH-4 | One class per file; an interface and its only implementation may share one                  | `pending` | `@branchleft/eslint-config`                           |
 | ARCH-5 | No loose functions: utilities are grouped into a module, namespace-imported in TypeScript   | `review`  | New top-level functions and their grouping module     |
 | ARCH-6 | Every outside dependency sits behind an interface and is passed in, so a test can fake it   | `review`  | Constructors and factories in the diff                |
 | ARCH-7 | No function exceeds a cognitive complexity of 15                                            | `pending` | —                                                     |
@@ -420,8 +428,8 @@ elsewhere and are **cited, never restated**:
 
 | ID    | Rule                                                                           | Gate      | Evidence                    |
 | ----- | ------------------------------------------------------------------------------ | --------- | --------------------------- |
-| NAM-1 | Whole words; an abbreviation only when it is the domain's own word             | `pending` | —                           |
-| NAM-2 | Each language's naming and casing conventions, enforced by its linter          | `pending` | —                           |
+| NAM-1 | Whole words; an abbreviation only when it is the domain's own word             | `pending` | `@branchleft/eslint-config` |
+| NAM-2 | Each language's naming and casing conventions, enforced by its linter          | `pending` | `@branchleft/eslint-config` |
 | NAM-3 | Code implementing a design pattern names it (`TenantFactory`, `RetryStrategy`) | `review`  | New class names in the diff |
 | NAM-4 | Booleans read as questions, functions as verbs, classes as nouns               | `review`  | New names in the diff       |
 | NAM-5 | A host is named `<role><n>`                                                    | `pending` | —                           |
@@ -431,8 +439,8 @@ elsewhere and are **cited, never restated**:
 
 | ID    | Rule                                                                                           | Gate      | Evidence                                            |
 | ----- | ---------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
-| TYP-1 | No `any` or `unknown` (`Any` in Python), except `unknown` parsed at once with a schema library | `pending` | —                                                   |
-| TYP-2 | Every signature states every parameter type and its return type explicitly                     | `pending` | —                                                   |
+| TYP-1 | No `any` or `unknown` (`Any` in Python), except `unknown` parsed at once with a schema library | `pending` | `@branchleft/eslint-config`                         |
+| TYP-2 | Every signature states every parameter type and its return type explicitly                     | `pending` | `@branchleft/eslint-config`                         |
 | TYP-3 | A variable whose type is not obvious carries an explicit annotation                            | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | Each value takes the most precise type that fits                                               | `review`  | New type annotations in the diff                    |
 | TYP-5 | Type checking runs at maximum strictness, with the floor raised until every repo is there      | `pending` | —                                                   |
@@ -441,9 +449,9 @@ elsewhere and are **cited, never restated**:
 
 | ID    | Rule                                                                                  | Gate      | Evidence                               |
 | ----- | ------------------------------------------------------------------------------------- | --------- | -------------------------------------- |
-| ERR-1 | Code raises its own named error classes, never a bare built-in error or a string      | `pending` | —                                      |
-| ERR-2 | A docstring lists the errors a function can raise, and a unit test covers each        | `pending` | —                                      |
-| ERR-3 | A caught error is handled deliberately or raised again, never buried                  | `pending` | —                                      |
+| ERR-1 | Code raises its own named error classes, never a bare built-in error or a string      | `pending` | `@branchleft/eslint-config`            |
+| ERR-2 | A docstring lists the errors a function can raise, and a unit test covers each        | `pending` | `@branchleft/eslint-config`            |
+| ERR-3 | A caught error is handled deliberately or raised again, never buried                  | `pending` | `@branchleft/eslint-config`            |
 | ERR-4 | A public-facing response never shows an internal error verbatim                       | `review`  | Error handling at each public boundary |
 | ERR-5 | An error reaching a service boundary is logged at error level and counted as a metric | `pending` | —                                      |
 
@@ -492,6 +500,9 @@ elsewhere and are **cited, never restated**:
 | SEC-8  | Static security analysis on every PR: CodeQL public, Opengrep private, linter rules in pre-commit | `pending` | —                                                         |
 | SEC-9  | KICS scans Dockerfiles, Compose files and workflows; hadolint lints Dockerfiles                   | `pending` | —                                                         |
 | SEC-10 | Scanners are installed by pinned version and verified checksum                                    | `pending` | —                                                         |
+| SEC-11 | Agent prompts, transcripts and memory are never published                                         | `pending` | —                                                         |
+| SEC-12 | Data is encrypted in transit on every hop, private links included, and at rest in every store     | `review`  | New network connections, stores and backups in the diff   |
+| SEC-13 | No credential or key is shared between tenants, so one tenant's compromise reaches no other       | `review`  | Credentials, keys and stores more than one tenant uses    |
 
 ## Secrets and credentials — `credentials.md`
 
@@ -598,6 +609,21 @@ elsewhere and are **cited, never restated**:
 | NFR-4 | Sustainability is measured and published, as fully as possible                          | `review` | Published figures and their measurements    |
 | NFR-5 | Everything public-facing is accessible, not only web pages                              | `review` | New public-facing output                    |
 | NFR-6 | Once a service has objectives, we hold ourselves to them and report a miss openly       | `review` | Incident entries                            |
+
+## Product — `product.md`
+
+What we build for customers, rather than how the code is written. Each is the
+platform owner's decision. `eleven-factors.md` maps these and other clauses to
+the Eleven Factors, and records where we depart from them.
+
+| ID     | Rule                                                                                             | Gate     | Evidence                                      |
+| ------ | ------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------- |
+| PROD-1 | A new site starts with reader tracking off; the publisher turns it on knowingly                  | `review` | New sites' default settings                   |
+| PROD-2 | A publisher can always leave with all their content and members; self-hosting is not a goal      | `review` | Export paths and their formats                |
+| PROD-3 | Private by default, with no dark patterns and no engagement mechanics                            | `review` | New reader-facing features and their defaults |
+| PROD-4 | Security and accessibility are in every plan, never a paid upgrade                               | `review` | Plan and pricing definitions                  |
+| PROD-5 | No generative AI in the product; automated processing that affects people is disclosed           | `review` | New automated processing and its disclosure   |
+| PROD-6 | A shared platform service sits behind a defined contract, and reads site content only if it must | `review` | Contracts between shared services and sites   |
 
 ## Pending — blocked on authorship
 
