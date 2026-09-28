@@ -32,7 +32,8 @@ comments_strip_bom() {
 # separate case — the state machine already covers them.
 comment_flags_c_style() {
   comments_strip_bom "$1" | awk '
-    function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+    # Trailing \r too, so a CRLF file'"'"'s line still ends where the content does.
+    function trim(s) { gsub(/^[ \t]+|[ \t\r]+$/, "", s); return s }
     BEGIN { inblock = 0 }
     {
       t = trim($0)
@@ -70,14 +71,46 @@ comment_flags_c_style() {
 # single-quoted awk program.
 comment_flags_hash_style() {
   local file="$1" pyish="$2" dq='"""' sq="'''"
+  # A tokenizer, not a substring search, for the reason on find_delim below:
+  # a plain sed/gsub replacement of a literal apostrophe cannot appear inside
+  # this single-quoted awk program, so the walkthrough stays in prose here
+  # rather than showing the delimiter characters themselves.
   comments_strip_bom "$file" | awk -v pyish="$pyish" -v DQ="$dq" -v SQ="$sq" '
-    function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
-    # First triple-quote delimiter in s, leftmost of DQ/SQ, or 0 with
-    # DELIM left empty. awk has no multi-value return, hence the global.
-    function find_delim(s,    dp, sp) {
-      dp = index(s, DQ); sp = index(s, SQ)
-      if (dp > 0 && (sp == 0 || dp < sp)) { DELIM = DQ; return dp }
-      if (sp > 0) { DELIM = SQ; return sp }
+    # Trailing carriage return too, so a CRLF file line still ends where the
+    # content does — otherwise a closing delimiter right at end-of-line never
+    # reads as bare.
+    function trim(s) { gsub(/^[ \t]+|[ \t\r]+$/, "", s); return s }
+    # Walks the line once rather than substring-searching it, so a delimiter
+    # sequence inside an ordinary quoted string, or after an unquoted hash,
+    # is never mistaken for a real one: an ordinary string is skipped whole
+    # (its escaped characters included) without its content ever being
+    # tested, and a hash outside any string ends the scan on the spot,
+    # nothing after it being code. Returns the delimiter position, leftmost,
+    # or 0 with DELIM left empty; awk has no multi-value return, hence the
+    # global.
+    function find_delim(s,    i, n, c, cc, q) {
+      n = length(s)
+      i = 1
+      while (i <= n) {
+        c = substr(s, i, 1)
+        if (c == "#") {
+          DELIM = ""; return 0
+        }
+        if (c == "\"" || c == "'"'"'") {
+          cc = substr(s, i, 3)
+          if (cc == DQ || cc == SQ) { DELIM = cc; return i }
+          q = c
+          i += 1
+          while (i <= n) {
+            c = substr(s, i, 1)
+            if (c == "\\") { i += 2; continue }
+            i += 1
+            if (c == q) break
+          }
+          continue
+        }
+        i += 1
+      }
       DELIM = ""; return 0
     }
     BEGIN { indoc = 0; instr = 0; docdelim = "" }
