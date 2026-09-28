@@ -87,7 +87,7 @@ clauses_all_covered() {
 # mode, ignore and inline-allow handling as any other clause.
 audit_exemptions() {
   local gates="$1" inv="$2"
-  local ln=0 line glob clauses reason p matched used status fc fl ff fline
+  local ln=0 line glob clauses reason p matched used status fc fl ff fline fmsg
 
   if [ -f "$RATCHET_IGNORE_FILE" ]; then
     while IFS= read -r line || [ -n "$line" ]; do
@@ -104,7 +104,13 @@ audit_exemptions() {
       done < "$RATCHET_TMP/all"
 
       used=0
-      while IFS=$'\t' read -r fc fl ff fline; do
+      # Five tab-separated fields (clause, level, file, line, message); read
+      # every one by name. Naming fewer than the line has folds the rest,
+      # separators included, into the last variable — harmless where only
+      # the first three are compared, corrupting the fourth wherever it is.
+      # shellcheck disable=SC2034  # fmsg is read to keep the column count in
+      # step with the findings TSV's five columns; this check never prints it
+      while IFS=$'\t' read -r fc fl ff fline fmsg; do
         [ "$fl" = "exempt" ] || continue
         ratchet_glob_matches "$glob" "$ff" || continue
         case ",$clauses," in
@@ -168,7 +174,12 @@ audit_exemptions() {
       }
 
       used=0
-      while IFS=$'\t' read -r fc fl ff fline; do
+      # Same five-field read as above. Before this, `fline` absorbed the
+      # message too (the line number field ran on into "<line>\t<message>"),
+      # so this comparison could match only when a finding's own message was
+      # empty — a live inline allow read STALE on every real finding.
+      # shellcheck disable=SC2034  # fmsg is read for the same reason as above
+      while IFS=$'\t' read -r fc fl ff fline fmsg; do
         [ "$fl" = "exempt" ] || continue
         [ "$fc" = "$aclause" ] || continue
         [ "$ff" = "$f" ] || continue
@@ -470,6 +481,38 @@ EOF
       || { echo "FAIL: quoted mention counted as a suppression"; echo "$out"; exit 1; }
     rm .github/workflows/allow.yml
     git add -A && git commit -qm drop-allow
+
+    # An inline allow that is genuinely live: the finding it names is real,
+    # on the line right after it. The exemption inventory's own findings TSV
+    # has five tab-separated fields; a read naming fewer than five folds the
+    # rest into the last one, and the line-number field ends up holding
+    # "<line>\t<message>" instead of a bare number — a comparison against a
+    # bare number then never matches, so this reads STALE even though
+    # nothing about the suppression is stale.
+    cat > .github/workflows/live-allow.yml <<EOF
+name: Live
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # ${RATCHET_ALLOW_TOKEN} CI-1 pinned upstream, reviewed
+      - uses: actions/checkout@v4
+EOF
+    git add -A && git commit -qm live-allow
+    out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
+    # [[:blank:]], not a literal \t: GNU grep's -E does not expand \t to a
+    # tab (that's a GNU-only extension of -P), so this passed only under a
+    # PCRE-flavoured grep (this repo's dev machines) and failed deterministically
+    # in CI's plain GNU grep — this exact line, every run, regardless of #126.
+    printf '%s' "$out" | grep -qE '\.github/workflows/live-allow\.yml:[0-9]+[[:blank:]]CI-1[[:blank:]]live$' \
+      || { echo "FAIL: a live inline allow read stale"; echo "$out"; exit 1; }
+    rm .github/workflows/live-allow.yml
+    git add -A && git commit -qm drop-live-allow
 
     # STD-002 is a clause like any other, so its own exemption must silence it.
     printf '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n' >  .standardsignore

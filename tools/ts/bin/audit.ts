@@ -4,7 +4,7 @@
 // bash script until every gate below has a native TypeScript equivalent.
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Audit } from '../src/audit.ts';
+import { Audit, COVERED_CLAUSES, GATE_ONLY_CLAUSES } from '../src/audit.ts';
 import { BakedConfigGate } from '../src/bakedConfigGate.ts';
 import { BashGate } from '../src/bashGate.ts';
 import { parseCliOptions } from '../src/cliOptions.ts';
@@ -79,6 +79,13 @@ function main(): void {
   // reach the same verdict on an unchanged checkout, but coupling the two
   // runs is unnecessary risk for zero new information.
   const gates = options.advisoryOnly ? [] : GATE_NAMES.map((name) => gateAt(name, false, []));
+  // The skipped gates leave STD-002 with no way to tell a live exemption from
+  // a stale one for their clauses — every finding they would have produced is
+  // simply absent — so those clauses drop out of what this run can call
+  // "covered" for staleness purposes.
+  const coveredClauses = options.advisoryOnly
+    ? new Set([...COVERED_CLAUSES].filter((clause) => !GATE_ONLY_CLAUSES.has(clause)))
+    : COVERED_CLAUSES;
   const advisoryGates = [
     ...ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, [])),
     new SchemaDriftGate(ratchet, fs, processRunner, TOOLS_ROOT),
@@ -109,7 +116,8 @@ function main(): void {
     advisoryGates,
     TOOLS_ROOT,
     '../docs/index.md',
-    'thresholds.tsv'
+    'thresholds.tsv',
+    coveredClauses
   );
   const report = audit.run(options.json);
   process.stdout.write(report.output);

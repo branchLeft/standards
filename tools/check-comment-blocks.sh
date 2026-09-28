@@ -132,6 +132,107 @@ self_test() {
       echo 'echo hi'
     } > long.sh
 
+    # A triple-quoted string opened mid-line (an f-string, here) — its own
+    # opening line does not start with the delimiter, so the classifier must
+    # track that a string is open some other way. Before the fix, the lone
+    # closing `"""` on its own line read as a fresh docstring opener with
+    # nothing left to close it, so every line to EOF was swallowed as one
+    # comment block.
+    {
+      echo 'query = f"""'
+      echo 'SELECT 1'
+      echo '"""'
+      for i in $(seq 1 12); do echo "real_code_line_$i = $i"; done
+    } > fstring-close.py
+
+    # A second, independent case: a data string assigned by name, not a
+    # docstring, whose close is likewise misread as an opener — and here it
+    # merges straight into a real class docstring that follows.
+    {
+      echo 'DUMP_WITH_RESUME_POINT = """'
+      echo 'dump line 1'
+      echo 'dump line 2'
+      echo 'dump line 3'
+      echo '"""'
+      echo ''
+      echo ''
+      echo 'class Foo:'
+      echo '    """Class Foo docstring.'
+      echo ''
+      echo '    More narrative line 1.'
+      echo '    More narrative line 2.'
+      echo '    """'
+      echo ''
+      echo '    def bar(self):'
+      echo '        return 1'
+    } > data-string-merge.py
+
+    # Bypass fixture: a UTF-8 BOM at byte zero shifts the first `#` off
+    # column zero. Before stripping it, the classifier's block undercounts by
+    # exactly the BOM-prefixed line, which can slip an 11-line block under
+    # the fail threshold and report only a warning.
+    printf '\xef\xbb\xbf' > bom-bypass.sh
+    { for i in $(seq 1 11); do echo "# narrative line $i"; done; echo 'echo hi'; } >> bom-bypass.sh
+
+    # A trailing (non-line-initial) `#` comment that happens to contain a
+    # triple-quote sequence — a style note, say. A substring search over the
+    # whole line finds that `"""` and wrongly opens an untracked string
+    # state there, which then swallows or shifts the real 11-line docstring
+    # a few lines below. The tokenizer must stop dead at the unquoted `#`.
+    {
+      echo 'x = 5  # use """ for docstrings'
+      echo 'def f():'
+      echo '    """'
+      for i in $(seq 1 9); do echo "    narrative line $i"; done
+      echo '    """'
+      echo '    return 1'
+    } > trailing-comment-triple-quote.py
+
+    # A triple-quote sequence inside an ordinary single-quoted string, ahead
+    # of a real docstring. Skipping the string's content whole, rather than
+    # substring-searching it, is what keeps this from opening early.
+    {
+      echo "x = 'contains \"\"\" not a docstring'"
+      echo 'def f():'
+      echo '    """'
+      for i in $(seq 1 9); do echo "    narrative line $i"; done
+      echo '    """'
+      echo '    return 1'
+    } > quote-in-string.py
+
+    # An escaped quote inside an ordinary string must not end it early — an
+    # early, wrong end would expose the triple-quote sequence sitting later
+    # in the same string as a real delimiter.
+    {
+      printf "x = 'it\\\\'s a \"\"\" style note'\\n"
+      echo 'def f():'
+      echo '    """'
+      for i in $(seq 1 9); do echo "    narrative line $i"; done
+      echo '    """'
+      echo '    return 1'
+    } > escaped-quote.py
+
+    # A `//` comment containing a backtick — the C-style classifier has no
+    # quote-scanning to regress, but this pins that a backtick is just
+    # content to it, same as any other character.
+    {
+      echo 'export function f() {'
+      echo "  // uses a \`backtick\` in prose, not a template literal"
+      echo '  return 1;'
+      echo '}'
+    } > backtick-in-slash-comment.ts
+
+    # CRLF line endings: the closing delimiter\r\n must still read as bare —
+    # trim() has to strip the carriage return along with ordinary whitespace,
+    # or a docstring closed at true end-of-line under CRLF never closes.
+    {
+      printf 'def f():\r\n'
+      printf '    """\r\n'
+      for i in $(seq 1 9); do printf '    narrative line %d\r\n' "$i"; done
+      printf '    """\r\n'
+      printf '    return 1\r\n'
+    } > crlf.py
+
     git add -A && git commit -qm init
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
@@ -152,6 +253,28 @@ self_test() {
       || { echo "FAIL: shell comment run wrong length or level (want 9, warning)"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"clause":"CMT-4"' \
       && { echo "FAIL: CMT-4 reported by check-comment-blocks.sh — that clause moved to TypeScript"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"fstring-close.py"' \
+      && { echo "FAIL: an f-string's own closing \"\"\" read as a docstring opener, swallowing real code"; echo "$out"; exit 1; }
+    # The real class docstring (5 lines) still warns on its own — only the
+    # merge with the preceding data string, which would report a block
+    # starting at the data string's close and running well past 5 lines, is
+    # the bug under test.
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"data-string-merge.py","line":9,"level":"warning".*is 5 lines' \
+      || { echo "FAIL: data-string-merge.py's real class docstring (5 lines, line 9) not reported on its own"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE '"clause":"CMT-3".*"file":"data-string-merge\.py".*is (6|7|8|9|1[0-9]) lines' \
+      && { echo "FAIL: a data string's closing \"\"\" merged into the following class docstring"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"bom-bypass.sh".*"level":"error".*is 11 lines' \
+      || { echo "FAIL: a BOM-prefixed first # line undercounted the block below the fail threshold"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"trailing-comment-triple-quote.py".*"level":"error".*is 11 lines' \
+      || { echo "FAIL: a trailing # comment containing \"\"\" swallowed the real docstring below it"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"quote-in-string.py".*"level":"error".*is 11 lines' \
+      || { echo "FAIL: a \"\"\" inside an ordinary quoted string opened an untracked string state"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"escaped-quote.py".*"level":"error".*is 11 lines' \
+      || { echo "FAIL: an escaped quote ended its string early, corrupting the docstring below it"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"crlf.py".*"level":"error".*is 11 lines' \
+      || { echo "FAIL: a CRLF-terminated closing delimiter did not read as bare"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"backtick-in-slash-comment.ts"' \
+      && { echo "FAIL: a backtick inside a // comment was misread as something other than content"; echo "$out"; exit 1; }
 
     # A CMT-3 error fails the build; a CMT-3 warning alone never does.
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \

@@ -4,7 +4,7 @@ import type { Gate, GateContext } from './gate.ts';
 import { FakeFileSystem } from './test-support/fakeFileSystem.ts';
 import { FakeGitClient } from './test-support/fakeGitClient.ts';
 import { Ratchet } from './ratchet.ts';
-import { Audit } from './audit.ts';
+import { Audit, COVERED_CLAUSES, GATE_ONLY_CLAUSES } from './audit.ts';
 
 const ROOT = '/repo';
 
@@ -47,6 +47,55 @@ function makeAudit(gates: readonly Gate[], advisoryGates: readonly Gate[] = []):
     'thresholds.tsv'
   );
 }
+
+describe('Audit.run — --advisory-only and STD-002 staleness', () => {
+  // Standing in for bin/audit.ts's --advisory-only: the bash gates are
+  // skipped (`gates` is empty), so an exemption for one of their clauses has
+  // no finding to prove it live — matching DB-1's skipped check-raw-sql.sh
+  // in the real run this reproduces.
+  function makeAdvisoryOnlyAudit(coveredClauses: ReadonlySet<string>): Audit {
+    const fs = new FakeFileSystem();
+    fs.set(
+      ROOT,
+      '../docs/index.md',
+      '| ID | Rule | Gate | Encoded by |\n| DB-1 | r | `auto` | `x` |\n'
+    );
+    fs.set(ROOT, 'thresholds.tsv', '');
+    fs.set(ROOT, '.standardsignore', 'a.py\tDB-1\t# tooling allowance\n');
+    const git = new FakeGitClient({
+      root: ROOT,
+      files: ['a.py', '.standardsignore'],
+      headShortSha: 'abc1234',
+    });
+    const ratchet = Ratchet.init(git, fs, ROOT, { mode: 'enforce' });
+    return new Audit(
+      ratchet,
+      git,
+      fs,
+      [],
+      [],
+      ROOT,
+      '../docs/index.md',
+      'thresholds.tsv',
+      coveredClauses
+    );
+  }
+
+  it('with the gates skipped and clauses left fully covered, falsely reports STALE', () => {
+    const report = makeAdvisoryOnlyAudit(COVERED_CLAUSES).run(false);
+    expect(report.output).toContain('STALE — 1 files, no finding to suppress');
+    expect(report.output).toMatch(/stale=1/);
+    expect(report.success).toBe(false);
+  });
+
+  it('scoped to the clauses that actually ran, reports the exemption unverified instead', () => {
+    const scoped = new Set([...COVERED_CLAUSES].filter((c) => !GATE_ONLY_CLAUSES.has(c)));
+    const report = makeAdvisoryOnlyAudit(scoped).run(false);
+    expect(report.output).toContain('unverified — DB-1 is not gated here');
+    expect(report.output).toMatch(/stale=0/);
+    expect(report.success).toBe(true);
+  });
+});
 
 describe('Audit.run — human output', () => {
   it('renders the header, findings table and both summary lines', () => {
