@@ -1,6 +1,7 @@
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
+import { isBinaryInstalled } from './localBinary.ts';
 import type { ProcessRunner } from './processRunner.ts';
 import type { Ratchet } from './ratchet.ts';
 
@@ -43,14 +44,6 @@ const CONFIG_NAMES: readonly string[] = [
   '.eslintrc.yaml',
   '.eslintrc',
 ];
-
-const ESLINT_BINARY = 'node_modules/.bin/eslint';
-
-// How far up from the repo root to look for a hoisted `eslint` binary, the
-// same direction node's own module resolution walks (`node_modules`, then the
-// parent's `node_modules`, and so on). Generous enough for any real workspace
-// nesting; cheap to check even when it finds nothing.
-const MAX_ANCESTOR_LEVELS = 6;
 
 interface EslintMessage {
   readonly ruleId?: string | null;
@@ -97,17 +90,8 @@ export class EslintGate implements Gate {
     return CONFIG_NAMES.some((name) => this.fs.exists(this.ratchet.root, name));
   }
 
-  // The way node itself would resolve `eslint`: `node_modules/.bin/eslint` at
-  // the repo root, then each ancestor's `node_modules/.bin/eslint` in turn,
-  // for a workspace that hoists it above where the audit runs.
   private isInstalled(): boolean {
-    for (let depth = 0; depth <= MAX_ANCESTOR_LEVELS; depth += 1) {
-      const path = `${'../'.repeat(depth)}${ESLINT_BINARY}`;
-      if (this.fs.exists(this.ratchet.root, path)) {
-        return true;
-      }
-    }
-    return false;
+    return isBinaryInstalled(this.fs, this.ratchet.root, 'eslint');
   }
 
   // No config: reports nothing — a repo that has not adopted ESLint is not

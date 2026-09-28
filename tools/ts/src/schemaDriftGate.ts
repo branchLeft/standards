@@ -1,9 +1,12 @@
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
+import { isBinaryInstalled } from './localBinary.ts';
 import type { ProcessRunner } from './processRunner.ts';
 import type { Ratchet } from './ratchet.ts';
 import { readThresholdSetting, splitThresholdList } from './thresholdSettings.ts';
+
+const DRIZZLE_KIT_BINARY = 'drizzle-kit';
 
 const DEFAULT_CONFIG_NAMES: readonly string[] = [
   'drizzle.config.ts',
@@ -49,18 +52,24 @@ export class SchemaDriftGate implements Gate {
     return this.configNames().find((name) => this.fs.exists(this.ratchet.root, name));
   }
 
-  // Fails closed: a non-zero exit (drizzle-kit missing, npx unreachable, a
-  // bad config) or no output at all is reported as unable to verify, never
-  // as silence — silence there would read as "no drift" and pass.
+  // Fails closed: no locally resolvable drizzle-kit, a non-zero exit, or no
+  // output at all is reported as unable to verify, never as silence —
+  // silence there would read as "no drift" and pass. A caller repo in the
+  // reusable workflow never has `node_modules`, so this must be checked
+  // before `npx` runs at all: falling through would fetch drizzle-kit from
+  // the network or stall until the job's own timeout.
   run(_context: GateContext): readonly Finding[] {
     const configFile = this.findConfigFile();
     if (configFile === undefined) {
       return [];
     }
+    if (!isBinaryInstalled(this.fs, this.ratchet.root, DRIZZLE_KIT_BINARY)) {
+      return [this.unverifiedFinding(configFile, 'drizzle-kit is not installed')];
+    }
 
     const result = this.processRunner.run(
       'npx',
-      ['drizzle-kit', 'generate', '--config', configFile],
+      ['--no-install', '--offline', 'drizzle-kit', 'generate', '--config', configFile],
       this.ratchet.root
     );
 
