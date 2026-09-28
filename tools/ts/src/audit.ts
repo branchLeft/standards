@@ -70,6 +70,37 @@ export const COVERED_CLAUSES: ReadonlySet<string> = new Set([
   'LINT-4',
 ]);
 
+/**
+ * The subset of `COVERED_CLAUSES` produced only by the bash scripts in
+ * `bin/audit.ts`'s `GATE_NAMES` — never by an advisory gate (`COV-1`'s
+ * `check-coverage.sh` runs either way) or a native TypeScript one. `--advisory-only`
+ * skips exactly these scripts, so staleness for these clauses can no longer be
+ * computed in that mode: every finding they would have produced, including the
+ * `exempt` ones an exemption is suppressing, is simply absent, not clean.
+ */
+export const GATE_ONLY_CLAUSES: ReadonlySet<string> = new Set([
+  'TS-2',
+  'TS-3',
+  'TS-4',
+  'TS-5',
+  'CI-1',
+  'CI-2',
+  'CI-3',
+  'CI-4',
+  'CI-5',
+  'CI-9',
+  'CI-10',
+  'PUL-1',
+  'PUL-2',
+  'PUL-3',
+  'PUL-4',
+  'PUL-5',
+  'PUL-12',
+  'SYNC-1',
+  'CMT-3',
+  'DB-1',
+]);
+
 export interface AuditReport {
   readonly output: string;
   /** `true` when no finding is at level `error` — mirrors the bash exit code. */
