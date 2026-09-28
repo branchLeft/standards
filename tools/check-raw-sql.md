@@ -49,11 +49,26 @@ check. Until then the shape is enough, and it needs nothing beyond `awk`.
 
 ## Declaring database tooling
 
-DB-1 covers application code. Backup, restore and migration tooling is out of
-its scope, because driving the database directly — `mysqldump`, a restore, the
-ORM's own migration runner — is that tooling's job. A repo declares which
-paths are that tooling in `.standards-db-tooling` at its root, one glob per
-line, `#` comments allowed:
+DB-1 covers application code. Four categories of database tooling are out of
+its scope, because none of them is application data access the ORM could
+express:
+
+- Backup, restore and migration tooling, because driving the database
+  directly — `mysqldump`, a restore, the ORM's own migration runner — is
+  that tooling's job.
+- Database provisioning and administration tooling — creating databases,
+  users and grants — because it operates on server-level objects, not the
+  application data the ORM models.
+- Operational checks: host-side tooling that reads an application's
+  database to decide an operational action, such as counting in-flight
+  email batches before a colour swap. That read serves an operator's
+  decision, not the application.
+- Test-harness readiness probes, such as a bare `SELECT 1` retried until a
+  database container is up. The query has no application meaning; it only
+  detects that a connection can be made.
+
+A repo declares which paths are that tooling in `.standards-db-tooling` at
+its root, one glob per line, `#` comments allowed:
 
 ```text
 ops/db-tooling/*

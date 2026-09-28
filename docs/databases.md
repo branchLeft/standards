@@ -12,11 +12,27 @@ Application code never writes raw SQL. All database access goes through the
 ORM. Migration files the ORM generates count as ORM output; a hand-written
 migration is raw SQL and falls under `DB-2`.
 
-Database tooling is out of DB-1's scope: backup, restore and migration
-tooling drives the database directly — issuing `mysqldump`, restoring a dump,
-running the ORM's own migration runner — and that is its job, not a
-violation to work around. A repo declares which paths are that tooling once,
-in `.standards-db-tooling` at its root. A path nothing has declared is still
+Database tooling is out of DB-1's scope. None of the following is
+application data access, so none of it can be expressed through the ORM:
+
+- **Backup, restore and migration tooling** drives the database directly —
+  issuing `mysqldump`, restoring a dump, running the ORM's own migration
+  runner — and that is its job, not a violation to work around.
+- **Database provisioning and administration tooling** creates databases,
+  users and grants. The ORM models application data, not the server-level
+  objects that have to exist before an application connection is possible.
+- **Operational checks** are host-side tooling that reads an application's
+  database to decide an operational action — for example, counting
+  in-flight email batches before a colour swap. The read drives an
+  operator's deploy decision, not application logic, and often has to run
+  from outside the application's own runtime.
+- **Test-harness readiness probes** wait on a database container coming up,
+  for example a bare `SELECT 1` retried until it succeeds. The query
+  carries no application meaning; it exists only to detect that a
+  connection can be made at all.
+
+A repo declares which paths are that tooling once, in
+`.standards-db-tooling` at its root. A path nothing has declared is still
 application code, and raw SQL there still fails.
 
 Three things stop this file from becoming a per-PR exemption under a new
