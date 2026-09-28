@@ -531,15 +531,15 @@ elsewhere and are **cited, never restated**:
 
 ## Databases — `databases.md`
 
-| ID   | Rule                                                                                     | Gate      | Evidence                                   |
-| ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------------ |
-| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `auto`    | `tools/check-raw-sql.sh`                   |
-| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff       |
-| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                          |
-| DB-5 | Schema changes follow expand/contract, so the previous release keeps working             | `pending` | —                                          |
-| DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                          |
-| DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                          |
+| ID   | Rule                                                                                                          | Gate      | Evidence                                   |
+| ---- | ------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------ |
+| DB-1 | Never raw SQL in application code; database tooling is out of scope, declared once in `.standards-db-tooling` | `auto`    | `tools/check-raw-sql.sh`                   |
+| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval                      | `review`  | Every `sql` template use in the diff       |
+| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver                                  | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| DB-4 | Schema changes are versioned migrations that ship and deploy with the release                                 | `pending` | —                                          |
+| DB-5 | Schema changes follow expand/contract, so the previous release keeps working                                  | `pending` | —                                          |
+| DB-6 | Each migration is purely an expand or purely a contract                                                       | `pending` | —                                          |
+| DB-7 | CI runs the previous release's tests against the new schema                                                   | `pending` | —                                          |
 
 ## Containers — `containers.md`
 
