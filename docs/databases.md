@@ -22,10 +22,15 @@ application code, and raw SQL there still fails.
 Three things stop this file from becoming a per-PR exemption under a new
 name, none of them "ordinary review": `.standards-db-tooling` is
 CODEOWNERS-owned (`REPO-5`), so a PR cannot change it without the admin team;
-the checker refuses a catch-all or a bare top-level directory wildcard and
-fails closed, so a declaration must name real, specific tooling paths; and
-the audit inventories every declared path and flags one whose glob matches
-no tracked file, the same way it flags a stale exemption (`STD-002`).
+the checker refuses a line with no literal path segment before its first
+wildcard, or with only one literal segment backing a wildcard, and fails
+closed — so a declaration cannot buy scope for a whole source tree, or for
+any tree at all, in one line (`tools/check-raw-sql.md`'s shape rule); and the
+audit inventories every declared path with its live file count and flags one
+whose glob matches no tracked file, the same way it flags a stale exemption
+(`STD-002`). A two-segment declaration such as `src/app/*` cannot be told
+apart from a real one lexically — CODEOWNERS review and the audit's file
+count are what back that shape, not the shape rule.
 
 **Why:** raw SQL in application code ties it to one database dialect, and it
 escapes the types the rest of the code relies on. Database tooling makes no

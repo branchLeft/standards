@@ -39,7 +39,9 @@ describe('auditDatabaseTooling — .standards-db-tooling rows', () => {
     fs.set(ROOT, '.standards-db-tooling', '*\n');
     const ratchet = makeRatchet(fs, ['src/app.ts']);
     const result = auditDatabaseTooling(ratchet, fs, ROOT, ['src/app.ts']);
-    expect(result.inventory[0]).toContain('REFUSED — a catch-all with no literal path segment');
+    expect(result.inventory[0]).toContain(
+      'REFUSED — a wildcard with no literal path segment before it'
+    );
     expect(result.findings).toHaveLength(0);
   });
 

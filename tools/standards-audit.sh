@@ -491,7 +491,7 @@ EOF
       || { echo "FAIL: a live tooling declaration not inventoried"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep 'no-such-dir/nested' | grep -q STALE \
       || { echo "FAIL: a stale tooling declaration not flagged"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'REFUSED — a catch-all' \
+    printf '%s' "$out" | grep -q 'REFUSED — a wildcard with no literal' \
       || { echo "FAIL: a refused tooling declaration not inventoried"; echo "$out"; exit 1; }
 
     out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)

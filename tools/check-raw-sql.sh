@@ -251,8 +251,7 @@ EOF
     printf '%s' "$out" | grep -q '"file":"ops/db-tooling/backup.ts".*"level":"exempt"' \
       && { echo "FAIL: declared tooling reported as an exemption rather than out of scope"; echo "$out"; exit 1; }
 
-    # The reviewer's own repro (round 1, DO-NOT-MERGE): a catch-all line must
-    # not turn the file into a per-PR exemption under a new name.
+    # A catch-all line must not turn the file into a per-PR exemption.
     mkdir -p src
     cat > src/app.ts <<'EOF'
 const rows = db.prepare('SELECT * FROM users WHERE id = ?').all(id);
@@ -261,7 +260,7 @@ EOF
     git add -A && git commit -qm catch-all
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     expect src/app.ts 1 "a bare '*' line let raw SQL in application code pass"
-    printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling","line":1,"level":"error".*catch-all' \
+    printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling","line":1,"level":"error".*no literal' \
       || { echo "FAIL: the refused '*' line was not reported on .standards-db-tooling"; echo "$out"; exit 1; }
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
       && { echo "FAIL: a catch-all declaration did not fail the build"; exit 1; }
@@ -280,6 +279,12 @@ EOF
     refused_shape '**/*'
     refused_shape 'src/*'
     refused_shape 'src/**'
+    refused_shape '*.ts'
+    refused_shape '**/*.ts'
+    refused_shape '?*'
+    refused_shape '[a-z]*'
+    refused_shape 'src*'
+    refused_shape '*/app/*'
 
     # Comments and blank lines in the declaration file are not path globs.
     printf '# a comment\n\nops/db-tooling/*\n' > .standards-db-tooling

@@ -77,27 +77,44 @@ Three separate, mechanical things stop it:
   (`../docs/repo-settings.md#repo-5--codeowners-covers-the-escape-hatches`),
   synced fleet-wide by `SYNC-1`. Changing it needs the admin team, the same as
   `.standardsignore`.
-- **The shape rule, below.** A catch-all or a bare top-level directory
-  wildcard is refused, so a declaration has to name real, specific tooling —
-  it cannot buy scope for an entire source tree in one line.
+- **The shape rule, below.** A wildcard with no literal segment before it, or
+  with only one literal segment backing it, is refused — a declaration
+  cannot buy scope for a whole source tree, or for any tree at all, in one
+  line. A two-literal-segment line is a separate case: the shape rule cannot
+  tell it apart from a real declaration, so ownership and the audit back it
+  instead.
 - **The audit.** `standards-audit.sh` inventories every declared path, the
   same way it inventories exemptions, and flags one whose glob matches no
   tracked file (`STD-002`).
 
 ### The shape rule
 
+A `/`-separated segment is a **wildcard segment** if it contains `*`, `?` or
+`[` anywhere in it — not only a bare `*`. `*` already crosses `/`, so `src*`
+and `*.ts` are exactly as broad as a bare `*`, not a literal prefix with a
+narrow suffix; a segment is judged as a whole, never partly literal.
+
 A line is refused, and reported as a DB-1 finding on `.standards-db-tooling`
 itself, if it grants no legitimate declaration:
 
-- **A catch-all with no literal path segment** — every `/`-separated segment
-  is a bare `*` once `**` is collapsed to `*` (they are the same wildcard
-  here; `*` already crosses `/`). Refused: `*`, `**`, `**/*`, `*/*`.
+- **A wildcard with no literal segment before it.** Refused: `*`, `**`,
+  `**/*`, `*.ts`, `**/*.ts`, `?*`, `[a-z]*`, `src*`, `*/app/*`, `**/db/**`.
 - **A bare top-level directory wildcard, covering a whole source root** —
-  exactly one literal segment followed by one wildcard segment. Refused:
-  `src/*`, `src/**`.
+  exactly one literal segment in the whole line, with a wildcard segment
+  after it. Refused: `src/*`, `src/**`, `src/*/*` (one literal segment,
+  "src", however many wildcard segments follow it).
+- **An empty, `.` or `..` segment** — a leading, trailing or doubled `/`, or
+  a `.`/`..` component anywhere in the line. Refused: `/**`, `./**`,
+  `src/../**`.
 
-A path with two or more literal segments (`ops/db-tooling/*`), or none at all
-— an exact filename (`ops/db-tooling/backup.ts`) — is unaffected: that is the
-shape a real per-file or per-subdirectory declaration takes. A refused line
-grants no scope; the file or path it would have covered is still scanned as
-ordinary application code.
+A line with **two or more literal segments** before its scope narrows to
+wildcards — `ops/db-tooling/*`, `src/app/*`, `src/lib/**` — is accepted, and
+so is a path with no wildcard at all, an exact filename
+(`ops/db-tooling/backup.ts`). A lexical rule cannot tell `src/app/*` apart
+from a real, deliberate declaration two segments deep; ownership and the
+audit's file count are what back that shape, not the shape rule itself (see
+above). A refused line grants no scope either way: the file or path it would
+have covered is still scanned as ordinary application code.
+
+Full case table, read by both the bash and TypeScript self-tests so the two
+implementations cannot silently drift apart: `check-raw-sql.fixtures.tsv`.

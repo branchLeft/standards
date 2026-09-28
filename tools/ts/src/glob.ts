@@ -19,6 +19,8 @@ export function collapse(glob: string): string {
   return glob.replace(/\*\*/g, '*');
 }
 
+const WILDCARD_CHARS = /[*?[]/;
+
 /**
  * A DB-1 scope-declaration line (`.standards-db-tooling`) that grants no
  * legitimate declaration. Returns the reason if `glob` must be refused, or
@@ -26,12 +28,36 @@ export function collapse(glob: string): string {
  * `ratchet_db_tooling_refused_reason`: tools/lib/ratchet.sh, check-raw-sql.md.
  */
 export function databaseToolingRefusedReason(glob: string): string | undefined {
-  const segments = collapse(glob).split('/');
-  const literal = segments.some((segment) => segment !== '*');
-  if (!literal) {
-    return 'a catch-all with no literal path segment';
+  const collapsed = collapse(glob);
+  if (collapsed.endsWith('/')) {
+    return 'an empty path segment';
   }
-  if (segments.length === 2 && segments[1] === '*' && segments[0] !== '') {
+  const segments = collapsed.split('/');
+
+  let literalBefore = 0;
+  let literalTotal = 0;
+  let wildcardSeen = false;
+  for (const segment of segments) {
+    if (segment === '') {
+      return 'an empty path segment';
+    }
+    if (segment === '.' || segment === '..') {
+      return "a '.' or '..' path segment";
+    }
+    if (WILDCARD_CHARS.test(segment)) {
+      wildcardSeen = true;
+    } else {
+      literalTotal += 1;
+      if (!wildcardSeen) {
+        literalBefore += 1;
+      }
+    }
+  }
+
+  if (literalBefore === 0) {
+    return 'a wildcard with no literal path segment before it';
+  }
+  if (wildcardSeen && literalTotal === 1) {
     return 'a bare top-level directory wildcard, which covers a whole source root';
   }
   return undefined;
