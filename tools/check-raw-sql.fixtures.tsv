@@ -1,0 +1,29 @@
+# .standards-db-tooling line shapes, read by both check-raw-sql.sh's bash
+# self-test and glob.test.ts, so the two refusal implementations cannot
+# silently drift apart. Columns: glob<TAB>verdict<TAB>reason-substring.
+# verdict is "refused" or "accepted"; reason-substring is checked only for a
+# refused line, and is a substring of ratchet_db_tooling_refused_reason's
+# (Glob.databaseToolingRefusedReason's) return value. Rule and examples:
+# tools/check-raw-sql.md.
+*	refused	no literal path segment before it
+**	refused	no literal path segment before it
+**/*	refused	no literal path segment before it
+*/*	refused	no literal path segment before it
+*.ts	refused	no literal path segment before it
+**/*.ts	refused	no literal path segment before it
+?*	refused	no literal path segment before it
+[a-z]*	refused	no literal path segment before it
+src*	refused	no literal path segment before it
+*/app/*	refused	no literal path segment before it
+**/db/**	refused	no literal path segment before it
+src/*	refused	whole source root
+src/**	refused	whole source root
+src/*/*	refused	whole source root
+/**	refused	empty path segment
+./**	refused	'.' or '..' path segment
+src/../**	refused	'.' or '..' path segment
+ops/db-tooling/*	accepted
+ops/db-tooling/backup.ts	accepted
+backup.ts	accepted
+src/app/*	accepted
+src/lib/**	accepted

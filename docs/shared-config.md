@@ -68,7 +68,8 @@ commit nobody reviewed, which is the same class of problem as an unpinned
 action.
 
 `CODEOWNERS` shares the escape hatches `REPO-5` names: `.standardsignore`,
-`.standards.mode`, `.docs-lint*`, `tools/floors.tsv` and `.github/`. There is no
+`.standards.mode`, `.docs-lint*`, `tools/floors.tsv`, `.standards-db-tooling`
+and `.github/`. There is no
 catch-all. Owning the whole tree made code-owner review a review of every PR by
 the owner, which an agent reviewer can never satisfy, since GitHub doesn't let
 an App be a code owner. Owning the hatches keeps what matters: an exemption stays

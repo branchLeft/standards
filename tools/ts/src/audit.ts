@@ -6,6 +6,7 @@ import type { GitClient } from './gitClient.ts';
 import type { Gate, GateContext } from './gate.ts';
 import type { Ratchet } from './ratchet.ts';
 import { auditExemptions } from './exemptionInventory.ts';
+import { auditDatabaseTooling } from './databaseToolingInventory.ts';
 import { findNativeSuppressions } from './nativeSuppressions.ts';
 import { renderFindingsTable, renderTopFiles } from './renderers.ts';
 import { readClauseCoverage } from './clauseCoverage.ts';
@@ -170,7 +171,11 @@ export class Audit {
     this.coveredClauses = coveredClauses;
   }
 
-  private collectFindings(): { all: readonly Finding[]; exemptionRows: readonly string[] } {
+  private collectFindings(): {
+    all: readonly Finding[];
+    exemptionRows: readonly string[];
+    databaseToolingRows: readonly string[];
+  } {
     const context: GateContext = { root: this.ratchet.root, mode: this.ratchet.mode };
     const gateFindings = [...this.gates, ...this.advisoryGates].flatMap((gate) =>
       gate.run(context)
@@ -184,7 +189,17 @@ export class Audit {
       gateFindings,
       isCovered
     );
-    return { all: [...gateFindings, ...exemption.findings], exemptionRows: exemption.inventory };
+    const databaseTooling = auditDatabaseTooling(
+      this.ratchet,
+      this.fs,
+      this.ratchet.root,
+      this.ratchet.trackedFiles
+    );
+    return {
+      all: [...gateFindings, ...exemption.findings, ...databaseTooling.findings],
+      exemptionRows: exemption.inventory,
+      databaseToolingRows: databaseTooling.inventory,
+    };
   }
 
   private renderJson(findings: readonly Finding[], coverage: ClauseCoverage): string {
@@ -199,6 +214,7 @@ export class Audit {
   private renderHuman(
     findings: readonly Finding[],
     exemptionRows: readonly string[],
+    databaseToolingRows: readonly string[],
     nativeRows: readonly string[],
     totals: Totals,
     coverage: ClauseCoverage
@@ -211,6 +227,8 @@ export class Audit {
       renderTopFiles(findings),
       '\nexemptions\n',
       renderExemptionSection(exemptionRows),
+      '\ndatabase tooling\n',
+      renderExemptionSection(databaseToolingRows),
       '\nnative suppressions\n',
       renderExemptionSection(nativeRows),
       '\n',
@@ -221,7 +239,7 @@ export class Audit {
   }
 
   run(json: boolean): AuditReport {
-    const { all: findings, exemptionRows } = this.collectFindings();
+    const { all: findings, exemptionRows, databaseToolingRows } = this.collectFindings();
     const nativeRows = findNativeSuppressions(
       this.fs,
       this.ratchet.root,
@@ -237,7 +255,14 @@ export class Audit {
 
     const output = json
       ? this.renderJson(findings, coverage)
-      : this.renderHuman(findings, exemptionRows, nativeRows, totals, coverage);
+      : this.renderHuman(
+          findings,
+          exemptionRows,
+          databaseToolingRows,
+          nativeRows,
+          totals,
+          coverage
+        );
 
     return { output, success: totals.failures === 0 };
   }

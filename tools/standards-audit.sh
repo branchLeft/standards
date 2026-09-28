@@ -196,6 +196,41 @@ audit_exemptions() {
   done < <(grep_tracked "$RATCHET_ALLOW_TOKEN")
 }
 
+# DB-1's tooling-scope declarations, inventoried the same shape as
+# audit_exemptions: STD-002 flags a declaration whose glob matches no tracked
+# file. A refused line (tools/lib/ratchet.sh) is listed too, for visibility,
+# but raises no finding here — check-raw-sql.sh already reported it, run as
+# one of GATES above, and a second copy would double-count it.
+audit_db_tooling() {
+  local inv="$1" db_tooling_file=".standards-db-tooling"
+  [ -f "$db_tooling_file" ] || return 0
+
+  local ln=0 line reason matched p
+  while IFS= read -r line || [ -n "$line" ]; do
+    ln=$((ln + 1))
+    case "$line" in ''|\#*) continue ;; esac
+
+    if reason=$(ratchet_db_tooling_refused_reason "$line"); then
+      printf '    %s:%s\t%s\tREFUSED — %s\n' "$db_tooling_file" "$ln" "$line" "$reason" >> "$inv"
+      continue
+    fi
+
+    matched=0
+    while IFS= read -r p; do
+      ratchet_glob_matches "$line" "$p" && matched=$((matched + 1))
+    done < "$RATCHET_TMP/all"
+
+    if [ "$matched" -eq 0 ]; then
+      printf '    %s:%s\t%s\tSTALE — matches no tracked file\n' "$db_tooling_file" "$ln" "$line" >> "$inv"
+      ratchet_finding "STD-002" "$db_tooling_file" "$ln" \
+        "declared tooling path '$line' matches no tracked file — the path it covered is gone"
+    else
+      printf '    %s:%s\t%s\tlive — declaring %d file(s) out of DB-1'"'"'s scope\n' \
+        "$db_tooling_file" "$ln" "$line" "$matched" >> "$inv"
+    fi
+  done < "$db_tooling_file"
+}
+
 # One batched grep, not one per tracked file. A fork per file costs minutes on a
 # repo the size of the website, which is long enough that people stop running it.
 grep_tracked() {
@@ -276,7 +311,8 @@ main() {
   local tsv="$RATCHET_TMP/findings.tsv"
   local inv="$RATCHET_TMP/inventory"
   local nat="$RATCHET_TMP/native"
-  : > "$raw"; : > "$inv"; : > "$nat"
+  local tooling_inv="$RATCHET_TMP/tooling_inventory"
+  : > "$raw"; : > "$inv"; : > "$nat"; : > "$tooling_inv"
 
   local g
   for g in "${GATES[@]}"; do
@@ -291,6 +327,7 @@ main() {
 
   # Appended after the gates so the staleness test sees a complete finding set.
   audit_exemptions "$tsv" "$inv" >> "$raw"
+  audit_db_tooling "$tooling_inv" >> "$raw"
   native_suppressions "$nat"
   json_to_tsv < "$raw" > "$tsv"
 
@@ -306,6 +343,8 @@ main() {
     [ -s "$tsv" ] && render_files "$tsv" | grep . || printf '  none\n'
     printf '\nexemptions\n'
     if [ -s "$inv" ]; then sort "$inv"; else printf '    none\n'; fi
+    printf '\ndatabase tooling\n'
+    if [ -s "$tooling_inv" ]; then sort "$tooling_inv"; else printf '    none\n'; fi
     printf '\nnative suppressions\n'
     if [ -s "$nat" ]; then sort "$nat"; else printf '    none\n'; fi
     printf '\n'
@@ -475,6 +514,31 @@ EOF
     git add -A && git commit -qm exempt-std002
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: STD-002 not suppressible by its own exemption"; exit 1; }
+
+    # DB-1's tooling-scope declarations: a live one, a stale one (matches no
+    # tracked file, STD-002-style), and a refused catch-all — inventoried the
+    # same way exemptions are, not double-reported for the refused line.
+    mkdir -p ops/db-tooling
+    printf 'export const backupPath = 1;\n' > ops/db-tooling/backup.ts
+    printf 'ops/db-tooling/backup.ts\nno-such-dir/nested/*\n*\n' > .standards-db-tooling
+    git add -A && git commit -qm db-tooling-fixture
+
+    out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q "ops/db-tooling/backup.ts.*live — declaring 1 file" \
+      || { echo "FAIL: a live tooling declaration not inventoried"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep 'no-such-dir/nested' | grep -q STALE \
+      || { echo "FAIL: a stale tooling declaration not flagged"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'REFUSED — a wildcard with no literal' \
+      || { echo "FAIL: a refused tooling declaration not inventoried"; echo "$out"; exit 1; }
+
+    out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)
+    [ "$(printf '%s' "$out" | grep -c '"clause":"DB-1".*standards-db-tooling')" -eq 1 ] \
+      || { echo "FAIL: the refused declaration was reported more than once"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"STD-002".*"file":"\.standards-db-tooling"' \
+      || { echo "FAIL: the stale tooling declaration did not raise STD-002"; echo "$out"; exit 1; }
+
+    rm -rf ops .standards-db-tooling
+    git add -A && git commit -qm drop-db-tooling-fixture
 
     # A CMT-3 finding in the warn band (5 to 10 lines) shows up here at level
     # warning — a real GATES member, but this particular fixture never fails
