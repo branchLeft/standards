@@ -260,4 +260,24 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
 
     assertParity(repo.root);
   }, 120000);
+
+  it('renders the database tooling section — live, stale and refused rows', () => {
+    repo = ScratchRepo.create();
+    repo.write('ops/db-tooling/backup.ts', 'export const backupPath = 1;\n');
+    repo.write('.standards-db-tooling', 'ops/db-tooling/backup.ts\nno-such-dir/nested/*\n*\n');
+    repo.commit('init');
+
+    const human = buildTsAudit(repo.root).run(false);
+    expect(human.output).toContain("live — declaring 1 file(s) out of DB-1's scope");
+    expect(human.output).toContain('STALE — matches no tracked file');
+    expect(human.output).toContain('REFUSED — a wildcard with no literal path segment before it');
+
+    const json = buildTsAudit(repo.root).run(true);
+    expect(json.output).toContain('"clause":"STD-002"');
+    expect(
+      json.output.split('\n').filter((line) => line.includes('.standards-db-tooling')).length
+    ).toBe(2);
+
+    assertParity(repo.root);
+  }, 120000);
 });

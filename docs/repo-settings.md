@@ -70,8 +70,9 @@ endpoint 403s, and constraint 1 applies.
 ## REPO-5 — CODEOWNERS covers the escape hatches
 
 `CODEOWNERS` must cover `.standardsignore`, `.standards.mode`, `.docs-lint*`,
-`tools/floors.tsv` and `.github/`. An exemption is a review decision; if the
-files that grant exemptions are not owned, a PR can widen one quietly.
+`tools/floors.tsv`, `.standards-db-tooling` and `.github/`. An exemption or a
+scope declaration is a review decision; if the files that grant one are not
+owned, a PR can widen one quietly.
 
 ## REPO-6 — every repo's payload is committed and audited
 
