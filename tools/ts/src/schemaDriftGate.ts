@@ -1,3 +1,4 @@
+import { basename, dirname, join } from 'node:path';
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
@@ -48,8 +49,20 @@ export class SchemaDriftGate implements Gate {
     return raw === undefined ? DEFAULT_CONFIG_NAMES : splitThresholdList(raw);
   }
 
-  private findConfigFile(): string | undefined {
-    return this.configNames().find((name) => this.fs.exists(this.ratchet.root, name));
+  // Tracked, not merely present on disk — a config nobody committed can't
+  // widen what gets checked — and matched by basename so a nested
+  // `services/x/drizzle.config.ts` is found the same way a root one is. A
+  // monorepo may commit one config per service, each with its own
+  // `node_modules` and migrations folder, not only one at the repo root.
+  private findConfigFiles(): readonly string[] {
+    const names = new Set(this.configNames());
+    return this.ratchet.trackedFiles
+      .filter((file) => names.has(basename(file)) && this.fs.exists(this.ratchet.root, file))
+      .sort();
+  }
+
+  run(_context: GateContext): readonly Finding[] {
+    return this.findConfigFiles().flatMap((configFile) => this.checkConfig(configFile));
   }
 
   // Fails closed: no locally resolvable drizzle-kit, a non-zero exit, or no
@@ -58,19 +71,19 @@ export class SchemaDriftGate implements Gate {
   // reusable workflow never has `node_modules`, so this must be checked
   // before `npx` runs at all: falling through would fetch drizzle-kit from
   // the network or stall until the job's own timeout.
-  run(_context: GateContext): readonly Finding[] {
-    const configFile = this.findConfigFile();
-    if (configFile === undefined) {
-      return [];
-    }
-    if (!isBinaryInstalled(this.fs, this.ratchet.root, DRIZZLE_KIT_BINARY)) {
+  private checkConfig(configFile: string): readonly Finding[] {
+    // The config's own directory — its `package.json`'s worth of
+    // `node_modules`, whether hoisted to the repo root or local to it — not
+    // the repo root, which may be a different package entirely.
+    const packageDirectory = join(this.ratchet.root, dirname(configFile));
+    if (!isBinaryInstalled(this.fs, packageDirectory, DRIZZLE_KIT_BINARY)) {
       return [this.unverifiedFinding(configFile, 'drizzle-kit is not installed')];
     }
 
     const result = this.processRunner.run(
       'npx',
-      ['--no-install', '--offline', 'drizzle-kit', 'generate', '--config', configFile],
-      this.ratchet.root
+      ['--no-install', '--offline', 'drizzle-kit', 'generate', '--config', basename(configFile)],
+      packageDirectory
     );
 
     if (result.status !== 0) {
