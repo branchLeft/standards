@@ -8,14 +8,19 @@ import { Audit } from '../src/audit.ts';
 import { BakedConfigGate } from '../src/bakedConfigGate.ts';
 import { BashGate } from '../src/bashGate.ts';
 import { CommentRatioGate } from '../src/commentRatioGate.ts';
+import { CommitSigningGate } from '../src/commitSigningGate.ts';
 import { ComposeNetworkGate } from '../src/composeNetworkGate.ts';
 import { ComposeResourceGate } from '../src/composeResourceGate.ts';
 import { ComposeRuntimeGate } from '../src/composeRuntimeGate.ts';
+import { DependabotEcosystemGate } from '../src/dependabotEcosystemGate.ts';
+import { DeployEnvironmentGate } from '../src/deployEnvironmentGate.ts';
+import { DeployRolloutGate } from '../src/deployRolloutGate.ts';
 import { DockerImageGate } from '../src/dockerImageGate.ts';
 import { EslintGate } from '../src/eslintGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { HealthcheckGate } from '../src/healthcheckGate.ts';
+import { LintCoverageGate } from '../src/lintCoverageGate.ts';
 import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
 import { PythonConfigGate } from '../src/pythonConfigGate.ts';
@@ -101,6 +106,11 @@ function main(): void {
     new CommentRatioGate(ratchet, fs, TOOLS_ROOT),
     new WorkItemReferenceGate(ratchet, fs, TOOLS_ROOT),
     new EslintGate(ratchet, fs, processRunner),
+    new DeployEnvironmentGate(ratchet, fs, TOOLS_ROOT),
+    new DeployRolloutGate(ratchet, fs, TOOLS_ROOT),
+    new DependabotEcosystemGate(ratchet, fs, TOOLS_ROOT),
+    new CommitSigningGate(ratchet, fs, TOOLS_ROOT),
+    new LintCoverageGate(ratchet, fs, TOOLS_ROOT),
     new DockerImageGate(ratchet, fs, TOOLS_ROOT),
     new ComposeRuntimeGate(ratchet, fs),
     new ComposeNetworkGate(ratchet, fs, TOOLS_ROOT),
