@@ -493,6 +493,8 @@ EOF
 name: Live
 on:
   pull_request:
+  push:
+    branches: [main]
 jobs:
   a:
     runs-on: ubuntu-latest
@@ -503,7 +505,11 @@ jobs:
 EOF
     git add -A && git commit -qm live-allow
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -qE '\.github/workflows/live-allow\.yml:[0-9]+\tCI-1\tlive$' \
+    # [[:blank:]], not a literal \t: GNU grep's -E does not expand \t to a
+    # tab (that's a GNU-only extension of -P), so this passed only under a
+    # PCRE-flavoured grep (this repo's dev machines) and failed deterministically
+    # in CI's plain GNU grep — this exact line, every run, regardless of #126.
+    printf '%s' "$out" | grep -qE '\.github/workflows/live-allow\.yml:[0-9]+[[:blank:]]CI-1[[:blank:]]live$' \
       || { echo "FAIL: a live inline allow read stale"; echo "$out"; exit 1; }
     rm .github/workflows/live-allow.yml
     git add -A && git commit -qm drop-live-allow
