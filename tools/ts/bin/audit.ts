@@ -5,17 +5,24 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Audit } from '../src/audit.ts';
+import { BakedConfigGate } from '../src/bakedConfigGate.ts';
 import { BashGate } from '../src/bashGate.ts';
 import { CommentRatioGate } from '../src/commentRatioGate.ts';
+import { ComposeNetworkGate } from '../src/composeNetworkGate.ts';
+import { ComposeResourceGate } from '../src/composeResourceGate.ts';
+import { ComposeRuntimeGate } from '../src/composeRuntimeGate.ts';
+import { DockerImageGate } from '../src/dockerImageGate.ts';
 import { EslintGate } from '../src/eslintGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
+import { HealthcheckGate } from '../src/healthcheckGate.ts';
 import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
 import { PythonConfigGate } from '../src/pythonConfigGate.ts';
 import { Ratchet } from '../src/ratchet.ts';
 import { RatchetInitError } from '../src/ratchetInitError.ts';
 import { SchemaDriftGate } from '../src/schemaDriftGate.ts';
+import { SecretsFileGate } from '../src/secretsFileGate.ts';
 import { WorkItemReferenceGate } from '../src/workItemReferenceGate.ts';
 import type { RatchetMode } from '../src/ratchet.ts';
 
@@ -94,6 +101,13 @@ function main(): void {
     new CommentRatioGate(ratchet, fs, TOOLS_ROOT),
     new WorkItemReferenceGate(ratchet, fs, TOOLS_ROOT),
     new EslintGate(ratchet, fs, processRunner),
+    new DockerImageGate(ratchet, fs, TOOLS_ROOT),
+    new ComposeRuntimeGate(ratchet, fs),
+    new ComposeNetworkGate(ratchet, fs, TOOLS_ROOT),
+    new ComposeResourceGate(ratchet, fs),
+    new HealthcheckGate(ratchet, fs),
+    new SecretsFileGate(ratchet, fs),
+    new BakedConfigGate(ratchet, fs),
   ];
 
   const audit = new Audit(
