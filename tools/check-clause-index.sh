@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Drift test between docs/index.md and everything it claims — seven
+# Drift test between docs/index.md and everything it claims — eight
 # assertions, increasingly strict. Full list: check-clause-index.md.
 # Usage: check-clause-index.sh [DOCS_DIR] | --self-test
 
@@ -89,6 +89,40 @@ clause_paths_ids() {
   local paths="$1"
   [ -f "$paths" ] || return 0
   awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print $1 }' "$paths"
+}
+
+# clause<TAB>globs<TAB>scope row's own scope column for ID, or nothing if ID
+# has no row — same shape as clause_paths_ids(), one row instead of the whole
+# file.
+clause_paths_scope() {
+  local id="$1" file="$2"
+  [ -f "$file" ] || return 0
+  awk -F'\t' -v id="$id" \
+    '/^[ \t]*#/ || NF < 3 { next } $1 == id { print $3; found = 1 } END { exit !found }' "$file"
+}
+
+# Three shapes the derivation just below cannot see on its own — a shell
+# variable, not a literal string (TS-1..3); ratchet_finding bypassed entirely
+# (PUL-12); no ratchet_scope_files call at all, an unfiltered scan instead
+# (STD-000, STD-002). Hand-maintained for the same reason standards-audit.sh's
+# own COVERED list is: check-clause-index.md.
+GATE_SCOPE_OVERRIDE="TS-1 TS-2 TS-3 PUL-12 STD-000 STD-002"
+
+# Every clause a real tools/*.sh gate scopes to specific files with
+# ratchet_scope_files, plus GATE_SCOPE_OVERRIDE above. What assertion 8 below
+# checks tools/clause-paths.tsv against: check-clause-index.md.
+gate_scoped_clauses() {
+  local root="$1" f
+  for f in "$root"/tools/*.sh; do
+    [ -f "$f" ] || continue
+    grep -q 'ratchet_scope_files' "$f" || continue
+    grep -oE 'ratchet_finding(_warn)?[[:space:]]+"[A-Z]{2,5}-[0-9]{1,3}"' "$f" \
+      | grep -oE '[A-Z]{2,5}-[0-9]{1,3}'
+  done
+  # Deliberately unquoted: GATE_SCOPE_OVERRIDE is a space-separated list of
+  # bare words, and this is the one place that splits it back into IDs.
+  # shellcheck disable=SC2086
+  printf '%s\n' $GATE_SCOPE_OVERRIDE
 }
 
 # True if PKG has a row in tools/package-consumers.tsv — the committed record
@@ -274,6 +308,29 @@ check_index() {
   else
     echo "::error::no clause-paths file at $clause_paths"
     rc=1
+  fi
+
+  # Assertion 8: a clause a real tools/*.sh gate scopes to specific files —
+  # gate_scoped_clauses() above — must carry the `[gate]` tag in
+  # clause-paths.tsv, not `[fleet]`, `[doc]` or `[none]`. Those three read as
+  # "nobody has grounded this in the gate yet", which stops being true the
+  # moment a script does. Skipped for an id with no clause-paths.tsv row at
+  # all — that gap is assertion 7's error, not this one's, and reporting it
+  # twice would just be noise.
+  if [ -f "$clause_paths" ]; then
+    local scoped_id scope
+    while IFS= read -r scoped_id; do
+      [ -n "$scoped_id" ] || continue
+      printf '%s\n' "$mapped" | grep -qx "$scoped_id" || continue
+      scope=$(clause_paths_scope "$scoped_id" "$clause_paths")
+      case "$scope" in
+        '[gate]'*) ;;
+        *)
+          echo "::error::$scoped_id is reported by a tools/*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged \`[gate]\`"
+          rc=1
+          ;;
+      esac
+    done < <(gate_scoped_clauses "$ROOT" | sort -u)
   fi
 
   if [ "$rc" -eq 0 ]; then
@@ -746,6 +803,33 @@ EOF
     [ "$grc" -eq 1 ] || { echo "FAIL: missing clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "no clause-paths file at" \
       || { echo "FAIL: missing clause-paths.tsv not reported"; echo "$out"; exit 1; }
+
+    # --- clause-paths.tsv: assertion 8 ----------------------------------
+    # A gate that scopes its files with ratchet_scope_files and reports AA-1
+    # literally — the shape gate_scoped_clauses() is built to find on its
+    # own, no override needed. A stale, unrelated tag must be caught.
+    printf 'ratchet_scope_files\nratchet_finding "AA-1"\n' > tools/gate.sh
+    printf 'AA-1\t*\t[fleet] a guess, not read from the gate\n' > tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: unscoped-looking tag on a real scoped gate exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "AA-1 is reported by a tools/\*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged .\[gate\]." \
+      || { echo "FAIL: stale non-gate tag on a scoped gate not reported"; echo "$out"; exit 1; }
+
+    # The fix: tag it [gate], nothing else about the fixture changes.
+    printf 'AA-1\t*\t[gate] gate.sh: ratchet_scope_files\n' > tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: [gate]-tagged scoped clause still exited $grc"; echo "$out"; exit 1; }
+
+    # The control case: a gate that reports AA-1 but never calls
+    # ratchet_scope_files must not be required to carry [gate] — the same
+    # fixture's non-gate tag from the very first honest-index case above
+    # passed for exactly this reason, proven again here so this assertion
+    # can't quietly start flagging every gate regardless of scope.
+    printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
+    printf 'AA-1\t*\t[fleet] not scoped by this gate\n' > tools/clause-paths.tsv
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: unscoped gate wrongly required a [gate] tag, exited $grc"; echo "$out"; exit 1; }
+    printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     SYNC_PATHS=1
 
     exit 0

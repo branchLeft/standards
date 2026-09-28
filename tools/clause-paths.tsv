@@ -39,9 +39,9 @@ PRIN-5	*	[none] a repo-scope decision — not tied to any file in a diff
 PRIN-6	*	[none] an agent-authorisation decision — not tied to any file in a diff
 
 ## Meta — index.md "Meta"
-STD-000	*	[doc] a `standards-allow-next-line` suppression can be the preceding line of any tracked file
+STD-000	*	[gate] standards-audit.sh audit_exemptions(): a malformed `standards-allow-next-line` token, found via an unfiltered grep_tracked over every git-tracked file — no ratchet_scope_files pattern, so scope is genuinely every tracked file
 STD-001	.standardsignore	[doc] exemptions are rows in this file only
-STD-002	.standardsignore	[doc] staleness is computed over this file's rows
+STD-002	*	[gate] standards-audit.sh audit_exemptions(): stale .standardsignore rows, plus an inline `standards-allow-next-line` whose next line no longer offends, found via an unfiltered grep_tracked over every git-tracked file — no ratchet_scope_files pattern, so this is not restricted to .standardsignore itself
 STD-003	*	[none] a statement of scope, not tied to any file
 STD-004	*	[none] a rule about rules, not tied to any file
 
@@ -67,7 +67,7 @@ SYNC-1	.editorconfig;.nvmrc;.github/CODEOWNERS;.pre-commit-config.yaml	[doc] exa
 ## Code comments — code-comments.md
 CMT-1	*	[none] "a comment" — the doc names no language or extension
 CMT-2	*	[none] same as CMT-1
-CMT-3	*	[none] same as CMT-1
+CMT-3	*.ts;*.tsx;*.js;*.mjs;*.cjs;*.py;*.sh	[gate] check-comment-blocks.sh: ratchet_scope_files '\.(ts|tsx|js|mjs|cjs|py|sh)$'
 CMT-4	*	[none] same as CMT-1
 CMT-5	*	[none] same as CMT-1
 
@@ -292,7 +292,7 @@ CFG-3	*.ts;*.py;Pulumi.*.yaml;*/Pulumi.*.yaml	[fleet] stack configuration and sc
 CFG-4	*.ts;*.tsx;*.py	[fleet] feature-flag code in service source
 
 ## Databases — databases.md
-DB-1	*.ts;*.tsx;*.mts;*.cts;*.js;*.jsx;*.mjs;*.cjs;*.py;*.sql	[fleet] source and migration files; no path stated
+DB-1	*.ts;*.tsx;*.mts;*.cts;*.js;*.jsx;*.mjs;*.cjs;*.py;*.sql	[gate] check-raw-sql.sh: ratchet_scope_files '\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|sql)$', then content-filtered for a SQL-statement string literal — a path glob cannot replicate the content filter, so this over-matches every file of these types
 DB-2	*.ts;*.tsx	[fleet] the `sql` template is a TypeScript construct
 DB-3	package.json;*/package.json;*.ts	[fleet] dependency manifests and TypeScript database code
 DB-4	*.sql;*/migrations/*;*/drizzle/*;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] migration folders and the deploy workflow

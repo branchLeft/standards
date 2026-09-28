@@ -1,6 +1,6 @@
 # check-clause-index.sh
 
-Drift test between `docs/index.md` and everything it claims. Seven
+Drift test between `docs/index.md` and everything it claims. Eight
 assertions, in increasing order of what they catch:
 
 1. Every clause ID defined in docs/ appears in the index, and vice versa.
@@ -44,6 +44,19 @@ beyond the index carries no path at all (`## Family`); a header naming
    with no mapping is invisible to a reviewer using the map to find what
    applies to a diff, and that silent gap is worse than an absent floor
    because nothing else prints a warning for it.
+8. Every clause a real `tools/*.sh` gate scopes to specific files with
+   `ratchet_scope_files` — `gate_scoped_clauses()` — is tagged `[gate]` in
+   `tools/clause-paths.tsv`, not `[fleet]`, `[doc]` or `[none]`. Those three
+   tags mean "not grounded in a gate yet"; once a script scopes and reports
+   the clause, the row saying otherwise is stale, exactly like an
+   `auto` clause the index itself still called `pending`. The three shapes
+   `gate_scoped_clauses()` cannot see on its own — a clause emitted through a
+   shell variable rather than a literal string, a script that bypasses
+   `ratchet_finding` entirely, or a script that scans every tracked file
+   unfiltered instead of calling `ratchet_scope_files` — are a short,
+   commented, hand-maintained override next to the function, for the same
+   reason `standards-audit.sh`'s own `COVERED` list is hand-maintained: a
+   grep-only derivation under- and over-reports these exact shapes.
 
 Assertion 2 also runs in reverse: a `pending` clause that some artefact
 anywhere under tools/, packages/ or templates/ does name is a row that was
