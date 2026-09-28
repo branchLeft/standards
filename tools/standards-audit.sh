@@ -484,7 +484,7 @@ EOF
     printf '%s' "$out" \
       | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
       || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"measured_clauses":\["ARCH-4","ARCH-7","CI-12","CMT-2","CMT-3","CMT-4","COV-1","DB-1","DB-3","DB-4","DB-5","DB-6","DEP-8","ERR-1","ERR-2","ERR-3","LINT-2","LINT-4","NAM-1","NAM-2","OPS-2","PY-2","PY-3","REPO-8","TYP-1","TYP-2","TYP-5"\]' \
+    printf '%s' "$out" | grep -q '"measured_clauses":\["ARCH-4","ARCH-7","CFG-2","CI-12","CMT-2","CMT-3","CMT-4","CON-1","CON-10","CON-14","CON-3","CON-4","CON-5","CON-6","CON-7","CON-8","CON-9","COV-1","CRED-10","DB-1","DB-3","DB-4","DB-5","DB-6","DEP-8","ERR-1","ERR-2","ERR-3","LINT-2","LINT-4","NAM-1","NAM-2","OPS-2","PY-2","PY-3","REPO-8","TYP-1","TYP-2","TYP-5"\]' \
       || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here
