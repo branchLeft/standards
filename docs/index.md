@@ -215,18 +215,18 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Repository settings — `repo-settings.md`
 
-| ID      | Rule                                                                                | Gate      | Encoded by               |
-| ------- | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
-| REPO-1  | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
-| REPO-2  | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
-| REPO-3  | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
-| REPO-4  | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
-| REPO-5  | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
-| REPO-6  | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
-| REPO-7  | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
-| REPO-8  | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
-| REPO-9  | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
-| REPO-10 | Every agent-written commit and pull request says so                                 | `pending` | —                        |
+| ID      | Rule                                                                                                      | Gate      | Encoded by               |
+| ------- | --------------------------------------------------------------------------------------------------------- | --------- | ------------------------ |
+| REPO-1  | Default-branch ruleset shape: linear history, signed commits, squash-only PR                              | `auto`    | `templates/rulesets/`    |
+| REPO-2  | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                                       | `auto`    | `templates/rulesets/`    |
+| REPO-3  | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures                           | `auto`    | `templates/rulesets/`    |
+| REPO-4  | Required checks: never before a real run, `warn`-mode scope documented, names match                       | `review`  | `tools/ruleset-audit.sh` |
+| REPO-5  | CODEOWNERS covers the escape hatches — ignore files, mode files, floors, DB-1's tooling scope declaration | `pending` | —                        |
+| REPO-6  | Every repo's ruleset payload is committed and audited                                                     | `auto`    | `tools/ruleset-audit.sh` |
+| REPO-7  | An apply never reduces live protection — a weakening payload is refused                                   | `auto`    | `tools/ruleset-apply.sh` |
+| REPO-8  | Every commit is signed; signing is never switched off to get past a block                                 | `pending` | —                        |
+| REPO-9  | Every public repo has secret scanning and push protection on                                              | `pending` | —                        |
+| REPO-10 | Every agent-written commit and pull request says so                                                       | `pending` | —                        |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
@@ -531,15 +531,15 @@ elsewhere and are **cited, never restated**:
 
 ## Databases — `databases.md`
 
-| ID   | Rule                                                                                     | Gate      | Evidence                                   |
-| ---- | ---------------------------------------------------------------------------------------- | --------- | ------------------------------------------ |
-| DB-1 | Never raw SQL: all database access, migrations and operations go through the ORM         | `auto`    | `tools/check-raw-sql.sh`                   |
-| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval | `review`  | Every `sql` template use in the diff       |
-| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver             | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| DB-4 | Schema changes are versioned migrations that ship and deploy with the release            | `pending` | —                                          |
-| DB-5 | Schema changes follow expand/contract, so the previous release keeps working             | `pending` | —                                          |
-| DB-6 | Each migration is purely an expand or purely a contract                                  | `pending` | —                                          |
-| DB-7 | CI runs the previous release's tests against the new schema                              | `pending` | —                                          |
+| ID   | Rule                                                                                                          | Gate      | Evidence                                   |
+| ---- | ------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------ |
+| DB-1 | Never raw SQL in application code; database tooling is out of scope, declared once in `.standards-db-tooling` | `auto`    | `tools/check-raw-sql.sh`                   |
+| DB-2 | The ORM's `sql` template only where dialect-agnostic; anything else needs owner approval                      | `review`  | Every `sql` template use in the diff       |
+| DB-3 | TypeScript uses Drizzle ORM; a SQLite store uses its `better-sqlite3` driver                                  | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| DB-4 | Schema changes are versioned migrations that ship and deploy with the release                                 | `pending` | —                                          |
+| DB-5 | Schema changes follow expand/contract, so the previous release keeps working                                  | `pending` | —                                          |
+| DB-6 | Each migration is purely an expand or purely a contract                                                       | `pending` | —                                          |
+| DB-7 | CI runs the previous release's tests against the new schema                                                   | `pending` | —                                          |
 
 ## Containers — `containers.md`
 

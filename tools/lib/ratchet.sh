@@ -10,6 +10,11 @@
 # i.e. it stops testing the file and never says so.
 RATCHET_LIB_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
+# Shared with glob.test.ts, so the two refusal implementations are checked
+# against one case table rather than two hand-written lists that can drift:
+# tools/check-raw-sql.md.
+RATCHET_DB_TOOLING_FIXTURES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/check-raw-sql.fixtures.tsv"
+
 RATCHET_MODE="enforce"
 RATCHET_JSON=0
 RATCHET_TMP=""
@@ -97,12 +102,70 @@ ratchet_is_enforced() {
 # this would eventually disagree, and the disagreement would show up as an
 # exemption reported stale while it is still suppressing a finding.
 ratchet_glob_matches() {
-  local glob="$1" path="$2"
-  # Unquoted: inside double quotes the `\*` replacement is a literal backslash
-  # and the resulting pattern then matches only a literal asterisk.
-  glob=${glob//\*\*/\*}
+  local glob path
+  glob=$(ratchet_collapse_glob "$1")
+  path="$2"
   # shellcheck disable=SC2254  # $glob is a pattern by design
   case "$path" in $glob) return 0 ;; esac
+  return 1
+}
+
+# `**` collapses to `*` so a caller judges breadth by the same shape
+# ratchet_glob_matches will later match against. Shared for the same reason
+# ratchet_glob_matches itself is shared: two copies would disagree.
+ratchet_collapse_glob() {
+  local g
+  # Unquoted: inside double quotes the `\*` replacement is a literal backslash
+  # and the resulting pattern then matches only a literal asterisk.
+  g=${1//\*\*/\*}
+  printf '%s' "$g"
+}
+
+# A segment is a wildcard segment if it contains a glob metacharacter
+# anywhere in it — `*` already crosses `/`, so `src*` and `*.ts` are as
+# broad as a bare `*`, not a literal prefix with a suffix. The rule and why:
+# tools/check-raw-sql.md.
+ratchet_db_tooling_is_wildcard_segment() {
+  case "$1" in *'*'*|*'?'*|*'['*) return 0 ;; esac
+  return 1
+}
+
+# A DB-1 scope-declaration line that grants no legitimate declaration: the
+# rule and why, tools/check-raw-sql.md. Prints the reason and returns 0 if
+# $1 must be refused; returns 1 and prints nothing if it is fine.
+ratchet_db_tooling_refused_reason() {
+  local glob rest seg literal_before=0 literal_total=0 wildcard_seen=0
+
+  glob=$(ratchet_collapse_glob "$1")
+  case "$glob" in */) printf 'an empty path segment'; return 0 ;; esac
+
+  rest="$glob"
+  while :; do
+    case "$rest" in
+      */*) seg="${rest%%/*}"; rest="${rest#*/}" ;;
+      *)   seg="$rest"; rest="" ;;
+    esac
+    case "$seg" in
+      '')   printf 'an empty path segment'; return 0 ;;
+      .|..) printf "a '.' or '..' path segment"; return 0 ;;
+    esac
+    if ratchet_db_tooling_is_wildcard_segment "$seg"; then
+      wildcard_seen=1
+    else
+      literal_total=$((literal_total + 1))
+      [ "$wildcard_seen" -eq 0 ] && literal_before=$((literal_before + 1))
+    fi
+    [ -n "$rest" ] || break
+  done
+
+  if [ "$literal_before" -eq 0 ]; then
+    printf 'a wildcard with no literal path segment before it'
+    return 0
+  fi
+  if [ "$wildcard_seen" -eq 1 ] && [ "$literal_total" -eq 1 ]; then
+    printf 'a bare top-level directory wildcard, which covers a whole source root'
+    return 0
+  fi
   return 1
 }
 
@@ -274,6 +337,27 @@ ratchet_self_test() {
     ratchet_glob_matches "src/*" "src/deep/a.ts" || { echo "FAIL: glob across separators"; exit 1; }
     ratchet_glob_matches "src/**" "src/deep/a.ts" || { echo "FAIL: ** normalisation"; exit 1; }
     ratchet_glob_matches "src/*" "app/a.ts"      && { echo "FAIL: glob over-matched"; exit 1; }
+
+    [ -f "$RATCHET_DB_TOOLING_FIXTURES" ] \
+      || { echo "FAIL: no fixture table at $RATCHET_DB_TOOLING_FIXTURES"; exit 1; }
+    local fx_glob fx_verdict fx_reason fx_actual fx_rc fx_rows=0
+    while IFS=$'\t' read -r fx_glob fx_verdict fx_reason; do
+      case "$fx_glob" in ''|\#*) continue ;; esac
+      fx_rows=$((fx_rows + 1))
+      fx_actual=$(ratchet_db_tooling_refused_reason "$fx_glob"); fx_rc=$?
+      if [ "$fx_verdict" = "refused" ]; then
+        [ "$fx_rc" -eq 0 ] || { echo "FAIL: '$fx_glob' should be refused"; exit 1; }
+        case "$fx_actual" in
+          *"$fx_reason"*) ;;
+          *) echo "FAIL: '$fx_glob' refused for '$fx_actual', expected to contain '$fx_reason'"
+             exit 1 ;;
+        esac
+      else
+        [ "$fx_rc" -ne 0 ] \
+          || { echo "FAIL: '$fx_glob' should not be refused ($fx_actual)"; exit 1; }
+      fi
+    done < "$RATCHET_DB_TOOLING_FIXTURES"
+    [ "$fx_rows" -ge 20 ] || { echo "FAIL: fixture table only had $fx_rows rows"; exit 1; }
 
     ratchet_is_exempt "src/a.ts" "TS-2"    || { echo "FAIL: glob exemption"; exit 1; }
     ratchet_is_exempt "src/a.ts" "TS-3"    && { echo "FAIL: clause not scoped"; exit 1; }

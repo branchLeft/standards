@@ -87,7 +87,7 @@ clauses_all_covered() {
 # mode, ignore and inline-allow handling as any other clause.
 audit_exemptions() {
   local gates="$1" inv="$2"
-  local ln=0 line glob clauses reason p matched used status fc fl ff fline
+  local ln=0 line glob clauses reason p matched used status fc fl ff fline fmsg
 
   if [ -f "$RATCHET_IGNORE_FILE" ]; then
     while IFS= read -r line || [ -n "$line" ]; do
@@ -104,7 +104,13 @@ audit_exemptions() {
       done < "$RATCHET_TMP/all"
 
       used=0
-      while IFS=$'\t' read -r fc fl ff fline; do
+      # Five tab-separated fields (clause, level, file, line, message); read
+      # every one by name. Naming fewer than the line has folds the rest,
+      # separators included, into the last variable — harmless where only
+      # the first three are compared, corrupting the fourth wherever it is.
+      # shellcheck disable=SC2034  # fmsg is read to keep the column count in
+      # step with the findings TSV's five columns; this check never prints it
+      while IFS=$'\t' read -r fc fl ff fline fmsg; do
         [ "$fl" = "exempt" ] || continue
         ratchet_glob_matches "$glob" "$ff" || continue
         case ",$clauses," in
@@ -168,7 +174,12 @@ audit_exemptions() {
       }
 
       used=0
-      while IFS=$'\t' read -r fc fl ff fline; do
+      # Same five-field read as above. Before this, `fline` absorbed the
+      # message too (the line number field ran on into "<line>\t<message>"),
+      # so this comparison could match only when a finding's own message was
+      # empty — a live inline allow read STALE on every real finding.
+      # shellcheck disable=SC2034  # fmsg is read for the same reason as above
+      while IFS=$'\t' read -r fc fl ff fline fmsg; do
         [ "$fl" = "exempt" ] || continue
         [ "$fc" = "$aclause" ] || continue
         [ "$ff" = "$f" ] || continue
@@ -183,6 +194,41 @@ audit_exemptions() {
           "inline allow for $aclause suppresses nothing — the line below it no longer offends"
       fi
   done < <(grep_tracked "$RATCHET_ALLOW_TOKEN")
+}
+
+# DB-1's tooling-scope declarations, inventoried the same shape as
+# audit_exemptions: STD-002 flags a declaration whose glob matches no tracked
+# file. A refused line (tools/lib/ratchet.sh) is listed too, for visibility,
+# but raises no finding here — check-raw-sql.sh already reported it, run as
+# one of GATES above, and a second copy would double-count it.
+audit_db_tooling() {
+  local inv="$1" db_tooling_file=".standards-db-tooling"
+  [ -f "$db_tooling_file" ] || return 0
+
+  local ln=0 line reason matched p
+  while IFS= read -r line || [ -n "$line" ]; do
+    ln=$((ln + 1))
+    case "$line" in ''|\#*) continue ;; esac
+
+    if reason=$(ratchet_db_tooling_refused_reason "$line"); then
+      printf '    %s:%s\t%s\tREFUSED — %s\n' "$db_tooling_file" "$ln" "$line" "$reason" >> "$inv"
+      continue
+    fi
+
+    matched=0
+    while IFS= read -r p; do
+      ratchet_glob_matches "$line" "$p" && matched=$((matched + 1))
+    done < "$RATCHET_TMP/all"
+
+    if [ "$matched" -eq 0 ]; then
+      printf '    %s:%s\t%s\tSTALE — matches no tracked file\n' "$db_tooling_file" "$ln" "$line" >> "$inv"
+      ratchet_finding "STD-002" "$db_tooling_file" "$ln" \
+        "declared tooling path '$line' matches no tracked file — the path it covered is gone"
+    else
+      printf '    %s:%s\t%s\tlive — declaring %d file(s) out of DB-1'"'"'s scope\n' \
+        "$db_tooling_file" "$ln" "$line" "$matched" >> "$inv"
+    fi
+  done < "$db_tooling_file"
 }
 
 # One batched grep, not one per tracked file. A fork per file costs minutes on a
@@ -265,7 +311,8 @@ main() {
   local tsv="$RATCHET_TMP/findings.tsv"
   local inv="$RATCHET_TMP/inventory"
   local nat="$RATCHET_TMP/native"
-  : > "$raw"; : > "$inv"; : > "$nat"
+  local tooling_inv="$RATCHET_TMP/tooling_inventory"
+  : > "$raw"; : > "$inv"; : > "$nat"; : > "$tooling_inv"
 
   local g
   for g in "${GATES[@]}"; do
@@ -280,6 +327,7 @@ main() {
 
   # Appended after the gates so the staleness test sees a complete finding set.
   audit_exemptions "$tsv" "$inv" >> "$raw"
+  audit_db_tooling "$tooling_inv" >> "$raw"
   native_suppressions "$nat"
   json_to_tsv < "$raw" > "$tsv"
 
@@ -295,6 +343,8 @@ main() {
     [ -s "$tsv" ] && render_files "$tsv" | grep . || printf '  none\n'
     printf '\nexemptions\n'
     if [ -s "$inv" ]; then sort "$inv"; else printf '    none\n'; fi
+    printf '\ndatabase tooling\n'
+    if [ -s "$tooling_inv" ]; then sort "$tooling_inv"; else printf '    none\n'; fi
     printf '\nnative suppressions\n'
     if [ -s "$nat" ]; then sort "$nat"; else printf '    none\n'; fi
     printf '\n'
@@ -432,12 +482,69 @@ EOF
     rm .github/workflows/allow.yml
     git add -A && git commit -qm drop-allow
 
+    # An inline allow that is genuinely live: the finding it names is real,
+    # on the line right after it. The exemption inventory's own findings TSV
+    # has five tab-separated fields; a read naming fewer than five folds the
+    # rest into the last one, and the line-number field ends up holding
+    # "<line>\t<message>" instead of a bare number — a comparison against a
+    # bare number then never matches, so this reads STALE even though
+    # nothing about the suppression is stale.
+    cat > .github/workflows/live-allow.yml <<EOF
+name: Live
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # ${RATCHET_ALLOW_TOKEN} CI-1 pinned upstream, reviewed
+      - uses: actions/checkout@v4
+EOF
+    git add -A && git commit -qm live-allow
+    out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
+    # [[:blank:]], not a literal \t: GNU grep's -E does not expand \t to a
+    # tab (that's a GNU-only extension of -P), so this passed only under a
+    # PCRE-flavoured grep (this repo's dev machines) and failed deterministically
+    # in CI's plain GNU grep — this exact line, every run, regardless of #126.
+    printf '%s' "$out" | grep -qE '\.github/workflows/live-allow\.yml:[0-9]+[[:blank:]]CI-1[[:blank:]]live$' \
+      || { echo "FAIL: a live inline allow read stale"; echo "$out"; exit 1; }
+    rm .github/workflows/live-allow.yml
+    git add -A && git commit -qm drop-live-allow
+
     # STD-002 is a clause like any other, so its own exemption must silence it.
     printf '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n' >  .standardsignore
     printf '.standardsignore\tSTD-002\t# reviewed, keeping the licence\n' >> .standardsignore
     git add -A && git commit -qm exempt-std002
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: STD-002 not suppressible by its own exemption"; exit 1; }
+
+    # DB-1's tooling-scope declarations: a live one, a stale one (matches no
+    # tracked file, STD-002-style), and a refused catch-all — inventoried the
+    # same way exemptions are, not double-reported for the refused line.
+    mkdir -p ops/db-tooling
+    printf 'export const backupPath = 1;\n' > ops/db-tooling/backup.ts
+    printf 'ops/db-tooling/backup.ts\nno-such-dir/nested/*\n*\n' > .standards-db-tooling
+    git add -A && git commit -qm db-tooling-fixture
+
+    out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q "ops/db-tooling/backup.ts.*live — declaring 1 file" \
+      || { echo "FAIL: a live tooling declaration not inventoried"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep 'no-such-dir/nested' | grep -q STALE \
+      || { echo "FAIL: a stale tooling declaration not flagged"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'REFUSED — a wildcard with no literal' \
+      || { echo "FAIL: a refused tooling declaration not inventoried"; echo "$out"; exit 1; }
+
+    out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)
+    [ "$(printf '%s' "$out" | grep -c '"clause":"DB-1".*standards-db-tooling')" -eq 1 ] \
+      || { echo "FAIL: the refused declaration was reported more than once"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"STD-002".*"file":"\.standards-db-tooling"' \
+      || { echo "FAIL: the stale tooling declaration did not raise STD-002"; echo "$out"; exit 1; }
+
+    rm -rf ops .standards-db-tooling
+    git add -A && git commit -qm drop-db-tooling-fixture
 
     # A CMT-3 finding in the warn band (5 to 10 lines) shows up here at level
     # warning — a real GATES member, but this particular fixture never fails

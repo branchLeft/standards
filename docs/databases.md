@@ -6,19 +6,58 @@ and new versions of a service can run against the same database at once.
 These rules cover code we own; upstream software, such as Ghost's own query
 builder, follows its own standards (`STD-003`).
 
-## DB-1 — never raw SQL
+## DB-1 — never raw SQL in application code
 
-Never write raw SQL. All database access, migrations and database operations
-go through the ORM. Migration files the ORM generates count as ORM output; a
-hand-written migration is raw SQL and falls under `DB-2`. An operation no ORM
-can express, such as creating database users, lives in tooling or a runbook.
+Application code never writes raw SQL. All database access goes through the
+ORM. Migration files the ORM generates count as ORM output; a hand-written
+migration is raw SQL and falls under `DB-2`.
 
-**Why:** raw SQL ties code to one database dialect, and it escapes the types
-the rest of the code relies on.
+Database tooling is out of DB-1's scope. None of the following is
+application data access, so none of it can be expressed through the ORM:
 
-**Check plan:** `tools/check-raw-sql.sh` reads for it, and is a gate.
-`tools/check-raw-sql.md` says what it matches and what it misses; a
-parser-based rule replaces it if those misses show up in practice.
+- **Backup, restore and migration tooling** drives the database directly —
+  issuing `mysqldump`, restoring a dump, running the ORM's own migration
+  runner — and that is its job, not a violation to work around.
+- **Database provisioning and administration tooling** creates databases,
+  users and grants. The ORM models application data, not the server-level
+  objects that have to exist before an application connection is possible.
+- **Operational checks** are host-side tooling that reads an application's
+  database to decide an operational action — for example, counting
+  in-flight email batches before a colour swap. The read drives an
+  operator's deploy decision, not application logic, and often has to run
+  from outside the application's own runtime.
+- **Test-harness readiness probes** wait on a database container coming up,
+  for example a bare `SELECT 1` retried until it succeeds. The query
+  carries no application meaning; it exists only to detect that a
+  connection can be made at all.
+
+A repo declares which paths are that tooling once, in
+`.standards-db-tooling` at its root. A path nothing has declared is still
+application code, and raw SQL there still fails.
+
+Three things stop this file from becoming a per-PR exemption under a new
+name, none of them "ordinary review": `.standards-db-tooling` is
+CODEOWNERS-owned (`REPO-5`), so a PR cannot change it without the admin team;
+the checker refuses a line with no literal path segment before its first
+wildcard, or with only one literal segment backing a wildcard, and fails
+closed — so a declaration cannot buy scope for a whole source tree, or for
+any tree at all, in one line (`tools/check-raw-sql.md`'s shape rule); and the
+audit inventories every declared path with its live file count and flags one
+whose glob matches no tracked file, the same way it flags a stale exemption
+(`STD-002`). A two-segment declaration such as `src/app/*` cannot be told
+apart from a real one lexically — CODEOWNERS review and the audit's file
+count are what back that shape, not the shape rule.
+
+**Why:** raw SQL in application code ties it to one database dialect, and it
+escapes the types the rest of the code relies on. Database tooling makes no
+such promise — driving the database directly is the point of it.
+
+**Check plan:** `tools/check-raw-sql.sh` reads for it, and is a gate. It
+treats a declared tooling path as out of scope, not as an exemption — no
+finding is raised there at all, the same way an ORM migration folder is
+already out of scope. `tools/check-raw-sql.md` says what it matches, what it
+misses, and how a path is declared; a parser-based rule replaces the matcher
+if those misses show up in practice.
 
 ## DB-2 — the `sql` template only when dialect-agnostic
 

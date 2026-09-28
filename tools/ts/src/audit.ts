@@ -6,6 +6,7 @@ import type { GitClient } from './gitClient.ts';
 import type { Gate, GateContext } from './gate.ts';
 import type { Ratchet } from './ratchet.ts';
 import { auditExemptions } from './exemptionInventory.ts';
+import { auditDatabaseTooling } from './databaseToolingInventory.ts';
 import { findNativeSuppressions } from './nativeSuppressions.ts';
 import { renderFindingsTable, renderTopFiles } from './renderers.ts';
 import { readClauseCoverage } from './clauseCoverage.ts';
@@ -68,6 +69,37 @@ export const COVERED_CLAUSES: ReadonlySet<string> = new Set([
   'REPO-8',
   'LINT-2',
   'LINT-4',
+]);
+
+/**
+ * The subset of `COVERED_CLAUSES` produced only by the bash scripts in
+ * `bin/audit.ts`'s `GATE_NAMES` — never by an advisory gate (`COV-1`'s
+ * `check-coverage.sh` runs either way) or a native TypeScript one. `--advisory-only`
+ * skips exactly these scripts, so staleness for these clauses can no longer be
+ * computed in that mode: every finding they would have produced, including the
+ * `exempt` ones an exemption is suppressing, is simply absent, not clean.
+ */
+export const GATE_ONLY_CLAUSES: ReadonlySet<string> = new Set([
+  'TS-2',
+  'TS-3',
+  'TS-4',
+  'TS-5',
+  'CI-1',
+  'CI-2',
+  'CI-3',
+  'CI-4',
+  'CI-5',
+  'CI-9',
+  'CI-10',
+  'PUL-1',
+  'PUL-2',
+  'PUL-3',
+  'PUL-4',
+  'PUL-5',
+  'PUL-12',
+  'SYNC-1',
+  'CMT-3',
+  'DB-1',
 ]);
 
 export interface AuditReport {
@@ -139,7 +171,11 @@ export class Audit {
     this.coveredClauses = coveredClauses;
   }
 
-  private collectFindings(): { all: readonly Finding[]; exemptionRows: readonly string[] } {
+  private collectFindings(): {
+    all: readonly Finding[];
+    exemptionRows: readonly string[];
+    databaseToolingRows: readonly string[];
+  } {
     const context: GateContext = { root: this.ratchet.root, mode: this.ratchet.mode };
     const gateFindings = [...this.gates, ...this.advisoryGates].flatMap((gate) =>
       gate.run(context)
@@ -153,7 +189,17 @@ export class Audit {
       gateFindings,
       isCovered
     );
-    return { all: [...gateFindings, ...exemption.findings], exemptionRows: exemption.inventory };
+    const databaseTooling = auditDatabaseTooling(
+      this.ratchet,
+      this.fs,
+      this.ratchet.root,
+      this.ratchet.trackedFiles
+    );
+    return {
+      all: [...gateFindings, ...exemption.findings, ...databaseTooling.findings],
+      exemptionRows: exemption.inventory,
+      databaseToolingRows: databaseTooling.inventory,
+    };
   }
 
   private renderJson(findings: readonly Finding[], coverage: ClauseCoverage): string {
@@ -168,6 +214,7 @@ export class Audit {
   private renderHuman(
     findings: readonly Finding[],
     exemptionRows: readonly string[],
+    databaseToolingRows: readonly string[],
     nativeRows: readonly string[],
     totals: Totals,
     coverage: ClauseCoverage
@@ -180,6 +227,8 @@ export class Audit {
       renderTopFiles(findings),
       '\nexemptions\n',
       renderExemptionSection(exemptionRows),
+      '\ndatabase tooling\n',
+      renderExemptionSection(databaseToolingRows),
       '\nnative suppressions\n',
       renderExemptionSection(nativeRows),
       '\n',
@@ -190,7 +239,7 @@ export class Audit {
   }
 
   run(json: boolean): AuditReport {
-    const { all: findings, exemptionRows } = this.collectFindings();
+    const { all: findings, exemptionRows, databaseToolingRows } = this.collectFindings();
     const nativeRows = findNativeSuppressions(
       this.fs,
       this.ratchet.root,
@@ -206,7 +255,14 @@ export class Audit {
 
     const output = json
       ? this.renderJson(findings, coverage)
-      : this.renderHuman(findings, exemptionRows, nativeRows, totals, coverage);
+      : this.renderHuman(
+          findings,
+          exemptionRows,
+          databaseToolingRows,
+          nativeRows,
+          totals,
+          coverage
+        );
 
     return { output, success: totals.failures === 0 };
   }
