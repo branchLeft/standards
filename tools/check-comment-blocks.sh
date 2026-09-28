@@ -132,6 +132,48 @@ self_test() {
       echo 'echo hi'
     } > long.sh
 
+    # A triple-quoted string opened mid-line (an f-string, here) — its own
+    # opening line does not start with the delimiter, so the classifier must
+    # track that a string is open some other way. Before the fix, the lone
+    # closing `"""` on its own line read as a fresh docstring opener with
+    # nothing left to close it, so every line to EOF was swallowed as one
+    # comment block.
+    {
+      echo 'query = f"""'
+      echo 'SELECT 1'
+      echo '"""'
+      for i in $(seq 1 12); do echo "real_code_line_$i = $i"; done
+    } > fstring-close.py
+
+    # A second, independent case: a data string assigned by name, not a
+    # docstring, whose close is likewise misread as an opener — and here it
+    # merges straight into a real class docstring that follows.
+    {
+      echo 'DUMP_WITH_RESUME_POINT = """'
+      echo 'dump line 1'
+      echo 'dump line 2'
+      echo 'dump line 3'
+      echo '"""'
+      echo ''
+      echo ''
+      echo 'class Foo:'
+      echo '    """Class Foo docstring.'
+      echo ''
+      echo '    More narrative line 1.'
+      echo '    More narrative line 2.'
+      echo '    """'
+      echo ''
+      echo '    def bar(self):'
+      echo '        return 1'
+    } > data-string-merge.py
+
+    # Bypass fixture: a UTF-8 BOM at byte zero shifts the first `#` off
+    # column zero. Before stripping it, the classifier's block undercounts by
+    # exactly the BOM-prefixed line, which can slip an 11-line block under
+    # the fail threshold and report only a warning.
+    printf '\xef\xbb\xbf' > bom-bypass.sh
+    { for i in $(seq 1 11); do echo "# narrative line $i"; done; echo 'echo hi'; } >> bom-bypass.sh
+
     git add -A && git commit -qm init
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
@@ -152,6 +194,18 @@ self_test() {
       || { echo "FAIL: shell comment run wrong length or level (want 9, warning)"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"clause":"CMT-4"' \
       && { echo "FAIL: CMT-4 reported by check-comment-blocks.sh — that clause moved to TypeScript"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"fstring-close.py"' \
+      && { echo "FAIL: an f-string's own closing \"\"\" read as a docstring opener, swallowing real code"; echo "$out"; exit 1; }
+    # The real class docstring (5 lines) still warns on its own — only the
+    # merge with the preceding data string, which would report a block
+    # starting at the data string's close and running well past 5 lines, is
+    # the bug under test.
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"data-string-merge.py","line":9,"level":"warning".*is 5 lines' \
+      || { echo "FAIL: data-string-merge.py's real class docstring (5 lines, line 9) not reported on its own"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE '"clause":"CMT-3".*"file":"data-string-merge\.py".*is (6|7|8|9|1[0-9]) lines' \
+      && { echo "FAIL: a data string's closing \"\"\" merged into the following class docstring"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"bom-bypass.sh".*"level":"error".*is 11 lines' \
+      || { echo "FAIL: a BOM-prefixed first # line undercounted the block below the fail threshold"; echo "$out"; exit 1; }
 
     # A CMT-3 error fails the build; a CMT-3 warning alone never does.
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
