@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { Audit } from '../src/audit.ts';
 import { BakedConfigGate } from '../src/bakedConfigGate.ts';
 import { BashGate } from '../src/bashGate.ts';
+import { parseCliOptions } from '../src/cliOptions.ts';
 import { CommentRatioGate } from '../src/commentRatioGate.ts';
 import { CommitSigningGate } from '../src/commitSigningGate.ts';
 import { ComposeNetworkGate } from '../src/composeNetworkGate.ts';
@@ -29,7 +30,6 @@ import { RatchetInitError } from '../src/ratchetInitError.ts';
 import { SchemaDriftGate } from '../src/schemaDriftGate.ts';
 import { SecretsFileGate } from '../src/secretsFileGate.ts';
 import { WorkItemReferenceGate } from '../src/workItemReferenceGate.ts';
-import type { RatchetMode } from '../src/ratchet.ts';
 
 const TOOLS_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -46,32 +46,6 @@ const GATE_NAMES = [
   'check-comment-blocks.sh',
 ];
 const ADVISORY_GATE_NAMES = ['check-coverage.sh'];
-
-interface CliOptions {
-  readonly mode?: RatchetMode | undefined;
-  readonly json: boolean;
-}
-
-function parseCliOptions(argv: readonly string[]): CliOptions {
-  let mode: RatchetMode | undefined;
-  let json = false;
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    if (argument === '--json') {
-      json = true;
-    } else if (argument === '--mode') {
-      index += 1;
-      const value = argv[index];
-      if (value !== 'warn' && value !== 'enforce') {
-        throw new Error(`standards-audit: --mode must be 'warn' or 'enforce', got '${value}'`);
-      }
-      mode = value;
-    } else {
-      throw new Error(`standards-audit: unknown option ${argument}`);
-    }
-  }
-  return { mode, json };
-}
 
 function main(): void {
   const options = parseCliOptions(process.argv.slice(2));
@@ -97,7 +71,14 @@ function main(): void {
   // Clauses are informational on this adapter — BashGate defers to each
   // script's own findings — so an empty list costs nothing while the gates
   // stay bash.
-  const gates = GATE_NAMES.map((name) => gateAt(name, false, []));
+  //
+  // --advisory-only drops these entirely rather than running them a second
+  // time: a caller's own standards.yml already runs every one of these
+  // scripts directly and that run alone decides the job's pass/fail. A
+  // second run here (BashGate.advisory is false for all of them) would
+  // reach the same verdict on an unchanged checkout, but coupling the two
+  // runs is unnecessary risk for zero new information.
+  const gates = options.advisoryOnly ? [] : GATE_NAMES.map((name) => gateAt(name, false, []));
   const advisoryGates = [
     ...ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, [])),
     new SchemaDriftGate(ratchet, fs, processRunner, TOOLS_ROOT),

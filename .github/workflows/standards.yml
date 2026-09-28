@@ -6,8 +6,15 @@
 # here must never hardcode a tag of this repo internally: a literal tag would
 # pin callers to a revision unrelated to the one they requested.
 #
-# Uses only actions/checkout plus `run:` steps, deliberately, so it passes under
-# `allowed_actions: selected` with no per-repo allow-list change.
+# Deliberately stays inside the `actions/` namespace GitHub itself publishes,
+# plus `run:` steps, so it passes under `allowed_actions: selected` with no
+# per-repo allow-list change: that setting has a standing checkbox for
+# GitHub-owned actions, so `actions/checkout` and `actions/setup-node` both
+# clear it on the strength of who publishes them, not a name-by-name
+# allow-list entry a caller would otherwise need to add. `actions/setup-node`
+# was added, pinned the same way, to run the TypeScript audit below on the
+# Node version it requires — never a third-party action, and never a version
+# resolved any way but from the pinned `.standards` checkout itself.
 name: Standards
 
 on:
@@ -26,7 +33,7 @@ jobs:
   standards:
     name: Standards gates
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - name: Check out the caller
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -125,3 +132,47 @@ jobs:
           .standards/tools/check-raw-sql.sh   "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/check-comment-blocks.sh "${args[@]+"${args[@]}"}" || rc=1
           exit "$rc"
+
+      # The TypeScript audit's gates are all pending: advisory evidence, never
+      # a build failure. Node is needed only for this step — every gate above
+      # runs as plain bash. Read from the pinned `.standards` checkout's own
+      # `.nvmrc` so the version tracks the release, not this workflow file or
+      # the caller's own toolchain (a caller may run an older Node, or none).
+      - name: Resolve the pinned Node version for the TypeScript audit
+        id: node
+        run: |
+          set -euo pipefail
+          if [ -f .standards/.nvmrc ]; then
+            version=$(tr -d '[:space:]' < .standards/.nvmrc | sed 's/^v//')
+          else
+            version=26
+          fi
+          printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node for the TypeScript audit
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+
+      # tools/ts uses node built-in modules only — no install step precedes
+      # this, deliberately, so a caller with no node_modules of its own (every
+      # caller, in a fresh workflow_call job) still gets the advisory findings
+      # rather than a step that can't run. EslintGate is the one gate here that
+      # depends on the caller's own tooling: with no node_modules present it
+      # reports "eslint is not installed" and returns without ever invoking
+      # `npx`, so this step never blocks on an install or reaches the network
+      # doing one — see eslintGate.ts's isInstalled/hasConfig split.
+      #
+      # --advisory-only skips the bash gates above a second time: they already
+      # decided this job's pass/fail, and every remaining gate here reports at
+      # level advisory or exempt, never error, so this call cannot fail on a
+      # finding. It can still fail on a crash, which is deliberately left
+      # unguarded so a real defect here is visible rather than swallowed.
+      - name: Run the TypeScript audit (advisory)
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          args=()
+          [ -n "$MODE" ] && args+=(--mode "$MODE")
+          node .standards/tools/ts/bin/audit.ts --advisory-only "${args[@]+"${args[@]}"}"
