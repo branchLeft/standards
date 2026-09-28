@@ -24,3 +24,26 @@ describe('Glob.matches', () => {
     expect(Glob.matches('a.b', 'a.b')).toBe(true);
   });
 });
+
+describe('Glob.databaseToolingRefusedReason', () => {
+  it('refuses a bare catch-all, in every spelling', () => {
+    expect(Glob.databaseToolingRefusedReason('*')).toBeDefined();
+    expect(Glob.databaseToolingRefusedReason('**')).toBeDefined();
+    expect(Glob.databaseToolingRefusedReason('**/*')).toBeDefined();
+    expect(Glob.databaseToolingRefusedReason('*/*')).toBeDefined();
+  });
+
+  it('refuses a bare top-level directory wildcard', () => {
+    expect(Glob.databaseToolingRefusedReason('src/*')).toBeDefined();
+    expect(Glob.databaseToolingRefusedReason('src/**')).toBeDefined();
+  });
+
+  it('accepts two or more literal segments plus a wildcard tail', () => {
+    expect(Glob.databaseToolingRefusedReason('ops/db-tooling/*')).toBeUndefined();
+  });
+
+  it('accepts an exact filename, with or without a directory', () => {
+    expect(Glob.databaseToolingRefusedReason('ops/db-tooling/backup.ts')).toBeUndefined();
+    expect(Glob.databaseToolingRefusedReason('backup.ts')).toBeUndefined();
+  });
+});

@@ -62,10 +62,42 @@ scripts/backup/*
 
 This is a scope declaration, not a `.standardsignore` exemption: a matching
 path raises no DB-1 finding at all, the same way the ORM's migration folder
-already doesn't. It lives in one file, reviewed like any other change to the
-repo, so no single file or PR can opt itself out of DB-1 unnoticed — declaring
-a path is visible in the diff of the one file every reviewer already knows to
-check.
+already doesn't.
 
 A path this file does not name is still application code. Raw SQL there still
 fails, whatever the file calls itself or where else in the tree it sits.
+
+### What stops this from becoming a per-PR exemption
+
+Not "ordinary review" — a PR that adds its own raw SQL plus its own
+`.standards-db-tooling` line gets exactly the same review as any other PR.
+Three separate, mechanical things stop it:
+
+- **Ownership.** `.standards-db-tooling` is CODEOWNERS-owned
+  (`../docs/repo-settings.md#repo-5--codeowners-covers-the-escape-hatches`),
+  synced fleet-wide by `SYNC-1`. Changing it needs the admin team, the same as
+  `.standardsignore`.
+- **The shape rule, below.** A catch-all or a bare top-level directory
+  wildcard is refused, so a declaration has to name real, specific tooling —
+  it cannot buy scope for an entire source tree in one line.
+- **The audit.** `standards-audit.sh` inventories every declared path, the
+  same way it inventories exemptions, and flags one whose glob matches no
+  tracked file (`STD-002`).
+
+### The shape rule
+
+A line is refused, and reported as a DB-1 finding on `.standards-db-tooling`
+itself, if it grants no legitimate declaration:
+
+- **A catch-all with no literal path segment** — every `/`-separated segment
+  is a bare `*` once `**` is collapsed to `*` (they are the same wildcard
+  here; `*` already crosses `/`). Refused: `*`, `**`, `**/*`, `*/*`.
+- **A bare top-level directory wildcard, covering a whole source root** —
+  exactly one literal segment followed by one wildcard segment. Refused:
+  `src/*`, `src/**`.
+
+A path with two or more literal segments (`ops/db-tooling/*`), or none at all
+— an exact filename (`ops/db-tooling/backup.ts`) — is unaffected: that is the
+shape a real per-file or per-subdirectory declaration takes. A refused line
+grants no scope; the file or path it would have covered is still scanned as
+ordinary application code.

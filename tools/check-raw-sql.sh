@@ -5,6 +5,8 @@
 # Usage:
 #   check-raw-sql.sh [--mode warn|enforce] [--json] [--self-test]
 
+# shellcheck disable=SC2094  # ratchet_finding writes to stdout; the tooling file is only ever read
+
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -72,20 +74,45 @@ in_orm_dir() {
   return 1
 }
 
+# Every accepted line of $DB_TOOLING_FILE, newline-separated. Set by
+# load_db_tooling_declarations, which also fails a refused line closed: it
+# reports the line and grants it no scope, rather than skip or honour it.
+DB_TOOLING_ACCEPTED=""
+
+# A refused line grants no scope; reasons and the shape rule:
+# tools/lib/ratchet.sh, tools/check-raw-sql.md.
+load_db_tooling_declarations() {
+  DB_TOOLING_ACCEPTED=""
+  [ -f "$DB_TOOLING_FILE" ] || return 0
+  local ln=0 line reason
+  while IFS= read -r line || [ -n "$line" ]; do
+    ln=$((ln + 1))
+    case "$line" in ''|\#*) continue ;; esac
+    if reason=$(ratchet_db_tooling_refused_reason "$line"); then
+      ratchet_finding "DB-1" "$DB_TOOLING_FILE" "$ln" \
+        "refused: $reason ('$line') — declares no tooling path"
+      continue
+    fi
+    DB_TOOLING_ACCEPTED="$DB_TOOLING_ACCEPTED$line
+"
+  done < "$DB_TOOLING_FILE"
+}
+
 # Reuses ratchet_glob_matches, the one matcher every gate and the audit's own
 # staleness check share — a second copy here would eventually disagree with it.
 in_declared_tooling() {
   local file="$1" glob
-  [ -f "$DB_TOOLING_FILE" ] || return 1
+  [ -n "$DB_TOOLING_ACCEPTED" ] || return 1
   while IFS= read -r glob; do
-    case "$glob" in ''|\#*) continue ;; esac
+    [ -n "$glob" ] || continue
     ratchet_glob_matches "$glob" "$file" && return 0
-  done < "$DB_TOOLING_FILE"
+  done <<< "$DB_TOOLING_ACCEPTED"
   return 1
 }
 
 main() {
   ratchet_init "$@" || exit 2
+  load_db_tooling_declarations
 
   local dirs
   dirs=$(setting_for "orm_migration_dirs") || dirs="$DEFAULT_ORM_MIGRATION_DIRS"
@@ -223,6 +250,44 @@ EOF
       || { echo "FAIL: declaring db tooling silenced unrelated application code"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"file":"ops/db-tooling/backup.ts".*"level":"exempt"' \
       && { echo "FAIL: declared tooling reported as an exemption rather than out of scope"; echo "$out"; exit 1; }
+
+    # The reviewer's own repro (round 1, DO-NOT-MERGE): a catch-all line must
+    # not turn the file into a per-PR exemption under a new name.
+    mkdir -p src
+    cat > src/app.ts <<'EOF'
+const rows = db.prepare('SELECT * FROM users WHERE id = ?').all(id);
+EOF
+    printf '*\n' > .standards-db-tooling
+    git add -A && git commit -qm catch-all
+    out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
+    expect src/app.ts 1 "a bare '*' line let raw SQL in application code pass"
+    printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling","line":1,"level":"error".*catch-all' \
+      || { echo "FAIL: the refused '*' line was not reported on .standards-db-tooling"; echo "$out"; exit 1; }
+    "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
+      && { echo "FAIL: a catch-all declaration did not fail the build"; exit 1; }
+
+    # Every refused shape: each reported, none granting scope to src/app.ts.
+    refused_shape() {
+      printf '%s\n' "$1" > .standards-db-tooling
+      git add -A && git commit -qm refuse-shape
+      out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
+      printf '%s' "$out" | grep -q "\"file\":\"\.standards-db-tooling\",\"line\":1,\"level\":\"error\"" \
+        || { echo "FAIL: '$1' was not refused"; echo "$out"; exit 1; }
+      printf '%s' "$out" | grep -q '"file":"src/app.ts","line":1,"level":"error"' \
+        || { echo "FAIL: '$1' granted scope to application code"; echo "$out"; exit 1; }
+    }
+    refused_shape '**'
+    refused_shape '**/*'
+    refused_shape 'src/*'
+    refused_shape 'src/**'
+
+    # Comments and blank lines in the declaration file are not path globs.
+    printf '# a comment\n\nops/db-tooling/*\n' > .standards-db-tooling
+    git add -A && git commit -qm tooling-comments
+    out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
+    refuse ops/db-tooling/backup.ts '[0-9]*' "a comment or blank line in .standards-db-tooling was read as a glob"
+    printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling"' \
+      && { echo "FAIL: a comment or blank line in .standards-db-tooling was reported as refused"; echo "$out"; exit 1; }
 
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q '::error.*DB-1' \

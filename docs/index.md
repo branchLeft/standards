@@ -215,18 +215,18 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Repository settings — `repo-settings.md`
 
-| ID      | Rule                                                                                | Gate      | Encoded by               |
-| ------- | ----------------------------------------------------------------------------------- | --------- | ------------------------ |
-| REPO-1  | Default-branch ruleset shape: linear history, signed commits, squash-only PR        | `auto`    | `templates/rulesets/`    |
-| REPO-2  | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                 | `auto`    | `templates/rulesets/`    |
-| REPO-3  | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures     | `auto`    | `templates/rulesets/`    |
-| REPO-4  | Required checks: never before a real run, `warn`-mode scope documented, names match | `review`  | `tools/ruleset-audit.sh` |
-| REPO-5  | CODEOWNERS covers the escape hatches — ignore files, mode files, floors             | `pending` | —                        |
-| REPO-6  | Every repo's ruleset payload is committed and audited                               | `auto`    | `tools/ruleset-audit.sh` |
-| REPO-7  | An apply never reduces live protection — a weakening payload is refused             | `auto`    | `tools/ruleset-apply.sh` |
-| REPO-8  | Every commit is signed; signing is never switched off to get past a block           | `pending` | —                        |
-| REPO-9  | Every public repo has secret scanning and push protection on                        | `pending` | —                        |
-| REPO-10 | Every agent-written commit and pull request says so                                 | `pending` | —                        |
+| ID      | Rule                                                                                                      | Gate      | Encoded by               |
+| ------- | --------------------------------------------------------------------------------------------------------- | --------- | ------------------------ |
+| REPO-1  | Default-branch ruleset shape: linear history, signed commits, squash-only PR                              | `auto`    | `templates/rulesets/`    |
+| REPO-2  | One bypass actor — `OrganizationAdmin`, in `pull_request` mode only                                       | `auto`    | `templates/rulesets/`    |
+| REPO-3  | Release tags block `deletion`, `update`, `non_fast_forward`; require signatures                           | `auto`    | `templates/rulesets/`    |
+| REPO-4  | Required checks: never before a real run, `warn`-mode scope documented, names match                       | `review`  | `tools/ruleset-audit.sh` |
+| REPO-5  | CODEOWNERS covers the escape hatches — ignore files, mode files, floors, DB-1's tooling scope declaration | `pending` | —                        |
+| REPO-6  | Every repo's ruleset payload is committed and audited                                                     | `auto`    | `tools/ruleset-audit.sh` |
+| REPO-7  | An apply never reduces live protection — a weakening payload is refused                                   | `auto`    | `tools/ruleset-apply.sh` |
+| REPO-8  | Every commit is signed; signing is never switched off to get past a block                                 | `pending` | —                        |
+| REPO-9  | Every public repo has secret scanning and push protection on                                              | `pending` | —                        |
+| REPO-10 | Every agent-written commit and pull request says so                                                       | `pending` | —                        |
 
 **`update` is the clause people leave out**, and leaving it out is the whole
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`

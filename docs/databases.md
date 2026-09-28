@@ -16,10 +16,16 @@ Database tooling is out of DB-1's scope: backup, restore and migration
 tooling drives the database directly — issuing `mysqldump`, restoring a dump,
 running the ORM's own migration runner — and that is its job, not a
 violation to work around. A repo declares which paths are that tooling once,
-in `.standards-db-tooling` at its root, reviewed the same way any other file
-in the repo is. A path nothing has declared is still application code, and
-raw SQL there still fails; declaring a path is a scope decision, not a
-per-file escape hatch, so nothing can opt itself out silently.
+in `.standards-db-tooling` at its root. A path nothing has declared is still
+application code, and raw SQL there still fails.
+
+Three things stop this file from becoming a per-PR exemption under a new
+name, none of them "ordinary review": `.standards-db-tooling` is
+CODEOWNERS-owned (`REPO-5`), so a PR cannot change it without the admin team;
+the checker refuses a catch-all or a bare top-level directory wildcard and
+fails closed, so a declaration must name real, specific tooling paths; and
+the audit inventories every declared path and flags one whose glob matches
+no tracked file, the same way it flags a stale exemption (`STD-002`).
 
 **Why:** raw SQL in application code ties it to one database dialect, and it
 escapes the types the rest of the code relies on. Database tooling makes no

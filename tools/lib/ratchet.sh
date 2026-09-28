@@ -97,12 +97,51 @@ ratchet_is_enforced() {
 # this would eventually disagree, and the disagreement would show up as an
 # exemption reported stale while it is still suppressing a finding.
 ratchet_glob_matches() {
-  local glob="$1" path="$2"
-  # Unquoted: inside double quotes the `\*` replacement is a literal backslash
-  # and the resulting pattern then matches only a literal asterisk.
-  glob=${glob//\*\*/\*}
+  local glob path
+  glob=$(ratchet_collapse_glob "$1")
+  path="$2"
   # shellcheck disable=SC2254  # $glob is a pattern by design
   case "$path" in $glob) return 0 ;; esac
+  return 1
+}
+
+# `**` collapses to `*` so a caller judges breadth by the same shape
+# ratchet_glob_matches will later match against. Shared for the same reason
+# ratchet_glob_matches itself is shared: two copies would disagree.
+ratchet_collapse_glob() {
+  local g
+  # Unquoted: inside double quotes the `\*` replacement is a literal backslash
+  # and the resulting pattern then matches only a literal asterisk.
+  g=${1//\*\*/\*}
+  printf '%s' "$g"
+}
+
+# A DB-1 scope-declaration line that grants no legitimate declaration: the
+# rule and why, tools/check-raw-sql.md. Prints the reason and returns 0 if
+# $1 must be refused; returns 1 and prints nothing if it is fine.
+ratchet_db_tooling_refused_reason() {
+  local glob rest seg literal=0 n=0 last="" first=""
+  glob=$(ratchet_collapse_glob "$1")
+  rest="$glob"
+  while :; do
+    case "$rest" in
+      */*) seg="${rest%%/*}"; rest="${rest#*/}" ;;
+      *)   seg="$rest"; rest="" ;;
+    esac
+    n=$((n + 1))
+    [ "$n" -eq 1 ] && first="$seg"
+    last="$seg"
+    [ "$seg" = "*" ] || literal=1
+    [ -n "$rest" ] || break
+  done
+  if [ "$literal" -eq 0 ]; then
+    printf 'a catch-all with no literal path segment'
+    return 0
+  fi
+  if [ "$n" -eq 2 ] && [ "$last" = "*" ] && [ -n "$first" ]; then
+    printf 'a bare top-level directory wildcard, which covers a whole source root'
+    return 0
+  fi
   return 1
 }
 
@@ -274,6 +313,26 @@ ratchet_self_test() {
     ratchet_glob_matches "src/*" "src/deep/a.ts" || { echo "FAIL: glob across separators"; exit 1; }
     ratchet_glob_matches "src/**" "src/deep/a.ts" || { echo "FAIL: ** normalisation"; exit 1; }
     ratchet_glob_matches "src/*" "app/a.ts"      && { echo "FAIL: glob over-matched"; exit 1; }
+
+    refused() {
+      local reason
+      reason=$(ratchet_db_tooling_refused_reason "$1") \
+        || { echo "FAIL: '$1' should be refused ($2)"; exit 1; }
+      [ -n "$reason" ] || { echo "FAIL: '$1' refused with no reason"; exit 1; }
+    }
+    fine() {
+      ratchet_db_tooling_refused_reason "$1" \
+        && { echo "FAIL: '$1' should not be refused ($2)"; exit 1; }
+      return 0
+    }
+    refused '*'                "bare catch-all"
+    refused '**'                "bare recursive catch-all"
+    refused '**/*'              "catch-all with no literal segment"
+    refused 'src/*'             "top-level directory wildcard"
+    refused 'src/**'            "top-level directory wildcard, ** spelling"
+    fine    'ops/db-tooling/*'  "two literal segments plus a wildcard tail"
+    fine    'ops/db-tooling/backup.ts' "an exact filename"
+    fine    'backup.ts'         "a bare filename with no wildcard"
 
     ratchet_is_exempt "src/a.ts" "TS-2"    || { echo "FAIL: glob exemption"; exit 1; }
     ratchet_is_exempt "src/a.ts" "TS-3"    && { echo "FAIL: clause not scoped"; exit 1; }
