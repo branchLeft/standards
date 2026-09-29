@@ -20,6 +20,7 @@ FLEET_REPOS=(
   ghost-tenant-blog
   content-safety
   control-plane
+  speckify
 )
 
 # Overridable so --self-test can inject fixture data with no network call —
