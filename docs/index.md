@@ -86,15 +86,38 @@ finding is to build the control or the check, never to go and look by hand.
 
 ## TypeScript
 
-| ID   | Rule                                                                                             | Gate      | Encoded by             |
-| ---- | ------------------------------------------------------------------------------------------------ | --------- | ---------------------- |
-| TS-1 | `extends` resolves to a `@branchleft/tsconfig` entry                                             | `auto`    | `@branchleft/tsconfig` |
-| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                      |
-| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                      |
-| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`     |
-| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                      |
-| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                      |
-| TS-7 | No default exports outside framework-mandated module shapes                                      | `review`  | —                      |
+| ID   | Rule                                                                                             | Gate      | Encoded by                |
+| ---- | ------------------------------------------------------------------------------------------------ | --------- | ------------------------- |
+| TS-1 | Effective `compilerOptions` meet the standard's strict floor                                     | `auto`    | `tools/check-tsconfig.sh` |
+| TS-2 | No `include` entry is a directory-flat glob (`*.ts`, `src/*.ts`)                                 | `auto`    | —                         |
+| TS-3 | No `compilerOptions` key repeats the inherited base's value                                      | `auto`    | —                         |
+| TS-4 | The extended tier is at or above the floor                                                       | `auto`    | `tools/floors.tsv`        |
+| TS-5 | Every git-tracked `.ts` under the project root appears in `tsc --listFiles`                      | `auto`    | —                         |
+| TS-6 | Canonical script names: `typecheck`, `lint`, `lint:check`, `format`, `format:check`, `test:unit` | `pending` | —                         |
+| TS-7 | No default exports outside framework-mandated module shapes                                      | `review`  | —                         |
+
+**TS-1 asserts a value, not a lineage.** The gate computes each tsconfig's
+effective `compilerOptions` — its own settings plus everything it inherits
+through `extends`, following a local chain and, where an entry names
+`@branchleft/tsconfig`, resolving that preset from the standards checkout the
+gate itself runs from, never from the repo's own `node_modules` — and checks
+the result against the standard's strict floor: every flag `strict-1.json`
+sets on top of `base.json`, currently `strict`, `noUnusedLocals`,
+`noUnusedParameters`, `noImplicitReturns` and `noFallthroughCasesInSwitch`
+(read from `packages/tsconfig` itself, so raising `TS-4`'s floor in
+`tools/floors.tsv` raises what TS-1 requires with no second edit). Extending
+the preset at that tier is one way to arrive at those values; an inline
+config that sets them itself is another, and the two now pass equally.
+Weakening any of them, at any point in an `extends` chain, fails, naming the
+flag, the value found and the file that set it.
+
+**Why:** a repo consuming a package built under these standards — installing
+it, running its tests, building it — must not need a `@branchleft/*` package
+or the token that gates it just to have a tsconfig. Standards run in CI only;
+nothing about using or contributing to a repo should require adopting them
+locally. `TS-4`'s tier-based check still runs for repos that extend the
+preset by name; TS-1 is what makes an inline config an equally valid way to
+meet the floor.
 
 **Why TS-2 and TS-5 are gates rather than inheritance.** `include`, `exclude` and
 `files` resolve relative to the config file that declares them, so an `include`

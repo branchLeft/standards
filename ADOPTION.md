@@ -30,6 +30,12 @@ minimumReleaseAgeExclude[]=@branchleft/*
 
 ## 2. tsconfig
 
+Adopting the shared preset is the easiest way to meet TS-1, not the only one:
+the gate checks the tsconfig's effective `compilerOptions`, so a repo that
+would rather not add an `@branchleft/*` dependency to its own tsconfig can set
+the same flags inline instead and passes identically — see `docs/index.md`'s
+TypeScript section for the exact floor.
+
 ```jsonc
 {
   "extends": [
