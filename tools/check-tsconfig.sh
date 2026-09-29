@@ -17,18 +17,70 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FLOOR_TIER=$(awk -F'\t' '$1=="TS-4"{print $2}' "$HERE/floors.tsv" 2>/dev/null)
 : "${FLOOR_TIER:=strict-1}"
 
+# packages/tsconfig, resolved from THIS checkout — the standards checkout the
+# reusable workflow places at `.standards/`, never the consuming repo's
+# node_modules. TS-1 no longer requires a repo to install or extend
+# `@branchleft/tsconfig`; the flags it asserts still live there, and this is
+# how the gate reads them without a token.
+TSCONFIG_PKG_DIR="$HERE/../packages/tsconfig"
+
 tier_rank() {
   case "$1" in
     base) echo 0 ;; strict-1) echo 1 ;; strict-2) echo 2 ;; *) echo -1 ;;
   esac
 }
 
+# TS-1's floor: the boolean strictness/safety flags set by base.json plus
+# every tier up to and including $FLOOR_TIER, filtered to the flags that are
+# actually about type-safety strictness — `target`, `module`, `lib` and
+# similar shape/output settings from base.json are not what TS-1 is about and
+# a repo choosing its own is not a weakening.
+#
+# Reading the tier's own JSON files rather than hardcoding values here means
+# TS-1 tracks TS-4's floor automatically: raising tools/floors.tsv's TS-4 row
+# raises what TS-1 requires too, with no second edit.
+floor_flags_json() {
+  node - "$TSCONFIG_PKG_DIR" "$FLOOR_TIER" <<'NODE'
+const fs = require('fs');
+const path = require('path');
+const dir = process.argv[2];
+const tier = process.argv[3];
+
+const STRICTNESS_FLAGS = new Set([
+  'strict', 'noImplicitAny', 'strictNullChecks', 'strictFunctionTypes',
+  'strictBindCallApply', 'strictPropertyInitialization', 'noImplicitThis',
+  'useUnknownInCatchVariables', 'alwaysStrict',
+  'noUnusedLocals', 'noUnusedParameters', 'noImplicitReturns',
+  'noFallthroughCasesInSwitch', 'noUncheckedIndexedAccess',
+  'exactOptionalPropertyTypes', 'noImplicitOverride',
+  'noPropertyAccessFromIndexSignature',
+]);
+
+const order = ['base', 'strict-1', 'strict-2'];
+const idx = order.indexOf(tier);
+const files = idx < 0 ? ['base'] : order.slice(0, idx + 1);
+
+let merged = {};
+for (const t of files) {
+  const full = path.join(dir, t === 'base' ? 'base.json' : `${t}.json`);
+  if (!fs.existsSync(full)) continue;
+  const c = JSON.parse(fs.readFileSync(full, 'utf8'));
+  for (const [k, v] of Object.entries(c.compilerOptions || {})) {
+    if (STRICTNESS_FLAGS.has(k)) merged[k] = v;
+  }
+}
+console.log(JSON.stringify(merged));
+NODE
+}
+
 # Reads one tsconfig and prints findings as: CLAUSE<TAB>LINE<TAB>MESSAGE
 analyse_tsconfig() {
-  node - "$1" <<'NODE'
+  node - "$1" "$TSCONFIG_PKG_DIR" "$2" <<'NODE'
 const fs = require('fs');
 const path = require('path');
 const file = process.argv[2];
+const standardsTsconfigDir = process.argv[3];
+const floorFlags = JSON.parse(process.argv[4] || '{}');
 const raw = fs.readFileSync(file, 'utf8');
 
 // tsconfig is JSONC in practice. Strip comments and trailing commas before
@@ -97,9 +149,65 @@ const collectExtends = (from, depth = 0, seen = new Set()) => {
 };
 const extendsChain = collectExtends(file);
 
-// TS-1 — must extend a @branchleft base, directly or through a relative parent.
-if (!extendsChain.some((e) => e.startsWith('@branchleft/tsconfig'))) {
-  console.log(`TS-1\t${lineOf('"extends"') || 1}\tdoes not extend a @branchleft/tsconfig base`);
+// Resolves one `extends` specifier to an absolute config file, or null if it
+// names something TS-1 has no opinion about (a third-party base).
+//
+// A `@branchleft/tsconfig` specifier resolves from THIS checkout's own
+// packages/tsconfig — the standards checkout the reusable workflow places
+// at `.standards/` — never the consuming repo's node_modules. That is the
+// whole point: a contributor building the repo locally needs no token and no
+// install to have their tsconfig checked the same way CI checks it.
+function resolveExtendsSpec(spec, fromFile) {
+  if (spec.startsWith('.')) {
+    const base = path.resolve(path.dirname(fromFile), spec);
+    return fs.existsSync(base) && fs.statSync(base).isFile() ? base : `${base}.json`;
+  }
+  if (spec.startsWith('@branchleft/tsconfig')) {
+    const rel = spec.replace('@branchleft/tsconfig', '') || '/base.json';
+    return path.join(standardsTsconfigDir, rel);
+  }
+  return null;
+}
+
+// The effective compilerOptions this config resolves to, each value tagged
+// with the file that last set it. "Last" following the same precedence
+// TypeScript itself uses: a config's own compilerOptions win over anything
+// it extends, and of several `extends` entries a later one wins over an
+// earlier one. Tagging the source file is what lets a finding below name
+// which file weakened a flag, rather than just the file under scan — the
+// weakening is often several links up an `extends` chain.
+function effectiveOptions(from, depth = 0, seen = new Set()) {
+  const abs = path.resolve(from);
+  if (depth > 10 || seen.has(abs) || !fs.existsSync(abs)) return {};
+  seen.add(abs);
+  let c;
+  try { c = JSON.parse(stripJsonc(fs.readFileSync(abs, 'utf8'))); } catch { return {}; }
+  const merged = {};
+  for (const e of extendsOf(c)) {
+    const target = resolveExtendsSpec(String(e), abs);
+    if (target) Object.assign(merged, effectiveOptions(target, depth + 1, seen));
+  }
+  for (const [k, v] of Object.entries(c.compilerOptions || {})) {
+    merged[k] = { value: v, file: abs };
+  }
+  return merged;
+}
+
+// TS-1 — the effective compilerOptions meet the standard's strict floor, by
+// value rather than by lineage. Extending `@branchleft/tsconfig` at the
+// floor tier is one way to arrive at these values; an inline config that
+// sets them itself is another, and the two now pass equally. Neither an
+// install nor a token is needed for either path: only this checkout's own
+// packages/tsconfig, read directly, ever contributes a value.
+const effective = effectiveOptions(file);
+for (const [flag, required] of Object.entries(floorFlags)) {
+  const entry = effective[flag];
+  const matches = entry && JSON.stringify(entry.value) === JSON.stringify(required);
+  if (!matches) {
+    const actual = entry ? JSON.stringify(entry.value) : 'unset';
+    const where = entry ? path.relative(process.cwd(), entry.file) : file;
+    console.log(`TS-1\t${lineOf(`"${flag}"`) || lineOf('"extends"') || 1}\t${flag} is ${actual} in ${where}, the standard's floor requires ${JSON.stringify(required)}`);
+  }
 }
 
 // TS-2 — a flat glob matches root-level files only. A file added in a
@@ -179,9 +287,13 @@ NODE
 main() {
   ratchet_init "$@" || exit 2
 
-  local tsconfigs
+  local tsconfigs floor_flags
   tsconfigs=$(ratchet_scope_files '(^|/)tsconfig(\.[a-z]+)?\.json$' | grep -v node_modules)
   [ -z "$tsconfigs" ] && { ratchet_summary; return $?; }
+
+  # Computed once per run, not per file: the floor is fleet-wide, not
+  # per-tsconfig.
+  floor_flags=$(floor_flags_json)
 
   local f clause ln msg tier
   while IFS= read -r f; do
@@ -195,7 +307,7 @@ main() {
         continue
       fi
       ratchet_finding "$clause" "$f" "$ln" "$msg"
-    done < <(analyse_tsconfig "$f")
+    done < <(analyse_tsconfig "$f" "$floor_flags")
 
     if [ -n "$tier" ] && [ "$tier" != "none" ]; then
       if [ "$(tier_rank "$tier")" -lt "$(tier_rank "$FLOOR_TIER")" ]; then
@@ -259,7 +371,8 @@ self_test() {
     mkdir -p sub node_modules/@branchleft
     # Resolve through node_modules exactly as a consuming repo does, rather than
     # via an env override — otherwise the test proves nothing about the path
-    # production actually takes.
+    # production actually takes. Only TS-3 still resolves this way; TS-1 reads
+    # packages/tsconfig from this checkout directly (see below).
     ln -s "$HERE/../packages/tsconfig" node_modules/@branchleft/tsconfig
 
     cat > tsconfig.json <<'EOF'
@@ -275,6 +388,10 @@ EOF
 
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
 
+    # Extending only base.json is short of the strict-1 floor, so TS-1 now
+    # fires too — same defect TS-4 already named by tier, now also named by
+    # value.
+    printf '%s' "$out" | grep -q 'TS-1' || { echo "FAIL: extending base only should miss the strict-1 floor"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q 'TS-2' || { echo "FAIL: flat glob not caught"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q 'TS-3' || { echo "FAIL: redundant inherited option not caught"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q 'TS-4' || { echo "FAIL: tier below floor not caught"; echo "$out"; exit 1; }
@@ -288,7 +405,7 @@ EOF
 EOF
     git add -A && git commit -qm fix
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -qE 'TS-(2|3|4)' && { echo "FAIL: clean config reported"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -qE 'TS-(1|2|3|4)' && { echo "FAIL: clean config reported"; echo "$out"; exit 1; }
 
     # A child that reaches the shared base through a relative parent has
     # adopted it. Judging its own `extends` line alone fails the normal shape
@@ -310,6 +427,8 @@ EOF
 
     # Mutation: break the chain at the parent. Both configs must now fail,
     # otherwise the walk above is passing everything rather than resolving.
+    # Each carries one TS-1 line per missing floor flag, so the assertion
+    # counts distinct files named rather than a fixed line count.
     cat > tsconfig.json <<'EOF'
 {
   "include": ["**/*.ts"]
@@ -317,8 +436,10 @@ EOF
 EOF
     git add -A && git commit -qm break
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    [ "$(printf '%s\n' "$out" | grep -c 'TS-1')" -eq 2 ] || {
-      echo "FAIL: broken chain should report TS-1 on both configs"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep 'TS-1' | grep -qE 'file=tsconfig\.json,' || {
+      echo "FAIL: broken chain should report TS-1 on tsconfig.json"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep 'TS-1' | grep -qE 'file=tsconfig\.build\.json,' || {
+      echo "FAIL: broken chain should report TS-1 on tsconfig.build.json"; echo "$out"; exit 1; }
 
     cat > tsconfig.json <<'EOF'
 {
@@ -329,14 +450,92 @@ EOF
     rm tsconfig.build.json
     git add -A && git commit -qm restore
 
-    # An unresolvable base is a check that did not run, not a violation. The
-    # reusable workflow installs nothing, so this is the normal case there —
-    # failing on it would make every repo red for a check that never executed.
+    # An unresolvable base only affects TS-3, which still walks the
+    # consuming repo's own node_modules — a check that did not run, not a
+    # violation. The reusable workflow installs nothing, so this is the
+    # normal case there — failing on it would make every repo red for a
+    # check that never executed. TS-1 is unaffected: it never looks at
+    # node_modules, so it must still pass.
     rm node_modules/@branchleft/tsconfig
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1); rc=$?
     printf '%s' "$out" | grep -q '::warning.*TS-3 not checked' || {
       echo "FAIL: missing base should warn"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q 'TS-1' && {
+      echo "FAIL: TS-1 depended on the repo's own node_modules"; echo "$out"; exit 1; }
     [ "$rc" -eq 0 ] || { echo "FAIL: missing base should not fail the run"; echo "$out"; exit 1; }
+
+    # --- TS-1: the floor is asserted by value, not by lineage ---------------
+    # This is the shape the ruling is about: a contributor building the repo
+    # needs no `@branchleft/tsconfig` install and no token, so an inline
+    # config that sets the floor's own flags must pass exactly as extending
+    # the preset does.
+    cat > tsconfig.json <<'EOF'
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["**/*.ts"]
+}
+EOF
+    git add -A && git commit -qm inline-strict
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'TS-1' && {
+      echo "FAIL: an inline config meeting the floor by value reported TS-1"; echo "$out"; exit 1; }
+
+    # Weakening one floor flag inline must fail, naming the flag and the file
+    # that set it.
+    cat > tsconfig.json <<'EOF'
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": false
+  },
+  "include": ["**/*.ts"]
+}
+EOF
+    git add -A && git commit -qm inline-weakened
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q "noFallthroughCasesInSwitch is false in tsconfig.json" || {
+      echo "FAIL: a weakened inline flag was not named with its value and file"; echo "$out"; exit 1; }
+
+    # A chain that weakens a flag partway up, rather than at the file under
+    # scan, must still be caught, and the message must name the file that
+    # actually set the bad value — not just the leaf being checked.
+    cat > internal-base.json <<'EOF'
+{
+  "extends": "@branchleft/tsconfig/strict-1.json",
+  "compilerOptions": { "strict": false }
+}
+EOF
+    cat > tsconfig.json <<'EOF'
+{
+  "extends": "./internal-base.json",
+  "include": ["**/*.ts"]
+}
+EOF
+    git add -A && git commit -qm chain-weakened
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'strict is false in internal-base.json' || {
+      echo "FAIL: a flag weakened partway up an extends chain was not named with its own file"; echo "$out"; exit 1; }
+
+    # The positive twin: the same chain with the override removed passes.
+    cat > internal-base.json <<'EOF'
+{
+  "extends": "@branchleft/tsconfig/strict-1.json"
+}
+EOF
+    git add -A && git commit -qm chain-fixed
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'TS-1' && {
+      echo "FAIL: an extends chain reaching the floor through a local wrapper reported TS-1"; echo "$out"; exit 1; }
+    rm -f internal-base.json
 
     exit 0
   ) || rc=$?
