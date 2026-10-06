@@ -7,5 +7,3 @@ coverage/
 # Sibling worktrees live here and are never part of this repo's tree.
 .claude/worktrees/
 .worktrees/
-
-graphify-out/
