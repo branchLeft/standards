@@ -8,9 +8,42 @@ not a click-through per repo, and drift is a diff rather than a discovery.
 ## REPO-1 — the default-branch ruleset shape
 
 On the default branch: no deletion, no force-push, linear history, signed
-commits, and a pull request requiring one approving review, code-owner review,
-stale-review dismissal, last-push approval, resolved conversations, an extra
-approval for unattributed changes, and squash-only merge.
+commits, and a pull request requiring one approving review, stale-review
+dismissal, last-push approval, resolved conversations, an extra approval for
+unattributed changes, and squash-only merge.
+
+**Code-owner review is required per repo, not everywhere.** The field
+`require_code_owner_review` is set as follows, and no repo outside these lists
+is ruled on:
+
+| Value   | Repos                                                                                                                                                                    |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `true`  | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `.github`                                                                                       |
+| `false` | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards` |
+
+The `false` repos have this reason on record: the CODEOWNERS team there
+excludes the reviewer App, so a required code-owner review would stall agent
+pull requests. Contributing already requires organisation membership (the
+owner and the agent accounts), and the other REPO-1 protections above (a pull
+request, one approval, last-push approval, no force-push, no deletion, squash
+only) carry the gate.
+
+`ghost-platform-docs` is not in either list: its live value cannot be read
+(the rulesets endpoint returns 403 on a private repo on GitHub Free), and its
+committed payload says `true`. It stays unruled until the owner decides.
+
+**How an audit reads it.** For each repo in the table, the live value is
+`gh api repos/branchLeft/<repo>/rulesets/<id>` and the field is
+`.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review`,
+where `<id>` is the default-branch ruleset from `gh api repos/branchLeft/<repo>/rulesets`.
+The committed value is the same field in `templates/rulesets/<repo>/` on the
+default-branch payload. Both must equal the table's value. A repo that
+`ruleset-audit.sh` reports as `DRIFT` on this field, or a repo outside the
+table whose payload sets it, fails this clause. The table is the source of
+truth: a live value that differs from it is a finding, not a reason to change
+the table without an owner ruling. A repo with no live ruleset (`ghost-tenant-blog`
+until its ruleset is applied) has no live value to read, so only its payload
+is checked until then.
 
 `require_extra_approval_for_unattributed_changes` arrived in the payloads by
 being **chosen**, not by being inherited: GitHub began setting it server-side,
