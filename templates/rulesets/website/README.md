@@ -9,7 +9,9 @@ squash-only merge. Its `required_status_checks` rule names four contexts:
 - `docs-lint / docs-lint` and `standards / Standards gates`, emitted by the
   callers in `.github/workflows/`.
 
-The repo's `.standards.mode` file contains `warn` (read on `main`).
+The repo's `.standards.mode` file contains `warn` (read on `main`). The website
+gate runs in warn mode, so requiring `standards / Standards gates` gates new and
+changed code, not the tree as a whole (REPO-4, rule 2; `docs/ratchet.md`).
 
 What a warn-mode finding does is defined by the standards workflow at the
 pinned version; read it there.
