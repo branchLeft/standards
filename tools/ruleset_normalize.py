@@ -4,9 +4,13 @@
 A live read without bypass_actors is UNKNOWN, never []. Why: ruleset-audit.md.
 """
 
+import contextlib
 import difflib
+import io
 import json
+import os
 import sys
+import tempfile
 
 # The value of a bypass_actors field this token cannot see. A string, because no
 # real bypass_actors value is one, so it compares unequal to every list.
@@ -14,9 +18,16 @@ UNKNOWN = "UNKNOWN"
 
 CLEAN = 0
 DRIFT = 1
+ERROR = 2
 UNCOMPARED = 3
 
 UNKNOWN_TEXT = "bypass_actors: UNKNOWN (bypass_actors not returned to this token)"
+
+USAGE = (
+    "usage: ruleset_normalize.py [--payload] < ruleset.json\n"
+    "       ruleset_normalize.py --report PAYLOAD.json < live.json\n"
+    "       ruleset_normalize.py --self-test"
+)
 
 
 def canon_rule(rule):
@@ -88,11 +99,37 @@ def report(payload, live):
     return (CLEAN if comparable else UNCOMPARED), lines
 
 
+def judge(payload, live):
+    """report(), but a crash is ERROR: an uncaught exception also exits 1.
+    """
+    try:
+        return report(payload, live)
+    except (KeyError, TypeError, ValueError) as exc:
+        return ERROR, [f"ERROR: cannot compare ({type(exc).__name__}: {exc})"]
+
+
+def run_main(args, stdin_text):
+    """Run main() in-process; returns (exit code, stdout, stderr)."""
+    out, err = io.StringIO(), io.StringIO()
+    real_stdin = sys.stdin
+    sys.stdin = io.StringIO(stdin_text)
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = main(["ruleset_normalize.py", *args])
+    finally:
+        sys.stdin = real_stdin
+    return rc, out.getvalue(), err.getvalue()
+
+
 def self_test():
     rc_all = 0
 
-    def check(name, got, want):
+    def check(name, fn, want):
         nonlocal rc_all
+        try:
+            got = fn()
+        except Exception as exc:  # a crash is a failed check, not a traceback
+            got = f"raised {type(exc).__name__}: {exc}"
         if got != want:
             print(f"  FAIL {name}: expected {want!r}, got {got!r}")
             rc_all = 1
@@ -118,57 +155,82 @@ def self_test():
     repo_role = {"actor_type": "RepositoryRole", "actor_id": 5, "bypass_mode": "pull_request"}
 
     # Canonical form: what each bypass_actors state becomes.
-    check("absent key canonicalises to UNKNOWN", canon(ruleset())["bypass_actors"], UNKNOWN)
-    check("null canonicalises to UNKNOWN", canon(ruleset(None))["bypass_actors"], UNKNOWN)
-    check("present [] stays []", canon(ruleset([]))["bypass_actors"], [])
-    check(
-        "present list stays a list, actor_id filled in",
-        canon(ruleset([org_admin]))["bypass_actors"],
-        [org_admin_from_api],
-    )
-    check("absent key read as [] when given a payload", canon(ruleset(), absent=[])["bypass_actors"], [])
+    check("absent key canonicalises to UNKNOWN",
+          lambda: canon(ruleset())["bypass_actors"], UNKNOWN)
+    check("null canonicalises to UNKNOWN",
+          lambda: canon(ruleset(None))["bypass_actors"], UNKNOWN)
+    check("present [] stays []", lambda: canon(ruleset([]))["bypass_actors"], [])
+    check("present list stays a list, actor_id filled in",
+          lambda: canon(ruleset([org_admin]))["bypass_actors"], [org_admin_from_api])
+    check("absent key read as [] when given a payload",
+          lambda: canon(ruleset(), absent=[])["bypass_actors"], [])
 
     # Report: live cannot see bypass_actors. Neither payload value may read as clean
     # or as drift on that field.
     unknown_only = (UNCOMPARED, [UNKNOWN_TEXT])
-    check(
-        "payload [OrganizationAdmin] vs live absent is UNKNOWN, not drift",
-        report(ruleset([org_admin]), ruleset()),
-        unknown_only,
-    )
-    check(
-        "payload [] vs live absent is UNKNOWN, not clean",
-        report(ruleset([]), ruleset()),
-        unknown_only,
-    )
-    check(
-        "payload with no key vs live absent is UNKNOWN",
-        report(ruleset(), ruleset()),
-        unknown_only,
-    )
+    check("payload [OrganizationAdmin] vs live absent is UNKNOWN, not drift",
+          lambda: report(ruleset([org_admin]), ruleset()), unknown_only)
+    check("payload [] vs live absent is UNKNOWN, not clean",
+          lambda: report(ruleset([]), ruleset()), unknown_only)
+    check("payload with no key vs live absent is UNKNOWN",
+          lambda: report(ruleset(), ruleset()), unknown_only)
 
     # Known values still compare, and an UNKNOWN field does not hide drift elsewhere.
-    check(
-        "present [] vs present [] is clean",
-        report(ruleset([]), ruleset([])),
-        (CLEAN, []),
-    )
-    rc, lines = report(ruleset([org_admin]), ruleset([org_admin_from_api]))
-    check("identical bypass with API-filled fields is clean", (rc, lines), (CLEAN, []))
+    check("present [] vs present [] is clean",
+          lambda: report(ruleset([]), ruleset([])), (CLEAN, []))
+    check("identical bypass with API-filled fields is clean",
+          lambda: report(ruleset([org_admin]), ruleset([org_admin_from_api])), (CLEAN, []))
     rc, lines = report(ruleset([org_admin]), ruleset([org_admin_from_api, repo_role]))
-    check("live has an extra bypass actor: drift", rc, DRIFT)
-    check(
-        "the extra bypass actor appears in the diff",
-        any(line.startswith("+") and "RepositoryRole" in line for line in lines),
-        True,
-    )
-    rc, lines = report(ruleset([]), ruleset([org_admin_from_api]))
-    check("live has a bypass the payload lacks: drift", rc, DRIFT)
+    check("live has an extra bypass actor: drift", lambda: rc, DRIFT)
+    check("the extra bypass actor appears in the diff",
+          lambda: any(line.startswith("+") and "RepositoryRole" in line for line in lines), True)
+    check("live has a bypass the payload lacks: drift",
+          lambda: report(ruleset([]), ruleset([org_admin_from_api]))[0], DRIFT)
     live_changed = ruleset()
     live_changed["enforcement"] = "evaluate"
     rc, lines = report(ruleset([org_admin]), live_changed)
-    check("drift elsewhere is still DRIFT when bypass is UNKNOWN", rc, DRIFT)
-    check("UNKNOWN is still reported alongside that drift", UNKNOWN_TEXT in lines, True)
+    check("drift elsewhere is still DRIFT when bypass is UNKNOWN", lambda: rc, DRIFT)
+    check("UNKNOWN is still reported alongside that drift", lambda: UNKNOWN_TEXT in lines, True)
+
+    # A payload with no key is compared as no bypass, the assumption the docs state.
+    # Pinned so that changing it is a deliberate act.
+    check("payload with no key vs live [] is clean (assumes no bypass)",
+          lambda: report(ruleset(), ruleset([])), (CLEAN, []))
+
+    # A crash in the comparison is ERROR, never DRIFT (exit 1 is a known difference).
+    check("live without name is ERROR, not DRIFT",
+          lambda: judge(ruleset([org_admin]), {k: v for k, v in ruleset().items()
+                                               if k != "name"})[0], ERROR)
+    check("live that is not an object is ERROR, not DRIFT",
+          lambda: judge(ruleset([org_admin]), [])[0], ERROR)
+    check("a live bypass_actors that is a string is ERROR, not DRIFT",
+          lambda: judge(ruleset([org_admin]), ruleset("nope"))[0], ERROR)
+
+    # CLI: report mode with bad input is ERROR (2), not DRIFT (1), and says why.
+    fd, payload_path = tempfile.mkstemp(suffix=".json")
+    with os.fdopen(fd, "w") as handle:
+        json.dump(ruleset([org_admin]), handle)
+    try:
+        check("CLI report: live without name exits ERROR",
+              lambda: run_main(["--report", payload_path], json.dumps({"id": 1}))[0], ERROR)
+        check("CLI report: live that is not JSON exits ERROR",
+              lambda: run_main(["--report", payload_path], "{not json")[0], ERROR)
+        check("CLI report: a missing payload file exits ERROR",
+              lambda: run_main(["--report", payload_path + ".missing"], "{}")[0], ERROR)
+    finally:
+        os.unlink(payload_path)
+
+    # CLI canonical mode: a payload with no key is [] only when asked for as a payload.
+    no_key = json.dumps(ruleset())
+    check("--payload: no-key payload canonicalises to []",
+          lambda: json.loads(run_main(["--payload"], no_key)[1])["bypass_actors"], [])
+    check("default mode: no-key input canonicalises to UNKNOWN",
+          lambda: json.loads(run_main([], no_key)[1])["bypass_actors"], UNKNOWN)
+
+    # A bad argument prints the usage line, not a line of the docstring.
+    check("bad argument prints usage and exits 2",
+          lambda: (lambda r: (r[0], r[2].startswith("usage:")))(run_main(["--bogus"], "")),
+          (2, True))
 
     if rc_all == 0:
         print("ruleset_normalize.py: self-test passed")
@@ -176,20 +238,36 @@ def self_test():
 
 
 def main(argv):
-    if len(argv) == 2 and argv[1] == "--self-test":
+    if argv[1:] == ["--self-test"]:
         return self_test()
-    if len(argv) == 3 and argv[1] == "--report":
-        payload = json.load(open(argv[2]))
-        rc, lines = report(payload, json.load(sys.stdin))
+
+    if argv[1:2] == ["--report"] and len(argv) == 3:
+        try:
+            with open(argv[2]) as handle:
+                payload = json.load(handle)
+            live = json.load(sys.stdin)
+        except (OSError, ValueError) as exc:
+            print(f"ERROR: cannot read the ruleset ({exc})")
+            return ERROR
+        rc, lines = judge(payload, live)
         for line in lines:
             print(line)
         return rc
-    if len(argv) != 1:
-        print(__doc__.strip().splitlines()[-1], file=sys.stderr)
-        return 2
-    json.dump(canon(json.load(sys.stdin)), sys.stdout, indent=2, sort_keys=True)
-    print()
-    return 0
+
+    if argv[1:] in ([], ["--payload"]):
+        # A committed payload's absent key means no bypass; a live read's means UNKNOWN.
+        absent = [] if argv[1:] == ["--payload"] else UNKNOWN
+        try:
+            canonical = canon(json.load(sys.stdin), absent=absent)
+        except (KeyError, TypeError, ValueError) as exc:
+            print(f"ERROR: cannot canonicalise ({exc})", file=sys.stderr)
+            return ERROR
+        json.dump(canonical, sys.stdout, indent=2, sort_keys=True)
+        print()
+        return 0
+
+    print(USAGE, file=sys.stderr)
+    return 2
 
 
 if __name__ == "__main__":

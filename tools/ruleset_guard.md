@@ -25,11 +25,17 @@ finding the guard could not read is not one anybody has seen.
 `bypass_actors` on the live side has a third state. GitHub returns that key
 only to a token with admin read, so a live ruleset read by any other token has
 no key at all. That is UNKNOWN, and it exits 3: the guard cannot prove the
-payload does not widen a bypass it cannot see, and an absent key must never be
-read as "no bypass actors", which would let any payload through. A present
-`[]` is still a claim and is compared as before. A payload with no
-`bypass_actors` key means no bypass (REPO-3's release tags are written that
-way), so it is compared as `[]`.
+payload does not widen a bypass it cannot see. An absent key must never be read
+as "no bypass actors", which would let a payload that writes no bypass through.
+A present `[]` is still a claim and is compared as before.
+
+A payload with no `bypass_actors` key is compared as `[]`. That rests on an
+assumption: GitHub's handling of a PUT that omits the key is not documented, and
+has not been verified. The consequence, stated plainly: a no-key payload against
+a live admin bypass such as `[OrganizationAdmin]` exits 0, because the guard
+reads the removed bypass as no finding. If GitHub in fact keeps the live bypass
+when the key is omitted, that exit 0 is wrong. Left for the owner to decide;
+the guard's rule is not changed here.
 
 ## Usage
 

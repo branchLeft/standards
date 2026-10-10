@@ -69,7 +69,7 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       if [ "$guard_rc" -eq 3 ]; then
         echo "  REFUSED: the guard could not classify the difference against live ${id}." >&2
         echo "  --allow-weakening does not cover this. Resolve it by hand." >&2
-        exit 1
+        exit 3
       elif [ "$guard_rc" -ne 0 ]; then
         if [ "$allow_weakening" = true ]; then
           echo "  --allow-weakening given for ${repo}: applying the reduction above anyway"

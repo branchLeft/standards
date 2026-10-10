@@ -87,6 +87,9 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
         echo "  ERROR: ${want_name} (${id}): the comparison failed"
         errors=$((errors + 1))
         status=1
+        if [ -n "$report" ]; then
+          printf '%s\n' "$report" | sed 's/^/    /'
+        fi
         continue
         ;;
     esac

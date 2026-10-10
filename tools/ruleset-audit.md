@@ -25,9 +25,10 @@ never read as `[]`, which would make a payload with `[OrganizationAdmin]` a
 false DRIFT and a payload with `[]` a false CLEAN, and leave REPO-2's and
 REPO-3's "no bypass" unverified.
 
-A committed payload with no `bypass_actors` key means no bypass, because that
-is what a PUT without the key applies. REPO-3's release-tag payloads are written
-that way.
+A committed payload with no `bypass_actors` key is compared as `[]`. That is an
+assumption: GitHub's handling of a PUT that omits the key is not documented and
+is unverified. Most REPO-3 payloads write an explicit `[]`; at least one omits
+the key.
 
 To verify bypass, run the audit with a token that is returned the field. Until
 then, every payload's bypass line reads `UNKNOWN`.

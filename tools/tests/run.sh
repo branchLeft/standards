@@ -22,6 +22,28 @@ run() {
   fi
 }
 
+# ruleset-apply.sh must exit 3 on a guard UNKNOWN, not 1, so a caller can tell it
+# from a weakening refusal. A stub gh serves a live ruleset with no bypass_actors
+# key; --dry-run would change nothing anyway.
+apply_unknown_exits_3() {
+  local stub rc
+  stub=$(mktemp -d) || return 1
+  cat > "$stub/gh" <<'STUB'
+#!/usr/bin/env bash
+case "$2" in
+  repos/branchLeft/standards/rulesets) echo '[{"id":1,"name":"Protect default branch"}]' ;;
+  repos/branchLeft/standards/rulesets/1)
+    echo '{"name":"Protect default branch","target":"branch","enforcement":"active","conditions":{},"rules":[]}' ;;
+  *) exit 1 ;;
+esac
+STUB
+  chmod +x "$stub/gh"
+  PATH="$stub:$PATH" bash "$TOOLS/ruleset-apply.sh" --dry-run standards >/dev/null 2>&1
+  rc=$?
+  rm -rf "$stub"
+  [ "$rc" -eq 3 ]
+}
+
 echo "self-tests:"
 run "ratchet.sh"           bash "$TOOLS/lib/ratchet.sh" --self-test
 run "check-tsconfig.sh"    bash "$TOOLS/check-tsconfig.sh" --self-test
@@ -35,6 +57,7 @@ run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
+run "ruleset-apply exits 3 on guard UNKNOWN" apply_unknown_exits_3
 run "ruleset_normalize.py" python3 "$TOOLS/ruleset_normalize.py" --self-test
 run "ruleset_guard.py"     python3 "$TOOLS/ruleset_guard.py" --self-test
 run "ruleset-audit.sh"     bash "$TOOLS/ruleset-audit.sh" --self-test

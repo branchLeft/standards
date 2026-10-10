@@ -160,8 +160,8 @@ def weakenings(live, payload):
 
 
 def bypass_findings(live, payload, findings):
-    """A payload with no bypass_actors key means no bypass (REPO-3's release tags),
-    so only the live side can be UNKNOWN."""
+    """A payload with no bypass_actors key is compared as []. That assumes GitHub
+    applies [] on a PUT that omits the key: unverified, see ruleset_guard.md."""
     live_bypass = bypass_actors(live)
     if live_bypass is None:
         unclassified(
@@ -419,6 +419,10 @@ def self_test():
          mutate(lambda rs: rs["bypass_actors"].append(
              {"actor_type": "RepositoryRole", "actor_id": 5, "bypass_mode": "always"})), 3),
         ("live present [] still compared: payload adds an actor", live_no_bypass, base, 1),
+        # Pins the current result for a no-key payload against a live admin bypass.
+        # It rests on the unverified assumption above; change it on purpose only.
+        ("payload with no key vs live [OrganizationAdmin]: exit 0 (assumes no bypass)",
+         base, mutate(lambda rs: rs.pop("bypass_actors")), 0),
     ]
     for name, live, payload, want_code in unseen_cases:
         found = weakenings(live, payload)
