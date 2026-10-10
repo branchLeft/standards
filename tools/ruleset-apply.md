@@ -14,6 +14,16 @@ would remove a rule, a required context, a protective flag or a protected ref.
 The PUT is a replacement, not a merge, so a payload that has fallen behind
 does not fail — it silently applies the protection it has stopped carrying.
 
+Exit codes are defined once, in [ruleset-audit.md](ruleset-audit.md#exit-codes),
+with this script's meanings in its apply column. The script stops at its first
+refusal and exits with that refusal's code. A failed write to GitHub stops it with
+gh's own status; the table's footnote says so.
+
+A live read that omits `bypass_actors` (a token without admin read gets no
+such key) is refused with exit 3, not applied: the guard cannot see what the
+live ruleset allows to bypass it. Re-run the read with a token that is returned
+the field before applying.
+
 `--allow-weakening` applies a reduction the operator has decided on, and takes
 exactly one repo: the flag is an override for a change that has been looked
 at, and a run-wide one would authorise every other reduction in the same

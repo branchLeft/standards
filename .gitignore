@@ -7,3 +7,6 @@ coverage/
 # Sibling worktrees live here and are never part of this repo's tree.
 .claude/worktrees/
 .worktrees/
+
+# Python bytecode, rewritten by every run of the gate self-tests.
+__pycache__/
