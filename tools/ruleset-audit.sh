@@ -59,11 +59,10 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
     if ! one=$(gh api "repos/branchLeft/${repo}/rulesets/${id}"); then
       echo "  ERROR: could not read ${want_name} (${id})"
       errors=$((errors + 1))
-      status=1
       continue
     fi
 
-    # --report exits 0 clean, 1 drift, 3 UNKNOWN, and prints the comparison.
+    # --report prints the comparison; its exit codes are in ruleset-audit.md.
     if report=$(printf '%s' "$one" | python3 "$NORMALIZE" --report "$payload"); then
       rc=0
     else
@@ -86,7 +85,6 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       *)
         echo "  ERROR: ${want_name} (${id}): the comparison failed"
         errors=$((errors + 1))
-        status=1
         if [ -n "$report" ]; then
           printf '%s\n' "$report" | sed 's/^/    /'
         fi
@@ -102,6 +100,11 @@ done
 echo
 echo "ruleset-audit: ${ok} ok, ${drift} DRIFT, ${missing} MISSING, ${unknown} UNKNOWN, ${errors} ERROR, ${blocked} blocked"
 
+# Precedence: ERROR (2) outranks DRIFT or MISSING (1), which outrank UNKNOWN (3).
+# An error means a payload was not compared at all, so the rest cannot be trusted.
+if [ "$errors" -gt 0 ]; then
+  exit 2
+fi
 if [ "$status" -ne 0 ]; then
   exit 1
 fi

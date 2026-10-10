@@ -100,11 +100,10 @@ def report(payload, live):
 
 
 def judge(payload, live):
-    """report(), but a crash is ERROR: an uncaught exception also exits 1.
-    """
+    """report(), but any exception while judging is ERROR, never DRIFT."""
     try:
         return report(payload, live)
-    except (KeyError, TypeError, ValueError) as exc:
+    except Exception as exc:
         return ERROR, [f"ERROR: cannot compare ({type(exc).__name__}: {exc})"]
 
 
@@ -205,6 +204,15 @@ def self_test():
           lambda: judge(ruleset([org_admin]), [])[0], ERROR)
     check("a live bypass_actors that is a string is ERROR, not DRIFT",
           lambda: judge(ruleset([org_admin]), ruleset("nope"))[0], ERROR)
+    # Malformed rules: each raises AttributeError or TypeError inside canon().
+    rules_entry_not_object = ruleset([org_admin])
+    rules_entry_not_object["rules"] = ["deletion"]
+    check("a live rules entry that is not an object is ERROR, not DRIFT",
+          lambda: judge(ruleset([org_admin]), rules_entry_not_object)[0], ERROR)
+    rules_not_a_list = ruleset([org_admin])
+    rules_not_a_list["rules"] = "deletion"
+    check("a live rules that is not a list is ERROR, not DRIFT",
+          lambda: judge(ruleset([org_admin]), rules_not_a_list)[0], ERROR)
 
     # CLI: report mode with bad input is ERROR (2), not DRIFT (1), and says why.
     fd, payload_path = tempfile.mkstemp(suffix=".json")

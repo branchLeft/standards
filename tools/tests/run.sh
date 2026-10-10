@@ -44,6 +44,30 @@ STUB
   [ "$rc" -eq 3 ]
 }
 
+# ruleset-audit.sh exits 2 on an ERROR, and ERROR outranks DRIFT (exit 1). A stub gh
+# serves one live ruleset with malformed rules and one that drifts from its payload.
+audit_error_exits_2() {
+  local stub rc
+  stub=$(mktemp -d) || return 1
+  cat > "$stub/gh" <<'STUB'
+#!/usr/bin/env bash
+case "$2" in
+  repos/branchLeft/standards/rulesets)
+    echo '[{"id":1,"name":"Protect default branch"},{"id":2,"name":"release tags"}]' ;;
+  repos/branchLeft/standards/rulesets/1)
+    echo '{"name":"Protect default branch","target":"branch","enforcement":"active","conditions":{},"rules":"x","bypass_actors":[]}' ;;
+  repos/branchLeft/standards/rulesets/2)
+    echo '{"name":"release tags","target":"tag","enforcement":"active","conditions":{},"rules":[],"bypass_actors":[]}' ;;
+  *) exit 1 ;;
+esac
+STUB
+  chmod +x "$stub/gh"
+  PATH="$stub:$PATH" bash "$TOOLS/ruleset-audit.sh" standards >/dev/null 2>&1
+  rc=$?
+  rm -rf "$stub"
+  [ "$rc" -eq 2 ]
+}
+
 echo "self-tests:"
 run "ratchet.sh"           bash "$TOOLS/lib/ratchet.sh" --self-test
 run "check-tsconfig.sh"    bash "$TOOLS/check-tsconfig.sh" --self-test
@@ -58,6 +82,7 @@ run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
 run "ruleset-apply exits 3 on guard UNKNOWN" apply_unknown_exits_3
+run "ruleset-audit exits 2 on ERROR over DRIFT" audit_error_exits_2
 run "ruleset_normalize.py" python3 "$TOOLS/ruleset_normalize.py" --self-test
 run "ruleset_guard.py"     python3 "$TOOLS/ruleset_guard.py" --self-test
 run "ruleset-audit.sh"     bash "$TOOLS/ruleset-audit.sh" --self-test

@@ -14,7 +14,7 @@ audit prints its verdict per payload:
 - `UNKNOWN` — nothing differs that could be compared, but a field could not be
   compared. Not clean, and not drift.
 - `MISSING` — no live ruleset carries the payload's name.
-- `ERROR` — the live read failed or the comparison itself failed.
+- `ERROR` — the live read failed, or the comparison raised. Never DRIFT.
 
 ## UNKNOWN: bypass_actors
 
@@ -22,32 +22,58 @@ GitHub returns `bypass_actors` only to a token with admin read. A live ruleset
 read by the agent App's token has no such key, and the response carries
 `current_user_can_bypass: "never"` in its place. That absence is UNKNOWN. It is
 never read as `[]`, which would make a payload with `[OrganizationAdmin]` a
-false DRIFT and a payload with `[]` a false CLEAN, and leave REPO-2's and
-REPO-3's "no bypass" unverified.
-
-A committed payload with no `bypass_actors` key is compared as `[]`. That is an
-assumption: GitHub's handling of a PUT that omits the key is not documented and
-is unverified. Most REPO-3 payloads write an explicit `[]`; at least one omits
-the key.
+false DRIFT and a payload with `[]` a false CLEAN.
 
 To verify bypass, run the audit with a token that is returned the field. Until
 then, every payload's bypass line reads `UNKNOWN`.
 
 ## Exit codes
 
-- `0` — every payload compared equal (or the repo is blocked, as before).
-- `1` — a payload is MISSING, DRIFTED or ERROR. Wins over UNKNOWN.
-- `3` — nothing drifted, but a field could not be compared. Not 0: a clean exit
-  would read as a verified bypass.
+These are the codes for the audit, the guard and the apply script. Every other
+page points here rather than restating them.
 
-The last line is always a summary:
+| Code | Meaning                                                                  | `ruleset-audit.sh`                   | `ruleset_guard.py`                | `ruleset-apply.sh`                                                     |
+| ---- | ------------------------------------------------------------------------ | ------------------------------------ | --------------------------------- | ---------------------------------------------------------------------- |
+| 0    | Clean: every field compared equal, nothing reduced                       | every payload `ok` (or repo blocked) | no finding                        | applied, or dry run                                                    |
+| 1    | A known difference                                                       | a payload is `MISSING` or `DRIFT`    | a reduction in the payload        | refused: the payload weakens live; `--allow-weakening` can override it |
+| 2    | ERROR: a read or comparison failed, or bad arguments                     | a read or comparison failed          | bad arguments                     | bad arguments                                                          |
+| 3    | UNKNOWN: a field could not be compared, so it is neither clean nor drift | a field this token cannot read       | a field the guard cannot classify | refused: cannot classify; `--allow-weakening` does not override        |
+
+The audit reports every payload, then exits with the most serious code present:
+2 (ERROR) outranks 1 (MISSING or DRIFT), which outranks 3 (UNKNOWN), which
+outranks 0. An error means a payload was not compared at all, so the rest
+cannot be trusted alone.
+
+The guard does not yet exit 2 for an internal exception: an uncaught one exits 1,
+the same code as a weakening. That is a known gap, not the intended code.
+
+The apply script does not map a failed call to GitHub onto a code of its own: it
+stops with that call's exit status.
+
+The last line of an audit run is always a summary:
 `ruleset-audit: N ok, N DRIFT, N MISSING, N UNKNOWN, N ERROR, N blocked`.
+
+## Unverified: no-key payloads
+
+A committed payload with no `bypass_actors` key is compared as `[]`. That rests
+on an assumption about GitHub: the behaviour of a PUT that omits the key is not
+documented and has not been verified.
+
+Open question for the owner: should such a payload count as "no bypass" for the
+audit's REPO-3 check? What the audit reports today: against a live bypass it can
+see, it reports `DRIFT`, not clean; against a live bypass it cannot see, it
+reports `UNKNOWN`. Either way it never reports clean while a visible bypass
+remains. The assumption decides what the payload asserts, and the audit compares
+that. No rule is changed here.
+
+Most REPO-3 payloads write an explicit `[]`; at least one omits the key.
 
 ## Self-test
 
 `ruleset-audit.sh --self-test` runs `ruleset_normalize.py --self-test`, which
-covers the three states of the field, each payload-against-live case above, and
-the diff output.
+covers the three states of the field, each payload-against-live case above, the
+ERROR cases, and the diff output. `tools/tests/run.sh` also checks the audit's
+exit codes with a stub `gh`.
 
 ## Usage
 

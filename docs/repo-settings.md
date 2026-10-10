@@ -83,9 +83,10 @@ owned, a PR can widen one quietly.
 ## REPO-6 — every repo's payload is committed and audited
 
 Adding a directory under `templates/rulesets/` is enough to bring a repo under
-audit. `ruleset-audit.sh` reports each payload as `ok`, `MISSING`, `DRIFT` or
-`UNKNOWN` with a diff, exits non-zero on `MISSING` or `DRIFT`, exits 3 on
-`UNKNOWN`, and reports a 403 repo as blocked rather than as drift.
+audit. `ruleset-audit.sh` reports each payload as `ok`, `MISSING`, `DRIFT`,
+`UNKNOWN` or `ERROR`, with a diff where there is one, and reports a 403 repo as
+blocked rather than as drift. Its exit codes, and those of the apply and guard
+scripts, are defined once in [`ruleset-audit.md`](../tools/ruleset-audit.md#exit-codes).
 
 `UNKNOWN` is a field the token cannot read, not a pass. GitHub omits
 `bypass_actors` from a live ruleset read by a token without admin read, so the

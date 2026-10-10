@@ -160,8 +160,9 @@ def weakenings(live, payload):
 
 
 def bypass_findings(live, payload, findings):
-    """A payload with no bypass_actors key is compared as []. That assumes GitHub
-    applies [] on a PUT that omits the key: unverified, see ruleset_guard.md."""
+    """A payload with no bypass_actors key is compared as []. Removing a bypass
+    actor is never a finding, so the result does not depend on what GitHub does
+    with the key."""
     live_bypass = bypass_actors(live)
     if live_bypass is None:
         unclassified(
@@ -419,9 +420,9 @@ def self_test():
          mutate(lambda rs: rs["bypass_actors"].append(
              {"actor_type": "RepositoryRole", "actor_id": 5, "bypass_mode": "always"})), 3),
         ("live present [] still compared: payload adds an actor", live_no_bypass, base, 1),
-        # Pins the current result for a no-key payload against a live admin bypass.
-        # It rests on the unverified assumption above; change it on purpose only.
-        ("payload with no key vs live [OrganizationAdmin]: exit 0 (assumes no bypass)",
+        # Pins that the guard never flags a removed bypass actor: exit 0 holds whether
+        # or not GitHub keeps the live bypass on a PUT without the key. Change on purpose.
+        ("payload with no key vs live [OrganizationAdmin]: exit 0 (removal is no finding)",
          base, mutate(lambda rs: rs.pop("bypass_actors")), 0),
     ]
     for name, live, payload, want_code in unseen_cases:

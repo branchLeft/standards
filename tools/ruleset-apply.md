@@ -14,6 +14,10 @@ would remove a rule, a required context, a protective flag or a protected ref.
 The PUT is a replacement, not a merge, so a payload that has fallen behind
 does not fail — it silently applies the protection it has stopped carrying.
 
+Exit codes are defined once, in [ruleset-audit.md](ruleset-audit.md#exit-codes).
+For this script: 1 is a refusal because the payload weakens live, 3 is a refusal
+because the guard could not classify the difference, and 2 is bad arguments.
+
 A live read that omits `bypass_actors` (a token without admin read gets no
 such key) is refused with exit 3, not applied: the guard cannot see what the
 live ruleset allows to bypass it. Re-run the read with a token that is returned
