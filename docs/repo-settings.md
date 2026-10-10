@@ -23,7 +23,8 @@ not audited for it (last row).
 | NOT AUDITED | Private repos, including `ghost-platform-docs`. Private repos: code-owner review is not enforceable on this plan (ACCEPTED-RISKS).                                                                         |
 
 Reasons for `false`. For the tenant repos (`ghost-tenant-*`, including
-`ghost-tenant-blog` and the repos generated from the template), the owner's
+`ghost-tenant-blog`, and the template `ghost-platform-tenant-template` with the
+repos generated from it), the owner's
 reason, recorded on 2026-10-10, is verbatim: "contributing still requires org
 members, which is only me and my agents today." For `ghost-platform`,
 `content-safety`, `control-plane` and `standards`, the live value is `false`:
