@@ -30,6 +30,9 @@ without holding a standing write exemption that bypasses the rules on direct
 push. It is the difference between an override that leaves a reviewable trace
 and one that does not.
 
+The audit verifies this only from a token that GitHub returns `bypass_actors`
+to. From any other token the bypass line reads `UNKNOWN`, which is not a pass.
+
 ## REPO-3 — release tags are immutable
 
 On `refs/tags/v*.*.*`: `deletion`, `update`, `non_fast_forward` and
@@ -39,6 +42,9 @@ On `refs/tags/v*.*.*`: `deletion`, `update`, `non_fast_forward` and
 vulnerability: without it a tag can be moved, so a consumer pinning `@v1.0.3`
 has pinned a name rather than a revision. A ruleset with `deletion` and
 `non_fast_forward` alone reads as protection and provides very little.
+
+As with REPO-2, the audit verifies "no bypass actor" only from a token that is
+returned `bypass_actors`; from any other token that line reads `UNKNOWN`.
 
 Because tags are immutable, there is no moving `@v1` convention. Every change
 ships as a new tag and every caller takes a one-line bump — see
@@ -77,9 +83,14 @@ owned, a PR can widen one quietly.
 ## REPO-6 — every repo's payload is committed and audited
 
 Adding a directory under `templates/rulesets/` is enough to bring a repo under
-audit. `ruleset-audit.sh` reports each payload as `ok`, `MISSING` or `DRIFT`
-with a diff, exits non-zero on either, and reports a 403 repo as blocked rather
-than as drift.
+audit. `ruleset-audit.sh` reports each payload as `ok`, `MISSING`, `DRIFT` or
+`UNKNOWN` with a diff, exits non-zero on `MISSING` or `DRIFT`, exits 3 on
+`UNKNOWN`, and reports a 403 repo as blocked rather than as drift.
+
+`UNKNOWN` is a field the token cannot read, not a pass. GitHub omits
+`bypass_actors` from a live ruleset read by a token without admin read, so the
+audit cannot verify bypass with that token and says so, rather than reading the
+absent key as "no bypass".
 
 Capture a hand-configured repo's live state as its payload rather than writing
 one from the standard — then the first audit tells you where it already differs,

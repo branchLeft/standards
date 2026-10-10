@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
-# Report drift between the committed ruleset payloads and each repo's live state.
-# Private repos on GitHub Free return 403 for the rulesets endpoint — that's
-# reported as blocked, not as drift. Exits non-zero on missing or drifted.
-#
-# This is where REPO-1, REPO-2, REPO-3 and REPO-6 are decided, and where CI-6
-# reads the live required-check list. They are absent from standards-audit.sh
-# because they need `gh api` — a network call and a credential no pre-commit
-# run can assume.
+# Reports drift between committed ruleset payloads and each repo's live state.
+# Exit codes, verdicts and UNKNOWN: ruleset-audit.md. Private repos on GitHub
+# Free are reported as blocked, not as drift.
+# REPO-1, REPO-2, REPO-3 and REPO-6 are decided here, and CI-6 reads the live
+# required-check list here. Absent from standards-audit.sh: they need `gh api`.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RULESETS="$HERE/../templates/rulesets"
 NORMALIZE="$HERE/ruleset_normalize.py"
+
+if [ "${1:-}" = "--self-test" ]; then
+  python3 "$NORMALIZE" --self-test
+  exit $?
+fi
 
 # Every repo with a committed payload. Adding a directory under
 # templates/rulesets/ is enough to bring a repo under audit.
@@ -28,12 +30,14 @@ if [ $# -gt 0 ]; then
 fi
 
 status=0
+ok=0 drift=0 missing=0 unknown=0 errors=0 blocked=0
 
 for repo in "${repos[@]}"; do
   echo "== ${repo} =="
   live=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
   if echo "$live" | grep -q "Upgrade to GitHub Pro"; then
     echo "  live: blocked (GitHub Free) — payloads not applied"
+    blocked=$((blocked + 1))
     continue
   fi
 
@@ -47,20 +51,58 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
 
     if [ -z "$id" ]; then
       echo "  MISSING: ${want_name}"
+      missing=$((missing + 1))
       status=1
       continue
     fi
 
-    drift=$(diff <(python3 "$NORMALIZE" < "$payload") \
-                 <(gh api "repos/branchLeft/${repo}/rulesets/${id}" | python3 "$NORMALIZE") || true)
-    if [ -z "$drift" ]; then
-      echo "  ok: ${want_name} (${id})"
-    else
-      echo "  DRIFT: ${want_name} (${id})"
-      printf '%s\n' "$drift" | sed 's/^/    /'
+    if ! one=$(gh api "repos/branchLeft/${repo}/rulesets/${id}"); then
+      echo "  ERROR: could not read ${want_name} (${id})"
+      errors=$((errors + 1))
       status=1
+      continue
+    fi
+
+    # --report exits 0 clean, 1 drift, 3 UNKNOWN, and prints the comparison.
+    if report=$(printf '%s' "$one" | python3 "$NORMALIZE" --report "$payload"); then
+      rc=0
+    else
+      rc=$?
+    fi
+    case "$rc" in
+      0)
+        echo "  ok: ${want_name} (${id})"
+        ok=$((ok + 1))
+        ;;
+      1)
+        echo "  DRIFT: ${want_name} (${id})"
+        drift=$((drift + 1))
+        status=1
+        ;;
+      3)
+        echo "  UNKNOWN: ${want_name} (${id}) — not compared, not clean"
+        unknown=$((unknown + 1))
+        ;;
+      *)
+        echo "  ERROR: ${want_name} (${id}): the comparison failed"
+        errors=$((errors + 1))
+        status=1
+        continue
+        ;;
+    esac
+    if [ -n "$report" ]; then
+      printf '%s\n' "$report" | sed 's/^/    /'
     fi
   done
 done
 
-exit "$status"
+echo
+echo "ruleset-audit: ${ok} ok, ${drift} DRIFT, ${missing} MISSING, ${unknown} UNKNOWN, ${errors} ERROR, ${blocked} blocked"
+
+if [ "$status" -ne 0 ]; then
+  exit 1
+fi
+if [ "$unknown" -gt 0 ]; then
+  exit 3
+fi
+exit 0

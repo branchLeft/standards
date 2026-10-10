@@ -35,6 +35,9 @@ run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
+run "ruleset_normalize.py" python3 "$TOOLS/ruleset_normalize.py" --self-test
+run "ruleset_guard.py"     python3 "$TOOLS/ruleset_guard.py" --self-test
+run "ruleset-audit.sh"     bash "$TOOLS/ruleset-audit.sh" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
 # check-coverage.sh: self-tested like every other gate, but deliberately
 # absent from GATES in standards-audit.sh and from
