@@ -17,14 +17,16 @@ not at this repo's checkout of the standards.
 `.standards.mode` file contains `warn`. Its scope is partial, and this is what
 the check does and does not cover:
 
-- In `warn` mode, a gate fails the job on findings in files the pull request
-  touches. The gates it runs are `check-tsconfig`, `check-workflows`,
-  `check-pulumi`, `check-pulumi-secrets`, `standards-sync`, `check-raw-sql`
-  and `check-comment-blocks`.
-- Findings in the rest of the tree are advisory. The whole-tree backlog does
-  not fail the job until the repo's `.standards.mode` file is removed.
-- The TypeScript audit that runs after the gates is advisory only and never
-  fails the job.
+- The gates it runs are `check-tsconfig`, `check-workflows`, `check-pulumi`,
+  `check-pulumi-secrets`, `standards-sync`, `check-raw-sql` and
+  `check-comment-blocks`. Each one runs the shared ratchet, which in `warn`
+  mode fails the job on a finding in a file the pull request touches, and
+  reports a finding anywhere else as advisory.
+- The whole-tree backlog therefore does not fail the job. Removing
+  `.standards.mode` makes every finding in the tree fail.
+- The TypeScript audit that runs after the gates cannot fail on a finding in
+  warn mode, because each of its findings is advisory. A crash in that step
+  still fails the job.
 
 So a required `standards / Standards gates` gates new and changed code. It is
 not evidence that the whole tree is clean; "four required checks" in this
