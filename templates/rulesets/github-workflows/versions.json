@@ -5,7 +5,7 @@
   "conditions": {
     "ref_name": {
       "exclude": [],
-      "include": ["refs/tags/v*"]
+      "include": ["refs/tags/v*.*.*"]
     }
   },
   "rules": [
@@ -22,11 +22,5 @@
       "type": "required_signatures"
     }
   ],
-  "bypass_actors": [
-    {
-      "actor_id": 18812121,
-      "actor_type": "Team",
-      "bypass_mode": "always"
-    }
-  ]
+  "bypass_actors": []
 }

@@ -16,14 +16,11 @@
       "type": "non_fast_forward"
     },
     {
+      "type": "update"
+    },
+    {
       "type": "required_signatures"
     }
   ],
-  "bypass_actors": [
-    {
-      "actor_id": null,
-      "actor_type": "OrganizationAdmin",
-      "bypass_mode": "always"
-    }
-  ]
+  "bypass_actors": []
 }
