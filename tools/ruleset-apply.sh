@@ -7,6 +7,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RULESETS="$HERE/../templates/rulesets"
 GUARD="$HERE/ruleset_guard.py"
+NORMALIZE="$HERE/ruleset_normalize.py"
 
 if [ "${1:-}" = "--self-test" ]; then
   python3 "$GUARD" --self-test
@@ -50,10 +51,22 @@ for repo in "${repos[@]}"; do
     # and gh puts the error body on stdout, which is a non-empty $id that then
     # fails at the PUT and takes the whole run down with it under `set -e` —
     # including the repos later in the alphabet that had nothing wrong.
-    listing=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
+    listing_rc=0
+    listing=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || listing_rc=$?
     if printf '%s' "$listing" | grep -q "Upgrade to GitHub Pro"; then
       echo "  skipped: rulesets are unreadable on this repo (private, GitHub Free)"
       continue
+    fi
+    # A failed or malformed listing is a read failure: refuse, exit 2 (ruleset-audit.md).
+    listing_err=""
+    if [ "$listing_rc" -ne 0 ]; then
+      listing_err="gh exited ${listing_rc}: ${listing:0:200}"
+    elif ! listing_err=$(printf '%s' "$listing" | python3 "$NORMALIZE" --check-listing); then
+      : # listing_err holds the reason
+    fi
+    if [ -n "$listing_err" ]; then
+      echo "  REFUSED: cannot read the rulesets list for ${repo}: ${listing_err}" >&2
+      exit 2
     fi
     id=$(printf '%s' "$listing" | python3 -c '
 import json, sys
@@ -63,7 +76,10 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
     if [ -n "$id" ]; then
       # Read live once and feed the same bytes to the guard, so what is judged
       # is what is about to be overwritten.
-      live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}")
+      if ! live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}"); then
+        echo "  REFUSED: cannot read ruleset ${id} on ${repo}; nothing was changed in it." >&2
+        exit 2
+      fi
       guard_rc=0
       printf '%s' "$live" | python3 "$GUARD" "$payload" || guard_rc=$?
       if [ "$guard_rc" -eq 3 ]; then

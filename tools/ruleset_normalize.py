@@ -107,6 +107,16 @@ def judge(payload, live):
         return ERROR, [f"ERROR: cannot compare ({type(exc).__name__}: {exc})"]
 
 
+def check_listing(listing):
+    """None if a rulesets listing is a JSON array of objects with id and name, else why not."""
+    if not isinstance(listing, list):
+        return "the rulesets list is not a JSON array"
+    for entry in listing:
+        if not isinstance(entry, dict) or "id" not in entry or "name" not in entry:
+            return "a rulesets list entry lacks id or name"
+    return None
+
+
 def run_main(args, stdin_text):
     """Run main() in-process; returns (exit code, stdout, stderr)."""
     out, err = io.StringIO(), io.StringIO()
@@ -204,6 +214,18 @@ def self_test():
           lambda: judge(ruleset([org_admin]), [])[0], ERROR)
     check("a live bypass_actors that is a string is ERROR, not DRIFT",
           lambda: judge(ruleset([org_admin]), ruleset("nope"))[0], ERROR)
+    # The rulesets listing the scripts read first. Anything but a JSON array of
+    # objects with id and name is ERROR, and the reason is printed.
+    listing_ok = '[{"id": 1, "name": "Protect default branch"}]'
+    check("a valid rulesets listing passes", lambda: run_main(["--check-listing"], listing_ok)[0], CLEAN)
+    check("a listing that is an object is ERROR",
+          lambda: run_main(["--check-listing"], '{"message": "Not Found"}')[0], ERROR)
+    check("a listing that is not JSON is ERROR and says why",
+          lambda: (lambda r: (r[0], "upstream unavailable" in r[1]))(
+              run_main(["--check-listing"], "upstream unavailable")), (ERROR, True))
+    check("a listing entry without a name is ERROR",
+          lambda: run_main(["--check-listing"], '[{"id": 1}]')[0], ERROR)
+
     # Malformed rules: each raises AttributeError or TypeError inside canon().
     rules_entry_not_object = ruleset([org_admin])
     rules_entry_not_object["rules"] = ["deletion"]
@@ -261,6 +283,17 @@ def main(argv):
         for line in lines:
             print(line)
         return rc
+
+    if argv[1:] == ["--check-listing"]:
+        text = sys.stdin.read()
+        try:
+            reason = check_listing(json.loads(text))
+        except ValueError:
+            reason = f"not JSON: {text.strip()[:200]}"
+        if reason:
+            print(reason)
+            return ERROR
+        return CLEAN
 
     if argv[1:] in ([], ["--payload"]):
         # A committed payload's absent key means no bypass; a live read's means UNKNOWN.

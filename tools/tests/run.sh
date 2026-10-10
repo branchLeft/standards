@@ -68,6 +68,42 @@ STUB
   [ "$rc" -eq 2 ]
 }
 
+# A failed or malformed rulesets listing: ruleset-audit.sh reports an ERROR for the
+# repo, still prints its summary line, and exits 2. Two shapes: gh fails (non-zero),
+# and gh succeeds but returns non-JSON (the check, not gh's status, must catch it).
+audit_listing_case() {
+  local body="$1" stub rc out
+  stub=$(mktemp -d) || return 1
+  printf '#!/usr/bin/env bash\n%s\n' "$body" > "$stub/gh"
+  chmod +x "$stub/gh"
+  out=$(PATH="$stub:$PATH" bash "$TOOLS/ruleset-audit.sh" standards 2>&1)
+  rc=$?
+  rm -rf "$stub"
+  [ "$rc" -eq 2 ] && printf '%s' "$out" | grep -q "cannot read the rulesets list" \
+    && printf '%s' "$out" | grep -q "^ruleset-audit: "
+}
+
+audit_listing_error_exits_2() {
+  audit_listing_case 'echo "HTTP 502: upstream unavailable"; exit 1' \
+    && audit_listing_case 'echo "upstream unavailable"; exit 0'
+}
+
+# A malformed rulesets listing: ruleset-apply.sh refuses with a REFUSED line and
+# exits 2, before any PUT or POST. The stub's gh succeeds but returns non-JSON.
+apply_listing_error_exits_2() {
+  local stub rc err
+  stub=$(mktemp -d) || return 1
+  cat > "$stub/gh" <<'STUB'
+#!/usr/bin/env bash
+echo "upstream unavailable"
+STUB
+  chmod +x "$stub/gh"
+  err=$(PATH="$stub:$PATH" bash "$TOOLS/ruleset-apply.sh" --dry-run standards 2>&1 >/dev/null)
+  rc=$?
+  rm -rf "$stub"
+  [ "$rc" -eq 2 ] && printf '%s' "$err" | grep -q "REFUSED: cannot read the rulesets list"
+}
+
 echo "self-tests:"
 run "ratchet.sh"           bash "$TOOLS/lib/ratchet.sh" --self-test
 run "check-tsconfig.sh"    bash "$TOOLS/check-tsconfig.sh" --self-test
@@ -83,6 +119,8 @@ run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
 run "ruleset-apply exits 3 on guard UNKNOWN" apply_unknown_exits_3
 run "ruleset-audit exits 2 on ERROR over DRIFT" audit_error_exits_2
+run "ruleset-audit exits 2 on a failed listing" audit_listing_error_exits_2
+run "ruleset-apply exits 2 on a malformed listing" apply_listing_error_exits_2
 run "ruleset_normalize.py" python3 "$TOOLS/ruleset_normalize.py" --self-test
 run "ruleset_guard.py"     python3 "$TOOLS/ruleset_guard.py" --self-test
 run "ruleset-audit.sh"     bash "$TOOLS/ruleset-audit.sh" --self-test

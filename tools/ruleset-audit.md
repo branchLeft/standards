@@ -14,7 +14,8 @@ audit prints its verdict per payload:
 - `UNKNOWN` — nothing differs that could be compared, but a field could not be
   compared. Not clean, and not drift.
 - `MISSING` — no live ruleset carries the payload's name.
-- `ERROR` — the live read failed, or the comparison raised. Never DRIFT.
+- `ERROR` — the rulesets list or a live ruleset could not be read, or the
+  comparison raised. Never DRIFT.
 
 ## UNKNOWN: bypass_actors
 
@@ -32,23 +33,27 @@ then, every payload's bypass line reads `UNKNOWN`.
 These are the codes for the audit, the guard and the apply script. Every other
 page points here rather than restating them.
 
-| Code | Meaning                                                                  | `ruleset-audit.sh`                   | `ruleset_guard.py`                | `ruleset-apply.sh`                                                     |
-| ---- | ------------------------------------------------------------------------ | ------------------------------------ | --------------------------------- | ---------------------------------------------------------------------- |
-| 0    | Clean: every field compared equal, nothing reduced                       | every payload `ok` (or repo blocked) | no finding                        | applied, or dry run                                                    |
-| 1    | A known difference                                                       | a payload is `MISSING` or `DRIFT`    | a reduction in the payload        | refused: the payload weakens live; `--allow-weakening` can override it |
-| 2    | ERROR: a read or comparison failed, or bad arguments                     | a read or comparison failed          | bad arguments                     | bad arguments                                                          |
-| 3    | UNKNOWN: a field could not be compared, so it is neither clean nor drift | a field this token cannot read       | a field the guard cannot classify | refused: cannot classify; `--allow-weakening` does not override        |
+| Code | Meaning                                                                  | `ruleset-audit.sh`                                                              | `ruleset_guard.py`                | `ruleset-apply.sh`                                                     |
+| ---- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------- | ---------------------------------------------------------------------- |
+| 0    | Clean: every field compared equal, nothing reduced                       | every payload `ok` (or repo blocked)                                            | no finding                        | applied, or dry run                                                    |
+| 1    | A known difference                                                       | a payload is `MISSING` or `DRIFT`                                               | a reduction in the payload        | refused: the payload weakens live; `--allow-weakening` can override it |
+| 2    | ERROR: a read or comparison failed, or bad arguments                     | a payload could not be read or compared, or the rulesets list could not be read | bad arguments                     | a rulesets list or ruleset could not be read, or bad arguments         |
+| 3    | UNKNOWN: a field could not be compared, so it is neither clean nor drift | a field this token cannot read                                                  | a field the guard cannot classify | refused: cannot classify; `--allow-weakening` does not override        |
 
-The audit reports every payload, then exits with the most serious code present:
-2 (ERROR) outranks 1 (MISSING or DRIFT), which outranks 3 (UNKNOWN), which
-outranks 0. An error means a payload was not compared at all, so the rest
-cannot be trusted alone.
+Precedence, most serious first:
 
-The guard does not yet exit 2 for an internal exception: an uncaught one exits 1,
-the same code as a weakening. That is a known gap, not the intended code.
+- Audit: 2 over 1 over 3 over 0. Every payload is still reported. An error means
+  a payload was not compared at all, so the rest cannot be trusted alone.
+- Guard: 3 over 1 over 0. A run that finds both a reduction and an unclassified
+  field exits 3, so an override cannot pass it. 2 is for bad arguments only.
+- Apply: stops at its first refusal and exits with that refusal's code.
 
-The apply script does not map a failed call to GitHub onto a code of its own: it
-stops with that call's exit status.
+Two known gaps, neither the intended code:
+
+- The guard exits 1, the same as a weakening, when an internal exception escapes
+  it. It should exit 2.
+- A failed write (PUT or POST) to GitHub stops the apply script with gh's own exit
+  status, which need not be one of these codes.
 
 The last line of an audit run is always a summary:
 `ruleset-audit: N ok, N DRIFT, N MISSING, N UNKNOWN, N ERROR, N blocked`.

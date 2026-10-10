@@ -391,6 +391,12 @@ def self_test():
             ["would protect something else"],
             3,
         ),
+        (
+            "a reduction and an unclassified field together exit 3, not 1",
+            mutate(lambda rs: (drop_rule(rs, "deletion"), rs.__setitem__("enforcement", "sometimes"))),
+            ["payload drops the whole `deletion` rule", "unrecognised value"],
+            3,
+        ),
     ]
 
     rc = 0

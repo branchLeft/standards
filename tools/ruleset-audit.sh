@@ -34,10 +34,25 @@ ok=0 drift=0 missing=0 unknown=0 errors=0 blocked=0
 
 for repo in "${repos[@]}"; do
   echo "== ${repo} =="
-  live=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
+  listing_rc=0
+  live=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || listing_rc=$?
   if echo "$live" | grep -q "Upgrade to GitHub Pro"; then
     echo "  live: blocked (GitHub Free) — payloads not applied"
     blocked=$((blocked + 1))
+    continue
+  fi
+
+  # Judge the listing once: a failed or malformed one is an ERROR for this repo,
+  # and the run goes on to the next repo, so the summary line is still printed.
+  listing_err=""
+  if [ "$listing_rc" -ne 0 ]; then
+    listing_err="gh exited ${listing_rc}: ${live:0:200}"
+  elif ! listing_err=$(printf '%s' "$live" | python3 "$NORMALIZE" --check-listing); then
+    : # listing_err holds the reason
+  fi
+  if [ -n "$listing_err" ]; then
+    echo "  ERROR: cannot read the rulesets list: ${listing_err}"
+    errors=$((errors + 1))
     continue
   fi
 
