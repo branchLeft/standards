@@ -22,14 +22,14 @@ not audited for it (last row).
 | `false`     | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards`.                                  |
 | NOT AUDITED | Private repos, including `ghost-platform-docs`. Private repos: code-owner review is not enforceable on this plan (ACCEPTED-RISKS).                                                                         |
 
-For the `false` repos the reasons are the owner's, recorded on 2026-10-10: the
-CODEOWNERS team excludes the reviewer App, so a required code-owner review
-would stall agent pull requests; and contributing already requires
-organisation membership (the owner and the agent accounts). The other REPO-1
-protections above (a pull request, one approval, last-push approval, no
-force-push, no deletion, squash only) carry the gate. Neither reason is
-verified against the live team or membership: the reviewer App cannot read
-them.
+Reasons for `false`. For the tenant repos (`ghost-tenant-*`, including
+`ghost-tenant-blog` and the repos generated from the template), the owner's
+reason, recorded on 2026-10-10, is verbatim: "contributing still requires org
+members, which is only me and my agents today." For `ghost-platform`,
+`content-safety`, `control-plane` and `standards`, the live value is `false`:
+this is the recorded live value; no ruling states why. The live readings are
+recorded in the pull request that introduced this table, and `ruleset-audit.sh`
+reads them again.
 
 **How an audit reads it.** For each public repo in the `true` and `false`
 rows, the live value is `gh api repos/branchLeft/<repo>/rulesets/<id>` and the
@@ -38,9 +38,7 @@ where `<id>` is the default-branch ruleset from `gh api repos/branchLeft/<repo>/
 The committed value is the same field in `templates/rulesets/<repo>/` on the
 default-branch payload. Both must equal the row's value. A repo that
 `ruleset-audit.sh` reports as `DRIFT` on this field fails this clause. So does
-any public repo outside the two rows whose payload sets the field. A repo with
-no live ruleset (`ghost-tenant-blog` until its ruleset is applied) has no live
-value to read, so only its payload is checked until then.
+any public repo outside the two rows whose payload sets the field.
 
 **Private repos are NOT AUDITED.** Their rulesets endpoint returns 403 on this
 plan, so no live value can be read. A payload value for a private repo, `true`
