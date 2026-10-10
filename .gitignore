@@ -7,3 +7,7 @@ coverage/
 # Sibling worktrees live here and are never part of this repo's tree.
 .claude/worktrees/
 .worktrees/
+
+# Python bytecode caches are generated, never tracked.
+__pycache__/
+*.pyc
