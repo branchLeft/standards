@@ -81,14 +81,21 @@ rule, when the route's conditions all read true live. Where a condition does not
 read true, the deploy waits for the owner. Outside those bounds the apply still
 waits for the owner. Only inside them does the approval not wait on a human.
 
-_Hosts stack and shared-infra._ The owner has ruled that agents deploy whatever
-the gates pass, on every stack in the owner's runbook, the hosts stack included.
-This replaces the owner's earlier cautious rulings on production servers: pinned
-versions, strict checks, and leaving the hosts stack out. It is a ruling. For the
-hosts stack, and for shared-infra, it takes effect only when the code that gates
-each one lands; until then both stay as they are today. Agent merges to
-shared-infra stay refused until the mail-plan keys are separated, per stack or
-per preview environment.
+_Hosts stack and shared-infra._ The owner's recorded answer, on whether the
+11 October notes replace the earlier cautious rulings on production servers, is:
+"A: replace all three, hosts stack included". The three replaced rulings are the
+8 October "keep pins" ruling, the 8 October "keep it strict" ruling, and the
+10 October "hosts stack not allowed" choice. This is a ruling. For each of the
+hosts stack and shared-infra it takes effect only when the code that gates it
+lands, the register wording and the owner's own click included. Until then each
+is not approved by the App. Agent merges to shared-infra stay refused until the
+mail-plan keys are separated, per stack or per preview environment.
+
+_What stops a hosts-stack apply today._ The approve script refuses it by name
+(EXCLUDED_REPOS, EXCLUDED_WORKFLOWS, EXCLUDED_ENVIRONMENTS). The installed
+register must name the exclusions, or the script refuses. The hosts job's "Refuse
+to apply through an ungated environment" step requires a required-reviewers rule
+on `production`.
 
 _Exclusions that stay with the owner._ The App does not approve these, and no
 ruling above lifts them: a first deploy of a stack that would destroy or replace
@@ -134,9 +141,9 @@ our own blog, that exists to help us make mistakes before we have paying
 clients."
 
 The definition has two limbs. The first is a real tenant serving readership. The
-second, strangers provisioning demo slots, is the demo go-live, so the pre-live
-period ends at demo go-live, not at a tenant. The checks in the scripts implement
-only a proxy of the first limb and nothing of the second.
+second is strangers able to provision demo slots, which is the demo go-live. The
+pre-live period ends at whichever limb is met first; the demo go-live may come
+before any tenant. No script checks either limb today; the owner decides.
 
 The owner decides the end. An agent never decides that the condition has been
 met or that the exception has ended. It may find the condition met and stop, and
