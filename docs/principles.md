@@ -117,7 +117,7 @@ _End._ The exception ends only on the owner's word. A test for a live tenant
 takes effect only when the owner confirms it: a non-archived repository named
 `ghost-tenant-*`, other than `ghost-tenant-blog`, with a successful production
 deploy on `main`. Disposable proofs are excluded only by a comment from the owner
-saying so. Until the owner confirms the test, it has no effect. Once he does, the
+saying so. Until the owner confirms the test, it has no effect. Once the owner does, the
 exception also ends when the test is met. An agent never decides that the
 exception has ended and never extends it. An agent that finds the test met stops
 and reports it to the owner. Where it is unclear whether a live tenant exists,
