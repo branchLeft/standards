@@ -59,6 +59,26 @@ looks automated. And an unprotected merge-deploys-production path is an
 incident generator by construction: the blast radius of a compromised or
 careless push is the same as the blast radius of a bad release.
 
+**Time-limited exception to PRIN-2, pre-live only (DRAFT, for the owner's decision).**
+While the platform has no live tenant, a merge to `main` of a reviewed change
+triggers the CI deploy to production, and the `branchleft-reviewer` App approves
+that deploy by script when its gates pass; the apply does not wait on a human.
+The register's section "Approving a queued CI deploy in the programme's repos"
+(in the workspace `AUTHORISATIONS.md`) is the route for that approval.
+
+This is an exception for the pre-live period, not a change to how a merge is
+reviewed. The review round, the sabotage proofs and every CI gate are still
+required before the merge; nothing here lets a change skip them.
+
+The exception ends at the first live tenant, as defined by the owner, or on the
+owner's word, whichever is first. After it ends, PRIN-2 reads as written above.
+The definition of "live" is open until the owner confirms it.
+
+Unchanged, and binding this exception: PRIN-3 (anything that could cost money is
+the owner's), PRIN-6 (the four triggers, including stop and hand over for spend,
+a sensitive-data boundary crossing, any circumvention, and any business
+decision), and the never-list in the workspace `AUTHORISATIONS.md`.
+
 ## PRIN-3 — spend is eliminated, not optimised
 
 Cloud and service spend is driven toward zero, not merely tracked or
