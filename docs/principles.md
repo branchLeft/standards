@@ -68,7 +68,11 @@ invokes it. The mechanism changes when the owner changes it.
 
 _Reach._ While the platform has no live tenant, this applies to the repositories
 the owner has enrolled in the register's CI-deploy approval route, and to no
-other.
+other. Tenant repositories are public. A private tenant waits outside this
+exception. The owner's note on the cost is: "our first private tenant is the
+trigger point for procuring a paid Github plan. This would be part of a bespoke
+offering and the cost would be forwarded (and split if we end up with multiple
+private ones)." Any such spend is the owner's act under PRIN-3, at that time.
 
 _What changes._ For a deploy within the bounds of that route, a merge to `main`
 of a reviewed change triggers the CI deploy to production, and the
@@ -77,14 +81,24 @@ rule, when the route's conditions all read true live. Where a condition does not
 read true, the deploy waits for the owner. Outside those bounds the apply still
 waits for the owner. Only inside them does the approval not wait on a human.
 
-_Exclusions that stay with the owner._ Until the owner's standing section lifts
-them, these go to the owner and are not approved by the App: a stack's first
-deploy; the hosts stack; `shared-infra` in any form; the workflow that creates
-repositories; a change to a protected path not yet landed by the owner; a held
-stack lock; a plan change the reviewed change does not explain; any migration or
-data change; and any destroy or replace of a stateful resource. The delete guard
-covers only the protected resource types it names, and no script condition reads
-a migration or data change, so a change of either kind waits for the owner.
+_Hosts stack and shared-infra._ The owner has ruled that agents deploy whatever
+the gates pass, on every stack in the owner's runbook, the hosts stack included.
+This replaces the owner's earlier cautious rulings on production servers: pinned
+versions, strict checks, and leaving the hosts stack out. It is a ruling. For the
+hosts stack, and for shared-infra, it takes effect only when the code that gates
+each one lands; until then both stay as they are today. Agent merges to
+shared-infra stay refused until the mail-plan keys are separated, per stack or
+per preview environment.
+
+_Exclusions that stay with the owner._ The App does not approve these, and no
+ruling above lifts them: a first deploy of a stack that would destroy or replace
+stateful resources; any migration or data change; spend, under PRIN-3; mail;
+secrets; the tenant-provisioning workflow; and the workflow that creates
+repositories. The delete guard covers only the protected resource types it names,
+and no script condition reads a migration or data change, so a change of either
+kind waits for the owner. The route's conditions still hold: a change to a
+protected path not yet landed by the owner, a held stack lock, and a plan change
+the reviewed change does not explain each wait for the owner.
 
 _Never-list._ The never-list is the set of standing exclusions in the owner's
 register of agent grants, in its Never section. This exception does not change
@@ -113,14 +127,20 @@ would incur spend, anything that circumvents a rule or a protection, and any
 business decision. The review round, the sabotage proofs and every CI gate stay
 required before the merge.
 
-_End._ The exception ends only on the owner's word. A test for a live tenant
-takes effect only when the owner confirms it: a non-archived repository named
-`ghost-tenant-*`, other than `ghost-tenant-blog`, with a successful production
-deploy on `main`. Disposable proofs are excluded only by a comment from the owner
-saying so. Until the owner confirms the test, it has no effect. Once the owner does, the
-exception also ends when the test is met. An agent never decides that the
-exception has ended and never extends it. An agent that finds the test met stops
-and reports it to the owner. Where it is unclear whether a live tenant exists,
+_End._ The owner's definition of a live tenant, quoted verbatim: "When a real
+tenant of a real publication is serving readership on our platform, or when
+strangers can provision demo slots, whichever comes first. That DOESN'T include
+our own blog, that exists to help us make mistakes before we have paying
+clients."
+
+The definition has two limbs. The first is a real tenant serving readership. The
+second, strangers provisioning demo slots, is the demo go-live, so the pre-live
+period ends at demo go-live, not at a tenant. The checks in the scripts implement
+only a proxy of the first limb and nothing of the second.
+
+The owner decides the end. An agent never decides that the condition has been
+met or that the exception has ended. It may find the condition met and stop, and
+it never extends the exception. Where it is unclear whether either limb holds,
 this exception does not apply. After it ends, PRIN-2 reads as written above.
 
 _Clause ID._ None is added. The owner may choose to keep this under PRIN-2's ID.
