@@ -59,25 +59,67 @@ looks automated. And an unprotected merge-deploys-production path is an
 incident generator by construction: the blast radius of a compromised or
 careless push is the same as the blast radius of a bad release.
 
-**Time-limited exception to PRIN-2, pre-live only (DRAFT, for the owner's decision).**
-While the platform has no live tenant, a merge to `main` of a reviewed change
-triggers the CI deploy to production, and the `branchleft-reviewer` App approves
-that deploy by script when its gates pass; the apply does not wait on a human.
-The register's section "Approving a queued CI deploy in the programme's repos"
-(in the workspace `AUTHORISATIONS.md`) is the route for that approval.
+**Time-limited exception to PRIN-2, pre-live only.**
 
-This is an exception for the pre-live period, not a change to how a merge is
-reviewed. The review round, the sabotage proofs and every CI gate are still
-required before the merge; nothing here lets a change skip them.
+_Ruling, not mechanism._ This is a ruling about who may approve a deploy. It is
+not a mechanism. Today the gate on the production environments is a
+required-reviewers rule naming the owner, and the approval script runs only when
+a session invokes it. The mechanism changes when the owner changes it.
 
-The exception ends at the first live tenant, as defined by the owner, or on the
-owner's word, whichever is first. After it ends, PRIN-2 reads as written above.
-The definition of "live" is open until the owner confirms it.
+_Reach._ While the platform has no live tenant, this applies to the repositories
+the owner has enrolled in the pre-live approval route, and to no other.
 
-Unchanged, and binding this exception: PRIN-3 (anything that could cost money is
-the owner's), PRIN-6 (the four triggers, including stop and hand over for spend,
-a sensitive-data boundary crossing, any circumvention, and any business
-decision), and the never-list in the workspace `AUTHORISATIONS.md`.
+_What changes._ For a deploy within the bounds of that route, a merge to `main`
+of a reviewed change triggers the CI deploy to production, and the
+`branchleft-reviewer` App approves it as the environment's deployment protection
+rule, when the route's conditions all read true live. Where a condition does not
+read true, the deploy waits for the owner. Outside those bounds the apply still
+waits for the owner. The approval does not wait on a human only inside them.
+
+_Exclusions that stay with the owner._ Until the owner's standing approval route
+lifts them, these go to the owner and are not approved by the App: a stack's
+first deploy; the hosts stack; the workflow that creates repositories; a change
+to a protected path not yet landed by the owner; a held stack lock; a plan change
+the reviewed change does not explain; any migration or data change; and any
+destroy or replace of a stateful resource. The workflow's delete guard must
+refuse such a destroy or replace, and the App never approves it.
+
+_Never-list._ The never-list is the set of standing exclusions in the owner's
+register of agent grants, in its Never section. This exception does not change
+it, and it binds the exception.
+
+_Clauses reconciled for the pre-live period._
+
+- CI-7 stands unchanged. Its required-reviewer gate is met, for in-bounds
+  deploys, by the App's protection rule. Its Workload Identity condition is not
+  touched.
+- CI-12 is superseded for the pre-live period in its approval words only. The
+  protected environment, default-branch-only use and the rule that every deploy
+  job uses one still stand. The approver for in-bounds deploys is the App, not
+  the platform owner.
+- CI-13 is superseded for the pre-live period only for in-bounds deploys: the
+  approval click is the App's approval there. Every other human step stays under
+  the exception list in IAC-1, and CI-13 stands for them.
+
+_Unchanged._ PRIN-3 says that anything which would incur a charge is "a human
+decision. It is never made by an automated agent or pipeline on its own." A
+change that would incur a charge is outside this exception. The route's
+conditions do not read spend, so the review round is the check on it. PRIN-6's
+four triggers stay: moving sensitive data across a trust boundary, anything that
+would incur spend, anything that circumvents a rule or a protection, and any
+business decision. The review round, the sabotage proofs and every CI gate stay
+required before the merge.
+
+_End._ The exception ends at the owner's word, or when the owner's test for a
+live tenant is met: a non-archived repository named `ghost-tenant-*`, other than
+`ghost-tenant-blog`, with a successful production deploy on `main`. The owner may
+exclude disposable proofs, and only by a comment saying so. The owner decides
+whether the end has come. An agent never decides that it has come and never
+extends it. An agent that finds the test met stops and reports it to the owner.
+Where it is unclear whether a live tenant exists, this exception does not apply.
+After it ends, PRIN-2 reads as written above.
+
+_Clause ID._ None is added. The owner may choose to keep this under PRIN-2's ID.
 
 ## PRIN-3 — spend is eliminated, not optimised
 
