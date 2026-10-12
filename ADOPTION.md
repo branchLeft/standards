@@ -15,7 +15,7 @@ more than the work in them.
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use
-pnpm add -D @branchleft/tsconfig @branchleft/prettier-config   # or npm i -D
+command pnpm add -D @branchleft/tsconfig @branchleft/prettier-config   # or npm i -D
 ```
 
 Add the cooldown exclude **in the same PR**, not after the first failure —
@@ -94,7 +94,7 @@ about: a vendored checkout, or a file whose syntax Prettier would damage.
 ## 4. ESLint
 
 ```bash
-pnpm add -D @branchleft/eslint-config   # or npm i -D
+command pnpm add -D @branchleft/eslint-config   # or npm i -D
 ```
 
 ```js
