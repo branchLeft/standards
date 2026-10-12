@@ -25,8 +25,8 @@ failure. Prove the matcher still matches before trusting a pass.
 Before opening a PR:
 
 ```bash
-source ~/.nvm/nvm.sh && nvm use && command pnpm install
-command pnpm lint:check && command pnpm typecheck && ./tools/tests/run.sh
+source ~/.nvm/nvm.sh && nvm use && pnpm install
+pnpm lint:check && pnpm typecheck && ./tools/tests/run.sh
 ```
 
 `tools/tests/run.sh` runs every self-test, the clause-index drift check, and
