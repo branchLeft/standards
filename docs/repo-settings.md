@@ -16,11 +16,11 @@ unattributed changes, and squash-only merge.
 `require_code_owner_review` is set as follows. A repo that is not public is
 not audited for it (last row).
 
-| Value       | Repos                                                                                                                                                                                                      |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `true`      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `.github`. Note: `speckify` and `.github` are live `true`; an earlier list had them `false`, and the live value is recorded here. |
-| `false`     | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards`.                                  |
-| NOT AUDITED | Private repos, including `ghost-platform-docs`. Private repos: code-owner review is not enforceable on this plan (ACCEPTED-RISKS).                                                                         |
+| Value       | Repos                                                                                                                                                                                                                |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `true`      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`. Note: `speckify` and `.github` are live `true`; an earlier list had them `false`, and the live value is recorded here. |
+| `false`     | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards`.                                            |
+| NOT AUDITED | Private repos, including `ghost-platform-docs`. Private repos: code-owner review is not enforceable on this plan (ACCEPTED-RISKS).                                                                                   |
 
 Reasons for `false`. For the tenant repos (`ghost-tenant-*`, including
 `ghost-tenant-blog`, and the template `ghost-platform-tenant-template` with the
