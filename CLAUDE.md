@@ -35,9 +35,9 @@ pnpm workspaces, Node from `.nvmrc`. The repo dogfoods its own packages through
 ever published.
 
 ```bash
-source ~/.nvm/nvm.sh && nvm use && command pnpm install
-command pnpm build
-command pnpm format:check && command pnpm lint:check && command pnpm typecheck && command pnpm test:unit && command pnpm selftest
+source ~/.nvm/nvm.sh && nvm use && pnpm install
+pnpm build
+pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test:unit && pnpm selftest
 ```
 
 `pnpm build` is not optional and not first out of tidiness. The eslint flat
