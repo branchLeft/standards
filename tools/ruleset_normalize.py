@@ -265,6 +265,14 @@ def self_test():
           lambda: json.loads(run_main(["--payload"], no_key)[1])["bypass_actors"], [])
     check("default mode: no-key input canonicalises to UNKNOWN",
           lambda: json.loads(run_main([], no_key)[1])["bypass_actors"], UNKNOWN)
+    # A valid ruleset whose conditions is 100000 deep: canon() passes conditions through, so
+    # the RecursionError comes from serialising. It must be ERROR with nothing on stdout.
+    deep_ruleset = (
+        '{"name": "Protect default branch", "target": "branch", "enforcement": "active", '
+        '"conditions": ' + "[" * 100000 + "]" * 100000 + ', "rules": [], "bypass_actors": []}'
+    )
+    check("canonical mode: a deeply nested conditions field is ERROR with no stdout",
+          lambda: (lambda r: (r[0], r[1] == ""))(run_main([], deep_ruleset)), (ERROR, True))
     check("canonical mode: a deeply nested input is ERROR, not a traceback",
           lambda: run_main([], "[" * 100000 + "]" * 100000)[0], ERROR)
 
@@ -313,11 +321,14 @@ def main(argv):
         absent = [] if argv[1:] == ["--payload"] else UNKNOWN
         try:
             canonical = canon(json.load(sys.stdin), absent=absent)
+            # Serialise into a buffer: json.dumps does not raise on deep input on 3.14,
+            # json.dump does, and nothing reaches stdout unless the whole text succeeded.
+            buffer = io.StringIO()
+            json.dump(canonical, buffer, indent=2, sort_keys=True)
         except (KeyError, TypeError, ValueError, RecursionError) as exc:
             print(f"ERROR: cannot canonicalise ({exc})", file=sys.stderr)
             return ERROR
-        json.dump(canonical, sys.stdout, indent=2, sort_keys=True)
-        print()
+        sys.stdout.write(buffer.getvalue() + "\n")
         return 0
 
     print(USAGE, file=sys.stderr)
