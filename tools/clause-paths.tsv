@@ -132,6 +132,25 @@ PUL-11	*.ts	[fleet] review clause, no gate script; same file type as PUL-1-5
 PUL-12	Pulumi.*.yaml;*/Pulumi.*.yaml	[gate] check-pulumi-secrets.sh: ratchet_scope_files '(^|/)Pulumi\.[A-Za-z0-9_-]+\.yaml$'
 PUL-13	*.ts;Pulumi.*.yaml;*/Pulumi.*.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] programs, stack configuration and the preview workflow
 
+## Ansible — stacks/ansible.md
+ANS-1	ansible/*	[doc] the page puts every host-configuration file under ansible/
+ANS-2	ansible/*.py;ansible/pyproject.toml	[doc] custom modules, plugins and filters live in a role's library/, module_utils/ and filter_plugins/ under ansible/
+ANS-3	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*	[doc] the clause names a role's tasks and handlers
+ANS-4	ansible/requirements.txt;ansible/requirements.yml	[doc] the two committed requirements files the clause names
+ANS-5	.ansible-lint;.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the lint configuration the clause names, plus where it runs
+ANS-6	.yamllint;ansible/*.yml;ansible/*.yaml	[doc] the yamllint configuration and the YAML under ansible/
+ANS-7	ansible/roles/*/meta/argument_specs.yml;ansible/roles/*/defaults/main.yml;ansible/roles/*/tasks/*	[doc] the spec, the defaults it must agree with and the tasks that read variables
+ANS-8	ansible/*.yml;ansible/*.yaml	[doc] every task and handler file under ansible/
+ANS-9	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*	[doc] the clause names tasks and handlers
+ANS-10	ansible/roles/*/tasks/*;ansible/roles/*/library/*;ansible/roles/*/molecule/*	[doc] role tasks, custom modules and the scenario that exercises check mode
+ANS-11	ansible/roles/*/tasks/*;ansible/roles/*/molecule/*	[doc] role tasks and the scenario whose idempotence step proves them
+ANS-12	ansible/roles/*/meta/main.yml;ansible/playbooks/*	[doc] the role metadata that carries dependencies and the playbooks that compose roles
+ANS-13	ansible/*	[doc] the clause fixes the layout of ansible/
+ANS-14	ansible/roles/*/README.md	[doc] the file the clause names
+ANS-15	ansible/roles/*/molecule/*	[doc] the scenario directory the clause names
+ANS-16	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*;ansible/roles/*/defaults/main.yml;.ansible-lint	[doc] tasks that handle secrets, the defaults that must not hold one and the lint file that enables the rule
+ANS-17	.github/workflows/*.yml;.github/workflows/*.yaml;*.md	[fleet] delivery workflows and the documents that describe how a role is applied
+
 ## Infrastructure operations — infrastructure.md
 IAC-1	*	[none] a CI-403-vs-hand-apply judgement call; infrastructure.md names no path
 IAC-2	*	[none] same disclaimer as IAC-1

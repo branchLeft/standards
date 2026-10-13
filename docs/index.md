@@ -289,6 +289,35 @@ so neither `.standards.mode: warn` nor a `.standardsignore` line can turn a
 committed salt advisory. See [`stacks/pulumi.md`](stacks/pulumi.md) for the
 salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 
+## Ansible — `stacks/ansible.md`
+
+| ID     | Rule                                                                                      | Gate      | Evidence                                                    |
+| ------ | ----------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------- |
+| ANS-1  | Host state is declared in Ansible playbooks and roles, written in YAML                    | `review`  | New or changed host-configuration files in the diff         |
+| ANS-2  | Python 3, fully annotated and mypy-strict, is the only language for custom code           | `pending` | —                                                           |
+| ANS-3  | No bash in a role, except a program the role installs                                     | `pending` | —                                                           |
+| ANS-4  | ansible-core, the tools and every collection are pinned to exact versions                 | `pending` | —                                                           |
+| ANS-5  | ansible-lint runs at the production profile, non-mutating, in pre-commit and CI           | `pending` | —                                                           |
+| ANS-6  | yamllint covers every YAML file under `ansible/`                                          | `pending` | —                                                           |
+| ANS-7  | Every role declares its typed interface in `meta/argument_specs.yml`                      | `pending` | —                                                           |
+| ANS-8  | Modules and plugins are named by fully qualified collection name                          | `pending` | —                                                           |
+| ANS-9  | A module before a command; a command states its change                                    | `pending` | —                                                           |
+| ANS-10 | Every role and custom module supports check mode                                          | `review`  | The role's Molecule scenario and any module in the diff     |
+| ANS-11 | A second run against a configured host changes nothing                                    | `pending` | —                                                           |
+| ANS-12 | One role per logical service; composition is in a playbook                                | `review`  | New roles and their `meta/main.yml` in the diff             |
+| ANS-13 | A role lives with the service it configures, under `ansible/roles/`                       | `review`  | New paths under `ansible/` in the diff                      |
+| ANS-14 | Every role has a README a maintainer new to the repository can use                        | `review`  | The role's `README.md` against its tasks                    |
+| ANS-15 | Every role carries a Molecule test on containers only, never a production host            | `pending` | —                                                           |
+| ANS-16 | A secret never reaches a log: `no_log`, `diff: false`, supplied at run time               | `pending` | —                                                           |
+| ANS-17 | A role is applied to production only by the gated workflow against `main`; no local apply | `review`  | Workflows that run `ansible-playbook` and their environment |
+
+**No `ANS-*` clause is `auto`.** No gate script under `tools/` reads any of
+them yet, so each is binding prose carried by `ansible-lint`, Molecule, mypy and
+review rather than by this repo. `ANS-5` makes `ANS-8`, `ANS-9`, `ANS-12` and
+`ANS-16` mechanical in a repo that runs it; the standard names the tool and the
+profile, not a copy of the rule list. See [`stacks/ansible.md`](stacks/ansible.md)
+for the reasoning and a worked example.
+
 ## Infrastructure operations — `infrastructure.md`
 
 | ID    | Rule                                                                                         | Gate      | Encoded by |
