@@ -1,5 +1,7 @@
-# This file names only the escape hatches REPO-5 defines, so code-owner
-# review gates exemptions (REPO-5, STD-001), not every PR. The shared lines
+# This file names only the escape hatches REPO-5 defines. Where REPO-1 requires
+# code-owner review, that review gates exemptions (REPO-5, STD-001), not every
+# PR. This repo does not require it (REPO-1), so these lines request a review
+# and do not block a merge by themselves. The shared lines
 # from templates/codeowners stay last: GitHub applies the LAST matching
 # pattern, so this repo's own lines go above them, never after.
 

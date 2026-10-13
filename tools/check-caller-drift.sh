@@ -21,6 +21,7 @@ FLEET_REPOS=(
   content-safety
   control-plane
   speckify
+  pdq-ts
 )
 
 # Overridable so --self-test can inject fixture data with no network call —

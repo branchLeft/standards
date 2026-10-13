@@ -21,8 +21,11 @@ only `ref_name`. Confirmed against GitHub's REST schema for
 Targets `ghost-tenant-*` — every tenant infrastructure repo, present and
 future — and applies the estate's standard default-branch shape (modelled on
 `templates/rulesets/ghost-platform-tenant-template/main.json`: no deletion, no
-force-push, linear history, signed commits, one approving + code-owner review,
-squash-only). Filed against
+force-push, linear history, signed commits, one approving review, squash-only).
+`require_code_owner_review` is `false`, matching the REPO-1 clause in
+[`docs/repo-settings.md`](../../docs/repo-settings.md) for the tenant repos.
+The payload is inert on GitHub Free today (the org rulesets endpoint returns
+403; see "Applying" below). Filed against
 [branchLeft/workspace#151](https://github.com/branchLeft/workspace/issues/151).
 
 Today `ghost-tenant-*` matches `branchLeft/ghost-tenant-blog` (public, the

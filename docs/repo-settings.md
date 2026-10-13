@@ -8,9 +8,43 @@ not a click-through per repo, and drift is a diff rather than a discovery.
 ## REPO-1 — the default-branch ruleset shape
 
 On the default branch: no deletion, no force-push, linear history, signed
-commits, and a pull request requiring one approving review, code-owner review,
-stale-review dismissal, last-push approval, resolved conversations, an extra
-approval for unattributed changes, and squash-only merge.
+commits, and a pull request requiring one approving review, stale-review
+dismissal, last-push approval, resolved conversations, an extra approval for
+unattributed changes, and squash-only merge.
+
+**Code-owner review is required per repo, not everywhere.** The field
+`require_code_owner_review` is set as follows. A repo that is not public is
+not audited for it (last row).
+
+| Value       | Repos                                                                                                                                                                                                                |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `true`      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`. Note: `speckify` and `.github` are live `true`; an earlier list had them `false`, and the live value is recorded here. |
+| `false`     | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards`.                                            |
+| NOT AUDITED | Private repos, including `ghost-platform-docs`. Private repos: code-owner review is not enforceable on this plan (ACCEPTED-RISKS).                                                                                   |
+
+Reasons for `false`. For the tenant repos (`ghost-tenant-*`, including
+`ghost-tenant-blog`, and the template `ghost-platform-tenant-template` with the
+repos generated from it), the owner's
+reason, recorded on 2026-10-10, is verbatim: "contributing still requires org
+members, which is only me and my agents today." For `ghost-platform`,
+`content-safety`, `control-plane` and `standards`, the live value is `false`:
+this is the recorded live value; no ruling states why. The live readings are
+recorded in the pull request that introduced this table, and `ruleset-audit.sh`
+reads them again.
+
+**How an audit reads it.** For each public repo in the `true` and `false`
+rows, the live value is `gh api repos/branchLeft/<repo>/rulesets/<id>` and the
+field is `.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review`,
+where `<id>` is the default-branch ruleset from `gh api repos/branchLeft/<repo>/rulesets`.
+The committed value is the same field in `templates/rulesets/<repo>/` on the
+default-branch payload. Both must equal the row's value. A repo that
+`ruleset-audit.sh` reports as `DRIFT` on this field fails this clause. So does
+any public repo outside the two rows whose payload sets the field.
+
+**Private repos are NOT AUDITED.** Their rulesets endpoint returns 403 on this
+plan, so no live value can be read. A payload value for a private repo, `true`
+or `false`, carries no force and is not read by this clause. The row says
+NOT AUDITED, never on or off, for every private repo.
 
 `require_extra_approval_for_unattributed_changes` arrived in the payloads by
 being **chosen**, not by being inherited: GitHub began setting it server-side,

@@ -8,5 +8,6 @@ coverage/
 .claude/worktrees/
 .worktrees/
 
-# Python bytecode, rewritten by every run of the gate self-tests.
+# Python bytecode caches are generated, never tracked.
 __pycache__/
+*.pyc

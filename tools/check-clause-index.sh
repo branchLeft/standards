@@ -185,7 +185,7 @@ check_index() {
 
   while IFS= read -r c; do
     [ -n "$c" ] || continue
-    printf '%s\n' "$indexed" | grep -qx "$c" || {
+    grep -qx "$c" <<< "$indexed" || {
       echo "::error::$c is defined in docs/ but missing from index.md"; rc=1; }
   done <<< "$defined"
 
@@ -199,7 +199,7 @@ check_index() {
   local undefined=0
   while IFS= read -r c; do
     [ -n "$c" ] || continue
-    printf '%s\n' "$defined" | grep -qx "$c" || {
+    grep -qx "$c" <<< "$defined" || {
       echo "::warning::$c is indexed but not yet defined in a doc"
       undefined=$((undefined + 1)); }
   done <<< "$indexed"
@@ -269,7 +269,7 @@ check_index() {
   local floor_id
   while IFS= read -r floor_id; do
     [ -n "$floor_id" ] || continue
-    printf '%s\n' "$indexed" | grep -qx "$floor_id" || {
+    grep -qx "$floor_id" <<< "$indexed" || {
       echo "::error::$floor_id has a floor in tools/floors.tsv but is not indexed in $index"
       rc=1; }
   done < <(floor_ids "$ROOT/tools/floors.tsv")
@@ -288,7 +288,7 @@ check_index() {
     local mapped_id
     while IFS= read -r mapped_id; do
       [ -n "$mapped_id" ] || continue
-      printf '%s\n' "$indexed" | grep -qx "$mapped_id" || {
+      grep -qx "$mapped_id" <<< "$indexed" || {
         echo "::error::$mapped_id has a row in tools/clause-paths.tsv but is not indexed in $index"
         rc=1; }
     done <<< "$mapped"
@@ -301,7 +301,7 @@ check_index() {
     local idx_id
     while IFS= read -r idx_id; do
       [ -n "$idx_id" ] || continue
-      printf '%s\n' "$mapped" | grep -qx "$idx_id" || {
+      grep -qx "$idx_id" <<< "$mapped" || {
         echo "::error::$idx_id is indexed in $index but has no row in tools/clause-paths.tsv"
         rc=1; }
     done <<< "$indexed"
@@ -321,7 +321,7 @@ check_index() {
     local scoped_id scope
     while IFS= read -r scoped_id; do
       [ -n "$scoped_id" ] || continue
-      printf '%s\n' "$mapped" | grep -qx "$scoped_id" || continue
+      grep -qx "$scoped_id" <<< "$mapped" || continue
       scope=$(clause_paths_scope "$scoped_id" "$clause_paths")
       case "$scope" in
         '[gate]'*) ;;
