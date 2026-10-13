@@ -137,7 +137,7 @@ ANS-1	ansible/*	[doc] the page puts every host-configuration file under ansible/
 ANS-2	ansible/*.py;ansible/pyproject.toml	[doc] custom modules, plugins and filters live in a role's library/, module_utils/ and filter_plugins/ under ansible/
 ANS-3	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*	[doc] the clause names a role's tasks and handlers
 ANS-4	ansible/requirements.txt;ansible/requirements.yml	[doc] the two committed requirements files the clause names
-ANS-5	.ansible-lint;.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the lint configuration the clause names, plus where it runs
+ANS-5	.ansible-lint;.ansible-lint-ignore;.config/ansible-lint-ignore.txt;.pre-commit-config.yaml;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the lint configuration and the ignore files the clause names, plus where it runs
 ANS-6	.yamllint;ansible/*.yml;ansible/*.yaml	[doc] the yamllint configuration and the YAML under ansible/
 ANS-7	ansible/roles/*/meta/argument_specs.yml;ansible/roles/*/defaults/main.yml;ansible/roles/*/tasks/*	[doc] the spec, the defaults it must agree with and the tasks that read variables
 ANS-8	ansible/*.yml;ansible/*.yaml	[doc] every task and handler file under ansible/
@@ -147,8 +147,8 @@ ANS-11	ansible/roles/*/tasks/*;ansible/roles/*/molecule/*	[doc] role tasks and t
 ANS-12	ansible/roles/*/meta/main.yml;ansible/playbooks/*	[doc] the role metadata that carries dependencies and the playbooks that compose roles
 ANS-13	ansible/*	[doc] the clause fixes the layout of ansible/
 ANS-14	ansible/roles/*/README.md	[doc] the file the clause names
-ANS-15	ansible/roles/*/molecule/*	[doc] the scenario directory the clause names
-ANS-16	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*;ansible/roles/*/defaults/main.yml;.ansible-lint	[doc] tasks that handle secrets, the defaults that must not hold one and the lint file that enables the rule
+ANS-15	ansible/roles/*/molecule/*;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the scenario directory the clause names, plus the job whose environment must not set DOCKER_HOST
+ANS-16	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*;ansible/roles/*/defaults/main.yml;ansible/roles/*/templates/*;.ansible-lint	[doc] tasks and templates that handle secrets, the defaults that must not hold one and the lint file that enables the rule
 ANS-17	.github/workflows/*.yml;.github/workflows/*.yaml;*.md	[fleet] delivery workflows and the documents that describe how a role is applied
 
 ## Infrastructure operations — infrastructure.md
