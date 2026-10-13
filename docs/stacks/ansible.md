@@ -66,9 +66,14 @@ ansible-core, ansible-lint, Molecule and its driver plugin, mypy and ruff are
 pinned to exact versions in one committed requirements file under `ansible/`.
 Every collection a role uses is pinned to an exact version in
 `ansible/requirements.yml` and is vendored: the pinned copy is committed to the
-repository, so a run installs no collection from a public index. CI installs
-the Python tools from the requirements file, uses the vendored collections, and
-fetches nothing else.
+repository, so that a clean checkout installs the pinned set with no network
+beyond the pins. CI installs the Python tools from the requirements file and
+uses the vendored collections.
+
+The pre-commit hook for ansible-lint is the one other place a pin lives:
+pre-commit installs a hook into its own virtual environment, so the hook's
+`rev` is the ansible-lint version in the requirements file, and a bump changes
+both in one pull request.
 
 A bump is a deliberate pull request that changes the pin and, for a collection,
 the vendored copy together. Dependabot raises the pip pins (`DEP-8`); it has no
@@ -81,13 +86,28 @@ install makes a green run unrepeatable, the reason `CI-1` pins actions. A
 vendored collection cannot change, or disappear, between two runs of one commit.
 
 **Check plan:** a check that every line in the requirements file and every
-collection entry carries an exact version, and that the vendored copy matches
-the pin; review of a bump.
+collection entry carries an exact version; review of a bump, and of the vendored
+copy against its pin until a check for that exists.
 
 **Named limit:** nothing prompts a collection bump between `ansible-core`
 changes, so a collection can age silently until one of those reviews.
 Dependabot's list of supported ecosystems has no entry for Ansible collections,
 and this page does not add a scheduled job it cannot defend.
+
+**Named limit:** where the vendored copy lives, how Ansible and ansible-lint
+find it, and how a check proves that it matches its pin are decided by the
+foundation ticket that pins `ansible-core` and vendors the collections, and are
+recorded here by amendment. This page does not state them.
+
+**Named limit:** ansible-lint's documentation says it supports only the latest
+`ansible-core` when run as a pre-commit hook, so the hook can run a different
+`ansible-core` from the pinned one. The CI run at the pinned versions is the
+result that blocks (`CI-14`). Separately, Molecule's configuration page lists
+`galaxy` as the default dependency manager and `dependency` as the first step of
+its default sequences, and says the manager can be disabled by setting
+`enabled` to false. This page has not established whether that step reaches a
+public index with the vendored copy in place, so how a scenario's dependency
+step is configured is recorded by the same amendment.
 
 ## ANS-5 — ansible-lint runs at the production profile
 
@@ -98,11 +118,15 @@ strictest of the six profiles (`min`, `basic`, `moderate`, `safety`, `shared`,
 text is "Return non-zero exit code on warnings as well as errors", and the
 file sets `strict: true`.
 
-No route that hides a finding or a file from the lint is used. The
-configuration sets none of `skip_list`, `exclude_paths`, `mock_modules`,
-`mock_roles` or `kinds`, and no ignore file exists: neither
-`.ansible-lint-ignore` nor `.config/ansible-lint-ignore.txt`, nor one named by
-`ANSIBLE_LINT_IGNORE_FILE`. `warn_list` is set explicitly to `experimental`
+No route that hides a finding or a file from the lint is used. In the
+configuration file, none of `skip_list`, `exclude_paths`, `mock_modules`,
+`mock_roles` or `kinds` is set. No ignore file exists: neither
+`.ansible-lint-ignore` nor `.config/ansible-lint-ignore.txt`, the two names the
+tool looks for by default. In the invocation, which is the pre-commit hook's
+`args` and the CI step's command line, none of `-x` (`--skip-list`),
+`--exclude` or `-i` (`--ignore-file`) is passed. No task carries the
+`skip_ansible_lint` tag, which the tool's usage page documents as skipping all
+task-based rules for a task. `warn_list` is set explicitly to `experimental`
 alone. ansible-lint's default warn list is `experimental`, `jinja[spacing]` and
 `fqcn[deep]`, and a list the file defines replaces it, so the two rules that
 the profile includes are errors, not warnings. The tool's documentation does
@@ -123,7 +147,17 @@ a pull request can switch off by adding one line is not a floor.
 
 **Check plan:** a CI step running ansible-lint with `--strict`, and a check
 that `.ansible-lint` names the production profile, sets none of the keys above
-and a `warn_list` of `experimental` alone, and that no ignore file exists.
+and a `warn_list` of `experimental` alone, that no ignore file exists, that no
+workflow or pre-commit `args` passes one of the flags above, and that no task
+under `ansible/` carries the `skip_ansible_lint` tag. Until that check exists
+these are review.
+
+**Named limit:** the routes listed are the ones read in the tool's
+documentation and source for this page; the page does not claim the list is
+every route the tool offers. `ANSIBLE_LINT_IGNORE_FILE` is not one of them: the
+usage page says it overrides the name of the default ignore file, but in the
+source read its only use is as the output path of `--generate-ignore`, and the
+loader that reads an ignore file does not mention it.
 
 ## ANS-6 — yamllint covers every YAML file under `ansible/`
 
@@ -131,7 +165,10 @@ and a `warn_list` of `experimental` alone, and that no ignore file exists.
 rule requires: `comments.min-spaces-from-content` is 1,
 `braces.min-spaces-inside` is 0, `braces.max-spaces-inside` is 1, and
 `octal-values.forbid-implicit-octal` and `octal-values.forbid-explicit-octal`
-are both true. yamllint runs in pre-commit and in CI over
+are both true. It also sets two values the same way ansible-lint's own default
+configuration does, which that rule's page shows: `line-length.max` is 160,
+where yamllint's `default` preset enables the rule with that rule's own maximum,
+and `document-start` is disabled. yamllint runs in pre-commit and in CI over
 every YAML file under `ansible/`, as its own step, so a file ansible-lint does
 not treat as Ansible content is covered too.
 
@@ -139,7 +176,8 @@ not treat as Ansible content is covered too.
 hides what changed from a reviewer.
 
 **Check plan:** a CI step running yamllint with the committed `.yamllint`, and a
-check that the file keeps the five settings above.
+check that the file keeps the five settings above and the two values after
+them.
 
 ## ANS-7 — every role declares its interface in `meta/argument_specs.yml`
 
@@ -174,7 +212,8 @@ one role moves to a collection and is called by its qualified name.
 same task can run different code on two controllers.
 
 **Check plan:** the `fqcn` rule, which the production profile includes
-(`ANS-5`), for the names a task uses; review for the rest.
+(`ANS-5`), for the names a task uses; review for the rest, including every
+file under a role's `templates/`.
 
 **Named limit:** the `fqcn` rule's documentation says it checks module and
 plugin names in Ansible content, that its `fqcn[keyword]` check is about the
@@ -214,10 +253,16 @@ reads and changes nothing, so that later tasks have its result.
 role that fails under it, or silently skips half its tasks, gives them nothing
 to approve.
 
-**Check plan:** review of the role and of any module in the diff; the role's
-test (`ANS-15`) requires a CI run of the scenario's `check` action, Molecule's
-dry run of the role, so a role that fails under check mode fails CI. That run
-covers the state the scenario is in when it runs; the other state is review.
+**Check plan:** review of the role and of any module in the diff. The approved
+delivery path (`ANS-17`) has a plan job that runs in check mode and shows each
+host's diff before the approval. The role's test (`ANS-15`) also requires a CI
+run of Molecule's `check` action.
+
+**Named limit:** Molecule's configuration page lists `check` as a step of
+`check_sequence`, after `converge`, and its usage page lists it as an action;
+neither page says what the step runs, so this page does not claim that it runs
+the role in check mode. Whatever it runs covers the state the scenario is in
+when it runs, and the other state is review.
 
 ## ANS-11 — a second run changes nothing
 
@@ -252,6 +297,10 @@ profile, but its profiles page links that entry to a GitHub issue rather than
 a rule page and says such entries are not yet implemented. Nothing in the lint
 refuses a role dependency, so this part of the clause is review-only until
 the rule exists or a repository adds its own check.
+
+**Named limit:** nothing here forbids a role's tasks from including or
+importing another role, which composes roles in the way a dependency does. That
+is decided with the first role pattern and recorded here by amendment.
 
 ## ANS-13 — where roles and playbooks live
 
@@ -333,12 +382,9 @@ has not been proven to run, so the first role to use it records the result.
 
 Every task that reads, templates or passes a secret sets `no_log: true`,
 including a task in a loop, and sets `diff: false` where `--diff` would show
-the rendered secret. A secret reaches a role as a variable supplied at run time
-by the approved delivery path (`ANS-17`), from a file or the environment of the
-run and never as a command-line argument, which any process on the host can
-read (`CRED-2`, `CRED-10`). It is never a default in `defaults/main.yml`, and is
-never committed (`CRED-11`, `LOG-4`). A Molecule test uses throwaway values made
-for the run.
+the rendered secret. A secret reaches a role as a variable supplied at run time, never as a default
+in `defaults/main.yml`, and is never committed (`CRED-11`) or logged (`LOG-4`).
+A Molecule test uses throwaway values made for the run.
 
 **Why:** a secret in a CI log is published to everyone who can read it, and
 Ansible prints task arguments and diffs by default.
@@ -348,6 +394,11 @@ renders or passes a secret, for `no_log: true` and `diff: false`. Two checks
 back the review and neither replaces it: the `no-log-password` rule, enabled in
 `.ansible-lint` (`ANS-5`), and the secret scan of `CRED-11`, which looks for
 committed values.
+
+**Named limit:** where a secret comes from at run time, and how it reaches a
+host that pulls its commit, is decided by the secrets pattern and recorded here
+by amendment. This page names no delivery mechanism and states no property of
+one.
 
 **Named limit:** `no-log-password` flags a task only when one of its module
 argument names contains `password`, the task has a `loop` or `with_` key, and
@@ -363,15 +414,20 @@ log through a validation failure is not established.
 
 Delivery to a production host is only through a GitHub workflow run against
 `main`, after the approval of its protected deployment environment (`CI-12`,
-`CI-13`, `IAC-4`). Two shapes are approved. In the first the workflow runs
-`ansible-playbook` against the host. In the second the workflow holds the gate
-and the host then pulls an exact commit of `main` and applies it itself. A
-nightly drift run in check mode, on either shape, reports and changes nothing.
+`CI-13`, `IAC-4`). The approved shape is a gated pull. A plan job shows each
+host's diff before the approval. After the approval, the host runs
+`ansible-pull` of that exact commit of `main`, and CI never holds a root shell.
+Every live apply also gets a second run that must report zero changes. A nightly
+drift run in check mode is part of the same approved plan.
+
+Pushing from a CI runner to the host over SSH was the alternative the owner did
+not choose. This page does not approve it, and a ticket cannot cite this clause
+for it; choosing it is a decision for the owner.
 
 An agent is never authorised to deliver to a production host in any other way.
 It does not run `ansible-playbook` against one from a local machine, either to
 apply or in check mode: a check-mode run opens a session to the host and is
-not one of the approved shapes. A probe, a lab or a spike that touches no
+not the approved shape. A probe, a lab or a spike that touches no
 production host is not delivery and is outside this clause. A hand-made
 emergency change is redone through the workflow within a day (`OPS-1`), and the
 human exceptions are `IAC-1`'s list; this page adds none.
@@ -382,9 +438,14 @@ containers on that machine (`ANS-15`).
 **Why:** a deploy from a laptop skips the approval and the review, depends on
 that laptop's credentials, and leaves no run to audit.
 
-**Check plan:** review; a workflow that runs `ansible-playbook` uses a
-protected environment, a host's pull follows the gate, and no document tells
-an agent to run it by hand.
+**Check plan:** review; a delivery workflow has a plan job before a protected
+environment, the host's pull follows the gate, a second run follows every live
+apply, and no document tells an agent to run `ansible-playbook` by hand.
+
+**Named limit:** how the pull is triggered, how the host verifies the commit it
+pulls, and how the second run is wired into the workflow are decided by the
+trigger-wrapper and reusable-CI tickets and recorded here by amendment. This
+page states only the shape the owner approved.
 
 ## A worked example
 
@@ -444,7 +505,7 @@ argument_specs:
       example_service_api_token:
         type: str
         required: true
-        description: Token the service uses upstream. Supplied at run time by the approved delivery path.
+        description: Token the service uses upstream. Supplied at run time.
 ```
 
 This is `meta/argument_specs.yml`. The role's own `defaults/main.yml` holds the
@@ -454,9 +515,12 @@ same defaults and no value for the token (`ANS-7`, `ANS-16`).
 
 `meta/main.yml` has no `dependencies` entry (`ANS-12`). ansible-lint's `schema`
 rule requires `galaxy_info.standalone` for a role that is not part of a
-collection and refuses an empty file, and `meta-incorrect` refuses the
-placeholder text of the generated template for the author, description,
-company and licence.
+collection and refuses an empty file. The meta schema it enforces requires
+`author`, `description`, `license` and `min_ansible_version` when `standalone`
+is true, and types `min_ansible_version` as a string. `meta-incorrect` refuses
+the placeholder text of the generated template for the author, description,
+company and licence. The value of `min_ansible_version` is the pinned
+`ansible-core` version (`ANS-4`), the one the role's test runs against.
 
 ```yaml
 galaxy_info:
@@ -464,6 +528,7 @@ galaxy_info:
   author: AUTHOR_NAME
   description: Installs and configures EXAMPLE_SERVICE.
   license: LICENSE_ID
+  min_ansible_version: PINNED_CORE_VERSION
 ```
 
 ### The lint configuration
@@ -480,11 +545,15 @@ enable_list:
 ```
 
 This is `.yamllint` at the repository root, with the five settings ansible-lint's
-`yaml` rule requires and nothing that loosens them (`ANS-6`).
+`yaml` rule requires, the two values ansible-lint's own default configuration
+sets, and nothing that loosens the five (`ANS-6`).
 
 ```yaml
 extends: default
 rules:
+  line-length:
+    max: 160
+  document-start: disable
   comments:
     min-spaces-from-content: 1
   braces:
@@ -529,8 +598,9 @@ platforms:
     pre_build_image: true
 ```
 
-`converge.yml` applies the role with throwaway values, and `verify.yml` asserts
-the outcome rather than that converge finished (`TEST-2`):
+`converge.yml` applies the role with throwaway values, setting `no_log: true`
+on the task that passes the token (`ANS-16`), and `verify.yml` asserts the
+outcome rather than that converge finished (`TEST-2`):
 
 ```yaml
 - name: Converge
@@ -541,6 +611,7 @@ the outcome rather than that converge finished (`TEST-2`):
         name: example_service
       vars:
         example_service_api_token: THROWAWAY_VALUE
+      no_log: true
 ```
 
 ```yaml

@@ -314,12 +314,11 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 **No `ANS-*` clause is `auto`.** No gate script under `tools/` reads any of
 them yet, so each is binding prose carried by review, or by `ansible-lint`,
 Molecule and mypy in a repo that runs them, rather than by this repo. The
-`pending` rows are the ones such a tool is meant to check once it runs. Three
-clauses carry a named limit on that: `ANS-12`'s dependency rule is not
-implemented in ansible-lint, `ANS-16`'s rule flags only a password argument in a
-loop, and `ANS-8`'s rule documents nothing about filters in templates, so those
-parts are review. The standard names the tool and the profile, not a copy of
-the rule list. See [`stacks/ansible.md`](stacks/ansible.md) for the reasoning
+`pending` rows are the ones such a tool is meant to check once it runs. A
+clause that a tool does not fully check says so under a `Named limit:` marker on
+the page, and the part it names is review; read the page for those, which is
+where a count would go stale. The standard names the tool and the profile, not
+a copy of the rule list. See [`stacks/ansible.md`](stacks/ansible.md) for the reasoning
 and a worked example.
 
 ## Infrastructure operations — `infrastructure.md`
