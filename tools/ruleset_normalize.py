@@ -226,6 +226,13 @@ def self_test():
     check("a listing entry without a name is ERROR",
           lambda: run_main(["--check-listing"], '[{"id": 1}]')[0], ERROR)
 
+    # A deeply nested listing raises RecursionError inside json.loads on some Pythons (3.9, 3.11),
+    # and parses on others (3.14). Either way it must be ERROR with a line of output, never a traceback.
+    deep_text = "[" * 100000 + "]" * 100000
+    check("a deeply nested listing is ERROR with a reason, not a traceback",
+          lambda: (lambda r: (r[0], r[1].strip() != ""))(run_main(["--check-listing"], deep_text)),
+          (ERROR, True))
+
     # Malformed rules: each raises AttributeError or TypeError inside canon().
     rules_entry_not_object = ruleset([org_admin])
     rules_entry_not_object["rules"] = ["deletion"]
@@ -245,6 +252,8 @@ def self_test():
               lambda: run_main(["--report", payload_path], json.dumps({"id": 1}))[0], ERROR)
         check("CLI report: live that is not JSON exits ERROR",
               lambda: run_main(["--report", payload_path], "{not json")[0], ERROR)
+        check("CLI report: a deeply nested live read exits ERROR, not a traceback",
+              lambda: run_main(["--report", payload_path], "[" * 100000 + "]" * 100000)[0], ERROR)
         check("CLI report: a missing payload file exits ERROR",
               lambda: run_main(["--report", payload_path + ".missing"], "{}")[0], ERROR)
     finally:
@@ -256,6 +265,8 @@ def self_test():
           lambda: json.loads(run_main(["--payload"], no_key)[1])["bypass_actors"], [])
     check("default mode: no-key input canonicalises to UNKNOWN",
           lambda: json.loads(run_main([], no_key)[1])["bypass_actors"], UNKNOWN)
+    check("canonical mode: a deeply nested input is ERROR, not a traceback",
+          lambda: run_main([], "[" * 100000 + "]" * 100000)[0], ERROR)
 
     # A bad argument prints the usage line, not a line of the docstring.
     check("bad argument prints usage and exits 2",
@@ -276,7 +287,7 @@ def main(argv):
             with open(argv[2]) as handle:
                 payload = json.load(handle)
             live = json.load(sys.stdin)
-        except (OSError, ValueError) as exc:
+        except (OSError, ValueError, RecursionError) as exc:
             print(f"ERROR: cannot read the ruleset ({exc})")
             return ERROR
         rc, lines = judge(payload, live)
@@ -288,6 +299,8 @@ def main(argv):
         text = sys.stdin.read()
         try:
             reason = check_listing(json.loads(text))
+        except RecursionError:
+            reason = "the rulesets list is nested too deeply to read"
         except ValueError:
             reason = f"not JSON: {text.strip()[:200]}"
         if reason:
@@ -300,7 +313,7 @@ def main(argv):
         absent = [] if argv[1:] == ["--payload"] else UNKNOWN
         try:
             canonical = canon(json.load(sys.stdin), absent=absent)
-        except (KeyError, TypeError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError, RecursionError) as exc:
             print(f"ERROR: cannot canonicalise ({exc})", file=sys.stderr)
             return ERROR
         json.dump(canonical, sys.stdout, indent=2, sort_keys=True)
