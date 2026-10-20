@@ -421,7 +421,7 @@ last one applied, and then runs `ansible-playbook` on a checkout of exactly that
 commit, and CI never holds a root shell. The stock `ansible-pull --verify-commit`
 is not used because it verifies the text given to `-C`, a name, not the
 checked-out HEAD, so a branch named like a verified commit ran an unsigned one;
-it cannot be given an allowlist of signing keys; and it runs a signed commit
+it checks the signature against a keyring, not the signer's fingerprint against an allowlist; and it runs a signed commit
 that is not an ancestor of `main`.
 Every live apply also gets a second run that must report zero changes. A nightly
 drift run in check mode is part of the same approved plan.
