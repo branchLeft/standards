@@ -292,11 +292,22 @@ role**. A capability role:
 - configures no service, and restarts, reloads, starts and stops nothing;
 - owns no host state of its own: it writes only to paths its caller passes in as
   inputs, and to no path it names itself;
-- declares every input in `meta/argument_specs.yml`;
-- is called with `include_role`, with every input its entry point declares given
-  explicitly at the call, optional inputs included, so the call relies on no
-  default;
+- declares every input in `meta/argument_specs.yml`, where an input includes an
+  option of a list element or of a dictionary, and gives every input that is not
+  `required: true` a `default` there (a `default` key counts whatever its value,
+  null included; an option with neither `required: true` nor a `default` fails);
+- is called with `include_role`, with every required input given at the call and
+  no input the entry point does not declare. An optional input the call leaves
+  out takes the default its `argument_specs` entry declares and no other; a
+  default that appears only in `defaults/main.yml`, in `group_vars` or in the
+  caller's own variables is not declared;
 - names in its README each role that calls it.
+
+Ansible does not apply a default declared in `argument_specs` to the role: the
+value an omitted optional input takes at run time comes from the role's
+`defaults/main.yml` or, for an option of a list element, from its tasks. Those
+hold the same value as the declared default (`ANS-7`), so a reader of the spec
+learns what an omitted input becomes.
 
 Any other composition stays in a playbook. The tasks and handlers of a role never
 `include_tasks` or `import_tasks` a file outside their own role, and no role uses
@@ -315,9 +326,11 @@ Any other composition stays in a playbook. The tasks and handlers of a role neve
 **Why:** shared logic needs one home, or each role copies it and the copies
 drift. A role that includes another hides from its playbook what gets applied.
 A capability role that touches only the paths it is handed, takes only inputs
-that are declared, has each of them given at the call and names its callers
-keeps that visible, and the caller stays the owner of the files and of every
-action on them.
+that are declared, has each required one given at the call, declares a default
+for each optional one and names its callers keeps that visible, and the caller
+stays the owner of the files and of every action on them. A declared default
+tells a caller what an omitted input becomes, and only while the role's own
+defaults equal it, which is why that equality is on the review list.
 
 **Check plan:** per part of the rule.
 
@@ -329,9 +342,10 @@ action on them.
     a `dependencies` entry;
   - every `include_role`, against the conditions of a capability role that a
     tool can read and not against a list of roles: the included role has
-    `argument_specs` for the entry point the call names, the call gives every
-    input that entry point declares as required, and the included role's README
-    names the calling role;
+    `argument_specs` for the entry point the call names, every input of that
+    entry point that is not `required: true` has a `default` there, the call
+    gives every required input and no input the entry point does not declare,
+    and the included role's README names the calling role;
   - where the check requires a citation of the standards pull request that
     recorded this rule, it reads the cited pull request through the API and
     asserts that it is merged and that the cited commit is its merge commit.
@@ -339,10 +353,10 @@ action on them.
   that a tool can read says so; that it configures no service and acts on
   nothing but the paths its caller passes; that every variable its tasks read is
   an input it declares, because a check sees what a call gives and not what a
-  task reads; and that the call gives every optional input the entry point
-  declares and no input it does not declare. The named check reads only the
-  required inputs, so the optional and undeclared parts stay review only until
-  that check reads every declared input.
+  task reads; and that the value an omitted optional input takes in the role's
+  `defaults/main.yml` or tasks equals the `default` its `argument_specs` entry
+  declares, because a check that reads the spec and the call cannot see which
+  value runs. Whatever the list above does not name is review.
 - A repository's check may hold a condition this clause leaves open, such as
   that a capability role includes no role itself, or that the included role is
   named by a path built from the caller's `role_path` and not by a bare name.
@@ -362,6 +376,12 @@ the rule exists or a repository adds its own check.
 **Named limit:** a check that reads task and handler files sees the name or
 path an include states. An include whose target is built from a variable is not
 seen, and is review only.
+
+**Named limit:** the default an `argument_specs` entry declares and the value the
+role runs with are two copies, because Ansible does not apply the spec's default
+to the role. A check that reads the spec and the call cannot see the second, so
+their equality is review only. For an option of a list element the second copy
+is in the role's tasks and not in a `defaults/` file.
 
 **Named limit:** this clause does not say whether a capability role may itself
 include another capability role, nor whether the rule applies to a role from a
