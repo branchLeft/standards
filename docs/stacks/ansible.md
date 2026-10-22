@@ -281,16 +281,128 @@ idempotence step reports a change.
 
 A role configures one service, or one cross-cutting capability with one reason
 to change, and nothing else. It does not edit another role's files or restart
-another role's service. Composition is in a playbook, which lists roles in
-order; `meta/main.yml` carries no `dependencies`. A role's name is lowercase
-letters, digits and underscores, starting with a letter.
+another role's service; the one exception is a capability role, which writes the
+paths its caller passes it (below). Other composition is in a playbook, which
+lists roles in order; `meta/main.yml` carries no `dependencies`. A role's name
+is lowercase letters, digits and underscores, starting with a letter.
 
-**Why:** a role with two reasons to change cannot be tested, reviewed or
-removed alone, and a dependency chain hides what a playbook applies.
+A role may include another role only when the included role is a **capability
+role**. A capability role:
 
-**Check plan:** review of each new or changed `meta/main.yml` for a
-`dependencies` entry. The `role-name` rule (basic profile, included by `ANS-5`)
-checks the name.
+- configures no service, and restarts, reloads, starts and stops nothing;
+- owns no host state of its own: it writes only to paths its caller passes in as
+  inputs, and to no path it names itself;
+- declares every input in `meta/argument_specs.yml`, the options of a list
+  element or of a dictionary included, and gives every input that is not
+  `required: true` a `default` there (a `default` key counts whatever its value,
+  null included; an option with neither `required: true` nor a `default` fails);
+- is called with `include_role`, and the call sets a variable for every
+  required top-level option of the entry point and sets no variable that is not
+  an option of the entry point. The call carries no `loop`, `with_*` or
+  `loop_control`: a caller that needs several calls writes them out, or loops
+  inside an included task file of its own that makes one call per item, and each
+  such call still sets only the role's options. A call without `tasks_from`
+  names the `main` entry point. A top-level input is an option of the entry
+  point itself; an option of a list element or of a dictionary the call passes
+  is a nested input, and each element or dictionary the call passes gives the
+  nested options that are required. An optional input the call leaves out takes
+  the default its `argument_specs` entry declares and no other; a default that
+  appears only in `defaults/main.yml`, in `vars/main.yml`, in `group_vars` or in
+  the caller's own variables is not declared;
+- names in its README each role that calls it.
+
+Ansible does not apply a default declared in `argument_specs` to the role (the
+role argument validation section of the Ansible roles guide). The
+value an omitted optional top-level input takes at run time is that of whatever
+variable of its name is in scope, and the role's `defaults/main.yml` is the
+lowest-precedence place such a variable can come from: a variable of the same
+name set in the caller's scope overrides it, and so does the included role's
+own `vars/main.yml`, which outranks both role defaults and inventory variables.
+The caller's scope includes, for example, `group_vars`, `host_vars`, the play's
+`vars`, block and task `vars`, `include_vars`, `set_fact`, extra vars and the
+calling role's own defaults and vars; these are examples and not a closed set.
+For an option of a list element the value comes from the role's tasks. The
+role's own `defaults/main.yml`, `vars/main.yml` and tasks must hold the same
+value as the declared default wherever they set the input; `ANS-7` requires this
+for `defaults/main.yml`, and this clause extends it to `vars/main.yml` and to
+tasks. A reader of the spec then learns what an omitted input becomes, unless
+the caller's scope sets a variable of that name.
+
+Any other composition stays in a playbook. The tasks and handlers of a role never
+`include_tasks` or `import_tasks` a file outside their own role, and no role uses
+`import_role` or a `meta/main.yml` `dependencies` entry to compose another.
+
+```yaml
+- name: Record the applied state of each class
+  ansible.builtin.include_role:
+    name: EXAMPLE_CAPABILITY_ROLE
+    tasks_from: EXAMPLE_ENTRY_POINT
+  vars:
+    example_capability_paths:
+      - /var/lib/EXAMPLE_DIRECTORY/EXAMPLE_FILE
+```
+
+**Why:** shared logic needs one home, or each role copies it and the copies
+drift. A role that includes another hides from its playbook what gets applied.
+A capability role that touches only the paths it is handed, takes only inputs
+that are declared, has each required one given at the call, declares a default
+for each optional one and names its callers keeps that visible, and the caller
+stays the owner of the files and of every action on them. A declared default
+tells a caller what an omitted input becomes, and only while the role's own
+defaults, vars and tasks equal it and no variable of that name is set in the
+caller's scope, which is why both are on the review list.
+
+**Check plan:** per part of the rule.
+
+- Enforced by a check in the repository that owns the roles, such as
+  `ansible/checks/test_role_composition_gate.py` in `shared-infra`:
+  - an `include_tasks` or `import_tasks` in a role's tasks or handlers whose
+    path leaves that role;
+  - every `import_role`, whatever role it names, and every `meta/main.yml` with
+    a `dependencies` entry;
+  - every `include_role` in a role's tasks or handlers, against the conditions
+    of a capability role that a tool can read and not against a list of roles:
+    the included role has `argument_specs` for the entry point the call names
+    (`main` when the call has no `tasks_from`), every input of that entry point
+    that is not `required: true` has a `default` there, the options of a list
+    element or of a dictionary included, the call sets a variable for every
+    required top-level option of the entry point and no variable that is not an
+    option of the entry point, the call carries no `loop`, `with_*` or
+    `loop_control`, and the included role's README names the calling role;
+  - where the check requires a citation of the standards pull request that
+    recorded this rule, it reads the cited pull request through the API and
+    asserts that it is merged and that the cited commit is its merge commit.
+- Review only: that an included role is a capability role, because no marker
+  that a tool can read says so; that it configures no service and acts on
+  nothing but the paths its caller passes; that its tasks read no outside
+  variable its `argument_specs` does not declare (a role reads its declared
+  options and these values it makes itself: results it registers, facts it sets
+  itself or gathers itself by running setup, the loop items of its own loops and
+  the constants in its own `vars/main.yml`; every other variable is outside,
+  among them `hostvars`, `vars`, `groups` and any variable the caller set, a
+  caller's loop item or `set_fact` included), because a check sees what a call
+  gives and not what a task reads; that the value an omitted optional input takes in the role's
+  `defaults/main.yml`, in its `vars/main.yml` or in its tasks equals the
+  `default` its `argument_specs` entry declares, because a check that reads the
+  spec and the call cannot see which value runs; that no variable of the name of
+  an omitted optional input is set in the caller's scope (for example
+  `group_vars`, `host_vars`, the play's `vars`, block and task `vars`,
+  `include_vars`, `set_fact`, extra vars, the calling role's own defaults and
+  vars; the examples are not a closed set), because such a variable overrides
+  the role's defaults and a check that reads the spec and the call does not read
+  the caller's scope; and that each list element or dictionary a call passes
+  gives its required nested options, because a check that reads the names of the
+  variables a call sets sees the top-level inputs and not what is inside them.
+  Whatever the list above does not name is review.
+- A repository's check may hold a condition this clause leaves open, such as
+  that a capability role includes no role itself, or that the included role is
+  named by a path built from the caller's `role_path` and not by a bare name.
+  The clause neither requires nor forbids it, and the repository states the
+  condition in its own documentation.
+- Where no such check exists in the repository, the whole composition rule is
+  review only.
+
+The `role-name` rule (basic profile, included by `ANS-5`) checks the name.
 
 **Named limit:** ansible-lint lists `meta-no-dependencies` under its production
 profile, but its profiles page links that entry to a GitHub issue rather than
@@ -298,9 +410,28 @@ a rule page and says such entries are not yet implemented. Nothing in the lint
 refuses a role dependency, so this part of the clause is review-only until
 the rule exists or a repository adds its own check.
 
-**Named limit:** nothing here forbids a role's tasks from including or
-importing another role, which composes roles in the way a dependency does. That
-is decided with the first role pattern and recorded here by amendment.
+**Named limit:** a check that reads task and handler files sees the name or
+path an include states. An include whose target is built from a variable is not
+seen, and is review only.
+
+**Named limit:** the default an `argument_specs` entry declares and the value the
+role runs with are two copies, because Ansible does not apply the spec's default
+to the role. A check that reads the spec and the call cannot see the second, so
+their equality is review only. The second copy is in the role's
+`defaults/main.yml`, in its `vars/main.yml` or in its tasks; for an option of a
+list element it is in the role's tasks and not in a `defaults/` file.
+
+**Named limit:** an omitted optional top-level input takes the value of any
+variable of its name in the caller's scope, or in the included role's own
+`vars/main.yml`, because the role's defaults have the lowest precedence. The
+rule says the input takes its declared default and no other, and a check cannot
+see the caller's inventory, plays, blocks and tasks. A variable that shadows an
+omitted optional input is review only.
+
+**Named limit:** this clause does not say whether a capability role may itself
+include another capability role, nor whether the rule applies to a role from a
+collection (`ANS-13`). Neither is decided here, and a reviewer raises either as
+an open question rather than passing or failing the diff on this clause.
 
 ## ANS-13 — where roles and playbooks live
 

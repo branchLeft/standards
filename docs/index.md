@@ -304,7 +304,7 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 | ANS-9  | A module before a command; a command states its change                             | `pending` | —                                                           |
 | ANS-10 | Every role and custom module supports check mode                                   | `review`  | The role's Molecule scenario and any module in the diff     |
 | ANS-11 | A second run against a configured host changes nothing                             | `pending` | —                                                           |
-| ANS-12 | One role per logical service; composition is in a playbook                         | `review`  | New roles and their `meta/main.yml` in the diff             |
+| ANS-12 | One role per logical service; composition is in a playbook or a capability role    | `review`  | A role's meta, tasks, handlers, specs and README in a diff  |
 | ANS-13 | A role lives with the service it configures, under `ansible/roles/`                | `review`  | New paths under `ansible/` in the diff                      |
 | ANS-14 | Every role has a README a maintainer new to the repository can use                 | `review`  | The role's `README.md` against its tasks                    |
 | ANS-15 | Every role carries a Molecule test on containers only, never a production host     | `pending` | —                                                           |
