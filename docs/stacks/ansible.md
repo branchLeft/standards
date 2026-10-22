@@ -330,16 +330,19 @@ action on them.
   - every `include_role`, against the conditions of a capability role that a
     tool can read and not against a list of roles: the included role has
     `argument_specs` for the entry point the call names, the call gives every
-    input that entry point declares and none it does not, and the included
-    role's README names the calling role;
+    input that entry point declares as required, and the included role's README
+    names the calling role;
   - where the check requires a citation of the standards pull request that
     recorded this rule, it reads the cited pull request through the API and
     asserts that it is merged and that the cited commit is its merge commit.
 - Review only: that an included role is a capability role, because no marker
   that a tool can read says so; that it configures no service and acts on
-  nothing but the paths its caller passes; and that every variable its tasks
-  read is an input it declares, because a check sees what a call gives and not
-  what a task reads.
+  nothing but the paths its caller passes; that every variable its tasks read is
+  an input it declares, because a check sees what a call gives and not what a
+  task reads; and that the call gives every optional input the entry point
+  declares and no input it does not declare. The named check reads only the
+  required inputs, so the optional and undeclared parts stay review only until
+  that check reads every declared input.
 - A repository's check may hold a condition this clause leaves open, such as
   that a capability role includes no role itself, or that the included role is
   named by a path built from the caller's `role_path` and not by a bare name.
