@@ -292,22 +292,30 @@ role**. A capability role:
 - configures no service, and restarts, reloads, starts and stops nothing;
 - owns no host state of its own: it writes only to paths its caller passes in as
   inputs, and to no path it names itself;
-- declares every input in `meta/argument_specs.yml`, where an input includes an
-  option of a list element or of a dictionary, and gives every input that is not
+- declares every input in `meta/argument_specs.yml`, the options of a list
+  element or of a dictionary included, and gives every input that is not
   `required: true` a `default` there (a `default` key counts whatever its value,
   null included; an option with neither `required: true` nor a `default` fails);
-- is called with `include_role`, with every required input given at the call and
-  no input the entry point does not declare. An optional input the call leaves
-  out takes the default its `argument_specs` entry declares and no other; a
-  default that appears only in `defaults/main.yml`, in `group_vars` or in the
-  caller's own variables is not declared;
+- is called with `include_role`, with every required top-level input given at
+  the call and no top-level input the entry point does not declare. A top-level
+  input is an option of the entry point itself, named by a variable the call
+  sets; an option of a list element or of a dictionary the call passes is a
+  nested input, and each element or dictionary the call passes gives the nested
+  options that are required. An optional input the call leaves out takes the
+  default its `argument_specs` entry declares and no other; a default that
+  appears only in `defaults/main.yml`, in `group_vars` or in the caller's own
+  variables is not declared;
 - names in its README each role that calls it.
 
-Ansible does not apply a default declared in `argument_specs` to the role: the
-value an omitted optional input takes at run time comes from the role's
-`defaults/main.yml` or, for an option of a list element, from its tasks. Those
-hold the same value as the declared default (`ANS-7`), so a reader of the spec
-learns what an omitted input becomes.
+Ansible does not apply a default declared in `argument_specs` to the role. The
+value an omitted optional top-level input takes at run time is that of whatever
+variable of its name is in scope, and the role's `defaults/main.yml` is the
+lowest-precedence place such a variable can come from: a variable of the same
+name in `group_vars`, `host_vars`, the play's `vars`, `set_fact` or extra vars
+overrides it. For an option of a list element the value comes from the role's
+tasks. The role's own defaults and tasks hold the same value as the declared
+default (`ANS-7`), so a reader of the spec learns what an omitted input
+becomes, unless the caller's scope sets a variable of that name.
 
 Any other composition stays in a playbook. The tasks and handlers of a role never
 `include_tasks` or `import_tasks` a file outside their own role, and no role uses
@@ -330,7 +338,8 @@ that are declared, has each required one given at the call, declares a default
 for each optional one and names its callers keeps that visible, and the caller
 stays the owner of the files and of every action on them. A declared default
 tells a caller what an omitted input becomes, and only while the role's own
-defaults equal it, which is why that equality is on the review list.
+defaults equal it and no variable of that name is set in the caller's scope,
+which is why both are on the review list.
 
 **Check plan:** per part of the rule.
 
@@ -343,9 +352,10 @@ defaults equal it, which is why that equality is on the review list.
   - every `include_role`, against the conditions of a capability role that a
     tool can read and not against a list of roles: the included role has
     `argument_specs` for the entry point the call names, every input of that
-    entry point that is not `required: true` has a `default` there, the call
-    gives every required input and no input the entry point does not declare,
-    and the included role's README names the calling role;
+    entry point that is not `required: true` has a `default` there, the options
+    of a list element or of a dictionary included, the call gives every
+    required top-level input and no top-level input the entry point does not
+    declare, and the included role's README names the calling role;
   - where the check requires a citation of the standards pull request that
     recorded this rule, it reads the cited pull request through the API and
     asserts that it is merged and that the cited commit is its merge commit.
@@ -356,10 +366,14 @@ defaults equal it, which is why that equality is on the review list.
   task reads; and that the value an omitted optional input takes in the role's
   `defaults/main.yml` or tasks equals the `default` its `argument_specs` entry
   declares, because a check that reads the spec and the call cannot see which
-  value runs; and that each list element a call passes gives the required
-  options of its element, because a check that reads the names of the variables
-  a call sets sees the list and not what is inside it. Whatever the list above
-  does not name is review.
+  value runs; that no variable of the name of an omitted optional input is set
+  in the caller's scope (`group_vars`, `host_vars`, the play's `vars`,
+  `set_fact`, extra vars), because such a variable overrides the role's
+  defaults and a check that reads the spec and the call does not read the
+  caller's scope; and that each list element or dictionary a call passes gives
+  its required nested options, because a check that reads the names of the
+  variables a call sets sees the top-level inputs and not what is inside them.
+  Whatever the list above does not name is review.
 - A repository's check may hold a condition this clause leaves open, such as
   that a capability role includes no role itself, or that the included role is
   named by a path built from the caller's `role_path` and not by a bare name.
@@ -385,6 +399,12 @@ role runs with are two copies, because Ansible does not apply the spec's default
 to the role. A check that reads the spec and the call cannot see the second, so
 their equality is review only. For an option of a list element the second copy
 is in the role's tasks and not in a `defaults/` file.
+
+**Named limit:** an omitted optional top-level input takes the value of any
+variable of its name in the caller's scope, because the role's defaults have the
+lowest precedence. The rule says the input takes its declared default and no
+other, and a check cannot see the caller's inventory and plays. A variable that
+shadows an omitted optional input is review only.
 
 **Named limit:** this clause does not say whether a capability role may itself
 include another capability role, nor whether the rule applies to a role from a
