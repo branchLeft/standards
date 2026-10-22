@@ -293,7 +293,9 @@ role**. A capability role:
 - owns no host state of its own: it writes only to paths its caller passes in as
   inputs, and to no path it names itself;
 - declares every input in `meta/argument_specs.yml`;
-- is called with `include_role`, with every input given explicitly at the call;
+- is called with `include_role`, with every input its entry point declares given
+  explicitly at the call, optional inputs included, so the call relies on no
+  default;
 - names in its README each role that calls it.
 
 Any other composition stays in a playbook. The tasks and handlers of a role never
@@ -313,24 +315,36 @@ Any other composition stays in a playbook. The tasks and handlers of a role neve
 **Why:** shared logic needs one home, or each role copies it and the copies
 drift. A role that includes another hides from its playbook what gets applied.
 A capability role that touches only the paths it is handed, takes only inputs
-that are declared and names its callers keeps that visible, and the caller
-stays the owner of the files and of every action on them.
+that are declared, has each of them given at the call and names its callers
+keeps that visible, and the caller stays the owner of the files and of every
+action on them.
 
 **Check plan:** per part of the rule.
 
 - Enforced by a check in the repository that owns the roles, such as
-  `ansible/checks/test_role_composition_gate.py` in `shared-infra`: an
-  `include_tasks` or `import_tasks` in a role's tasks or handlers whose path
-  leaves that role; an `include_role` or `import_role` of a role that is not on
-  the check's own list of capability roles. Where that check requires a citation
-  of the standards pull request that recorded this rule, it reads the cited
-  pull request through the API and asserts that it is merged and that the cited
-  commit is its merge commit.
+  `ansible/checks/test_role_composition_gate.py` in `shared-infra`:
+  - an `include_tasks` or `import_tasks` in a role's tasks or handlers whose
+    path leaves that role;
+  - every `import_role`, whatever role it names, and every `meta/main.yml` with
+    a `dependencies` entry;
+  - every `include_role`, against the conditions of a capability role that a
+    tool can read and not against a list of roles: the included role has
+    `argument_specs` for the entry point the call names, the call gives every
+    input that entry point declares and none it does not, and the included
+    role's README names the calling role;
+  - where the check requires a citation of the standards pull request that
+    recorded this rule, it reads the cited pull request through the API and
+    asserts that it is merged and that the cited commit is its merge commit.
 - Review only: that an included role is a capability role, because no marker
-  that a tool can read says so; that it writes only the paths its caller passes
-  and acts on nothing else; that every input is given at the call; that its
-  README names its callers; that `meta/argument_specs.yml` declares every
-  input; and each new or changed `meta/main.yml` for a `dependencies` entry.
+  that a tool can read says so; that it configures no service and acts on
+  nothing but the paths its caller passes; and that every variable its tasks
+  read is an input it declares, because a check sees what a call gives and not
+  what a task reads.
+- A repository's check may hold a condition this clause leaves open, such as
+  that a capability role includes no role itself, or that the included role is
+  named by a path built from the caller's `role_path` and not by a bare name.
+  The clause neither requires nor forbids it, and the repository states the
+  condition in its own documentation.
 - Where no such check exists in the repository, the whole composition rule is
   review only.
 
