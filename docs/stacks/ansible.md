@@ -298,7 +298,11 @@ role**. A capability role:
   null included; an option with neither `required: true` nor a `default` fails);
 - is called with `include_role`, and the call sets a variable for every
   required top-level option of the entry point and sets no variable that is not
-  an option of the entry point. A top-level input is an option of the entry
+  an option of the entry point. The call carries no `loop`, `with_*` or
+  `loop_control`: a caller that needs several calls writes them out, or loops
+  inside an included task file of its own that makes one call per item, and each
+  such call still sets only the role's options. A call without `tasks_from`
+  names the `main` entry point. A top-level input is an option of the entry
   point itself; an option of a list element or of a dictionary the call passes
   is a nested input, and each element or dictionary the call passes gives the
   nested options that are required. An optional input the call leaves out takes
@@ -307,7 +311,8 @@ role**. A capability role:
   the caller's own variables is not declared;
 - names in its README each role that calls it.
 
-Ansible does not apply a default declared in `argument_specs` to the role. The
+Ansible does not apply a default declared in `argument_specs` to the role (the
+role argument validation section of the Ansible roles guide). The
 value an omitted optional top-level input takes at run time is that of whatever
 variable of its name is in scope, and the role's `defaults/main.yml` is the
 lowest-precedence place such a variable can come from: a variable of the same
@@ -317,10 +322,11 @@ The caller's scope includes, for example, `group_vars`, `host_vars`, the play's
 `vars`, block and task `vars`, `include_vars`, `set_fact`, extra vars and the
 calling role's own defaults and vars; these are examples and not a closed set.
 For an option of a list element the value comes from the role's tasks. The
-role's own `defaults/main.yml`, `vars/main.yml` and tasks hold the same value as
-the declared default wherever they set the input (`ANS-7`), so a reader of the
-spec learns what an omitted input becomes, unless the caller's scope sets a
-variable of that name.
+role's own `defaults/main.yml`, `vars/main.yml` and tasks must hold the same
+value as the declared default wherever they set the input; `ANS-7` requires this
+for `defaults/main.yml`, and this clause extends it to `vars/main.yml` and to
+tasks. A reader of the spec then learns what an omitted input becomes, unless
+the caller's scope sets a variable of that name.
 
 Any other composition stays in a playbook. The tasks and handlers of a role never
 `include_tasks` or `import_tasks` a file outside their own role, and no role uses
@@ -356,22 +362,26 @@ caller's scope, which is why both are on the review list.
     a `dependencies` entry;
   - every `include_role` in a role's tasks or handlers, against the conditions
     of a capability role that a tool can read and not against a list of roles:
-    the included role has `argument_specs` for the entry point the call names,
-    every input of that entry point that is not `required: true` has a
-    `default` there, the options of a list element or of a dictionary included,
-    the call sets a variable for every required top-level option of the entry
-    point and no variable that is not an option of the entry point, and the
-    included role's README names the calling role;
+    the included role has `argument_specs` for the entry point the call names
+    (`main` when the call has no `tasks_from`), every input of that entry point
+    that is not `required: true` has a `default` there, the options of a list
+    element or of a dictionary included, the call sets a variable for every
+    required top-level option of the entry point and no variable that is not an
+    option of the entry point, the call carries no `loop`, `with_*` or
+    `loop_control`, and the included role's README names the calling role;
   - where the check requires a citation of the standards pull request that
     recorded this rule, it reads the cited pull request through the API and
     asserts that it is merged and that the cited commit is its merge commit.
 - Review only: that an included role is a capability role, because no marker
   that a tool can read says so; that it configures no service and acts on
   nothing but the paths its caller passes; that its tasks read no outside
-  variable its `argument_specs` does not declare (a registered result, a loop
-  item, a fact, a magic variable and a constant in its own `vars/main.yml` are
-  not outside variables), because a check sees what a call gives and not what a
-  task reads; that the value an omitted optional input takes in the role's
+  variable its `argument_specs` does not declare (a role reads its declared
+  options and these values it makes itself: results it registers, facts it sets
+  itself or gathers itself by running setup, the loop items of its own loops and
+  the constants in its own `vars/main.yml`; every other variable is outside,
+  among them `hostvars`, `vars`, `groups` and any variable the caller set, a
+  caller's loop item or `set_fact` included), because a check sees what a call
+  gives and not what a task reads; that the value an omitted optional input takes in the role's
   `defaults/main.yml`, in its `vars/main.yml` or in its tasks equals the
   `default` its `argument_specs` entry declares, because a check that reads the
   spec and the call cannot see which value runs; that no variable of the name of

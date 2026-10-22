@@ -144,7 +144,7 @@ ANS-8	ansible/*.yml;ansible/*.yaml;ansible/roles/*/templates/*	[doc] every task 
 ANS-9	ansible/roles/*/tasks/*;ansible/roles/*/handlers/*	[doc] the clause names tasks and handlers
 ANS-10	ansible/roles/*/tasks/*;ansible/roles/*/library/*;ansible/roles/*/molecule/*	[doc] role tasks, custom modules and the scenario that exercises check mode
 ANS-11	ansible/roles/*/tasks/*;ansible/roles/*/molecule/*	[doc] role tasks and the scenario whose idempotence step proves them
-ANS-12	ansible/roles/*/meta/main.yml;ansible/roles/*/meta/argument_specs.yml;ansible/roles/*/tasks/*;ansible/roles/*/handlers/*;ansible/roles/*/README.md;ansible/playbooks/*	[doc] the role metadata that carries dependencies, the tasks and handlers that include another role, the argument specs and README a capability role must carry, and the playbooks that compose roles
+ANS-12	ansible/roles/*/meta/main.yml;ansible/roles/*/meta/argument_specs.yml;ansible/roles/*/tasks/*;ansible/roles/*/handlers/*;ansible/roles/*/defaults/*;ansible/roles/*/vars/*;ansible/roles/*/README.md;ansible/playbooks/*	[doc] the role metadata that carries dependencies, the tasks and handlers that include another role, the argument specs and README a capability role must carry, the defaults and vars that hold the value an omitted input runs with, and the playbooks that compose roles
 ANS-13	ansible/*	[doc] the clause fixes the layout of ansible/
 ANS-14	ansible/roles/*/README.md	[doc] the file the clause names
 ANS-15	ansible/roles/*/molecule/*;.github/workflows/*.yml;.github/workflows/*.yaml	[doc] the scenario directory the clause names, plus the job whose environment must not set DOCKER_HOST
