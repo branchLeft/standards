@@ -281,16 +281,60 @@ idempotence step reports a change.
 
 A role configures one service, or one cross-cutting capability with one reason
 to change, and nothing else. It does not edit another role's files or restart
-another role's service. Composition is in a playbook, which lists roles in
-order; `meta/main.yml` carries no `dependencies`. A role's name is lowercase
-letters, digits and underscores, starting with a letter.
+another role's service; the one exception is a capability role, which writes the
+paths its caller passes it (below). Other composition is in a playbook, which
+lists roles in order; `meta/main.yml` carries no `dependencies`. A role's name
+is lowercase letters, digits and underscores, starting with a letter.
 
-**Why:** a role with two reasons to change cannot be tested, reviewed or
-removed alone, and a dependency chain hides what a playbook applies.
+A role may include another role only when the included role is a **capability
+role**. A capability role:
 
-**Check plan:** review of each new or changed `meta/main.yml` for a
-`dependencies` entry. The `role-name` rule (basic profile, included by `ANS-5`)
-checks the name.
+- configures no service, and restarts, reloads, starts and stops nothing;
+- owns no host state of its own: it writes only to paths its caller passes in as
+  inputs, and to no path it names itself;
+- declares every input in `meta/argument_specs.yml`;
+- is called with `include_role`, with every input given explicitly at the call;
+- names in its README each role that calls it.
+
+Any other composition stays in a playbook. The tasks and handlers of a role never
+`include_tasks` or `import_tasks` a file outside their own role, and no role uses
+`import_role` or a `meta/main.yml` `dependencies` entry to compose another.
+
+```yaml
+- name: Record the applied state of each class
+  ansible.builtin.include_role:
+    name: EXAMPLE_CAPABILITY_ROLE
+    tasks_from: EXAMPLE_ENTRY_POINT
+  vars:
+    example_capability_paths:
+      - /var/lib/EXAMPLE_DIRECTORY/EXAMPLE_FILE
+```
+
+**Why:** shared logic needs one home, or each role copies it and the copies
+drift. A role that includes another hides from its playbook what gets applied.
+A capability role that touches only the paths it is handed, takes only inputs
+that are declared and names its callers keeps that visible, and the caller
+stays the owner of the files and of every action on them.
+
+**Check plan:** per part of the rule.
+
+- Enforced by a check in the repository that owns the roles, such as
+  `ansible/checks/test_role_composition_gate.py` in `shared-infra`: an
+  `include_tasks` or `import_tasks` in a role's tasks or handlers whose path
+  leaves that role; an `include_role` or `import_role` of a role that is not on
+  the check's own list of capability roles. Where that check requires a citation
+  of the standards pull request that recorded this rule, it reads the cited
+  pull request through the API and asserts that it is merged and that the cited
+  commit is its merge commit.
+- Review only: that an included role is a capability role, because no marker
+  that a tool can read says so; that it writes only the paths its caller passes
+  and acts on nothing else; that every input is given at the call; that its
+  README names its callers; that `meta/argument_specs.yml` declares every
+  input; and each new or changed `meta/main.yml` for a `dependencies` entry.
+- Where no such check exists in the repository, the whole composition rule is
+  review only.
+
+The `role-name` rule (basic profile, included by `ANS-5`) checks the name.
 
 **Named limit:** ansible-lint lists `meta-no-dependencies` under its production
 profile, but its profiles page links that entry to a GitHub issue rather than
@@ -298,9 +342,14 @@ a rule page and says such entries are not yet implemented. Nothing in the lint
 refuses a role dependency, so this part of the clause is review-only until
 the rule exists or a repository adds its own check.
 
-**Named limit:** nothing here forbids a role's tasks from including or
-importing another role, which composes roles in the way a dependency does. That
-is decided with the first role pattern and recorded here by amendment.
+**Named limit:** a check that reads task and handler files sees the name or
+path an include states. An include whose target is built from a variable is not
+seen, and is review only.
+
+**Named limit:** this clause does not say whether a capability role may itself
+include another capability role, nor whether the rule applies to a role from a
+collection (`ANS-13`). Neither is decided here, and a reviewer raises either as
+an open question rather than passing or failing the diff on this clause.
 
 ## ANS-13 — where roles and playbooks live
 
