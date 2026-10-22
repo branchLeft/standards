@@ -298,9 +298,38 @@ a rule page and says such entries are not yet implemented. Nothing in the lint
 refuses a role dependency, so this part of the clause is review-only until
 the rule exists or a repository adds its own check.
 
-**Named limit:** nothing here forbids a role's tasks from including or
-importing another role, which composes roles in the way a dependency does. That
-is decided with the first role pattern and recorded here by amendment.
+A role may include another role only when the included role is a **capability
+role**. A capability role configures no service and owns no host state of its
+own. It declares every input in `meta/argument_specs.yml`, is called with
+`include_role` with every input given explicitly, and says in its README which
+roles call it. Any other composition stays in a playbook. A role's tasks never
+`include_tasks` or `import_tasks` a file outside their own role, and no role
+uses `import_role` or a `meta/main.yml` `dependencies` entry to compose another.
+
+```yaml
+- name: Stamp the restart record
+  ansible.builtin.include_role:
+    name: EXAMPLE_CAPABILITY_ROLE
+  vars:
+    EXAMPLE_INPUT: EXAMPLE_VALUE
+```
+
+**Why:** shared logic needs one home, or each role copies it and the copies
+drift. A role that includes another hides from its playbook what gets applied,
+and a capability role with its inputs declared and its callers named keeps that
+visible.
+
+**Check plan:** review of each new or changed role's tasks for `include_role`,
+`include_tasks`, `import_tasks` and `import_role`, and of each included role's
+`meta/argument_specs.yml` and README. The planned gate is
+`ansible/checks/test_role_composition_gate.py` in the repository that owns the
+roles. It is not yet merged, so until it is, the whole of this part of the rule
+is review only.
+
+**Named limit:** no gate enforces this part of the rule yet. Nothing mechanical
+checks that an included role is a capability role, that its inputs are declared,
+or that its README names its callers. Each is review only until the planned gate
+is merged.
 
 ## ANS-13 — where roles and playbooks live
 
