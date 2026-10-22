@@ -356,7 +356,10 @@ defaults equal it, which is why that equality is on the review list.
   task reads; and that the value an omitted optional input takes in the role's
   `defaults/main.yml` or tasks equals the `default` its `argument_specs` entry
   declares, because a check that reads the spec and the call cannot see which
-  value runs. Whatever the list above does not name is review.
+  value runs; and that each list element a call passes gives the required
+  options of its element, because a check that reads the names of the variables
+  a call sets sees the list and not what is inside it. Whatever the list above
+  does not name is review.
 - A repository's check may hold a condition this clause leaves open, such as
   that a capability role includes no role itself, or that the included role is
   named by a path built from the caller's `role_path` and not by a bare name.
