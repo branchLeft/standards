@@ -31,12 +31,12 @@
   "dependencies": {
     "@eslint/js": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "65.1.0",
+    "eslint-plugin-jsdoc": "65.3.11",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.0.0",
-    "eslint-plugin-unicorn": "76.0.0",
+    "eslint-plugin-unicorn": "78.0.0",
     "globals": "^17.13.0",
-    "typescript-eslint": "^8.71.0"
+    "typescript-eslint": "^8.71.2"
   },
   "peerDependencies": {
     "eslint": "^9.0.0 || ^10.0.0",
