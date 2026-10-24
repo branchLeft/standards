@@ -109,9 +109,15 @@ def compare_value(live, payload, path, findings):
 
 
 def bypass_actors(ruleset):
+    """(actor_type, actor_id) → bypass_mode, or None when the key is absent.
+
+    None, not {}: an absent key is UNKNOWN, not "no bypass actors".
+    """
+    if ruleset.get("bypass_actors") is None:
+        return None
     return {
         (a["actor_type"], a.get("actor_id")): a.get("bypass_mode")
-        for a in ruleset.get("bypass_actors", [])
+        for a in ruleset["bypass_actors"]
     }
 
 
@@ -149,7 +155,23 @@ def weakenings(live, payload):
     for rtype in sorted(set(live_rules) & set(payload_rules)):
         compare_value(live_rules[rtype], payload_rules[rtype], f"rules.{rtype}", findings)
 
-    live_bypass, payload_bypass = bypass_actors(live), bypass_actors(payload)
+    bypass_findings(live, payload, findings)
+    return findings
+
+
+def bypass_findings(live, payload, findings):
+    """A payload with no bypass_actors key is compared as []. Removing a bypass
+    actor is never a finding, so the result does not depend on what GitHub does
+    with the key."""
+    live_bypass = bypass_actors(live)
+    if live_bypass is None:
+        unclassified(
+            findings,
+            "bypass_actors: UNKNOWN (bypass_actors not returned to this token) "
+            "— the guard cannot prove the payload does not widen it",
+        )
+        return
+    payload_bypass = bypass_actors(payload) or {}
     for actor, mode in sorted(payload_bypass.items(), key=str):
         if actor not in live_bypass:
             reduction(findings, f"bypass_actors: payload adds {actor[0]} ({mode})")
@@ -160,8 +182,6 @@ def weakenings(live, payload):
             unclassified(findings, f"bypass_actors: unrecognised bypass_mode for {actor[0]}")
         elif gained > held:
             reduction(findings, f"bypass_actors: {actor[0]} goes {live_bypass[actor]} → {mode}")
-
-    return findings
 
 
 def exit_code(findings):
@@ -371,6 +391,12 @@ def self_test():
             ["would protect something else"],
             3,
         ),
+        (
+            "a reduction and an unclassified field together exit 3, not 1",
+            mutate(lambda rs: (drop_rule(rs, "deletion"), rs.__setitem__("enforcement", "sometimes"))),
+            ["payload drops the whole `deletion` rule", "unrecognised value"],
+            3,
+        ),
     ]
 
     rc = 0
@@ -386,6 +412,33 @@ def self_test():
             rc = 1
         if exit_code(found) != want_code:
             print(f"  FAIL {name}: expected exit {want_code}, got {exit_code(found)}")
+            rc = 1
+
+    # Live with no bypass_actors key is UNKNOWN: refuse (exit 3) whatever the
+    # payload says. A present [] is still a claim, compared as before.
+    live_unseen = {k: v for k, v in base.items() if k != "bypass_actors"}
+    live_no_bypass = mutate(lambda rs: rs.__setitem__("bypass_actors", []))
+    unseen_cases = [
+        ("live omits bypass_actors, payload identical", live_unseen, base, 3),
+        ("live omits bypass_actors, payload has no bypass", live_unseen,
+         mutate(lambda rs: rs.__setitem__("bypass_actors", [])), 3),
+        ("live omits bypass_actors, payload adds an actor", live_unseen,
+         mutate(lambda rs: rs["bypass_actors"].append(
+             {"actor_type": "RepositoryRole", "actor_id": 5, "bypass_mode": "always"})), 3),
+        ("live present [] still compared: payload adds an actor", live_no_bypass, base, 1),
+        # Pins that the guard never flags a removed bypass actor: exit 0 holds whether
+        # or not GitHub keeps the live bypass on a PUT without the key. Change on purpose.
+        ("payload with no key vs live [OrganizationAdmin]: exit 0 (removal is no finding)",
+         base, mutate(lambda rs: rs.pop("bypass_actors")), 0),
+    ]
+    for name, live, payload, want_code in unseen_cases:
+        found = weakenings(live, payload)
+        texts = [text for text, _ in found]
+        if exit_code(found) != want_code:
+            print(f"  FAIL {name}: expected exit {want_code}, got {exit_code(found)} {texts}")
+            rc = 1
+        if want_code == 3 and not any("not returned to this token" in t for t in texts):
+            print(f"  FAIL {name}: expected the UNKNOWN finding, got {texts}")
             rc = 1
     if rc == 0:
         print("ruleset_guard.py: self-test passed")
