@@ -546,8 +546,14 @@ log through a validation failure is not established.
 Delivery to a production host is only through a GitHub workflow run against
 `main`, after the approval of its protected deployment environment (`CI-12`,
 `CI-13`, `IAC-4`). The approved shape is a gated pull. A plan job shows each
-host's diff before the approval. After the approval, the host runs
-`ansible-pull` of that exact commit of `main`, and CI never holds a root shell.
+host's diff before the approval. After the approval, the host program verifies
+the signature of the commit, that it is an ancestor of `main` and newer than the
+last one applied, and then runs `ansible-playbook` on a checkout of exactly that
+commit, and CI never holds a root shell. The stock `ansible-pull --verify-commit`
+is not used because it verifies the text given to `-C`, a name, not the
+checked-out HEAD, so a branch named like a verified commit ran an unsigned one;
+it checks the signature against a keyring, not the signer's fingerprint against an allowlist; and it runs a signed commit
+that is not an ancestor of `main`.
 Every live apply also gets a second run that must report zero changes. A nightly
 drift run in check mode is part of the same approved plan.
 
