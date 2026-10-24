@@ -566,6 +566,31 @@ human exceptions are `IAC-1`'s list; this page adds none.
 An author's local run is the role's Molecule test, whose targets are
 containers on that machine (`ANS-15`).
 
+**A step request.** A routine, named step that a role keeps behind the `never`
+tag (a database migration, the creation of a login, the onboarding of a customer)
+may be delivered through the same gated pull, as a step request. It is not a
+second way to deliver: it is the same pull with the same checks on the commit, and
+four further rules.
+
+- The step is a member of a closed list that the host program holds in its own
+  code, and is also named in the host's root-owned allow-list. Anything else is
+  refused before the repository is fetched. A way into a host that is not a
+  routine step (break-glass access, an operator's recovery) is never on the list.
+- The request names the commit, one step id and one typed confirmation word, and
+  runs by a key, a forced command, a sudo argument list and a protected
+  environment of its own. The plain apply key cannot request a step, and a
+  check-mode request cannot either. The word is a guard against a typing slip in a
+  public file, not a secret; the protection is the environment whose only
+  reviewer is the owner.
+- The plan for a step is what the approver reads before the environment pauses:
+  the commit, the step id, and the committed input the step compares (an image
+  digest, a hash of a rendered configuration). A check-mode diff cannot show a
+  step, because the step is not run in check mode; a delivery workflow that sends a
+  step says so in its plan job and prints these three lines.
+- A step is idempotent. The second request of the same step reports no change, and
+  the run's summary names the step so that a bare commit sent by mistake is not
+  read as one.
+
 **Why:** a deploy from a laptop skips the approval and the review, depends on
 that laptop's credentials, and leaves no run to audit.
 
