@@ -45,7 +45,37 @@ It matches the shape of a string, not the meaning of the code, so it misses:
 - SQL in a string that starts with something else.
 
 If misses like these turn up in practice, a parser-based rule replaces this
-check. Until then the shape is enough, and it needs nothing beyond `awk`.
+check. Until then the shape is enough, and it needs only `awk`, plus `pgrep` and
+`kill` to stop a scan that overruns its ceiling or receives a signal.
+
+## Runtime and failure behaviour
+
+The scan is one `awk` process, fed a list file of the files to read, so the
+size of the tree cannot overflow the command line. Its findings are replayed in
+file order, interleaved with the `.sql` findings, so the output reads as a
+per-file scan would.
+
+The runtime ceiling covers the scan only, not setup or the replay. It defaults
+to 120 seconds. Set `CHECK_RAW_SQL_CEILING_SECONDS` to override it, with whole
+seconds from 1 to 999999999 and no leading zero. Any other value makes the gate
+exit 2, with a line starting `check-raw-sql: CHECK_RAW_SQL_CEILING_SECONDS`.
+
+| Exit | Meaning                                                                                                                                                                                                      |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0    | Clean.                                                                                                                                                                                                       |
+| 1    | Findings.                                                                                                                                                                                                    |
+| 2    | Usage or setup error.                                                                                                                                                                                        |
+| 3    | Scan failed: it exited non-zero, its output lacks the completion marker, or its file count disagrees with the list. The message starts `check-raw-sql: scan failed` and names the file the scan had reached. |
+| 124  | Ceiling reached. The message starts `check-raw-sql: ceiling` and gives the seconds and the file reached.                                                                                                     |
+| 130  | Stopped by `INT` during the scan.                                                                                                                                                                            |
+| 143  | Stopped by `TERM` during the scan.                                                                                                                                                                           |
+
+While the scan runs, `TERM` or `INT` stops the scan and its child processes,
+exits 143 or 130, and removes the temporary directory. A failed scan prints no
+scan finding and no pass summary. The gate fails closed: a short or failed scan
+never passes with fewer findings.
+
+The self-test includes a 1000-file synthetic tree, run under CPU contention.
 
 ## Declaring database tooling
 
