@@ -4,32 +4,15 @@
 // bash script until every gate below has a native TypeScript equivalent.
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildAdvisoryGates } from '../src/advisoryGates.ts';
 import { Audit, COVERED_CLAUSES, GATE_ONLY_CLAUSES } from '../src/audit.ts';
-import { BakedConfigGate } from '../src/bakedConfigGate.ts';
 import { BashGate } from '../src/bashGate.ts';
 import { parseCliOptions } from '../src/cliOptions.ts';
-import { CommentRatioGate } from '../src/commentRatioGate.ts';
-import { CommitSigningGate } from '../src/commitSigningGate.ts';
-import { ComposeNetworkGate } from '../src/composeNetworkGate.ts';
-import { ComposeResourceGate } from '../src/composeResourceGate.ts';
-import { ComposeRuntimeGate } from '../src/composeRuntimeGate.ts';
-import { DependabotEcosystemGate } from '../src/dependabotEcosystemGate.ts';
-import { DeployEnvironmentGate } from '../src/deployEnvironmentGate.ts';
-import { DeployRolloutGate } from '../src/deployRolloutGate.ts';
-import { DockerImageGate } from '../src/dockerImageGate.ts';
-import { EslintGate } from '../src/eslintGate.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
-import { HealthcheckGate } from '../src/healthcheckGate.ts';
-import { LintCoverageGate } from '../src/lintCoverageGate.ts';
-import { MigrationClassifierGate } from '../src/migrationClassifierGate.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
-import { PythonConfigGate } from '../src/pythonConfigGate.ts';
 import { Ratchet } from '../src/ratchet.ts';
 import { RatchetInitError } from '../src/ratchetInitError.ts';
-import { SchemaDriftGate } from '../src/schemaDriftGate.ts';
-import { SecretsFileGate } from '../src/secretsFileGate.ts';
-import { WorkItemReferenceGate } from '../src/workItemReferenceGate.ts';
 
 const TOOLS_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -45,7 +28,6 @@ const GATE_NAMES = [
   'check-raw-sql.sh',
   'check-comment-blocks.sh',
 ];
-const ADVISORY_GATE_NAMES = ['check-coverage.sh'];
 
 function main(): void {
   const options = parseCliOptions(process.argv.slice(2));
@@ -86,27 +68,7 @@ function main(): void {
   const coveredClauses = options.advisoryOnly
     ? new Set([...COVERED_CLAUSES].filter((clause) => !GATE_ONLY_CLAUSES.has(clause)))
     : COVERED_CLAUSES;
-  const advisoryGates = [
-    ...ADVISORY_GATE_NAMES.map((name) => gateAt(name, true, [])),
-    new SchemaDriftGate(ratchet, fs, processRunner, TOOLS_ROOT),
-    new MigrationClassifierGate(ratchet, fs, TOOLS_ROOT),
-    new PythonConfigGate(ratchet, fs, TOOLS_ROOT),
-    new CommentRatioGate(ratchet, fs, TOOLS_ROOT),
-    new WorkItemReferenceGate(ratchet, fs, TOOLS_ROOT),
-    new EslintGate(ratchet, fs, processRunner),
-    new DeployEnvironmentGate(ratchet, fs, TOOLS_ROOT),
-    new DeployRolloutGate(ratchet, fs, TOOLS_ROOT),
-    new DependabotEcosystemGate(ratchet, fs, TOOLS_ROOT),
-    new CommitSigningGate(ratchet, fs, TOOLS_ROOT),
-    new LintCoverageGate(ratchet, fs, TOOLS_ROOT),
-    new DockerImageGate(ratchet, fs, TOOLS_ROOT),
-    new ComposeRuntimeGate(ratchet, fs),
-    new ComposeNetworkGate(ratchet, fs, TOOLS_ROOT),
-    new ComposeResourceGate(ratchet, fs),
-    new HealthcheckGate(ratchet, fs),
-    new SecretsFileGate(ratchet, fs),
-    new BakedConfigGate(ratchet, fs),
-  ];
+  const advisoryGates = buildAdvisoryGates(ratchet, fs, processRunner, TOOLS_ROOT);
 
   const audit = new Audit(
     ratchet,
