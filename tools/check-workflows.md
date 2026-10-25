@@ -54,3 +54,16 @@ flagged: treating any `<<:` as satisfying the clause would turn this real gap
 into another false negative, worse than the false positive it replaces.
 `plainunbounded` carries no merge key at all, proving the ordinary path still
 fires in a file that also exercises merge keys.
+
+## CI-2 and CI-4: `run:` is matched as a whole key
+
+Both clauses read the line as a YAML key (indentation and an optional list
+dash removed) and match `run:` only where the key starts. A substring match
+also read a `with:` input whose name ends in `run` (`dry-run:`, `pre-run:`,
+`rerun:`) as a `run:` body, so a reusable workflow's boolean or string input
+failed CI-2 on a line that is not shell. The block-scalar form (`run: |`) is
+matched on the same key, so `note-run: |` does not open a body either.
+
+Self-test: `dryrun.yml` carries those inputs and must produce no CI-2 finding;
+`runsha.yml` carries a real `run: echo ${{ github.sha }}` and must produce
+exactly one.
