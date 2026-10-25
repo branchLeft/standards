@@ -68,14 +68,17 @@ workflow_runs_every_gate() {
 run "reusable workflow runs every gate" workflow_runs_every_gate
 
 # REPO-6: the audit is what makes drift visible, so it must keep running on a
-# schedule. Each file it depends on is asserted present, the schedule and the
-# manual trigger are asserted, the audit step is asserted as a real run line
-# (a comment naming it does not count), and the scheduled workflow is asserted
-# to never invoke the apply script, which is a privileged write.
+# schedule. The schedule, the manual trigger and the audit step are asserted
+# here; the shape of the rest (permissions, triggers, the token guard, the gh api
+# methods) is asserted by check_audit_shape.sh, which refuses anything it cannot
+# positively recognise. Both are run against mutated copies below, so each
+# refusal is shown by name and a mutation that stops matching fails.
 echo "scheduled audit:"
+REAL_WORKFLOW="$TOOLS/../.github/workflows/repo-settings-audit.yml"
+REAL_AUDIT="$TOOLS/ruleset-audit.sh"
 scheduled_audit_guarded() {
-  local wf="$TOOLS/../.github/workflows/repo-settings-audit.yml" f rc=0
-  for f in "$TOOLS/ruleset-audit.sh" "$TOOLS/ruleset-apply.sh" "$wf"; do
+  local wf="${1:-$REAL_WORKFLOW}" audit="${2:-$REAL_AUDIT}" f rc=0
+  for f in "$audit" "$TOOLS/ruleset-apply.sh" "$wf"; do
     [ -f "$f" ] || { echo "missing: $f"; rc=1; }
   done
   [ -f "$wf" ] || return 1
@@ -89,9 +92,163 @@ scheduled_audit_guarded() {
     || { echo "$wf does not run tools/ruleset-audit.sh"; rc=1; }
   grep -v '^[[:space:]]*#' "$wf" | grep -q 'ruleset-apply' \
     && { echo "$wf invokes the apply script, which must stay manual"; rc=1; }
+  bash "$TOOLS/tests/check_audit_shape.sh" "$wf" "$audit" || rc=1
   return "$rc"
 }
 run "repo settings audit is scheduled and read-only" scheduled_audit_guarded
+
+fixture_dir="$(mktemp -d)" || { echo "cannot create a scratch directory"; exit 1; }
+trap 'rm -rf "${fixture_dir:?}"' EXIT
+
+# An edit that changes nothing is a failure: the fixture would otherwise pass
+# for the wrong reason, so every sed script must really match something.
+edited_copy() { # source sed_script destination
+  sed -e "$2" "$1" > "$3" && ! cmp -s "$1" "$3"
+}
+
+fixture_copies() { # workflow_sed audit_sed; an empty script keeps the real file
+  copy_wf="$fixture_dir/repo-settings-audit.yml"
+  copy_audit="$fixture_dir/ruleset-audit.sh"
+  if [ -n "$1" ]; then edited_copy "$REAL_WORKFLOW" "$1" "$copy_wf" || return 1
+  else cp "$REAL_WORKFLOW" "$copy_wf"; fi
+  if [ -n "$2" ]; then edited_copy "$REAL_AUDIT" "$2" "$copy_audit" || return 1
+  else cp "$REAL_AUDIT" "$copy_audit"; fi
+}
+
+refused_with() { # expected_message workflow_sed audit_sed
+  local output
+  fixture_copies "$2" "$3" || return 1
+  output="$(scheduled_audit_guarded "$copy_wf" "$copy_audit" 2>&1)" && return 1
+  case "$output" in *"$1"*) return 0 ;; esac
+  return 1
+}
+
+accepted_shape() { # workflow_sed audit_sed
+  fixture_copies "$1" "$2" || return 1
+  scheduled_audit_guarded "$copy_wf" "$copy_audit" >/dev/null 2>&1
+}
+
+unchanged_edit_is_rejected() {
+  ! fixture_copies 's/no such line in the workflow//' ''
+}
+
+# Sed scripts that add one step after the audit step, or one line to the audit script.
+probe_step() { # command
+  printf 's|run: tools/ruleset-audit.sh$|&\\n      - name: Probe\\n        run: %s|' "$1"
+}
+
+audit_probe() { # command
+  printf 's|^exit |%s\\nexit |' "$1"
+}
+
+R1_WORKFLOW='audit workflow runs gh api with a non-GET method or a request-body flag'
+R1_AUDIT='audit script runs gh api with a non-GET method or a request-body flag'
+R2_WIDE='audit workflow grants a write permission or more than contents: read'
+R2_MISSING='audit workflow has no top-level permissions block'
+R3_TRIGGER='audit workflow has a trigger besides schedule and workflow_dispatch'
+R3_MISSING='audit workflow has no top-level on: block'
+R4_GUARD='audit workflow lacks a guard step that exits 1 when RULESET_AUDIT_TOKEN is empty before the audit step'
+R4_NO_AUDIT='audit workflow has no step running tools/ruleset-audit.sh'
+R5_CONTINUE='audit workflow sets continue-on-error to something other than false'
+
+echo "scheduled audit shape:"
+run "audit workflow: gh api -X PUT is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -X PUT')" ''
+run "audit workflow: gh api -XPUT is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -XPUT')" ''
+run "audit workflow: gh api --method PATCH is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --method PATCH')" ''
+run "audit workflow: gh api --method=POST is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --method=POST')" ''
+run "audit workflow: gh api -X delete in lower case is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -X delete')" ''
+run "audit workflow: gh api -f field is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -f name=x')" ''
+run "audit workflow: gh api --input file is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --input file.json')" ''
+run "audit workflow: gh api -X GET is allowed" \
+  accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 -X GET')" ''
+run "audit workflow: gh api -XGET is allowed" \
+  accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 -XGET')" ''
+run "audit workflow: gh api --method GET is allowed" \
+  accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 --method GET')" ''
+run "audit workflow: gh api --method=GET is allowed" \
+  accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 --method=GET')" ''
+
+run "audit script: gh api --method PUT is refused" \
+  refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y --method PUT')"
+run "audit script: gh api -XPOST is refused" \
+  refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y -XPOST')"
+run "audit script: a GET with -f field is refused" \
+  refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y -f x=y')"
+run "audit script: gh api -X GET is allowed" \
+  accepted_shape '' "$(audit_probe 'gh api repos/x/y -X GET')"
+run "audit script: gh api -XGET is allowed" \
+  accepted_shape '' "$(audit_probe 'gh api repos/x/y -XGET')"
+run "audit script: gh api --method GET is allowed" \
+  accepted_shape '' "$(audit_probe 'gh api repos/x/y --method GET')"
+run "audit script: gh api --method=GET is allowed" \
+  accepted_shape '' "$(audit_probe 'gh api repos/x/y --method=GET')"
+run "audit script: a comment naming -X PUT does not count" \
+  accepted_shape '' 's|^# Report drift|# gh api repos/x/y -X PUT, named in a comment only\n&|'
+
+run "audit workflow: contents widened to write is refused" \
+  refused_with "$R2_WIDE" 's/^  contents: read$/  contents: write/' ''
+run "audit workflow: an added issues entry is refused" \
+  refused_with "$R2_WIDE" 's/^  contents: read$/&\n  issues: read/' ''
+run "audit workflow: permissions write-all is refused" \
+  refused_with "$R2_WIDE" 's/^permissions:$/permissions: write-all/' ''
+run "audit workflow: permissions read-all is refused" \
+  refused_with "$R2_WIDE" 's/^permissions:$/permissions: read-all/' ''
+run "audit workflow: a job-level permissions block is refused" \
+  refused_with "$R2_WIDE" 's/^    runs-on: ubuntu-latest$/    permissions:\n      contents: read\n&/' ''
+run "audit workflow: a missing top-level permissions block is refused" \
+  refused_with "$R2_MISSING" '/^permissions:$/,/^  contents: read$/d' ''
+
+run "audit workflow: an extra push trigger is refused" \
+  refused_with "$R3_TRIGGER" 's/^  workflow_dispatch:$/  push:\n&/' ''
+run "audit workflow: an extra pull_request trigger is refused" \
+  refused_with "$R3_TRIGGER" 's/^  workflow_dispatch:$/  pull_request:\n&/' ''
+run "audit workflow: an extra pull_request_target trigger is refused" \
+  refused_with "$R3_TRIGGER" 's/^  workflow_dispatch:$/  pull_request_target:\n&/' ''
+run "audit workflow: an extra workflow_run trigger is refused" \
+  refused_with "$R3_TRIGGER" 's/^  workflow_dispatch:$/  workflow_run:\n&/' ''
+run "audit workflow: flow-style triggers are refused" \
+  refused_with "$R3_TRIGGER" 's/^on:$/on: [push, schedule]/' ''
+run "audit workflow: an inline single trigger is refused" \
+  refused_with "$R3_TRIGGER" 's/^on:$/on: push/' ''
+run "audit workflow: a missing on block is refused" \
+  refused_with "$R3_MISSING" '/^on:$/,/^permissions:$/{/^permissions:$/!d
+}' ''
+
+run "audit workflow: a guard step that is deleted is refused" \
+  refused_with "$R4_GUARD" '/Fail visibly when the audit token is absent/,/Audit the live rulesets/{/Audit the live rulesets/!d
+}' ''
+run "audit workflow: a guard that exits 0 is refused" \
+  refused_with "$R4_GUARD" 's/exit 1$/exit 0/' ''
+run "audit workflow: a guard without exit 1 is refused" \
+  refused_with "$R4_GUARD" 's/exit 1$/true/' ''
+run "audit workflow: a guard moved after the audit step is refused" \
+  refused_with "$R4_GUARD" "s/^      # The default token cannot read.*\$/      - name: Audit the live rulesets\\n        env:\\n          GH_TOKEN: \${{ secrets.RULESET_AUDIT_TOKEN }}\\n        run: tools\\/ruleset-audit.sh\\n&/;/^      - name: Audit the live rulesets\$/,\$d" ''
+run "audit workflow: a guard testing another variable is refused" \
+  refused_with "$R4_GUARD" 's/AUDIT_TOKEN" \]/OTHER_TOKEN" ]/' ''
+run "audit workflow: no audit step is refused" \
+  refused_with "$R4_NO_AUDIT" 's/run: tools\/ruleset-audit.sh$/run: echo skipped/' ''
+
+run "audit workflow: continue-on-error true on the audit step is refused" \
+  refused_with "$R5_CONTINUE" 's/^        run: tools\/ruleset-audit.sh$/&\n        continue-on-error: true/' ''
+run "audit workflow: continue-on-error true on the job is refused" \
+  refused_with "$R5_CONTINUE" 's/^    timeout-minutes: 10$/&\n    continue-on-error: true/' ''
+run "audit workflow: a continue-on-error expression is refused" \
+  refused_with "$R5_CONTINUE" "s/^    timeout-minutes: 10\$/&\\n    continue-on-error: \${{ false }}/" ''
+run "audit workflow: continue-on-error false is allowed" \
+  accepted_shape 's/^    timeout-minutes: 10$/&\n    continue-on-error: false/' ''
+
+run "audit workflow: a comment naming ruleset-apply is allowed" \
+  accepted_shape 's|^name: Repo settings audit$|# tools/ruleset-apply.sh is never run from this workflow\n&|' ''
+run "audit workflow: a run step invoking ruleset-apply is refused" \
+  refused_with 'invokes the apply script' "$(probe_step 'tools/ruleset-apply.sh')" ''
+run "a fixture edit that matches nothing is rejected" unchanged_edit_is_rejected
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
