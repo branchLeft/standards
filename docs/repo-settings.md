@@ -58,6 +58,8 @@ Every repo's ruleset payload is committed under `templates/rulesets/<repo>/` (en
 
 **Check:** `tools/ruleset-audit.sh` reports each payload `ok`, `MISSING` or `DRIFT` with a diff, exits non-zero on either and reports a 403 repo as blocked.
 
+The audit runs weekly and on demand from `.github/workflows/repo-settings-audit.yml`. That workflow is read-only: it never runs `ruleset-apply.sh`. It reads the secret `RULESET_AUDIT_TOKEN`, because the default workflow token cannot read other repos' rulesets, and it fails visibly when the secret is absent. `tools/tests/run.sh` fails if the audit script, the apply script or the workflow is removed, or if the workflow stops running the audit.
+
 ## REPO-7 — an apply never reduces live protection
 
 `ruleset-apply.sh` reads live before every update and refuses a payload that would drop a rule, a required status check, a protective flag or a protected ref, downgrade enforcement, widen a bypass actor, lower the review count or permit a merge method live forbids, treating unrecognised structure as a reduction, and `--allow-weakening` takes exactly one repo and cannot cover a finding the guard could not classify.
