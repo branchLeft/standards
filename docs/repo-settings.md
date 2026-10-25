@@ -58,7 +58,7 @@ Every repo's ruleset payload is committed under `templates/rulesets/<repo>/` (en
 
 **Check:** `tools/ruleset-audit.sh` reports each payload `ok`, `MISSING` or `DRIFT` with a diff, exits non-zero on either and reports a 403 repo as blocked.
 
-The audit runs weekly and on demand from `.github/workflows/repo-settings-audit.yml`. That workflow is read-only: it never runs `ruleset-apply.sh`. It reads the secret `RULESET_AUDIT_TOKEN`, because the default workflow token cannot read other repos' rulesets, and it fails visibly when the secret is absent. `tools/tests/run.sh` fails if the audit script, the apply script or the workflow is removed, or if the workflow stops running the audit.
+The audit runs weekly and on demand from `.github/workflows/repo-settings-audit.yml`. That workflow is read-only: it never runs `ruleset-apply.sh`. It reads the secret `RULESET_AUDIT_TOKEN`, because the default workflow token cannot read other repos' rulesets, and it fails visibly when the secret is absent. `tools/tests/run.sh` fails if the audit script, the apply script or the workflow is removed, or if the workflow stops running the audit. `tools/tests/check_audit_shape.sh`, called from `run.sh`, also refuses a workflow that could write or go quiet: a `gh api` call that is not a plain read (a non-GET method or any request body), widened permissions, triggers beyond `schedule` and `workflow_dispatch`, a missing or weakened token guard, `continue-on-error`, or an `if:` condition on the token guard step, the audit step or their job. `run.sh` proves each refusal with a generated fixture.
 
 ## REPO-7 — an apply never reduces live protection
 
