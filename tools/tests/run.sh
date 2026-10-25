@@ -166,6 +166,26 @@ run "audit workflow: gh api -f field is refused" \
   refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -f name=x')" ''
 run "audit workflow: gh api --input file is refused" \
   refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --input file.json')" ''
+run "audit workflow: gh api -F field is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -F name=x')" ''
+run "audit workflow: gh api -fname attached field is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -fname=x')" ''
+run "audit workflow: gh api -Fname attached field is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 -Fname=x')" ''
+run "audit workflow: gh api --field name is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --field name=x')" ''
+run "audit workflow: gh api --field=name is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --field=name=x')" ''
+run "audit workflow: gh api --raw-field name is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --raw-field name=x')" ''
+run "audit workflow: gh api --raw-field=name is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --raw-field=name=x')" ''
+run "audit workflow: gh api --input=file is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_step 'gh api repos/x/y/rulesets/1 --input=file.json')" ''
+run "audit workflow: gh api --jq query is allowed" \
+  accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 --jq .name')" ''
+run "audit workflow: gh api -H header is allowed" \
+  accepted_shape "$(probe_step "gh api repos/x/y/rulesets/1 -H 'Accept: application/json'")" ''
 run "audit workflow: gh api -X GET is allowed" \
   accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 -X GET')" ''
 run "audit workflow: gh api -XGET is allowed" \
@@ -181,6 +201,8 @@ run "audit script: gh api -XPOST is refused" \
   refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y -XPOST')"
 run "audit script: a GET with -f field is refused" \
   refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y -f x=y')"
+run "audit script: a GET with --field name is refused" \
+  refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y --field name=x')"
 run "audit script: gh api -X GET is allowed" \
   accepted_shape '' "$(audit_probe 'gh api repos/x/y -X GET')"
 run "audit script: gh api -XGET is allowed" \
