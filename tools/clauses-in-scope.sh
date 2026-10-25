@@ -25,7 +25,8 @@ index_gates() {
       for (i = 1; i <= NF; i++) { gsub(/^[ \t]+|[ \t]+$/, "", $i); gsub(/`/, "", $i) }
       if ($2 == "ID") next
       if ($2 ~ /^-+$/) next
-      if ($2 ~ /^[A-Z]{2,5}-[0-9]{1,3}$/) printf "%s\t%s\n", $2, $3
+      # No {m,n} intervals in awk: mawk builds ignore them.
+      if ($2 ~ /^[A-Z][A-Z]([A-Z]([A-Z][A-Z]?)?)?-[0-9]([0-9][0-9]?)?$/) printf "%s\t%s\n", $2, $3
     }' "$1"
 }
 

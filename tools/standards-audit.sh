@@ -50,7 +50,8 @@ clause_coverage() {
       for (i = 1; i <= NF; i++) { gsub(/^[ \t]+|[ \t]+$/, "", $i); gsub(/`/, "", $i) }
       if ($2 == "ID") next
       if ($2 ~ /^-+$/) next
-      if ($2 !~ /^[A-Z]{2,5}-[0-9]{1,3}$/) next
+      # No {m,n} intervals in awk: mawk builds ignore them.
+      if ($2 !~ /^[A-Z][A-Z]([A-Z]([A-Z][A-Z]?)?)?-[0-9]([0-9][0-9]?)?$/) next
       if ($3 == "auto") enforced++
       else if ($2 in is_measured) measured_n++
       else not_checked++
