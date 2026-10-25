@@ -638,6 +638,10 @@ run_scan_self_tests() {
 self_test() {
   local tmp rc=0
   tmp=$(mktemp -d) || return 2
+  local scan_tmp
+  scan_tmp=$(mktemp -d) || return 2
+  run_scan_self_tests "$scan_tmp" || { rm -rf "${scan_tmp:?}" "${tmp:?}"; return 1; }
+  rm -rf "${scan_tmp:?}"
   (
     cd "$tmp" || exit 2
     ratchet_scratch_repo_init || exit 2
@@ -793,8 +797,6 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q '::error.*DB-1' \
       || { echo "FAIL: human-readable output did not use ::error::"; echo "$out"; exit 1; }
-
-    run_scan_self_tests "$tmp" || exit 1
 
     exit 0
   ) || rc=$?
