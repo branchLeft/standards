@@ -6,15 +6,15 @@ Repo settings are code: committed as payloads under `templates/rulesets/<repo>/<
 
 The default branch allows no deletion and no force-push, requires linear history and signed commits, and requires a pull request with one approving review, stale-review dismissal, last-push approval, resolved conversations, an extra approval for unattributed changes and squash-only merge, with code-owner review required per repo as the table below says.
 
-**Why:** the ruleset is the only control between a push and a production deploy (`PRIN-2`), and `require_extra_approval_for_unattributed_changes` was adopted by choice so a payload that omits it reads as a deliberate reduction.
+**Why:** the ruleset is the only control between a push and a production deploy (`PRIN-2`), and `require_extra_approval_for_unattributed_changes` was adopted by choice so a payload that omits it reads as a deliberate reduction. On `ghost-platform` the owner's ruling of 25 Oct 2026 set this flag to `false` (live wins), so its payload records `false` rather than the default above.
 
 **Check:** `templates/rulesets/` payloads and `tools/ruleset-audit.sh`, which reads `.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review` live and committed and fails a public repo that differs from its row or sits outside the rows.
 
-| `require_code_owner_review` | Repos                                                                                                                                                                               |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `true`                      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`.                                                                                       |
-| `false`                     | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards`.           |
-| NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS). |
+| `require_code_owner_review` | Repos                                                                                                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `true`                      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`, `ghost-platform`, `standards` (live, per the owner's ruling of 25 Oct 2026; see below). |
+| `false`                     | `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`.                                            |
+| NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS).   |
 
 The owner's recorded reason for `false` on the tenant repos, verbatim: "contributing still requires org members, which is only me and my agents today."
 
@@ -91,6 +91,29 @@ Every commit an agent writes carries a co-author trailer naming the model, and e
 **Why:** people reading the history are owed an accurate account of who wrote what.
 
 **Check:** a CI check that every commit in a PR raised by an agent identity carries the trailer.
+
+## Live settings win (owner ruling, 25 Oct 2026)
+
+On 25 Oct 2026 the owner ruled that, where GitHub's live settings differ from
+the committed payloads after hand edits, **the live settings win** for
+`shared-infra`, `ghost-platform` and `standards`. Their payloads under
+`templates/rulesets/<repo>/main.json` were then rewritten to the live values,
+and the audit reads them as `ok`. The two differences that matter are recorded
+in REPO-1 above: `ghost-platform` has `require_code_owner_review` true and
+`require_extra_approval_for_unattributed_changes` false; `standards` has
+`require_code_owner_review` true. `shared-infra` also records the
+`merge_queue` rule and the `Lint and test the Ansible roles` required check
+that live carries.
+
+Four exclusions from that ruling, each by the owner's own decision:
+
+- `wedding-platform` is permanently outside these rules.
+- The tag bypass on `github-workflows` is the owner's own settings change; the
+  payload there is left as this standard states it.
+- `ghost-tenant-blog` stays as it is.
+- The payloads above were captured from live state, not applied. The
+  apply script was not run for them; it remains the way the standard is
+  restored on any repo (see REPO-7).
 
 ## Organization-level rulesets
 
