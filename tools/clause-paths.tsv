@@ -49,7 +49,7 @@ STD-004	*	[none] a rule about rules, not tied to any file
 TS-1	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] check-tsconfig.sh: ratchet_scope_files '(^|/)tsconfig(\.[a-z]+)?\.json$'
 TS-2	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script
 TS-3	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script
-TS-4	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script; compares against tools/floors.tsv
+TS-4	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json	[gate] same pattern as TS-1, same script; compares against FLOOR_TIER in the script
 TS-5	tsconfig.json;*/tsconfig.json;tsconfig.*.json;*/tsconfig.*.json;*.ts	[gate] same tsconfig pattern, plus check_ts5() reads every tracked *.ts to compare against tsc --listFiles
 TS-6	package.json;*/package.json	[fleet] canonical script names live in package.json; clause is `pending`, no gate script to copy a pattern from
 TS-7	*.ts;*.tsx	[fleet] the reactApp eslint preset's target; tsconfig.md/index.md name no path

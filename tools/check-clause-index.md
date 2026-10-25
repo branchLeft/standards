@@ -1,69 +1,51 @@
 # check-clause-index.sh
 
-Drift test between `docs/index.md` and everything it claims. Eight
-assertions, in increasing order of what they catch:
+Drift test between `docs/index.md` and everything it claims. The index has three
+columns: ID, gate and evidence. Four assertions fail the run:
 
-1. Every clause ID defined in docs/ appears in the index, and vice versa.
-   Without this an unindexed rule cannot be cited by the audit tool, the
-   backlog or a CI annotation — so in practice it is not a rule.
+1. Every clause ID defined in docs/ appears in the index. Without this an
+   unindexed rule cannot be cited by the audit tool, the backlog or a CI
+   annotation, so in practice it is not a rule. An indexed clause with no doc
+   only warns, because the index declares families before they are written.
 2. Every `auto` clause is backed by one of two things: a script under
-   tools/ that names it, or — for a clause encoded by a shared-config
-   package rather than a script — a row for that package in
+   tools/ that names it, or, for a clause encoded by a shared-config
+   package rather than a script, a row for that package in
    `tools/package-consumers.tsv`, the committed record of which packages
    the fleet genuinely consumes. A package existing under packages/ is
    neither: it proves the package could be imported, never that anything
-   runs it — a row marked `auto` reads as mechanically enforced to every
-   consumer of the table, and "could be imported" is not enforcement.
-   This is necessarily a proxy either way: it proves a gate script exists
-   that mentions the ID, or that someone has committed a claim of
-   consumption, not that the script's logic is correct or that the
-   consumption claim is true — the same blind spot as every assertion
-   below, which prove a named thing exists, not that it does what the
-   rule says. The consumer-record path is honest about being unverified:
-   see `tools/package-consumers.tsv`'s own header.
-3. Every `Encoded by` value resolves — a path that exists, or a package
-   that exists under packages/. Weaker than assertion 2: it accepts a
-   package on existence alone, deliberately, because a `review` or
-   `pending` row may still name one honestly as the thing that would
-   enforce the rule once adopted — only `auto` requires the stronger
-   form, either a real gate script or a consumer record.
+   runs it. This is a proxy either way: it proves a gate script exists that
+   mentions the ID, or that someone has committed a claim of consumption,
+   not that the script's logic is correct or that the claim is true. The
+   consumer-record path is honest about being unverified: see
+   `tools/package-consumers.tsv`'s own header.
+3. Every `Encoded by` value resolves: a path that exists, or a package that
+   exists under packages/. The `Evidence` column of a `review` or `pending`
+   row is prose and is not resolved.
 4. Every family header (`## Family — \`path\``) links to a file that
 exists under docs/. A family that is genuinely thin and has nothing
 beyond the index carries no path at all (`## Family`); a header naming
    a path promises a doc, and a promise nothing resolves is worse than no
    promise.
-5. Every clause ID that carries a floor in `tools/floors.tsv` appears in the
-   index. A floor for an unindexed clause cannot be cited by anything that
-   reads the index — only by the floors file itself, which is not a
-   citation anyone else can follow.
-6. Every clause ID with a row in `tools/clause-paths.tsv` appears in the
-   index — the same "cannot be cited" reasoning as assertion 5, applied
-   to the file-scope map instead of the floor map.
-7. Every indexed clause has a row in `tools/clause-paths.tsv`. Unlike the
-   floor map, this direction is required rather than advisory: a clause
-   with no mapping is invisible to a reviewer using the map to find what
-   applies to a diff, and that silent gap is worse than an absent floor
-   because nothing else prints a warning for it.
-8. Every clause a real `tools/*.sh` gate scopes to specific files with
-   `ratchet_scope_files` — `gate_scoped_clauses()` — is tagged `[gate]` in
-   `tools/clause-paths.tsv`, not `[fleet]`, `[doc]` or `[none]`. Those three
-   tags mean "not grounded in a gate yet"; once a script scopes and reports
-   the clause, the row saying otherwise is stale, exactly like an
-   `auto` clause the index itself still called `pending`. The three shapes
-   `gate_scoped_clauses()` cannot see on its own — a clause emitted through a
-   shell variable rather than a literal string, a script that bypasses
-   `ratchet_finding` entirely, or a script that scans every tracked file
-   unfiltered instead of calling `ratchet_scope_files` — are a short,
-   commented, hand-maintained override next to the function, for the same
-   reason `standards-audit.sh`'s own `COVERED` list is hand-maintained: a
-   grep-only derivation under- and over-reports these exact shapes.
 
-Assertion 2 also runs in reverse: a `pending` clause that some artefact
-anywhere under tools/, packages/ or templates/ does name is a row that was
-implemented and never re-marked, which rots the table in the direction
-nobody checks. That direction deliberately stays broad — the point there is
-recall (catch any hint of implementation), where the forward direction wants
-precision (accept only a real gate script).
+A `pending` clause that some artefact names is not an error: the reverse check
+that failed it was dropped, so a row is moved to `auto` by editing the row.
+
+## `tools/clause-paths.tsv` is advisory
+
+The file maps each clause to the files a reviewer reads it against. The gate
+warns, and never fails, when:
+
+- a mapped clause is not indexed;
+- an indexed clause has no row, or the file is absent;
+- a clause a real `tools/*.sh` gate scopes to specific files with
+  `ratchet_scope_files` (`gate_scoped_clauses()`) is not tagged `[gate]`.
+
+The three shapes `gate_scoped_clauses()` cannot see on its own (a clause emitted
+through a shell variable rather than a literal string, a script that bypasses
+`ratchet_finding` entirely, or a script that scans every tracked file
+unfiltered) are a short, commented, hand-maintained override next to the
+function, for the same reason `standards-audit.sh`'s own `COVERED` list is
+hand-maintained.
 
 ## `family_header_paths`
 
@@ -83,15 +65,12 @@ trailing prose, trailing whitespace — is required to be empty.
 
 A literal, word-bounded search over the given directories. `TS-1` must not
 be satisfied by `TS-10`, and built output is skipped so a stale dist/ cannot
-vouch for a deleted rule. Callers pass which directories count: the broad
-"was this implemented at all" check searches `ARTEFACT_DIRS`, the narrow
-"does a gate script name it" check searches tools/ alone.
+vouch for a deleted rule. The `auto` check searches tools/ alone.
 
-`tools/clause-paths.tsv` is excluded for the same reason docs/ is absent from
-`ARTEFACT_DIRS`: it names every clause by construction — that is the whole
+`tools/clause-paths.tsv` is excluded because docs/ is not searched either:
+it names every clause by construction — that is the whole
 point of a file-scope map — so every ID in it would otherwise read as "named
-by an artefact under tools/", which would mark every `pending` clause
-implemented the moment it gets a row, and would let `clause-paths.tsv` alone
+by an artefact under tools/", which would let `clause-paths.tsv` alone
 satisfy the `auto` check for a clause with no real gate script.
 
 The exclusion is by exact path, not `grep --exclude`'s basename glob:

@@ -45,7 +45,7 @@ so nothing catches this on its own.
 ## Changing a gate is not the same as raising a floor
 
 A gate change ships in a release. A **floor** change is a one-line edit to
-`tools/floors.tsv` that turns affected repos amber all at once.
+`FLOOR_TIER` in `tools/check-tsconfig.sh` that turns affected repos amber all at once.
 
 Never do both in one release, and never raise a floor and fix a repo in the same
 PR. See [`docs/ratchet.md`](docs/ratchet.md).

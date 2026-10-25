@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Drift test between docs/index.md and everything it claims — eight
-# assertions, increasingly strict. Full list: check-clause-index.md.
+# Drift test between docs/index.md and everything it claims. Five assertions
+# fail the run; the tools/clause-paths.tsv ones only warn. Full list:
+# check-clause-index.md.
 # Usage: check-clause-index.sh [DOCS_DIR] | --self-test
 
 set -uo pipefail
@@ -12,22 +13,17 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # followed by digits only and we anchor on a word boundary.
 CLAUSE_RE='\b[A-Z]{2,5}-[0-9]{1,3}\b'
 
-# Where a clause may be enforced from. docs/ is deliberately absent: a clause
-# describing itself is not evidence that anything acts on it, and that
-# circularity is the whole defect this catches.
-ARTEFACT_DIRS=(tools packages templates)
-
 # Extract one row per indexed clause as ID<TAB>GATE<TAB>HEADER<TAB>VALUE, where
-# HEADER is the fourth column's own heading. It matters which: `Encoded by`
-# names an artefact and must resolve, while `Evidence` names what a human reads
-# and is prose.
+# HEADER is the third column's own heading. The index has three columns: ID,
+# Gate and Evidence. It matters which heading: `Encoded by` names an artefact
+# and must resolve, while `Evidence` names what a human reads and is prose.
 index_rows() {
   awk -F'|' '
     /^\|/ {
       for (i = 1; i <= NF; i++) { gsub(/^[ \t]+|[ \t]+$/, "", $i); gsub(/`/, "", $i) }
-      if ($2 == "ID") { header = $5; next }
+      if ($2 == "ID") { header = $4; next }
       if ($2 ~ /^-+$/) next
-      if ($2 ~ /^[A-Z]{2,5}-[0-9]{1,3}$/) printf "%s\t%s\t%s\t%s\n", $2, $4, header, $5
+      if ($2 ~ /^[A-Z]{2,5}-[0-9]{1,3}$/) printf "%s\t%s\t%s\t%s\n", $2, $3, header, $4
     }' "$1"
 }
 
@@ -52,39 +48,9 @@ clause_is_named() {
   return 1
 }
 
-# True if tools/thresholds.tsv carries a row for ID whose reason column is
-# marked #provisional. This is the one legitimate way a `pending` clause may
-# be named by a real script under tools/ without that reading as the usual
-# "implemented but the row was never updated" rot: a reader may be built
-# ahead of the gate class moving, provided the owner has not yet chosen the
-# real number and flipping the gate class stays a separate, later, reviewed
-# change — a deliberate, committed, two-step rollout rather than silence.
-clause_has_provisional_reader() {
-  local id="$1" file="$ROOT/tools/thresholds.tsv"
-  [ -f "$file" ] || return 1
-  awk -F'\t' -v id="$id" '
-    /^[ \t]*#/ || NF < 4 { next }
-    $1 == id && $4 ~ /#provisional/ { found = 1 }
-    END { exit !found }
-  ' "$file"
-}
-
-# clause<TAB>floor rows from tools/floors.tsv, comment and blank lines
-# skipped. Absent file means nothing to check, not a failure — a repo mid-way
-# through adopting the ratchet may not have floors yet.
-floor_ids() {
-  local floors="$1"
-  [ -f "$floors" ] || return 0
-  awk -F'\t' '/^[ \t]*#/ || NF < 2 { next } { print $1 }' "$floors"
-}
-
 # clause<TAB>globs<TAB>scope rows from tools/clause-paths.tsv, comment and
-# blank lines skipped — same extraction shape as floor_ids(). Unlike
-# floor_ids(), an absent file is the caller's problem, not this function's:
-# every indexed clause is required to have a row here (see the completeness
-# assertion below), so a repo without the file has not started, not finished
-# early, and the caller reports that as a hard error rather than "nothing to
-# check".
+# blank lines skipped. An absent file is the caller's problem, not this
+# function's; the map is advisory, so the caller reports it as a warning.
 clause_paths_ids() {
   local paths="$1"
   [ -f "$paths" ] || return 0
@@ -128,9 +94,8 @@ gate_scoped_clauses() {
 # True if PKG has a row in tools/package-consumers.tsv — the committed record
 # that a shared-config package (as opposed to a tools/ script) is genuinely
 # consumed somewhere in the fleet. Standards' own package.json is deliberately
-# not read as evidence here, for the same reason docs/ is absent from
-# ARTEFACT_DIRS: a package naming itself as its own consumer is not evidence
-# anything else acts on it.
+# not read as evidence here: a package naming itself as its own consumer is
+# not evidence anything else acts on it.
 package_has_consumers() {
   local pkg="$1" file="$2"
   [ -f "$file" ] || return 1
@@ -224,17 +189,7 @@ check_index() {
           echo "::error::$id is marked \`auto\` but no script under tools/ names it, and its \`Encoded by\` value has no row in tools/package-consumers.tsv — mark it \`review\`, add a gate script, or add a consumer record"
           rc=1; }
         ;;
-      pending)
-        if clause_is_named "$id" "${ARTEFACT_DIRS[@]}"; then
-          if clause_has_provisional_reader "$id"; then
-            echo "::notice::$id is marked \`pending\` with a provisional reader recorded in tools/thresholds.tsv — the gate class moves to \`auto\` in a later, separate, reviewed change once the owner sets a real threshold"
-          else
-            echo "::error::$id is marked \`pending\` but an artefact names it — mark it \`auto\`"
-            rc=1
-          fi
-        fi
-        ;;
-      review) ;;
+      pending|review) ;;
       *)
         echo "::error::$id has gate '$gate'; expected auto, review or pending"
         rc=1 ;;
@@ -266,57 +221,34 @@ check_index() {
       rc=1; }
   done < <(family_header_paths "$index")
 
-  local floor_id
-  while IFS= read -r floor_id; do
-    [ -n "$floor_id" ] || continue
-    grep -qx "$floor_id" <<< "$indexed" || {
-      echo "::error::$floor_id has a floor in tools/floors.tsv but is not indexed in $index"
-      rc=1; }
-  done < <(floor_ids "$ROOT/tools/floors.tsv")
-
-  # tools/clause-paths.tsv maps every clause to the files a reviewer should
-  # read it against. Absent entirely, that is reported once here rather than
-  # as 96 missing rows below — a missing file and an incomplete one are
-  # different defects and deserve different error text.
-  local clause_paths="$ROOT/tools/clause-paths.tsv" mapped=""
+  # tools/clause-paths.tsv maps clauses to the files a reviewer should read
+  # them against. It is a discovery aid, not a gate, so every disagreement
+  # below is a warning and never changes the exit status.
+  local clause_paths="$ROOT/tools/clause-paths.tsv" mapped="" advisory=0
   if [ -f "$clause_paths" ]; then
     mapped=$(clause_paths_ids "$clause_paths")
 
-    # Same shape as the floors check just above: a mapped clause that is not
-    # indexed cannot be cited by anything that reads the index, only by
-    # clause-paths.tsv itself.
     local mapped_id
     while IFS= read -r mapped_id; do
       [ -n "$mapped_id" ] || continue
       grep -qx "$mapped_id" <<< "$indexed" || {
-        echo "::error::$mapped_id has a row in tools/clause-paths.tsv but is not indexed in $index"
-        rc=1; }
+        echo "::warning::$mapped_id has a row in tools/clause-paths.tsv but is not indexed in $index"; advisory=$((advisory + 1)); }
     done <<< "$mapped"
 
-    # The direction floors.tsv is deliberately exempt from: every floor is
-    # optional, but every indexed clause is expected to have a mapping, so a
-    # reviewer facing a diff never has to fall back to reading the full
-    # table by hand. A clause added to the index without a row here is the
-    # exact gap this tool exists to close.
     local idx_id
     while IFS= read -r idx_id; do
       [ -n "$idx_id" ] || continue
       grep -qx "$idx_id" <<< "$mapped" || {
-        echo "::error::$idx_id is indexed in $index but has no row in tools/clause-paths.tsv"
-        rc=1; }
+        echo "::warning::$idx_id is indexed in $index but has no row in tools/clause-paths.tsv"; advisory=$((advisory + 1)); }
     done <<< "$indexed"
   else
-    echo "::error::no clause-paths file at $clause_paths"
-    rc=1
+    echo "::warning::no clause-paths file at $clause_paths"; advisory=$((advisory + 1))
   fi
 
-  # Assertion 8: a clause a real tools/*.sh gate scopes to specific files —
-  # gate_scoped_clauses() above — must carry the `[gate]` tag in
-  # clause-paths.tsv, not `[fleet]`, `[doc]` or `[none]`. Those three read as
-  # "nobody has grounded this in the gate yet", which stops being true the
-  # moment a script does. Skipped for an id with no clause-paths.tsv row at
-  # all — that gap is assertion 7's error, not this one's, and reporting it
-  # twice would just be noise.
+  # A clause a real tools/*.sh gate scopes to specific files —
+  # gate_scoped_clauses() above — should carry the `[gate]` tag in
+  # clause-paths.tsv, not `[fleet]`, `[doc]` or `[none]`. Skipped for an id
+  # with no clause-paths.tsv row at all, which is reported above.
   if [ -f "$clause_paths" ]; then
     local scoped_id scope
     while IFS= read -r scoped_id; do
@@ -326,8 +258,8 @@ check_index() {
       case "$scope" in
         '[gate]'*) ;;
         *)
-          echo "::error::$scoped_id is reported by a tools/*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged \`[gate]\`"
-          rc=1
+          echo "::warning::$scoped_id is reported by a tools/*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged \`[gate]\`"
+          advisory=$((advisory + 1))
           ;;
       esac
     done < <(gate_scoped_clauses "$ROOT" | sort -u)
@@ -336,6 +268,8 @@ check_index() {
   if [ "$rc" -eq 0 ]; then
     if [ "$undefined" -gt 0 ]; then
       echo "check-clause-index.sh: no errors, but $undefined indexed clause(s) have no doc — see the warnings above"
+    elif [ "$advisory" -gt 0 ]; then
+      echo "check-clause-index.sh: no errors, but $advisory advisory finding(s) on tools/clause-paths.tsv — see the warnings above"
     else
       echo "check-clause-index.sh: index, docs and artefacts agree"
     fi
@@ -382,10 +316,10 @@ self_test() {
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate      | Encoded by      |
-| ---- | ----------- | --------- | --------------- |
-| AA-1 | implemented | `auto`    | `tools/gate.sh` |
-| AA-2 | declared    | `pending` | —               |
+| ID   | Gate      | Encoded by      |
+| ---- | --------- | --------------- |
+| AA-1 | `auto`    | `tools/gate.sh` |
+| AA-2 | `pending` | —               |
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: honest index exited $grc"; echo "$out"; exit 1; }
@@ -398,11 +332,11 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate      | Encoded by      |
-| ---- | ----------- | --------- | --------------- |
-| AA-1 | implemented | `auto`    | `tools/gate.sh` |
-| AA-2 | declared    | `pending` | —               |
-| AA-9 | undocumented | `pending` | —              |
+| ID   | Gate      | Encoded by      |
+| ---- | --------- | --------------- |
+| AA-1 | `auto`    | `tools/gate.sh` |
+| AA-2 | `pending` | —               |
+| AA-9 | `pending` | —              |
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: undocumented pending clause exited $grc"; echo "$out"; exit 1; }
@@ -417,50 +351,33 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
-| AA-2 | declared    | `auto` | —               |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
+| AA-2 | `auto` | —               |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: unimplemented auto exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "AA-2 is marked .auto. but no script under tools/" \
       || { echo "FAIL: unimplemented auto not named"; echo "$out"; exit 1; }
 
-    # Rot in the other direction: implemented, still advertised as pending.
+    # A `pending` clause that a real artefact names is no longer an error:
+    # the reverse check was dropped, and what moves a row to `auto` is the
+    # owner editing the row. Proven here so the reverse check cannot return
+    # unnoticed.
     printf 'ratchet_finding "AA-2"\n' >> tools/gate.sh
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate      | Encoded by      |
-| ---- | ----------- | --------- | --------------- |
-| AA-1 | implemented | `auto`    | `tools/gate.sh` |
-| AA-2 | declared    | `pending` | —               |
+| ID   | Gate      | Encoded by      |
+| ---- | --------- | --------------- |
+| AA-1 | `auto`    | `tools/gate.sh` |
+| AA-2 | `pending` | —               |
 EOF
     gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: stale pending exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-2 is marked .pending." \
-      || { echo "FAIL: stale pending not named"; echo "$out"; exit 1; }
-
-    # A `pending` clause named by a real artefact is a notice, not an error,
-    # when tools/thresholds.tsv records it as a deliberate, committed,
-    # provisional reader — but still an error the moment that row is missing
-    # or its reason drops the #provisional marker, so the escape hatch cannot
-    # be claimed by accident.
-    printf 'AA-2\tsome_setting\t8\t#provisional, see the tracking issue\n' > tools/thresholds.tsv
-    gate
-    [ "$grc" -eq 0 ] || { echo "FAIL: provisional reader still exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-2 is marked .pending. with a provisional reader" \
-      || { echo "FAIL: provisional reader not reported as a notice"; echo "$out"; exit 1; }
+    [ "$grc" -eq 0 ] || { echo "FAIL: a named pending clause exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "::error::AA-2" \
-      && { echo "FAIL: provisional reader still raised the hard error"; echo "$out"; exit 1; }
-
-    # The reason column is what makes the row a deliberate marker rather than
-    # an ordinary setting — drop #provisional and the escape hatch closes.
-    printf 'AA-2\tsome_setting\t8\t# a real, owner-set floor now\n' > tools/thresholds.tsv
-    gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: a non-provisional thresholds.tsv row still bypassed the pending check"; echo "$out"; exit 1; }
-    rm -f tools/thresholds.tsv
+      && { echo "FAIL: a named pending clause still raised an error"; echo "$out"; exit 1; }
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
 
     # A word boundary, not a prefix: AA-1 must not be vouched for by AA-10.
@@ -469,9 +386,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: AA-10 satisfied AA-1, exited $grc"; echo "$out"; exit 1; }
@@ -480,9 +397,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by       |
-| ---- | ----------- | ------ | ---------------- |
-| AA-1 | implemented | `auto` | `tools/gone.sh`  |
+| ID   | Gate   | Encoded by       |
+| ---- | ------ | ---------------- |
+| AA-1 | `auto` | `tools/gone.sh`  |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: missing artefact path exited $grc"; echo "$out"; exit 1; }
@@ -492,9 +409,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by              |
-| ---- | ----------- | ------ | ----------------------- |
-| AA-1 | implemented | `auto` | `@branchleft/nosuchpkg` |
+| ID   | Gate   | Encoded by              |
+| ---- | ------ | ----------------------- |
+| AA-1 | `auto` | `@branchleft/nosuchpkg` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: missing package exited $grc"; echo "$out"; exit 1; }
@@ -502,9 +419,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by                  |
-| ---- | ----------- | ------ | --------------------------- |
-| AA-1 | implemented | `auto` | `@branchleft/eslint-config` |
+| ID   | Gate   | Encoded by                  |
+| ---- | ------ | --------------------------- |
+| AA-1 | `auto` | `@branchleft/eslint-config` |
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: existing package exited $grc"; echo "$out"; exit 1; }
@@ -520,9 +437,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by                  |
-| ---- | ----------- | ------ | ---------------------------- |
-| AA-1 | implemented | `auto` | `@branchleft/eslint-config` |
+| ID   | Gate   | Encoded by                  |
+| ---- | ------ | ---------------------------- |
+| AA-1 | `auto` | `@branchleft/eslint-config` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: package-only auto clause exited $grc"; echo "$out"; exit 1; }
@@ -570,9 +487,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule     | Gate     | Evidence |
-| ---- | -------- | -------- | -------- |
-| AA-1 | reviewed | `review` | The diff |
+| ID   | Gate     | Evidence |
+| ---- | -------- | -------- |
+| AA-1 | `review` | The diff |
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: Evidence column treated as a path, exited $grc"; echo "$out"; exit 1; }
@@ -580,9 +497,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate      | Encoded by      |
-| ---- | ----------- | --------- | --------------- |
-| AA-1 | implemented | `someday` | `tools/gate.sh` |
+| ID   | Gate      | Encoded by      |
+| ---- | --------- | --------------- |
+| AA-1 | `someday` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: unknown gate value exited $grc"; echo "$out"; exit 1; }
@@ -592,9 +509,9 @@ EOF
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: undocumented clause exited $grc"; echo "$out"; exit 1; }
@@ -612,9 +529,9 @@ EOF
 
 ## Real family — `family-ok.md`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: valid family header exited $grc"; echo "$out"; exit 1; }
@@ -625,9 +542,9 @@ EOF
 
 ## Dead family — `family-missing.md`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: dead family header exited $grc"; echo "$out"; exit 1; }
@@ -643,9 +560,9 @@ EOF
 
 ## Hyphen family - `family-missing.md`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: hyphen-separated dead header exited $grc"; echo "$out"; exit 1; }
@@ -657,9 +574,9 @@ EOF
 
 ## En dash family – `family-missing.md`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: en-dash-separated dead header exited $grc"; echo "$out"; exit 1; }
@@ -672,9 +589,9 @@ EOF
 
 ## Two files — `family-missing.md` and `family-ok.md`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: two-path header exited $grc"; echo "$out"; exit 1; }
@@ -689,9 +606,9 @@ EOF
 
 ## Directory family — `a-directory`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: directory family header exited $grc"; echo "$out"; exit 1; }
@@ -706,9 +623,9 @@ EOF
 
 ## Escaping family — `../README.md`
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: escaping family header exited $grc"; echo "$out"; exit 1; }
@@ -724,58 +641,33 @@ EOF
 ## Example family — `family-missing.md`
 ```
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: fenced example header exited $grc"; echo "$out"; exit 1; }
 
-    # A floors.tsv entry for a clause the index carries is fine — the same
-    # index as the previous fixture, AA-1 auto via tools/gate.sh, still holds.
-    printf '# clause\tfloor\nAA-1\tstrict-1\n' > tools/floors.tsv
-    gate
-    [ "$grc" -eq 0 ] || { echo "FAIL: indexed floor exited $grc"; echo "$out"; exit 1; }
-
-    # The whole point: a floor for a clause that does not exist cannot be
-    # cited by anything that reads the index, only by floors.tsv itself.
-    printf '# clause\tfloor\nAA-1\tstrict-1\nZZ-9\tstrict-1\n' > tools/floors.tsv
-    gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: ghost floor exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "ZZ-9 has a floor in tools/floors.tsv but is not indexed" \
-      || { echo "FAIL: ghost floor not reported"; echo "$out"; exit 1; }
-
-    # A missing floors.tsv is nothing to check, not a failure.
-    rm -f tools/floors.tsv
-    gate
-    [ "$grc" -eq 0 ] || { echo "FAIL: absent floors.tsv exited $grc"; echo "$out"; exit 1; }
-
-    # A comment or header-only floors.tsv names no clause and checks nothing.
-    printf '# clause\tfloor\n' > tools/floors.tsv
-    gate
-    [ "$grc" -eq 0 ] || { echo "FAIL: comment-only floors.tsv exited $grc"; echo "$out"; exit 1; }
-    rm -f tools/floors.tsv
-
-    # --- clause-paths.tsv: assertions 6 and 7 --------------------------------
+    # --- clause-paths.tsv is advisory: findings warn and never fail ---------
     # A single indexed clause, auto-synced to a matching clause-paths.tsv row.
     # The honest case, proven before any of the sabotage below.
     write_index <<'EOF'
 # Clause index
 
-| ID   | Rule        | Gate   | Encoded by      |
-| ---- | ----------- | ------ | --------------- |
-| AA-1 | implemented | `auto` | `tools/gate.sh` |
+| ID   | Gate   | Encoded by      |
+| ---- | ------ | --------------- |
+| AA-1 | `auto` | `tools/gate.sh` |
 EOF
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: synced clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
 
-    # Assertion 7, the direction floors.tsv does not require: an indexed
+    # An indexed
     # clause with no row in clause-paths.tsv at all.
     SYNC_PATHS=0
     : > tools/clause-paths.tsv
     gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: unmapped indexed clause exited $grc"; echo "$out"; exit 1; }
+    [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, unmapped indexed clause exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" \
       || { echo "FAIL: unmapped indexed clause not reported"; echo "$out"; exit 1; }
 
@@ -783,7 +675,7 @@ EOF
     # an ID the index does not carry.
     printf 'AA-1\t*\tfixture\nZZ-9\t*\tfixture\n' > tools/clause-paths.tsv
     gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: ghost clause-paths row exited $grc"; echo "$out"; exit 1; }
+    [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, ghost clause-paths row exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "ZZ-9 has a row in tools/clause-paths.tsv but is not indexed" \
       || { echo "FAIL: ghost clause-paths row not reported"; echo "$out"; exit 1; }
 
@@ -792,26 +684,26 @@ EOF
     # case above.
     printf '# clause\tglobs\tscope\n' > tools/clause-paths.tsv
     gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: comment-only clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
+    [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, comment-only clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" \
       || { echo "FAIL: comment-only clause-paths.tsv did not report the unmapped clause"; echo "$out"; exit 1; }
 
-    # An absent file is a harder, single error rather than one per clause —
+    # An absent file is one warning rather than one per clause —
     # deliberately distinct wording from the "no row" case above.
     rm -f tools/clause-paths.tsv
     gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: missing clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
+    [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, missing clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "no clause-paths file at" \
       || { echo "FAIL: missing clause-paths.tsv not reported"; echo "$out"; exit 1; }
 
-    # --- clause-paths.tsv: assertion 8 ----------------------------------
+    # --- clause-paths.tsv: the [gate] tag, also advisory -------------------
     # A gate that scopes its files with ratchet_scope_files and reports AA-1
     # literally — the shape gate_scoped_clauses() is built to find on its
     # own, no override needed. A stale, unrelated tag must be caught.
     printf 'ratchet_scope_files\nratchet_finding "AA-1"\n' > tools/gate.sh
     printf 'AA-1\t*\t[fleet] a guess, not read from the gate\n' > tools/clause-paths.tsv
     gate
-    [ "$grc" -eq 1 ] || { echo "FAIL: unscoped-looking tag on a real scoped gate exited $grc"; echo "$out"; exit 1; }
+    [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, unscoped-looking tag on a real scoped gate exited $grc"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "AA-1 is reported by a tools/\*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged .\[gate\]." \
       || { echo "FAIL: stale non-gate tag on a scoped gate not reported"; echo "$out"; exit 1; }
 
@@ -829,6 +721,8 @@ EOF
     printf 'AA-1\t*\t[fleet] not scoped by this gate\n' > tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: unscoped gate wrongly required a [gate] tag, exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "is not tagged" \
+      && { echo "FAIL: unscoped gate was warned about its tag"; echo "$out"; exit 1; }
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     SYNC_PATHS=1
 

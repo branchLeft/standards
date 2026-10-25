@@ -6,11 +6,11 @@ const ROOT = '/standards/tools';
 
 const DOCS = `# Clause index
 
-| ID | Rule | Gate | Encoded by |
-| --- | --- | --- | --- |
-| STD-000 | A rule | \`auto\` | \`tools/x.sh\` |
-| CMT-3 | Comment length | \`review\` | — |
-| ZZZ-1 | Something | \`pending\` | — |
+| ID | Gate | Encoded by |
+| --- | --- | --- |
+| STD-000 | \`auto\` | \`tools/x.sh\` |
+| CMT-3 | \`review\` | — |
+| ZZZ-1 | \`pending\` | — |
 `;
 
 const THRESHOLDS = `# comment

@@ -14,8 +14,9 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/ratchet.sh
 . "$HERE/lib/ratchet.sh"
 
-FLOOR_TIER=$(awk -F'\t' '$1=="TS-4"{print $2}' "$HERE/floors.tsv" 2>/dev/null)
-: "${FLOOR_TIER:=strict-1}"
+# TS-4's floor: the lowest tier a repo may extend. Raising it is a one-line edit
+# here and turns every repo below it amber at once (RELEASING.md).
+FLOOR_TIER=strict-1
 
 # packages/tsconfig, resolved from THIS checkout — the standards checkout the
 # reusable workflow places at `.standards/`, never the consuming repo's
@@ -37,7 +38,7 @@ tier_rank() {
 # a repo choosing its own is not a weakening.
 #
 # Reading the tier's own JSON files rather than hardcoding values here means
-# TS-1 tracks TS-4's floor automatically: raising tools/floors.tsv's TS-4 row
+# TS-1 tracks TS-4's floor automatically: raising FLOOR_TIER
 # raises what TS-1 requires too, with no second edit.
 floor_flags_json() {
   node - "$TSCONFIG_PKG_DIR" "$FLOOR_TIER" <<'NODE'

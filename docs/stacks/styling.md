@@ -1,77 +1,43 @@
 # Styling
 
-## The principle
-
-**Visual decisions live in one designated place, never inline in component
-markup.** Everything below is a concrete expression of that in a particular
-toolchain; a stack not covered here still owes the principle.
-
-The reason is not tidiness. A colour written into a component is a colour that
-cannot be changed centrally, cannot be themed, and cannot be audited for
-contrast — and nobody discovers any of that until the second consumer.
+Visual decisions live in one designated place, never inline in component markup; a stack not covered here still owes that principle, because a colour written into a component cannot be changed centrally, themed or audited for contrast.
 
 ## STY-1 — Tailwind applications: a three-level hierarchy
 
-For an application with a Tailwind pipeline, every visual decision sits at
-exactly one of three levels, in preference order:
+In an application with a Tailwind pipeline every visual decision sits at exactly one of three levels, in preference order: an element default in `@layer base`, a component class in `@layer components` with BEM modifiers, then a Tailwind utility in the markup as an escape hatch only, all living in the stylesheet directory and consumed by, not defined in, route and component markup.
 
-| Level            | Where                              | For                              |
-| ---------------- | ---------------------------------- | -------------------------------- |
-| Element default  | `@layer base`                      | How a bare `<h2>` or `<a>` looks |
-| Component class  | `@layer components`, BEM modifiers | A recurring composed thing       |
-| Tailwind utility | In the markup                      | Escape hatch only                |
+**Why:** a fixed order keeps a decision in one place instead of leaking into markup.
 
-All three live in the stylesheet directory. Route and component markup consumes
-them; it does not define them.
+**Check:** review of the diff.
 
 ## STY-2 — the absolute rules
 
-Within a Tailwind application:
+Within a Tailwind application, no colour, font, size or spacing literal in markup; no arbitrary Tailwind values (`w-[137px]`, `text-[13px]`); no more than one utility on an element without a justifying comment, so two utilities owe a component class; no re-declared tokens, `@font-face` blocks or element defaults outside the one file that owns them; no token duplicated as a raw literal in the stylesheet (use `@apply`).
 
-- **Never hardcode a colour, font, size, or spacing literal in markup.**
-- **Never use arbitrary Tailwind values** (`w-[137px]`, `text-[13px]`).
-- **Never stack more than one Tailwind utility on a single element without a
-  justifying comment.** Two utilities means the theme owes you a component
-  class.
-- **Never re-declare tokens, `@font-face` blocks, or element defaults** outside
-  the one file that owns them.
-- **Never duplicate a token as a raw literal** in the stylesheet — use `@apply`.
+**Why:** the two-utility rule catches the drift toward utility soup when the fix is still one class and not a project at fifty elements.
 
-The two-utility rule is the one that does the work. It is deliberately low: the
-point is to catch the drift toward utility soup at the moment it starts, when
-the fix is still one class, rather than at fifty elements when it is a project.
+**Check:** review of the diff.
 
 ## STY-3 — shared component libraries: class names are the public API
 
-A published component package has no theme of its own and must not assume one.
+A published component package has no theme of its own: components are unstyled or accept a `className` that appends to their own, class names are BEM under a package namespace (`bl-section-heading--linked`) that is the public styling API so renaming one is breaking, site-level theming is the consumer's job, and any shipped structural CSS is plain CSS reading every colour and font from a custom property with a fallback (`var(--bl-color-bg, #fff)`).
 
-- Components are unstyled, or accept a `className` that composes with their own.
-- Class names are BEM under a package namespace (`bl-section-heading`,
-  `bl-section-heading--linked`, `bl-section-heading__link`). That namespace is
-  the **public styling API** — renaming a class is a breaking change.
-- A consumer's `className` always appends rather than replaces.
-- **Site-level theming is the consumer's job.** Do not mirror the application's
-  design tokens into the package.
+**Why:** the package has no Tailwind pipeline to compile `@apply` and must not mirror an application's design tokens.
 
-Where a component must ship structural CSS, every colour and font value reads
-from a custom property with a fallback (`var(--bl-color-bg, #fff)`), never a
-hardcoded design-system token — and the CSS is plain CSS, because the package
-has no Tailwind pipeline to compile `@apply`.
+**Check:** review of the diff.
 
 ## STY-4 — CSS ships on a separate entry point
 
-A component package exports its CSS through a dedicated subpath, built from a
-CSS-only entry that is never imported by the JavaScript entry. Otherwise every
-consumer pulls the stylesheet into their bundle whether they use it or not, and
-a consumer with their own styling cannot opt out.
+A component package exports its CSS through a dedicated subpath built from a CSS-only entry that the JavaScript entry never imports.
+
+**Why:** otherwise every consumer pulls the stylesheet into their bundle, and a consumer with their own styling cannot opt out.
+
+**Check:** review of the package's exports.
 
 ## STY-5 — a dark theme needs only token changes
 
-CSS is written so that adding a dark theme would need changes to the design
-tokens and nothing else.
+CSS is written so that adding a dark theme would need changes to the design tokens and nothing else.
 
-**Why:** if theming is hard, visual decisions have leaked out of the one place
-they belong.
+**Why:** if theming is hard, visual decisions have leaked out of the one place they belong.
 
-**Check plan:** review of new colour values outside the token files; `STY-2`'s
-ban on literals does most of the work.
+**Check:** review of new colour values outside the token files; `STY-2`'s ban on literals does most of the work.

@@ -51,7 +51,7 @@ clause_coverage() {
       if ($2 == "ID") next
       if ($2 ~ /^-+$/) next
       if ($2 !~ /^[A-Z]{2,5}-[0-9]{1,3}$/) next
-      if ($4 == "auto") enforced++
+      if ($3 == "auto") enforced++
       else if ($2 in is_measured) measured_n++
       else not_checked++
     }
@@ -546,7 +546,7 @@ EOF
     rm -rf ops .standards-db-tooling
     git add -A && git commit -qm drop-db-tooling-fixture
 
-    # A CMT-3 finding in the warn band (5 to 10 lines) shows up here at level
+    # A CMT-3 finding in the warn band (5 to 24 lines) shows up here at level
     # warning — a real GATES member, but this particular fixture never fails
     # the build — and COV-1 (still an ADVISORY_GATES member) reports "info"
     # for a repo with no coverage report. Neither changes whether the run

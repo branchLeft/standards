@@ -28,11 +28,7 @@ class FakeGate implements Gate {
 
 function makeAudit(gates: readonly Gate[], advisoryGates: readonly Gate[] = []): Audit {
   const fs = new FakeFileSystem();
-  fs.set(
-    ROOT,
-    '../docs/index.md',
-    '| ID | Rule | Gate | Encoded by |\n| CI-1 | r | `auto` | `x` |\n'
-  );
+  fs.set(ROOT, '../docs/index.md', '| ID | Gate | Encoded by |\n| CI-1 | `auto` | `x` |\n');
   fs.set(ROOT, 'thresholds.tsv', '');
   const git = new FakeGitClient({ root: ROOT, files: [], headShortSha: 'abc1234' });
   const ratchet = Ratchet.init(git, fs, ROOT, { mode: 'enforce' });
@@ -55,11 +51,7 @@ describe('Audit.run — --advisory-only and STD-002 staleness', () => {
   // in the real run this reproduces.
   function makeAdvisoryOnlyAudit(coveredClauses: ReadonlySet<string>): Audit {
     const fs = new FakeFileSystem();
-    fs.set(
-      ROOT,
-      '../docs/index.md',
-      '| ID | Rule | Gate | Encoded by |\n| DB-1 | r | `auto` | `x` |\n'
-    );
+    fs.set(ROOT, '../docs/index.md', '| ID | Gate | Encoded by |\n| DB-1 | `auto` | `x` |\n');
     fs.set(ROOT, 'thresholds.tsv', '');
     fs.set(ROOT, '.standardsignore', 'a.py\tDB-1\t# tooling allowance\n');
     const git = new FakeGitClient({

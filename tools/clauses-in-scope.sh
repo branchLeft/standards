@@ -25,7 +25,7 @@ index_gates() {
       for (i = 1; i <= NF; i++) { gsub(/^[ \t]+|[ \t]+$/, "", $i); gsub(/`/, "", $i) }
       if ($2 == "ID") next
       if ($2 ~ /^-+$/) next
-      if ($2 ~ /^[A-Z]{2,5}-[0-9]{1,3}$/) printf "%s\t%s\n", $2, $4
+      if ($2 ~ /^[A-Z]{2,5}-[0-9]{1,3}$/) printf "%s\t%s\n", $2, $3
     }' "$1"
 }
 
@@ -124,11 +124,11 @@ self_test() {
     cat > docs/index.md <<'EOF'
 # Clause index
 
-| ID    | Rule                          | Gate     | Encoded by |
-| ----- | ------------------------------ | -------- | ---------- |
-| ZZ-1  | Actions pinned to a commit SHA | `auto`   | `tools/check-workflows.sh` |
-| ZZ-2 | One file per route             | `review` | —          |
-| ZZ-3  | No personal data in a repo     | `pending`| —          |
+| ID    | Gate     | Encoded by |
+| ----- | -------- | ---------- |
+| ZZ-1  | `auto`   | `tools/check-workflows.sh` |
+| ZZ-2 | `review` | —          |
+| ZZ-3  | `pending`| —          |
 EOF
 
     cat > tools/clause-paths.tsv <<'EOF'
@@ -221,9 +221,9 @@ EOF
     cat > docs/index.md <<'EOF'
 # Clause index
 
-| ID   | Rule                          | Gate   | Encoded by |
-| ---- | ------------------------------ | ------ | ---------- |
-| ZZ-1 | Actions pinned to a commit SHA | `auto` | `tools/check-workflows.sh` |
+| ID   | Gate   | Encoded by |
+| ---- | ------ | ---------- |
+| ZZ-1 | `auto` | `tools/check-workflows.sh` |
 EOF
 
     # `--files -` reads from stdin rather than a path.

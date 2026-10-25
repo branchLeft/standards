@@ -1,82 +1,67 @@
 # Component libraries
 
-Rules for a package published for other repos to consume. They are stricter than
-application rules because the consumer cannot see the source, cannot patch it,
-and finds out about a mistake at their own build.
+Rules for a package published for other repos to consume, stricter than application rules because the consumer cannot see or patch the source and finds a mistake at their own build.
 
 ## LIB-1 — the colocated quartet
 
-`Name.tsx`, `Name.test.tsx`, `Name.stories.tsx`, and `Name.css` where the
-component ships structural CSS. Flat, in one components directory — no
-per-component subdirectories.
+A component is `Name.tsx`, `Name.test.tsx`, `Name.stories.tsx` and `Name.css` where it ships structural CSS, flat in one components directory with no per-component subdirectories.
 
-The point of colocation is that a missing member is visible. A component with no
-adjacent test file is obvious in a directory listing in a way that a missing file
-three folders away is not.
+**Why:** colocation makes a missing member visible in a directory listing.
+
+**Check:** review of new components in the diff.
 
 ## LIB-2 — an explicit barrel, no `export *`
 
-The package's entry point names every export: the value and its types, one pair
-per component. `export *` re-exports whatever happens to be exported today, so
-the public API changes when an internal file does — and nothing in review shows
-it.
+The package's entry point names every export, the value and its types, one pair per component, and never uses `export *`.
+
+**Why:** `export *` re-exports whatever is exported today, so the public API changes when an internal file does and nothing in review shows it.
+
+**Check:** review of the entry point in the diff.
 
 ## LIB-3 — props are an exported, named interface
 
-`ComponentNameProps`, exported alongside the component. Members `readonly`, the
-parameter typed `Readonly<Props>`, the return typed explicitly. Optional props
-carry a documented default.
+Props are an exported `ComponentNameProps` interface alongside the component, with `readonly` members, the parameter typed `Readonly<Props>`, the return typed explicitly, optional props carrying a documented default, and members conflicting with a DOM element's attributes `Omit`ted explicitly.
 
-Where props extend a DOM element's attributes, conflicting members are `Omit`ted
-explicitly rather than left to collide.
+**Why:** the props interface is the component's contract to consumers who cannot see its source.
+
+**Check:** review of new components in the diff.
 
 ## LIB-4 — no default exports
 
-Except where a framework mandates the module shape. See
-[`react-app.md`](react-app.md) APP-1 — in a library there is no such framework,
-so the rule is absolute.
+A library has no default exports, with no framework exception (`APP-1` has one for routes, and a library has no such framework).
 
-A default export has no canonical name, so every consumer picks their own and
-the same component appears under three names across a codebase. It also makes
-re-exporting through a barrel lossy.
+**Why:** a default export has no canonical name, so the same component appears under three names across a codebase, and re-exporting it through a barrel is lossy.
 
-`review`, not `auto`: `@branchleft/eslint-config`'s `library` preset implements
-this, but no library repo composes it yet — see [`../index.md`](../index.md)
-and [`../../ADOPTION.md`](../../ADOPTION.md).
+**Check:** the `library` preset in `@branchleft/eslint-config` implements it, but no library repo composes it yet ([`ADOPTION.md`](../../ADOPTION.md)).
 
 ## LIB-5 — native semantics first
 
-Reach for the HTML element that already has the behaviour before reaching for
-ARIA. A disclosure built on `<details>`/`<summary>` needs no `aria-expanded`,
-no `aria-controls` and no JavaScript; the same thing built on `<div>` needs all
-three and will still be worse.
+The HTML element that already has the behaviour is used before ARIA (a disclosure on `<details>`/`<summary>` needs no `aria-expanded`, `aria-controls` or JavaScript), ARIA is added only where semantics are insufficient with a comment saying why, and decorative icons are `aria-hidden`.
 
-Add ARIA only where semantics are genuinely insufficient, and say in a comment
-why. Decorative icons are `aria-hidden`.
+**Why:** the same disclosure built on `<div>` needs all three and is still worse.
+
+**Check:** review of new components in the diff.
 
 ## LIB-6 — every component carries an SSR-safe a11y assertion
 
-Rendered with `renderToStaticMarkup`, asserted against axe. Static rendering is
-the right instrument here: it catches structural violations, and it proves the
-component works without a client runtime.
+Every component is rendered with `renderToStaticMarkup` and asserted against axe, with rule disables in one central config with a written reason each and never as per-test workarounds, and contrast deferred to the consuming application's browser-level run, said so next to the disable.
 
-Rule disables live in **one central config with a written reason each**, never
-as a per-test workaround. Two disables with reasons in one file can be reviewed;
-twenty scattered across test files cannot, and nobody will ever remove one.
+**Why:** static rendering catches structural violations and proves the component works without a client runtime, and twenty scattered disables cannot be reviewed or ever removed.
 
-Contrast is legitimately deferred to the consuming application's browser-level
-run — jsdom cannot evaluate it. Say so in the config, next to the disable.
+**Check:** review of new components and the central config in the diff.
 
 ## LIB-7 — Storybook is a development environment until it runs in CI
 
-Stories are valuable for development and review regardless. But the a11y and
-interactions addons only evaluate anything when a human is looking at the page,
-so a Storybook with no `play` functions and no test runner is not evidence of
-coverage — see [`../testing.md`](../testing.md) TEST-3. A build that compiles
-the stories proves that they compile.
+Storybook is a development environment, not evidence of coverage, until it runs headlessly in CI with `play` functions and a test runner (`TEST-3`).
+
+**Why:** the a11y and interactions addons only evaluate anything when a human is looking, and a build that compiles the stories proves only that they compile.
+
+**Check:** review of the Storybook CI job.
 
 ## LIB-8 — the published surface is what is tested
 
-Tests import through the package entry point, not by deep path. A test that
-reaches into an internal module can pass while the thing consumers actually
-import is broken.
+Tests import through the package entry point, not by deep path.
+
+**Why:** a test that reaches into an internal module can pass while the thing consumers import is broken.
+
+**Check:** review of test imports in the diff.
