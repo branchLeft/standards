@@ -18,6 +18,7 @@ ON_KEY="^${QUOTE}on${QUOTE}:"
 CONTINUE_OK='^[[:space:]]*(-[[:space:]]+)?continue-on-error:[[:space:]]+'"${QUOTE}"'false'"${QUOTE}"'([[:space:]]+#.*)?[[:space:]]*$'
 AUDIT_RUN='run:[[:space:]]+tools/ruleset-audit\.sh[[:space:]]*$'
 TOKEN_MAP='^[[:space:]]*(-[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*:[[:space:]]+\$\{\{[[:space:]]*secrets\.RULESET_AUDIT_TOKEN[[:space:]]*\}\}[[:space:]]*$'
+IF_MESSAGE='audit workflow puts an if: condition on the token guard, the audit step or its job'
 EXIT_ONE='(^|[[:space:];&|(])exit[[:space:]]+1([[:space:];&|)]|$)'
 
 violations=0
@@ -46,32 +47,40 @@ unquote() { # word
   printf '%s' "${stripped//\'/}"
 }
 
+# A word without the shell punctuation and quotes around it, so "gh", $(gh and
+# gh; all read as gh.
+bare_word() { # word
+  local word="${1##*[;&|(\`\{]}"
+  unquote "${word%%[;&|)]*}"
+}
+
 # Refuses any gh api call whose words could write: a non-GET method, or a flag
-# that sends a request body. Words run to the next | || && ; or ).
+# that sends a request body. The api word may follow gh after other words, as
+# in gh --hostname example.com api. Words run to the next | || && ; or ).
 check_gh_api_reads() { # file message
-  local file="$1" message="$2" line rest i word value
+  local file="$1" message="$2" line i word value state
   local -a words
   while IFS= read -r line; do
-    rest="$line"
-    while [[ $rest =~ gh[[:space:]]+api(.*)$ ]]; do
-      rest="${BASH_REMATCH[1]}"
-      read -r -a words <<< "$rest"
-      i=0
-      while [ "$i" -lt "${#words[@]}" ]; do
-        word="$(unquote "${words[i]}")"
-        case "$word" in
-          '|'|'||'|'&&'|';'|')') break ;;
-          -X|--method)
-            i=$((i + 1))
-            value="$(unquote "${words[i]:-}")"
-            is_get "$value" || report "$message" ;;
-          -X*) is_get "${word#-X}" || report "$message" ;;
-          --method=*) is_get "${word#--method=}" || report "$message" ;;
-          -f|-F|--field|--raw-field|--input|-f*|-F*|--field=*|--raw-field=*|--input=*)
-            report "$message" ;;
-        esac
-        i=$((i + 1))
-      done
+    read -r -a words <<< "$line"
+    state=seek_gh
+    for ((i = 0; i < ${#words[@]}; i++)); do
+      case "$state" in
+        seek_gh) [ "$(bare_word "${words[i]}")" = gh ] && state=seek_api ;;
+        seek_api) [ "$(bare_word "${words[i]}")" = api ] && state=in_call ;;
+        in_call)
+          word="$(unquote "${words[i]}")"
+          case "$word" in
+            '|'|'||'|'&&'|';'|')') state=seek_gh ;;
+            -X|--method)
+              i=$((i + 1))
+              value="$(unquote "${words[i]:-}")"
+              is_get "$value" || report "$message" ;;
+            -X*) is_get "${word#-X}" || report "$message" ;;
+            --method=*) is_get "${word#--method=}" || report "$message" ;;
+            -f|-F|--field|--raw-field|--input|-f*|-F*|--field=*|--raw-field=*|--input=*)
+              report "$message" ;;
+          esac ;;
+      esac
     done
   done < <(join_continuations "$file")
 }
@@ -175,6 +184,50 @@ is_token_guard() { # step text
   return 1
 }
 
+# Whether a step, given as text with its item line first, has an if key at the
+# column its other keys start at. Deeper lines (mappings, scripts) are not keys.
+step_has_condition() { # step text
+  printf '%s\n' "$1" | awk '
+    function indent(text) { match(text, /^[ ]*/); return RLENGTH }
+    function is_condition(text) { return text ~ /^("if"|\047if\047|if)[ ]*:/ }
+    /[^[:space:]]/ {
+      if (!seen_item) {
+        seen_item = 1
+        rest = $0; sub(/^[ ]*-[ ]*/, "", rest)
+        if (rest ~ /[^[:space:]]/) { key_indent = length($0) - length(rest); found = found || is_condition(rest) }
+        next
+      }
+      if (key_indent == "") key_indent = indent($0)
+      if (indent($0) == key_indent) found = found || is_condition(substr($0, key_indent + 1))
+    }
+    END { exit !found }
+  '
+}
+
+# Whether the job that runs the audit script has an if key beside its steps key.
+job_has_condition() { # workflow
+  awk '
+    function indent(text) { match(text, /^[ ]*/); return RLENGTH }
+    function is_condition(text) { return text ~ /^("if"|\047if\047|if)[ ]*:/ }
+    /^[[:space:]]*#/ || !/[^[:space:]]/ { next }
+    { count++; depth[count] = indent($0); text[count] = $0 }
+    END {
+      for (steps = 1; steps <= count; steps++) {
+        if (text[steps] !~ /^[ ]*steps:[ ]*$/) continue
+        first = steps; while (first > 1 && depth[first - 1] >= depth[steps]) first--
+        last = steps; while (last < count && depth[last + 1] >= depth[steps]) last++
+        holds_audit = 0; has_condition = 0
+        for (line = first; line <= last; line++) {
+          if (text[line] ~ /run:[ ]+tools\/ruleset-audit\.sh[ ]*$/) holds_audit = 1
+          if (depth[line] == depth[steps] && is_condition(substr(text[line], depth[steps] + 1))) has_condition = 1
+        }
+        if (holds_audit && has_condition) found = 1
+      }
+      exit !found
+    }
+  ' "$1"
+}
+
 check_token_guard() { # workflow
   local -a steps=()
   local step="" line i audit_seen=0 guard_seen=0
@@ -189,15 +242,23 @@ check_token_guard() { # workflow
   for ((i = 0; i < ${#steps[@]}; i++)); do
     if grep -qE "$AUDIT_RUN" <<< "${steps[i]}"; then
       audit_seen=1
+      ! step_has_condition "${steps[i]}" || report "$IF_MESSAGE"
       break
     fi
-    is_token_guard "${steps[i]}" && guard_seen=1
+    if is_token_guard "${steps[i]}"; then
+      guard_seen=1
+      ! step_has_condition "${steps[i]}" || report "$IF_MESSAGE"
+    fi
   done
   if [ "$audit_seen" -eq 0 ]; then
     report 'audit workflow has no step running tools/ruleset-audit.sh'
   elif [ "$guard_seen" -eq 0 ]; then
     report 'audit workflow lacks a guard step that exits 1 when RULESET_AUDIT_TOKEN is empty before the audit step'
   fi
+}
+
+check_job_condition() { # workflow
+  ! job_has_condition "$WORKFLOW" || report "$IF_MESSAGE"
 }
 
 check_continue_on_error() { # workflow
@@ -207,9 +268,20 @@ check_continue_on_error() { # workflow
   done < <(strip_comments "$WORKFLOW" | grep -F 'continue-on-error' | grep -vE "$CONTINUE_OK")
 }
 
+# Tests that only look at the path come first, so a FIFO is never opened.
+check_input_file() { # file
+  if [ ! -e "$1" ]; then
+    report "cannot read $1"
+  elif [ ! -f "$1" ]; then
+    report "not a regular file: $1"
+  elif [ ! -r "$1" ]; then
+    report "cannot read $1"
+  fi
+}
+
 [ "$#" -eq 2 ] || { echo 'usage: check_audit_shape.sh <workflow-file> <audit-script>' >&2; exit 2; }
 for file in "$WORKFLOW" "$AUDIT"; do
-  [ -r "$file" ] || report "cannot read $file"
+  check_input_file "$file"
 done
 if [ "$violations" -eq 0 ]; then
   check_gh_api_reads "$WORKFLOW" 'audit workflow runs gh api with a non-GET method or a request-body flag'
@@ -217,6 +289,7 @@ if [ "$violations" -eq 0 ]; then
   check_permissions
   check_triggers
   check_token_guard
+  check_job_condition
   check_continue_on_error
 fi
 [ "$violations" -eq 0 ]
