@@ -67,6 +67,32 @@ workflow_runs_every_gate() {
 }
 run "reusable workflow runs every gate" workflow_runs_every_gate
 
+# REPO-6: the audit is what makes drift visible, so it must keep running on a
+# schedule. Each file it depends on is asserted present, the schedule and the
+# manual trigger are asserted, the audit step is asserted as a real run line
+# (a comment naming it does not count), and the scheduled workflow is asserted
+# to never invoke the apply script, which is a privileged write.
+echo "scheduled audit:"
+scheduled_audit_guarded() {
+  local wf="$TOOLS/../.github/workflows/repo-settings-audit.yml" f rc=0
+  for f in "$TOOLS/ruleset-audit.sh" "$TOOLS/ruleset-apply.sh" "$wf"; do
+    [ -f "$f" ] || { echo "missing: $f"; rc=1; }
+  done
+  [ -f "$wf" ] || return 1
+  grep -qE '^[[:space:]]*schedule:[[:space:]]*$' "$wf" \
+    || { echo "$wf has no schedule trigger"; rc=1; }
+  grep -qE "^[[:space:]]*-[[:space:]]+cron:[[:space:]]+'[^']+'" "$wf" \
+    || { echo "$wf has no cron entry"; rc=1; }
+  grep -qE '^[[:space:]]*workflow_dispatch:[[:space:]]*$' "$wf" \
+    || { echo "$wf has no workflow_dispatch trigger"; rc=1; }
+  grep -qE '^[[:space:]]*run:[[:space:]]+tools/ruleset-audit\.sh[[:space:]]*$' "$wf" \
+    || { echo "$wf does not run tools/ruleset-audit.sh"; rc=1; }
+  grep -v '^[[:space:]]*#' "$wf" | grep -q 'ruleset-apply' \
+    && { echo "$wf invokes the apply script, which must stay manual"; rc=1; }
+  return "$rc"
+}
+run "repo settings audit is scheduled and read-only" scheduled_audit_guarded
+
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
   while IFS= read -r f; do
