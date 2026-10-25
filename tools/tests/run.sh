@@ -128,6 +128,18 @@ accepted_shape() { # workflow_sed audit_sed
   scheduled_audit_guarded "$copy_wf" "$copy_audit" >/dev/null 2>&1
 }
 
+# Runs the checker on arguments the caller chooses, with a timeout so a checker
+# that blocks on a FIFO fails the fixture instead of hanging the run.
+refused_directly() { # expected_exit expected_message args...
+  local expected_exit="$1" expected_message="$2" output rc
+  shift 2
+  output="$(timeout 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
+  rc=$?
+  [ "$rc" -eq "$expected_exit" ] || return 1
+  case "$output" in *"$expected_message"*) return 0 ;; esac
+  return 1
+}
+
 unchanged_edit_is_rejected() {
   ! fixture_copies 's/no such line in the workflow//' ''
 }
@@ -141,6 +153,11 @@ audit_probe() { # command
   printf 's|^exit |%s\\nexit |' "$1"
 }
 
+# As probe_step, but the command goes in a block scalar so quotes stay valid YAML.
+probe_script_step() { # command
+  printf 's#run: tools/ruleset-audit.sh$#&\\n      - name: Probe\\n        run: |\\n          %s#' "$1"
+}
+
 R1_WORKFLOW='audit workflow runs gh api with a non-GET method or a request-body flag'
 R1_AUDIT='audit script runs gh api with a non-GET method or a request-body flag'
 R2_WIDE='audit workflow grants a write permission or more than contents: read'
@@ -150,6 +167,7 @@ R3_MISSING='audit workflow has no top-level on: block'
 R4_GUARD='audit workflow lacks a guard step that exits 1 when RULESET_AUDIT_TOKEN is empty before the audit step'
 R4_NO_AUDIT='audit workflow has no step running tools/ruleset-audit.sh'
 R5_CONTINUE='audit workflow sets continue-on-error to something other than false'
+R_IF='audit workflow puts an if: condition on the token guard, the audit step or its job'
 
 echo "scheduled audit shape:"
 run "audit workflow: gh api -X PUT is refused" \
@@ -195,6 +213,15 @@ run "audit workflow: gh api --method GET is allowed" \
 run "audit workflow: gh api --method=GET is allowed" \
   accepted_shape "$(probe_step 'gh api repos/x/y/rulesets/1 --method=GET')" ''
 
+run 'audit workflow: "gh" api -X PUT is refused' \
+  refused_with "$R1_WORKFLOW" "$(probe_script_step '"gh" api repos/example/example/rulesets/1 -X PUT')" ''
+run "audit workflow: 'gh' api --method POST is refused" \
+  refused_with "$R1_WORKFLOW" "$(probe_script_step "'gh' api repos/example/example/rulesets/1 --method POST")" ''
+run 'audit workflow: gh --hostname github.com api -X DELETE is refused' \
+  refused_with "$R1_WORKFLOW" "$(probe_script_step 'gh --hostname github.com api repos/example/example/rulesets/1 -X DELETE')" ''
+run 'audit workflow: "gh" api repos/example/example/rulesets is allowed' \
+  accepted_shape "$(probe_script_step '"gh" api repos/example/example/rulesets')" ''
+
 run "audit script: gh api --method PUT is refused" \
   refused_with "$R1_AUDIT" '' "$(audit_probe 'gh api repos/x/y --method PUT')"
 run "audit script: gh api -XPOST is refused" \
@@ -213,6 +240,12 @@ run "audit script: gh api --method=GET is allowed" \
   accepted_shape '' "$(audit_probe 'gh api repos/x/y --method=GET')"
 run "audit script: a comment naming -X PUT does not count" \
   accepted_shape '' 's|^# Report drift|# gh api repos/x/y -X PUT, named in a comment only\n&|'
+run 'audit script: "gh" api -X PUT is refused' \
+  refused_with "$R1_AUDIT" '' "$(audit_probe '"gh" api repos/example/example/rulesets/1 -X PUT')"
+run "audit script: 'gh' api --method POST is refused" \
+  refused_with "$R1_AUDIT" '' "$(audit_probe "'gh' api repos/example/example/rulesets/1 --method POST")"
+run 'audit script: gh --hostname github.com api -X DELETE is refused' \
+  refused_with "$R1_AUDIT" '' "$(audit_probe 'gh --hostname github.com api repos/example/example/rulesets/1 -X DELETE')"
 
 run "audit workflow: contents widened to write is refused" \
   refused_with "$R2_WIDE" 's/^  contents: read$/  contents: write/' ''
@@ -266,11 +299,60 @@ run "audit workflow: a continue-on-error expression is refused" \
 run "audit workflow: continue-on-error false is allowed" \
   accepted_shape 's/^    timeout-minutes: 10$/&\n    continue-on-error: false/' ''
 
+run "audit workflow: if: false on the token guard step is refused" \
+  refused_with "$R_IF" 's/^      - name: Fail visibly when the audit token is absent$/&\n        if: false/' ''
+run "audit workflow: if: \${{ false }} on the token guard step is refused" \
+  refused_with "$R_IF" "s/^      - name: Fail visibly when the audit token is absent\$/&\\n        if: \${{ false }}/" ''
+run "audit workflow: if: on the audit step is refused" \
+  refused_with "$R_IF" "s/^      - name: Audit the live rulesets\$/&\\n        if: github.event_name == 'schedule'/" ''
+run "audit workflow: if: false on the job is refused" \
+  refused_with "$R_IF" 's/^    timeout-minutes: 10$/&\n    if: false/' ''
+run "audit workflow: if: always() on a step after the audit step is allowed" \
+  accepted_shape 's|run: tools/ruleset-audit.sh$|&\n      - name: Probe\n        if: always()\n        run: echo probe|' ''
+
 run "audit workflow: a comment naming ruleset-apply is allowed" \
   accepted_shape 's|^name: Repo settings audit$|# tools/ruleset-apply.sh is never run from this workflow\n&|' ''
 run "audit workflow: a run step invoking ruleset-apply is refused" \
   refused_with 'invokes the apply script' "$(probe_step 'tools/ruleset-apply.sh')" ''
 run "a fixture edit that matches nothing is rejected" unchanged_edit_is_rejected
+
+run "shape check: no arguments is refused" \
+  refused_directly 2 'usage: check_audit_shape.sh'
+run "shape check: one argument is refused" \
+  refused_directly 2 'usage: check_audit_shape.sh' "$REAL_WORKFLOW"
+
+missing_file_is_refused() {
+  local path="$fixture_dir/no-such-workflow.yml"
+  refused_directly 1 "cannot read $path" "$path" "$REAL_AUDIT"
+}
+run "shape check: a missing workflow file is refused" missing_file_is_refused
+
+unreadable_file_is_refused() {
+  local path="$fixture_dir/unreadable-workflow.yml" rc=0
+  rm -f "$path"
+  cp "$REAL_WORKFLOW" "$path" && chmod 000 "$path" || return 1
+  refused_directly 1 "cannot read $path" "$path" "$REAL_AUDIT" || rc=1
+  chmod 600 "$path"
+  return "$rc"
+}
+# chmod 000 does not stop root from reading, so the fixture cannot prove anything there.
+if [ "$(id -u)" -eq 0 ]; then
+  printf '  note  unreadable-file fixture skipped: running as root\n'
+else
+  run "shape check: an unreadable workflow file is refused" unreadable_file_is_refused
+fi
+
+directory_is_refused() {
+  local path="$fixture_dir/a-directory"
+  rm -rf "$path" && mkdir "$path" && refused_directly 1 "not a regular file: $path" "$REAL_WORKFLOW" "$path"
+}
+run "shape check: a directory given as the audit script is refused" directory_is_refused
+
+fifo_is_refused() {
+  local path="$fixture_dir/a-fifo"
+  rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
+}
+run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
