@@ -10,11 +10,11 @@ The default branch allows no deletion and no force-push, requires linear history
 
 **Check:** `templates/rulesets/` payloads and `tools/ruleset-audit.sh`, which reads `.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review` live and committed and fails a public repo that differs from its row or sits outside the rows.
 
-| `require_code_owner_review` | Repos                                                                                                                                                                               |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `require_code_owner_review` | Repos                                                                                                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `true`                      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`, `ghost-platform`, `standards` (live, per the owner's ruling of 25 Oct 2026; see below). |
-| `false`                     | `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`.                                          |
-| NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS). |
+| `false`                     | `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`.                                            |
+| NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS).   |
 
 The owner's recorded reason for `false` on the tenant repos, verbatim: "contributing still requires org members, which is only me and my agents today."
 
