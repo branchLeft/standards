@@ -2,6 +2,8 @@
 # CMT-3 (block length) per file. CMT-4 (comment/code ratio) moved to
 # tools/ts/src/commentRatioGate.ts — TypeScript-only, docs/index.md's `pending`
 # row. Classification rules: tools/lib/comments.md.
+# Limits (CMT-3): a comment block of 5 lines warns; a block of 25 lines or more
+# fails. Both numbers are the CMT-3 rows of tools/thresholds.tsv.
 # Usage: check-comment-blocks.sh [--mode warn|enforce] [--json] [--self-test]
 
 set -uo pipefail
@@ -14,12 +16,12 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/comments.sh
 . "$HERE/lib/comments.sh"
 
-THRESHOLDS_FILE="$HERE/thresholds.tsv"
+THRESHOLDS_FILE="${CMT_THRESHOLDS_FILE:-$HERE/thresholds.tsv}"
 # Mirrors thresholds.tsv's CMT-3 rows. Only reached if that file is missing or
 # malformed — a real checkout always carries it — so a corrupt settings file
 # degrades to the signed-off default instead of a crash.
 DEFAULT_WARN_MIN_LINES=5
-DEFAULT_FAIL_MIN_LINES=11
+DEFAULT_FAIL_MIN_LINES=25
 
 threshold_for() {
   local clause="$1" key="$2"
@@ -72,10 +74,10 @@ main() {
     # block; only a block-length measure catches that shape.
     if [ "${max:-0}" -ge "$fail_at" ]; then
       ratchet_finding "CMT-3" "$f" "${start:-1}" \
-        "longest unbroken comment block is $max lines (11 or more fails) — move the narrative to a colocated doc and leave a pointer"
+        "longest unbroken comment block is $max lines ($fail_at or more fails) — move the narrative to a colocated doc and leave a pointer"
     elif [ "${max:-0}" -ge "$warn_at" ]; then
       ratchet_finding_warn "CMT-3" "$f" "${start:-1}" \
-        "longest unbroken comment block is $max lines (5 to 10 warns) — consider moving the narrative to a colocated doc"
+        "longest unbroken comment block is $max lines ($warn_at to $((fail_at - 1)) warns) — consider moving the narrative to a colocated doc"
     fi
   done < <(ratchet_scope_files '\.(ts|tsx|js|mjs|cjs|py|sh)$')
 
@@ -88,6 +90,13 @@ self_test() {
   tmp=$(mktemp -d) || return 2
   (
     cd "$tmp" || exit 2
+
+    # The fixtures below sit on the boundaries of the old 5 and 11 line
+    # limits, so they run against their own thresholds file. The shipped
+    # numbers are checked at the end, against the real file.
+    fixture_thresholds="$tmp.thresholds.tsv"
+    printf 'CMT-3\twarn_min_lines\t5\t# fixture\nCMT-3\tfail_min_lines\t11\t# fixture\n' > "$fixture_thresholds"
+    export CMT_THRESHOLDS_FILE="$fixture_thresholds"
     ratchet_scratch_repo_init || exit 2
 
     # A JSDoc-style block comment at 11 lines — the fail boundary itself.
@@ -302,9 +311,30 @@ self_test() {
     printf '%s' "$out" | grep -qE '::notice' \
       && { echo "FAIL: human-readable output still used ::notice:: (advisory)"; echo "$out"; exit 1; }
 
+    # The shipped limits, read from the real tools/thresholds.tsv: a 24-line
+    # block only warns and a 25-line block fails.
+    unset CMT_THRESHOLDS_FILE
+    git rm -q -r --cached . >/dev/null && rm -f ./*.ts ./*.py ./*.sh
+    for n in 24 25; do
+      {
+        echo 'export function f() {'
+        echo '  /**'
+        for i in $(seq 1 $((n - 2))); do echo "   * narrative line $i"; done
+        echo '   */'
+        echo '  return 1;'
+        echo '}'
+      } > "edge$n.ts"
+    done
+    git add -A && git commit -qm edge
+    out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"edge24.ts".*"level":"warning".*is 24 lines' \
+      || { echo "FAIL: a 24-line block is not a warning under the shipped limits"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"edge25.ts".*"level":"error".*is 25 lines' \
+      || { echo "FAIL: a 25-line block is not an error under the shipped limits"; echo "$out"; exit 1; }
+
     exit 0
   ) || rc=$?
-  rm -rf "$tmp"
+  rm -rf "$tmp" "$tmp.thresholds.tsv"
   [ "$rc" -eq 0 ] && echo "check-comment-blocks.sh: self-test passed"
   return "$rc"
 }

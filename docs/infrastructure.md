@@ -1,78 +1,35 @@
 # Infrastructure operations
 
-Every stack applies through CI, under a deploy identity scoped to what its
-program creates — never an ambient credential on a laptop. The identity's
-narrowness is the security control, not friction to route around.
+Every stack applies through CI under a deploy identity scoped to what its program creates, never an ambient credential on a laptop; the identity's narrowness is the security control, not friction to route around.
 
 ## IAC-1 — CI applies; a human applies only what CI's identity cannot
 
-A hand-run `pulumi up` is legitimate only for what a stack's deploy identity is
-deliberately unable to apply: bootstrap (the first apply, which creates the
-identity's own prerequisites), a new project-level IAM binding, a new Secret
-Manager secret where the deployer holds no Secret Manager role, the stack's own
-federation, or anything else its role list excludes by design. The signal is a
-**CI 403**, not a preference or a hurry.
+A hand-run `pulumi up` is legitimate only for what a stack's deploy identity is deliberately unable to apply (bootstrap, a new project-level IAM binding, a new Secret Manager secret where the deployer holds no such role, the stack's own federation), signalled by a CI 403 and not by preference or hurry, after which the next CI run must report `unchanged`; the only other human steps are minting a supplier token in a console that offers no API for it and first creating a project or account with a supplier, each with its own runbook, and this is the exception list `CI-13` refers to.
 
-The narrow scope is what makes that 403 the design working: a compromised or
-malicious workflow run in a public repo can only reach what the deploy identity
-holds. `ghost-platform/infra/platform/serviceAccounts.ts` derives every role
-from what its program creates rather than a wider template;
-`website/infra/KNOWN_ISSUES.md` records the same shape twice — a stack that has
-run under CI for months 403s the day it first creates a resource type outside
-its original role list — alongside two bootstrap cases where the state bucket
-and KMS key had to exist before the identity that uses them.
+**Why:** the narrow scope makes the 403 the design working, so a compromised workflow in a public repo reaches only what the identity holds, and a step earns a place on the list only because no API exists, never because automating it was inconvenient.
 
-That is the day-2 gap this clause names rather than papers over: a genuinely
-new resource class needs one privileged apply before CI can take over the
-resource it just created. After that apply, the next CI run must report
-`unchanged`; if it does not, the change was not bootstrap-class and belongs in
-CI. Widening the deployer's roles instead is IAC-2's territory, and it trades
-away a security property on purpose — never a default a merge falls into.
-
-**This is the exception list the approval click (`CI-13`) otherwise closes
-off.** Beyond a stack's own deploy-identity 403, exactly two other shapes of
-step have no API to automate:
-
-- **Minting a supplier token in a console that offers no API for it.** The
-  token has to exist before anything — including CI — can read it back, so a
-  person clicks it into being once.
-- **First creation of a new project or account with a supplier.** The
-  project or account is the prerequisite every later API call, including the
-  one that would create the resources inside it, depends on.
-
-Each of these, and bootstrap above, carries its own runbook. The list stays
-short on purpose: a step earns a place on it only because the supplier
-genuinely offers no API for it, never because automating it was inconvenient,
-and anything that becomes automatable is automated and drops off the list.
+**Check:** review; whether a 403 is bootstrap-class or a role list that should be widened (`IAC-2`) needs judgement.
 
 ## IAC-2 — broadening a deploy identity is never applied by CI
 
-Grant the permission out-of-band first, under a human's own credentials;
-`pulumi import` it into the stack's state second; merge third. Never "let CI
-apply it" — a deployer that could grant itself new permissions would no longer
-be bounded by anything CI enforces, the same reason `serviceAccounts.ts`
-withholds `resourcemanager.projects.setIamPolicy` from every deployer in the
-fleet.
+A permission broadening a deploy identity is granted out-of-band first under a human's own credentials, imported into the stack's state second and merged third, and CI never applies it.
+
+**Why:** a deployer that could grant itself new permissions would no longer be bounded by anything CI enforces.
+
+**Check:** review; the deploy identity's role list is derived from what its program creates.
 
 ## IAC-3 — everything is declared in code
 
-All infrastructure and deployments are declared in code, as pinned versions
-plus the shape they deploy onto. Nothing is created by hand except where a
-supplier offers no API for it.
+All infrastructure and deployments are declared in code as pinned versions plus the shape they deploy onto, and nothing is created by hand except where a supplier offers no API.
 
-**Why:** declared infrastructure can be reviewed, rebuilt and compared;
-infrastructure made by hand can only be remembered.
+**Why:** declared infrastructure can be reviewed, rebuilt and compared, while hand-made infrastructure can only be remembered.
 
-**Check plan:** review; each stack's preview shows no drift. Later, a
-scheduled drift check comparing live state with each stack.
+**Check:** review; each stack's preview shows no drift.
 
 ## IAC-4 — CI delivers everything
 
-Every host is provisioned, and every deploy delivered, by CI. Deploy
-credentials are held only by CI, and no path is delivered by hand.
+Every host is provisioned and every deploy delivered by CI, deploy credentials are held only by CI, and no path is delivered by hand.
 
-**Why:** a path delivered by hand depends on a person's time and a laptop's
-credentials.
+**Why:** a path delivered by hand depends on a person's time and a laptop's credentials.
 
-**Check plan:** an audit of each repo's deploy paths that fails on any path
-delivered by hand.
+**Check:** an audit of each repo's deploy paths that fails on any path delivered by hand.

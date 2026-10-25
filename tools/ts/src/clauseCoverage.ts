@@ -28,7 +28,7 @@ function readMeasuredClauses(thresholdsContent: string | undefined): readonly st
   return [...ids].sort();
 }
 
-/** One `| ID | rule | gate | encoded-by |` row from `docs/index.md`. */
+/** One `| ID | gate | evidence |` row from `docs/index.md`. */
 function readIndexRow(line: string): { id: string; gate: string } | undefined {
   if (!line.startsWith('|')) {
     return undefined;
@@ -36,7 +36,7 @@ function readIndexRow(line: string): { id: string; gate: string } | undefined {
   const cells = line.split('|').map((cell) => cell.trim().replace(/`/g, ''));
   // cells[0] is the empty text before the leading `|`.
   const id = cells[1];
-  const gate = cells[3];
+  const gate = cells[2];
   if (id === undefined || gate === undefined || !CLAUSE_ID_PATTERN.test(id)) {
     return undefined;
   }

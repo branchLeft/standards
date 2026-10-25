@@ -1,78 +1,41 @@
 # Code comments
 
-Migrated from the branchLeft workspace `CLAUDE.md`, which held this as the
-authoritative cross-repo rule before this repo existed.
-
 ## CMT-1 — a comment states only what the code cannot
 
-A non-obvious constraint, an invariant, a workaround, a reason a naive approach
-would fail. Comments do not narrate what the code does.
+A comment states a non-obvious constraint, invariant, workaround or reason a naive approach would fail, and never narrates what the code does.
 
-The test is whether the comment would still be worth reading by someone who has
-already read the line below it. "Increment the counter" fails. "The trailing
-slash is load-bearing: without it, tenant `blog` also matches `blog-archive/`"
-passes, because the code cannot say that about itself.
+**Why:** a comment is worth keeping only if someone who has read the line below it still learns something; "increment the counter" fails, "the trailing slash is load-bearing" passes.
+
+**Check:** review of the diff.
 
 ## CMT-2 — no development-process references
 
-Never reference the development process in a comment: no ticket or story IDs, no
-people's names, no "verified live on `<date>`" logs, no decision-history prose.
+A comment carries no ticket or story IDs, no people's names, no dated verification logs and no decision history or motivation; that belongs in the PR description, a runbook, a decision record or an architecture doc.
 
-That context belongs in the PR description, a RUNBOOK, or an architecture doc —
-never in an inline comment.
+**Why:** backlogs live outside every repo, so a backlog reference in shipped source dangles for every reader, external contributors included; the ID belongs in commit and PR metadata.
 
-The same goes for motivation. Why an approach was chosen lives in markdown, a
-decision record or the issue tracker; the code carries the implementation.
-
-Backlog IDs are a specific case of this and the one that recurs. The backlogs
-live at a workspace root that no repo tracks, so a backlog reference in shipped
-source is dangling for every reader — including external contributors on the
-public repos. Explain the reasoning directly, so the comment stands alone with
-no access to any backlog. PR titles, PR bodies and commit messages are the right
-place for the ID: that is metadata, not shipped code, and it is genuinely useful
-for traceability.
-
-The rule is enforced mechanically. The documentation linter's DL009 covers
-backlog-style ids, in both markdown and source comments; `tools/check-work-item-refs.sh`
-covers the one shape DL009 does not, a cross-repo issue or PR reference. This
-paragraph cannot name an example of the thing it forbids — it would report
-itself.
-
-**Check plan:** `docs-lint` (DL009) plus `tools/check-work-item-refs.sh`.
+**Check:** `docs-lint` DL009 for backlog-style IDs and `tools/ts/src/workItemReferenceGate.ts` for the `org/repo#N` shape (TypeScript audit only).
 
 ## CMT-3 — a long comment moves to a doc
 
-A comment block of 5 to 10 lines warns, and a block of 11 lines or more fails.
-Docstrings count. The narrative moves to the module's colocated markdown file
-(`store.md` beside `store.ts`) or its folder's README, and the code keeps a
-one-line pointer.
+A long comment block, docstrings included, moves to the module's colocated markdown file or its folder's README, and the code keeps a one-line pointer.
 
-**Why:** long prose between lines of code hides the code from its reader and
-stops being maintained with it.
+**Why:** long prose between lines of code hides the code from its reader and stops being maintained with it.
 
-**Check plan:** `tools/check-comment-blocks.sh`, at these signed-off values.
-
-Move the narrative, keep the constraint.
+**Check:** `tools/check-comment-blocks.sh` warns and fails at the limits in its header.
 
 ## CMT-4 — comments never outnumber code
 
-A file whose comment lines outnumber its code lines fails. Docstrings count as
-comment lines.
+A file whose comment lines outnumber its code lines fails, docstrings counted as comment lines.
 
-**Why:** such a file has become a design document with an implementation
-attached, and the prose drifts from the code it describes, each vouching for
-the other.
+**Why:** such a file has become a design document with an implementation attached, and the prose and code drift apart.
 
-**Check plan:** the comment-block checker extended with a per-file ratio.
+**Check:** `tools/ts/src/commentRatioGate.ts` (TypeScript audit only).
 
 ## CMT-5 — a docstring says what the signature can't
 
-A docstring says what the code does beyond what its signature or interface
-already says, such as its behaviour, the errors it raises (`ERR-2`) and units.
-Where the module has a colocated markdown file, the docstring links to it by
-relative path.
+A docstring says what the code does beyond its signature, such as behaviour, the errors it raises (`ERR-2`) and units, and links by relative path to the module's colocated markdown file where one exists.
 
-**Why:** the signature already speaks for itself, and anything longer than a
-docstring belongs in the linked document.
+**Why:** the signature already speaks for itself, and anything longer than a docstring belongs in the linked document.
 
-**Check plan:** review of new docstrings in the diff.
+**Check:** review of new docstrings in the diff.

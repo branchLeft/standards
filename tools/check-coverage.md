@@ -24,3 +24,14 @@ The JSON parsing itself is delegated to `tools/lib/coverage-lines.mjs`. A repo
 with a `coverage-final.json` to read already has Node, because vitest wrote
 that file — unlike the rest of tools/, which stays pure bash+awk+grep so the
 three repos with no package.json can still run it.
+
+## Limits
+
+The numbers the clauses in `docs/testing.md` refer to live here and in
+`tools/thresholds.tsv`, not in the clause text:
+
+- COV-1: at least 90% of the lines a PR adds or changes are covered
+  (`min_line_coverage_pct`). Today this reader measures per-file line coverage
+  against the same 90%.
+- COV-2: a repo's total line coverage never drops below the merge base, and a
+  repo whose total has reached 90% keeps 90% as its floor.

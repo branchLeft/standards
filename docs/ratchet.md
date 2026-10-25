@@ -71,18 +71,6 @@ withdrew the licence to reintroduce it.
 STD-001 follows from this: a PR may not add an exemption to make its own gate
 pass. If a clause is wrong in a given repo, the fix is a PR here.
 
-## Floors
-
-`tools/floors.tsv` holds one line per clause: the tier currently required
-fleet-wide. Raising a floor is a one-line PR, and it turns the affected repos
-amber all at once — each then clears on its own schedule.
-
-**Never raise a floor and fix a repo in the same PR.** The floor change is
-fleet-wide and the fix is repo-local; bundled, the blast radius is unreviewable.
-The same holds in reverse: never lower a floor to make a repo green. If the
-clause is wrong, change the clause and say why. If a repo cannot meet it yet,
-that is a `.standardsignore` line with a reason and a review.
-
 ## Where a gate runs
 
 On pull requests **and** on push to `main`. The delete guards already established

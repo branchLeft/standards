@@ -8,9 +8,14 @@
 /tools/thresholds.tsv    @branchLeft/branchleft-admin
 /templates/rulesets/     @branchLeft/branchleft-admin
 /docs/                   @branchLeft/branchleft-admin
+# The clause docs and the TS-4 floor (FLOOR_TIER) are owned too.
+/docs/principles.md      @branchLeft/branchleft-admin
+/docs/index.md           @branchLeft/branchleft-admin
+/docs/*.md               @branchLeft/branchleft-admin
+/docs/stacks/*.md        @branchLeft/branchleft-admin
+/tools/check-tsconfig.sh @branchLeft/branchleft-admin
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
-/tools/floors.tsv        @branchLeft/branchleft-admin
 /.standards-db-tooling   @branchLeft/branchleft-admin
 /.github/                @branchLeft/branchleft-admin

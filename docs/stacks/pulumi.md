@@ -1,203 +1,107 @@
 # Pulumi
 
-These conventions were followed consistently across three programs before they
-were written down, which is why most of them are gateable: the fleet is already
-compliant, so the gates protect what exists rather than demanding a migration.
+These conventions were followed across three programs before they were written down, so most are gateable and the gates protect what exists rather than demanding a migration.
 
 ## PUL-1 — one exported ComponentResource per unit, with a typed URN
 
-```ts
-export class GhostTenant extends pulumi.ComponentResource {
-  constructor(name: string, args: GhostTenantArgs, opts?: pulumi.ComponentResourceOptions) {
-    super('ghostPlatform:tenant:GhostTenant', name, {}, opts);
-```
+Each unit is one exported `ComponentResource` whose first statement is `super('<org>:<layer>:<Type>', name, {}, opts)`, a three-segment URN type such as `ghostPlatform:tenant:GhostTenant`.
 
-The URN type is `<org>:<layer>:<Type>` — three colon-separated segments. It is
-what identifies the component in state, so it is effectively permanent: changing
-it is a replacement of every resource beneath it.
+**Why:** the URN type identifies the component in state and is effectively permanent, since changing it replaces every resource beneath, and anything before `super()` is outside the component in the URN tree.
 
-`super()` is the first statement. Anything before it is outside the component in
-the URN tree.
+**Check:** `tools/check-pulumi.sh`.
 
 ## PUL-2 — `registerOutputs()` closes the constructor
 
-The last statement of the constructor. Omitting it does not fail — the component
-works, the stack deploys, and the outputs are simply not registered, which
-breaks parenting in the state file and the delete guards' coverage check along
-with it. A defect that presents as success is exactly what a gate is for.
+`registerOutputs()` is the last statement of the constructor.
+
+**Why:** omitting it does not fail, the stack deploys, and the outputs are silently unregistered, which breaks parenting in state and the delete guards' coverage check.
+
+**Check:** `tools/check-pulumi.sh`.
 
 ## PUL-3 — every child resource takes `{ parent }`
 
-A resource created inside a component without a `parent` option is not inside
-the component in the URN tree, whatever the source layout suggests. It escapes
-targeted operations, it escapes `registerOutputs`, and it escapes the delete
-guard's coverage verification — so the guard reports full coverage of a resource
-set that no longer contains it.
+Every resource created inside a component takes the `{ parent }` option, and a `create*` factory takes `parent` as its first parameter so a call site that forgot it does not typecheck.
 
-Factories take `parent` as their **first** parameter, so a call site that forgot
-it does not typecheck.
+**Why:** a resource without a parent is not inside the component in the URN tree, so it escapes targeted operations, `registerOutputs` and the delete guard's coverage verification, which then reports full coverage of a set that no longer contains it.
+
+**Check:** `tools/check-pulumi.sh`, scoped to files that declare a ComponentResource or export a factory taking a parent, since a top-level stack program has no component to parent to.
 
 ## PUL-4 — an exported, documented `Args` interface
 
-Every component takes `<Name>Args`, exported, with a doc comment on every field.
-This interface is the entire public API of a published component: consumers read
-it instead of the source, and for a component published to a registry it is the
-only thing they can read.
+Every component takes an exported `<Name>Args` with a doc comment on every field, and an optional field documents its default as a named constant and not a literal buried in a destructuring expression.
 
-Optional fields document their default, and the default is a named constant
-rather than a literal buried in a destructuring expression.
+**Why:** this interface is the entire public API of a published component, and consumers read it instead of the source.
+
+**Check:** `tools/check-pulumi.sh`.
 
 ## PUL-5 — a component never reads a `StackReference`
 
-Cross-stack values arrive as constructor arguments. A stack entrypoint may use a
-`StackReference`; a `ComponentResource` may not.
+Cross-stack values arrive as constructor arguments; a stack entrypoint may use a `StackReference` and a `ComponentResource` may not.
 
-Two reasons, and the second is the harder one:
+**Why:** a component that reaches out to a named stack is untestable and unusable from another repo, and with per-tenant state buckets a `StackReference` across backends resolves to an empty value instead of failing loudly.
 
-- **Portability and testability.** A component that reaches out to a named stack
-  can only be instantiated where that stack exists, which makes it untestable
-  and unusable from another repo.
-- **A reference cannot cross backends.** With per-tenant state buckets, a
-  `StackReference` to a stack in a different backend resolves to `unknown
-stack` — it does not fail loudly, it produces an empty value.
+**Check:** `tools/check-pulumi.sh`.
 
 ## PUL-6 — security boundaries are constants, not stack config
 
-`review`.
+A value that decides who can federate, what identity can be assumed or which repository is trusted is a hardcoded constant with its rationale beside it, not a `pulumi config` key.
 
-A value that decides who can federate, what identity can be assumed, or which
-repository is trusted is a hardcoded constant with its rationale beside it — not
-a `pulumi config` key.
+**Why:** a stack-config value changes with `pulumi config set` and no code review, so the question for any config key is not "is this secret" but "should changing this require a reviewer".
 
-The argument is about review, not about safety of storage: a stack-config value
-can be changed with `pulumi config set` and no code review; a constant cannot be
-changed without a diff somebody has to approve. The question to ask of any
-config key is not "is this secret" but "should changing this require a
-reviewer".
-
-This stays a review clause because distinguishing a boundary from a knob needs
-judgement, and a gate that guesses would train people to suppress it.
+**Check:** review; telling a boundary from a knob needs judgement, and a gate that guessed would train people to suppress it.
 
 ## PUL-7 — `pulumi.Input<T>` by default; plain `string` only where needed synchronously
 
-`review`.
+Every argument defaults to `pulumi.Input<T>`, and a plain `string` is used only where the value must be read synchronously (to build a resource name or run constructor-time validation), said so in the field's doc comment.
 
-Default every argument to `pulumi.Input<T>`. Use a plain `string` only where the
-value must be read **synchronously** — to construct a resource name, or to run
-constructor-time validation — and say so in the field's doc comment.
+**Why:** validation inside `apply()` surfaces as a deployment-time error with an unhelpful stack, and a name assembled synchronously cannot be built from an `Output`.
 
-That exception is not stylistic. Validation inside an `apply()` surfaces as a
-deployment-time error with an unhelpful stack, rather than as an immediate local
-failure; and a name that must be assembled synchronously cannot be assembled
-from an `Output`.
+**Check:** review of new `Args` fields in the diff.
 
 ## PUL-8 — one file per concern, assembled by the entrypoint
 
-Each concern exports a `create*` factory taking `parent` first; the component's
-`index.ts` only assembles them. A component file that both declares resources
-and orchestrates other concerns has no natural size limit.
+Each concern is one file exporting a `create*` factory that takes `parent` first, and the component's `index.ts` only assembles them.
+
+**Why:** a component file that both declares resources and orchestrates other concerns has no natural size limit.
+
+**Check:** review of new component files in the diff.
 
 ## PUL-9 — validate once, at construction
 
-Validation runs once in the constructor, not at each call site. A validator
-whose output feeds several resource identities must be the single point that
-decides — and, per [`../testing.md`](../testing.md) TEST-4, it is
-security-sensitive and requires unit tests regardless of any other clause.
+Validation runs once in the constructor, not at each call site, and a validator whose output feeds several resource identities is the single point that decides and is security-sensitive (`TEST-4`).
+
+**Why:** a validator feeding several identities that is repeated can disagree with itself.
+
+**Check:** review of constructors in the diff.
 
 ## PUL-10 — a stack with protected resources carries a delete guard
 
-Any stack where a destructive plan would be materially unrecoverable — a load
-balancer, a certificate map, a database, a state bucket — carries a guard with
-three modes:
+Any stack where a destructive plan would be materially unrecoverable (a load balancer, a certificate map, a database, a state bucket) carries a guard with three modes: `<plan.json>` parses `pulumi preview --json` and fails on a destructive op against a protected name or type (matched by substring against `delete` and `replace`, so an unknown future op fails closed), `--self-test` proves the matcher still matches before the check is trusted, and `--verify-coverage <dir>` fails when a protected name is no longer a live resource logical id, and the guard runs on the pull request as well as before the apply.
 
-| Mode                      | Does                                                                                                 |
-| ------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `<plan.json>`             | Parses `pulumi preview --json` and fails on a destructive op against a protected name or type        |
-| `--self-test`             | Proves the matcher still matches, run **before** the real check is trusted                           |
-| `--verify-coverage <dir>` | Fails when a protected name is no longer a live resource logical id, closing the aliased-rename hole |
+**Why:** a predecessor guard matched rendered text, stopped matching after a format change, exited zero and would have permitted the apply it was written to block, so it parses `--json`, never rendered output.
 
-**Parse `--json`, never rendered text.** A predecessor guard matched rendered
-output, stopped matching after a format change, exited zero, and would have
-permitted the exact apply it was written to block.
-
-Match destructive operations by substring against `("delete", "replace")` so an
-unknown future op name fails closed rather than being silently permitted.
-
-Run the guard **on the pull request as well as before the apply**, so the change
-that introduces drift fails rather than the merge that ships it.
+**Check:** review of the stack's guard and its workflow step.
 
 ## PUL-11 — resource naming
 
-Two namespaces, kept distinct:
+A Pulumi logical name is `<tenant>-<resource>` (`acme-sa`) and a cloud physical name is `<product>-<scope>-<tenant>` (`ghost-tenant-acme`), and where a provider constrains identifier syntax the transformation is applied in one place with the constraint and its length budget documented at the constant, the maximum tenant-name length being derived from the provider's limit minus the prefix.
 
-|                     | Pattern                      | Example                   |
-| ------------------- | ---------------------------- | ------------------------- |
-| Pulumi logical name | `<tenant>-<resource>`        | `acme-sa`, `acme-service` |
-| Cloud physical name | `<product>-<scope>-<tenant>` | `ghost-tenant-acme`       |
+**Why:** two namespaces kept distinct avoid collisions, and a length budget derived from the provider's limit is not guessed.
 
-Where a provider constrains identifier syntax — a SQL user cannot contain a
-hyphen — the transformation is applied in one place and the constraint is
-documented at the constant, along with its **length budget**: the maximum
-tenant-name length is derived from the provider's limit minus the prefix, not
-guessed.
+**Check:** review of new resource names in the diff.
 
 ## PUL-12 — a committed stack config never carries an `encryptionsalt`
 
-Pulumi's passphrase secrets provider commits two things to
-`Pulumi.<stack>.yaml`: the ciphertext, and an `encryptionsalt` line. The salt
-is not itself a secret value — it is an **offline verifier** for one: anyone
-holding it can test a candidate passphrase against it without touching a state
-backend or any provider IAM. Storing it in git is safe only for as long as the
-repository stays private, and this fleet does not assume that: every repo is
-expected to be engineered as if it were public already, private ones included.
+A committed `Pulumi.<stack>.yaml` never contains an `encryptionsalt` line, in any case or encoding, and a stack still on the passphrase provider uses salt-injected-at-deploy, where CI writes `secretsprovider` and `encryptionsalt` at runtime from a GitHub Actions secret and never commits the result back; the passphrase provider and committed `secure:` ciphertext are themselves permitted.
 
-**The passphrase provider itself is permitted.** `secretsprovider: passphrase`
-(or the same thing by omission — passphrase is Pulumi's default when the key
-is missing) is not, on its own, a finding. Naming or omitting a provider names
-an algorithm; it does not expose anything. The salt is the only thing that
-does, so it is the only thing this clause bans:
+**Why:** the salt is an offline verifier for the passphrase, safe in git only while the repo stays private, which this fleet does not assume.
 
-- a committed `Pulumi.<stack>.yaml` never contains an `encryptionsalt` line,
-  in any case or with any encoding — that is the whole rule.
-
-A stack config with a committed `secure:` ciphertext value and no committed
-salt is not an oracle: without `encryptionsalt`, nothing in the file lets an
-attacker derive the encryption key or verify a passphrase guess offline.
-Rejecting that file would ban the safe half of the pattern along with the
-unsafe half, for no security gain.
-
-**The mandated pattern for a stack still on the passphrase provider is
-salt-injected-at-deploy**: CI writes `secretsprovider` and `encryptionsalt`
-into the file at runtime, sourced from a GitHub Actions secret, and never
-commits the result back. The working tree a deploy runs against then carries
-the values it needs; the tree committed to history carries neither. This is
-exactly the shape PUL-12 passes — no `secretsprovider`, no `encryptionsalt`,
-config values already encrypted — because it is exactly the shape with
-nothing crackable in it. If the salt is ever written to the file and
-committed, the next run of the gate catches it precisely because the salt,
-not the provider, is what it looks for.
-
-This is `auto`, unconditionally — there is no reviewable middle ground between
-"the salt is in git" and "it is not", and no ratchet either. Every other
-clause in this repo is a `ratchet_finding` consumer: `.standards.mode: warn`
-makes a finding in the legacy tree advisory, and a `.standardsignore` line
-silences it with a reason. PUL-12 is not — `tools/check-pulumi-secrets.sh`
-never calls `ratchet_finding` for it, so neither mechanism applies. A repo
-adopting a `standards` release that includes PUL-12 while it still carries a
-committed salt fails from the moment it adopts, in `warn` mode as much as
-`enforce`, and stays failing until the salt is gone. That is the intended
-effect, not friction to route around: the sanctioned way to remove a committed
-salt is the salt-injected-at-deploy pattern above, not an exemption line — the
-exemption already exists, it just does not live in `.standardsignore`.
+**Check:** `tools/check-pulumi-secrets.sh`, which does not go through the ratchet, so neither `.standards.mode: warn` nor a `.standardsignore` line turns the finding advisory and a repo adopting a release carrying it fails until the salt is gone.
 
 ## PUL-13 — policy packs guard every preview
 
-Pulumi policy packs run on every preview and refuse, among other things,
-destroying protected core infrastructure and making a bucket public.
+Pulumi policy packs run on every preview and refuse, among other things, destroying protected core infrastructure and making a bucket public.
 
-**Why:** a policy the engine enforces catches what a reviewer skimming a plan
-misses, and it sits alongside the delete guard (`PUL-10`) rather than
-replacing it.
+**Why:** a policy the engine enforces catches what a reviewer skimming a plan misses, and it sits alongside the delete guard (`PUL-10`) rather than replacing it.
 
-**Check plan:** policy packs in the preview workflow, each with a test program
-that violates it.
+**Check:** policy packs in the preview workflow, each with a test program that violates it.
