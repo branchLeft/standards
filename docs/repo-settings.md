@@ -16,7 +16,7 @@ The default branch allows no deletion and no force-push, requires linear history
 | `false`                     | `ghost-platform`, `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`, `standards`.           |
 | NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS). |
 
-The owner's recorded reason for `false` on the tenant repos (2026-10-10), verbatim: "contributing still requires org members, which is only me and my agents today."
+The owner's recorded reason for `false` on the tenant repos, verbatim: "contributing still requires org members, which is only me and my agents today."
 
 ## REPO-2 — one bypass actor, in pull_request mode
 
