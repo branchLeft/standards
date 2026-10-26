@@ -20,7 +20,7 @@ DEFAULT_ORM_MIGRATION_DIRS="drizzle"
 # A scope declaration, not an exemption — see tools/check-raw-sql.md.
 DB_TOOLING_FILE=".standards-db-tooling"
 
-STATEMENT='(SELECT([ \t]+DISTINCT)?[ \t]+[^ \t]+[ \t]*(,|["'"'"'`]|$)|SELECT[ \t].*[ \t]FROM([ \t]|$)|SELECT[ \t]*$|(INSERT|REPLACE)[ \t]+(OR[ \t]+[A-Z]+[ \t]+)?INTO[ \t]|UPDATE[ \t]+[^ \t]+[ \t]+SET[ \t]|DELETE[ \t]+FROM[ \t]|(CREATE|DROP)[ \t]+((TEMP|TEMPORARY|UNIQUE|VIRTUAL)[ \t]+)*(TABLE|INDEX|VIEW|TRIGGER)([ \t;]|$)|ALTER[ \t]+TABLE[ \t]|PRAGMA[ \t]+[a-z_]|WITH[ \t]+(RECURSIVE[ \t]+)?[A-Za-z_]+[ \t]+AS[ \t]*[(]|VACUUM|(BEGIN|COMMIT|ROLLBACK)([ \t]+(IMMEDIATE|EXCLUSIVE|DEFERRED|TRANSACTION))?[ \t]*;?["'"'"'`])'
+STATEMENT='(SELECT([ \t]+DISTINCT)?[ \t]+[^ \t]+[ \t]*(,|["'"'"'`]|$)|SELECT[ \t].*[ \t]FROM([ \t]|$)|SELECT[ \t]*$|(INSERT|REPLACE)[ \t]+(OR[ \t]+[A-Z]+[ \t]+)?INTO[ \t]|UPDATE[ \t]+[^ \t]+[ \t]+SET[ \t]|DELETE[ \t]+FROM[ \t]|(CREATE|DROP)[ \t]+((TEMP|TEMPORARY|UNIQUE|VIRTUAL)[ \t]+)*(TABLE|INDEX|VIEW|TRIGGER)([ \t;]|$)|ALTER[ \t]+TABLE[ \t]|ALTER[ \t]+DEFAULT[ \t]+PRIVILEGES([ \t]|$)|(CREATE|ALTER|DROP)[ \t]+(ROLE|USER)([ \t;]|$)|(GRANT|REVOKE)[ \t]+[A-Za-z][A-Za-z_ ,]*[ \t](ON|TO|FROM)[ \t]|PRAGMA[ \t]+[a-z_]|WITH[ \t]+(RECURSIVE[ \t]+)?[A-Za-z_]+[ \t]+AS[ \t]*[(]|VACUUM|(BEGIN|COMMIT|ROLLBACK)([ \t]+(IMMEDIATE|EXCLUSIVE|DEFERRED|TRANSACTION))?[ \t]*;?["'"'"'`])'
 
 setting_for() {
   [ -f "$THRESHOLDS_FILE" ] || return 1
@@ -793,6 +793,43 @@ EOF
     refuse ops/db-tooling/backup.ts '[0-9]*' "a comment or blank line in .standards-db-tooling was read as a glob"
     printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling"' \
       && { echo "FAIL: a comment or blank line in .standards-db-tooling was reported as refused"; echo "$out"; exit 1; }
+
+    # Permission DDL: one fixture per statement outside a declared path, and
+    # the same statement inside the declared path as the control.
+    mkdir -p src/perm ops/db-tooling
+    perm_case() {
+      printf "const q = '%s';\n" "$2" > "src/perm/$1.ts"
+      printf "const q = '%s';\n" "$2" > "ops/db-tooling/perm-$1.ts"
+    }
+    perm_case grant 'GRANT SELECT ON users TO app_reader'
+    perm_case revoke 'REVOKE ALL ON users FROM app_reader'
+    perm_case create_role 'CREATE ROLE app_writer'
+    perm_case alter_role 'ALTER ROLE app_writer WITH LOGIN'
+    perm_case drop_role 'DROP ROLE IF EXISTS app_writer'
+    perm_case create_user 'CREATE USER app_user'
+    perm_case alter_user 'ALTER USER app_user NOLOGIN'
+    perm_case drop_user 'DROP USER IF EXISTS app_user'
+    perm_case default_privileges 'ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO app_reader'
+    git add -A && git commit -qm permission-cases
+    out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
+    expect src/perm/grant.ts 1 "GRANT outside a declared path not caught"
+    expect src/perm/revoke.ts 1 "REVOKE outside a declared path not caught"
+    expect src/perm/create_role.ts 1 "CREATE ROLE outside a declared path not caught"
+    expect src/perm/alter_role.ts 1 "ALTER ROLE outside a declared path not caught"
+    expect src/perm/drop_role.ts 1 "DROP ROLE outside a declared path not caught"
+    expect src/perm/create_user.ts 1 "CREATE USER outside a declared path not caught"
+    expect src/perm/alter_user.ts 1 "ALTER USER outside a declared path not caught"
+    expect src/perm/drop_user.ts 1 "DROP USER outside a declared path not caught"
+    expect src/perm/default_privileges.ts 1 "ALTER DEFAULT PRIVILEGES outside a declared path not caught"
+    refuse ops/db-tooling/perm-grant.ts '[0-9]*' "declared-path GRANT was reported"
+    refuse ops/db-tooling/perm-revoke.ts '[0-9]*' "declared-path REVOKE was reported"
+    refuse ops/db-tooling/perm-create_role.ts '[0-9]*' "declared-path CREATE ROLE was reported"
+    refuse ops/db-tooling/perm-alter_role.ts '[0-9]*' "declared-path ALTER ROLE was reported"
+    refuse ops/db-tooling/perm-drop_role.ts '[0-9]*' "declared-path DROP ROLE was reported"
+    refuse ops/db-tooling/perm-create_user.ts '[0-9]*' "declared-path CREATE USER was reported"
+    refuse ops/db-tooling/perm-alter_user.ts '[0-9]*' "declared-path ALTER USER was reported"
+    refuse ops/db-tooling/perm-drop_user.ts '[0-9]*' "declared-path DROP USER was reported"
+    refuse ops/db-tooling/perm-default_privileges.ts '[0-9]*' "declared-path ALTER DEFAULT PRIVILEGES was reported"
 
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     printf '%s' "$out" | grep -q '::error.*DB-1' \
