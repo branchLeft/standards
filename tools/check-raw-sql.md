@@ -15,6 +15,11 @@ fails the build, through the same ratchet every other gate uses
   `CREATE` or `DROP` of a table, index, view or trigger, `ALTER TABLE`,
   `PRAGMA`, a `WITH … AS (` query, `VACUUM`, or a string that holds only a
   transaction statement such as `BEGIN IMMEDIATE`.
+- Permission and role DDL: `GRANT` and `REVOKE` of a privilege on an object,
+  `CREATE`, `ALTER` or `DROP` of a `ROLE` or `USER`, and `ALTER DEFAULT
+PRIVILEGES`. This is the riskiest raw SQL DB-1 fences, so it is matched the
+  same way as the statements above, and a declared tooling path is the only
+  place it may live.
 - The first SQL line of a multi-line string: a template literal opened at the
   end of a line, or a Python triple-quoted string.
 - Any `.sql` file outside the ORM's migration folder. The folder names come
