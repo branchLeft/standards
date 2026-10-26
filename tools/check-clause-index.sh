@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Drift test between docs/index.md and everything it claims. Five assertions
-# fail the run; the tools/clause-paths.tsv ones only warn. Full list:
-# check-clause-index.md.
+# Drift test between docs/index.md and everything it claims. The failing
+# assertions are listed in check-clause-index.md; the tools/clause-paths.tsv
+# ones only warn.
 # Usage: check-clause-index.sh [DOCS_DIR] | --self-test
 
 set -uo pipefail
@@ -72,8 +72,10 @@ clause_paths_scope() {
 # variable, not a literal string (TS-1..3); ratchet_finding bypassed entirely
 # (PUL-12); no ratchet_scope_files call at all, an unfiltered scan instead
 # (STD-000, STD-002). Hand-maintained for the same reason standards-audit.sh's
-# own COVERED list is: check-clause-index.md.
-GATE_SCOPE_OVERRIDE="TS-1 TS-2 TS-3 PUL-12 STD-000 STD-002"
+# own COVERED list is: check-clause-index.md. Every entry is checked against
+# the tools/*.sh gates by gate_scope_override_stale() below, and the self-test
+# injects its own list through the environment.
+GATE_SCOPE_OVERRIDE="${GATE_SCOPE_OVERRIDE-TS-1 TS-2 TS-3 PUL-12 STD-000 STD-002}"
 
 # Every clause a real tools/*.sh gate scopes to specific files with
 # ratchet_scope_files, plus GATE_SCOPE_OVERRIDE above. What assertion 8 below
@@ -90,6 +92,23 @@ gate_scoped_clauses() {
   # bare words, and this is the one place that splits it back into IDs.
   # shellcheck disable=SC2086
   printf '%s\n' $GATE_SCOPE_OVERRIDE
+}
+
+# Each GATE_SCOPE_OVERRIDE entry that no tools/*.sh gate names, one per line.
+# This script is excluded: its own override line and comments name every
+# entry, so counting it would let a bogus entry vouch for itself.
+gate_scope_override_stale() {
+  local root="$1" id f
+  # shellcheck disable=SC2086
+  for id in $GATE_SCOPE_OVERRIDE; do
+    local named=0
+    for f in "$root"/tools/*.sh; do
+      [ -f "$f" ] || continue
+      [ "$(basename "$f")" = "check-clause-index.sh" ] && continue
+      if grep -qFw -- "$id" "$f"; then named=1; break; fi
+    done
+    [ "$named" -eq 1 ] || printf '%s\n' "$id"
+  done
 }
 
 # True if PKG has a row in tools/package-consumers.tsv — the committed record
@@ -266,6 +285,15 @@ check_index() {
     done < <(gate_scoped_clauses "$ROOT" | sort -u)
   fi
 
+  # A GATE_SCOPE_OVERRIDE entry that no gate names is stale, and fails the run:
+  # a hand-kept list that nothing checks is how an entry outlives its gate.
+  local stale_override
+  while IFS= read -r stale_override; do
+    [ -n "$stale_override" ] || continue
+    echo "::error::GATE_SCOPE_OVERRIDE lists $stale_override, but no tools/*.sh gate names it — remove it from tools/check-clause-index.sh"
+    rc=1
+  done < <(gate_scope_override_stale "$ROOT")
+
   if [ "$rc" -eq 0 ]; then
     if [ "$undefined" -gt 0 ]; then
       echo "check-clause-index.sh: no errors, but $undefined indexed clause(s) have no doc — see the warnings above"
@@ -306,9 +334,11 @@ self_test() {
         printf '%s\t*\tfixture\n' "$id" >> tools/clause-paths.tsv
       done < <(grep -oE '\b[A-Z]{2,5}-[0-9]{1,3}\b' docs/index.md | sort -u)
     }
+    # The real GATE_SCOPE_OVERRIDE names IDs that only the real tools/ carries,
+    # so every fixture runs with it emptied unless it sets FIXTURE_OVERRIDE.
     gate() {
       [ "${SYNC_PATHS:-1}" = "1" ] && sync_paths_to_index
-      out=$("$CHECK_SCRIPT" "$tmp/docs" 2>&1); grc=$?
+      out=$(GATE_SCOPE_OVERRIDE="${FIXTURE_OVERRIDE-}" "$CHECK_SCRIPT" "$tmp/docs" 2>&1); grc=$?
     }
 
     printf '# Fake\n\n## AA-1 — implemented\n\n## AA-2 — declared\n' > docs/fake.md
@@ -726,6 +756,31 @@ EOF
       && { echo "FAIL: unscoped gate was warned about its tag"; echo "$out"; exit 1; }
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     SYNC_PATHS=1
+
+    # --- GATE_SCOPE_OVERRIDE: each entry must still be named by a gate -----
+    # An entry no tools/*.sh gate names is stale and fails the run, so the
+    # hand-kept list cannot outlive the gate it was written for.
+    FIXTURE_OVERRIDE="AA-1"
+    gate
+    [ "$grc" -eq 0 ] || { echo "FAIL: override naming a live gate exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "GATE_SCOPE_OVERRIDE lists" \
+      && { echo "FAIL: live override entry flagged as stale"; echo "$out"; exit 1; }
+
+    FIXTURE_OVERRIDE="AA-1 ZZ-8"
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: bogus override entry exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "GATE_SCOPE_OVERRIDE lists ZZ-8" \
+      || { echo "FAIL: bogus override entry not named"; echo "$out"; exit 1; }
+
+    # Word boundary: AA-1 must not be vouched for by a gate naming AA-10.
+    printf 'ratchet_finding "AA-10"\n' > tools/gate.sh
+    FIXTURE_OVERRIDE="AA-1"
+    gate
+    [ "$grc" -eq 1 ] || { echo "FAIL: AA-10 vouched for override AA-1, exited $grc"; echo "$out"; exit 1; }
+    printf '%s' "$out" | grep -q "GATE_SCOPE_OVERRIDE lists AA-1" \
+      || { echo "FAIL: prefix-only override not named"; echo "$out"; exit 1; }
+    printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
+    FIXTURE_OVERRIDE=""
 
     exit 0
   ) || rc=$?

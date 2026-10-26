@@ -47,6 +47,13 @@ unfiltered) are a short, commented, hand-maintained override next to the
 function, for the same reason `standards-audit.sh`'s own `COVERED` list is
 hand-maintained.
 
+That override is checked, and it fails the run. Each `GATE_SCOPE_OVERRIDE`
+entry must be named, as a whole word, by some `tools/*.sh` gate other than
+`check-clause-index.sh` itself. An entry no gate names is stale: its gate was
+renamed or removed, or the clause moved. `gate_scope_override_stale()` finds
+these. The override list is read from the environment when it is set, which
+is how the self-test gives each fixture tree its own list.
+
 ## `family_header_paths`
 
 A family header is `## Name — \`path\``, the path backtick-quoted right after
