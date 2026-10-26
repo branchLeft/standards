@@ -20,7 +20,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # A pinned action: uses: owner/repo@<40 hex> followed by a `# vX` comment.
 # Local (./...) and same-repo reusable calls have no SHA to pin.
 scan_workflow() {
-  local f="$1" ln=0 line in_run=0 run_indent=0 indent trimmed
+  local f="$1" ln=0 line in_run=0 run_indent=0 indent trimmed key_line ci4_scope
 
   while IFS= read -r line; do
     ln=$((ln + 1))
@@ -58,6 +58,11 @@ scan_workflow() {
     # is not reported under two clauses.
     line=$(printf '%s' "$line" | sed 's/\${{[[:space:]]*}}//g')
 
+    # The line as a YAML key: indentation and an optional list dash removed.
+    # `run:` is the key only when it starts here. A substring match also reads
+    # `dry-run:`, `pre-run:` and `rerun:` (with: inputs) as a run: body.
+    key_line=$(printf '%s' "$trimmed" | sed 's/^-[[:space:]]*//')
+
     # CI-1 — SHA pin with a version comment.
     case "$line" in
       *uses:*)
@@ -91,14 +96,14 @@ scan_workflow() {
         *'${{'*) ratchet_finding "CI-2" "$f" "$ln" "\${{ }} interpolated into a run: body — bind it to an env var instead" ;;
       esac
     fi
-    case "$line" in
-      *run:\ \|*|*run:\ \>*|*run:\|*)
+    case "$key_line" in
+      run:\ \|*|run:\ \>*|run:\|*|run:\>*)
         in_run=1; run_indent="$indent"
         case "$line" in
           *'${{'*) ratchet_finding "CI-2" "$f" "$ln" "\${{ }} interpolated into a run: body — bind it to an env var instead" ;;
         esac
         ;;
-      *run:*) # single-line run
+      run:*) # single-line run
         case "$line" in
           *'${{'*) ratchet_finding "CI-2" "$f" "$ln" "\${{ }} interpolated into a run: body — bind it to an env var instead" ;;
         esac
@@ -106,14 +111,15 @@ scan_workflow() {
     esac
 
     # CI-4 — CI reports, it does not rewrite.
-    case "$line" in
-      *run:*|*'  '*)
-        case "$line" in
-          *'--fix'*|*'prettier --write'*|*'--write .'*)
-            ratchet_finding "CI-4" "$f" "$ln" "mutating command in CI — use the non-mutating form (lint:check / format:check)" ;;
-        esac
-        ;;
-    esac
+    ci4_scope=0
+    case "$key_line" in run:*) ci4_scope=1 ;; esac
+    case "$line" in *'  '*) ci4_scope=1 ;; esac
+    if [ "$ci4_scope" -eq 1 ]; then
+      case "$line" in
+        *'--fix'*|*'prettier --write'*|*'--write .'*)
+          ratchet_finding "CI-4" "$f" "$ln" "mutating command in CI — use the non-mutating form (lint:check / format:check)" ;;
+      esac
+    fi
   done < "$f"
 
   # CI-3 — a gate running on pull_request also runs on push to main.
@@ -494,6 +500,54 @@ EOF
       echo "FAIL: CI-10 missed a job whose merge key does not supply timeout-minutes"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q "job 'plainunbounded' has no timeout-minutes" || {
       echo "FAIL: CI-10 missed an ordinary unbounded job in a file that also uses merge keys"; echo "$out"; exit 1; }
+
+    # CI-2 and CI-4 read run: as a whole YAML key, not as a substring. A with:
+    # input whose name merely ends in run (dry-run, pre-run, rerun) is not a
+    # run: body, and a block-scalar input such as note-run: | must not open
+    # one either. Both must pass; the real single-line run: must still fail.
+    rm -f .github/workflows/merge.yml
+    cat > .github/workflows/dryrun.yml <<'EOF'
+name: Dryrun
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: ./.github/workflows/gated.yml
+        with:
+          dry-run: ${{ inputs.dry-run }}
+          pre-run: ${{ inputs.pre-run }}
+          rerun: ${{ inputs.rerun }}
+          note-run: |
+            ${{ inputs.note }}
+EOF
+    git add -A && git commit -qm dryrun
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    printf '%s' "$out" | grep -q 'CI-2' && {
+      echo "FAIL: CI-2 read a with: input ending in run: as a run: body"; echo "$out"; exit 1; }
+
+    rm -f .github/workflows/dryrun.yml
+    cat > .github/workflows/runsha.yml <<'EOF'
+name: Runsha
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: echo ${{ github.sha }}
+EOF
+    git add -A && git commit -qm runsha
+    out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
+    [ "$(printf '%s' "$out" | grep -c 'CI-2 ')" -eq 1 ] || {
+      echo "FAIL: CI-2 missed a real single-line run: body interpolating an expression"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?
