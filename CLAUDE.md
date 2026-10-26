@@ -12,11 +12,11 @@ internal-only shorthand.
 
 ## Hard rules
 
-- **Never write an audit finding or a backlog ID into this repo.** The
-  improvement backlog lives at the workspace root, untracked, and enumerates
-  unfixed security-relevant gaps in public repos — committing it here publishes
-  them. `docs/` may describe a _pattern_; it must never cite a repo's current
-  gap as the example.
+- **Never write an audit finding or a work-item ID into this repo.** Findings
+  are filed as issues in a private tracker, never committed here, and an ID
+  belongs in commit and PR metadata, never in committed content. Committing a
+  finding would publish an unfixed gap. `docs/` may describe a _pattern_; it
+  must never cite a repo's current gap as the example.
 - **This repo meets its own standards from commit one.** There is no
   `.standards.mode` file and there will not be one. A standards repo running its
   own gates in advisory mode is not evidence of anything.
