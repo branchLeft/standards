@@ -12,13 +12,16 @@ TOOLS="$HERE/.."
 
 pass=0 fail=0
 
+# The output shown for a failure is the failing run's own. A second run to
+# collect it would print nothing for a case that failed intermittently, which is
+# exactly the case whose output is needed.
 run() {
-  local name="$1"; shift
-  if "$@" >/dev/null 2>&1; then
+  local name="$1" output; shift
+  if output=$("$@" 2>&1); then
     printf '  ok    %s\n' "$name"; pass=$((pass + 1))
   else
     printf '  FAIL  %s\n' "$name"; fail=$((fail + 1))
-    "$@" 2>&1 | sed 's/^/        /'
+    printf '%s\n' "$output" | sed 's/^/        /'
   fi
 }
 
@@ -353,6 +356,34 @@ fifo_is_refused() {
   rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
+
+echo "runner:"
+# A case that fails on its first run and passes on its second stands in for an
+# intermittent failure: the runner must show what the failing run printed.
+flaky_once() { # invoked through run
+  [ -e "$FLAKY_MARKER" ] && return 0
+  : > "$FLAKY_MARKER"
+  echo "OUTPUT_OF_THE_FAILING_RUN"
+  return 1
+}
+# Runs a command with its own pass and fail counts, so a case under test cannot
+# move the real ones.
+counted_apart() {
+  local pass=0 fail=0
+  "$@"
+}
+failing_run_output_is_shown() {
+  local shown
+  FLAKY_MARKER="$fixture_dir/failed-once"
+  rm -f "$FLAKY_MARKER"
+  shown=$(counted_apart run "flaky case" flaky_once)
+  case "$shown" in
+    *"FAIL  flaky case"*"OUTPUT_OF_THE_FAILING_RUN"*) return 0 ;;
+  esac
+  echo "$shown"
+  return 1
+}
+run "a failing case's own output is shown, not a rerun's" failing_run_output_is_shown
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
