@@ -508,11 +508,11 @@ check_state_isolation() {
     git add -A && git commit -qm state
   ) || return 2
   out=$(cd "$dir" && "$CHECK_SCRIPT" --mode enforce --json 2>&1)
-  printf '%s' "$out" | grep -q '"file":"src/a2.ts","line":1,' \
+  grep -q '"file":"src/a2.ts","line":1,' <<< "$out" \
     || { echo "FAIL: a block comment left open by one file swallowed the next file's first line, or its line number ran on"; return 1; }
-  printf '%s' "$out" | grep -q '"file":"src/b2.ts","line":2,' \
+  grep -q '"file":"src/b2.ts","line":2,' <<< "$out" \
     || { echo "FAIL: raw SQL on line 2 of the file after one ending in a backtick was not reported at line 2"; return 1; }
-  printf '%s' "$out" | grep -q '"file":"src/b2.ts","line":1,' \
+  grep -q '"file":"src/b2.ts","line":1,' <<< "$out" \
     && { echo "FAIL: a backtick left open at the end of one file made the next file's first line read as SQL"; return 1; }
   [ "$(printf '%s\n' "$out" | grep -c '"clause":"DB-1"')" -eq 2 ] \
     || { echo "FAIL: expected exactly 2 findings across files that leave state open"; return 1; }
@@ -538,7 +538,7 @@ check_scan_fails_closed() {
       || { echo "FAIL: $label printed no 'check-raw-sql: scan failed' line"; return 1; }
     grep -qF "$last_file" "$work/err" \
       || { echo "FAIL: $label did not name the file the scan had reached"; return 1; }
-    cat "$work/out" "$work/err" | grep -q '^standards: mode=' \
+    grep -q '^standards: mode=' "$work/out" "$work/err" \
       && { echo "FAIL: $label still printed a pass summary"; return 1; }
     grep -q 'raw SQL outside the ORM' "$work/out" \
       && { echo "FAIL: $label still printed a scan finding"; return 1; }
@@ -688,11 +688,11 @@ EOF
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     expect() {
-      printf '%s' "$out" | grep -q "\"file\":\"$1\",\"line\":$2,\"level\":\"error\"" \
+      grep -q "\"file\":\"$1\",\"line\":$2,\"level\":\"error\"" <<< "$out" \
         || { echo "FAIL: $3"; echo "$out"; exit 1; }
     }
     refuse() {
-      printf '%s' "$out" | grep -q "\"file\":\"$1\",\"line\":$2," \
+      grep -q "\"file\":\"$1\",\"line\":$2," <<< "$out" \
         && { echo "FAIL: $3"; echo "$out"; exit 1; }
       return 0
     }
@@ -721,7 +721,7 @@ EOF
     git add -A && git commit -qm exempt
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     expect_level() {
-      printf '%s' "$out" | grep -q "\"file\":\"$1\",\"line\":$2,\"level\":\"$3\"" \
+      grep -q "\"file\":\"$1\",\"line\":$2,\"level\":\"$3\"" <<< "$out" \
         || { echo "FAIL: $4"; echo "$out"; exit 1; }
     }
     expect_level db/seed.sql 1 exempt ".standardsignore did not exempt db/seed.sql"
@@ -746,9 +746,9 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     refuse ops/db-tooling/backup.ts '[0-9]*' "declared tooling script still reported"
     refuse ops/db-tooling/restore.sql '[0-9]*' "declared tooling .sql file still reported"
-    printf '%s' "$out" | grep -q '"file":"src/store.ts","line":5' \
+    grep -q '"file":"src/store.ts","line":5' <<< "$out" \
       || { echo "FAIL: declaring db tooling silenced unrelated application code"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"ops/db-tooling/backup.ts".*"level":"exempt"' \
+    grep -q '"file":"ops/db-tooling/backup.ts".*"level":"exempt"' <<< "$out" \
       && { echo "FAIL: declared tooling reported as an exemption rather than out of scope"; echo "$out"; exit 1; }
 
     # A catch-all line must not turn the file into a per-PR exemption.
@@ -760,7 +760,7 @@ EOF
     git add -A && git commit -qm catch-all
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     expect src/app.ts 1 "a bare '*' line let raw SQL in application code pass"
-    printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling","line":1,"level":"error".*no literal' \
+    grep -q '"file":"\.standards-db-tooling","line":1,"level":"error".*no literal' <<< "$out" \
       || { echo "FAIL: the refused '*' line was not reported on .standards-db-tooling"; echo "$out"; exit 1; }
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
       && { echo "FAIL: a catch-all declaration did not fail the build"; exit 1; }
@@ -770,9 +770,9 @@ EOF
       printf '%s\n' "$1" > .standards-db-tooling
       git add -A && git commit -qm refuse-shape
       out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
-      printf '%s' "$out" | grep -q "\"file\":\"\.standards-db-tooling\",\"line\":1,\"level\":\"error\"" \
+      grep -q "\"file\":\"\.standards-db-tooling\",\"line\":1,\"level\":\"error\"" <<< "$out" \
         || { echo "FAIL: '$1' was not refused"; echo "$out"; exit 1; }
-      printf '%s' "$out" | grep -q '"file":"src/app.ts","line":1,"level":"error"' \
+      grep -q '"file":"src/app.ts","line":1,"level":"error"' <<< "$out" \
         || { echo "FAIL: '$1' granted scope to application code"; echo "$out"; exit 1; }
     }
     refused_shape '**'
@@ -791,7 +791,7 @@ EOF
     git add -A && git commit -qm tooling-comments
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
     refuse ops/db-tooling/backup.ts '[0-9]*' "a comment or blank line in .standards-db-tooling was read as a glob"
-    printf '%s' "$out" | grep -q '"file":"\.standards-db-tooling"' \
+    grep -q '"file":"\.standards-db-tooling"' <<< "$out" \
       && { echo "FAIL: a comment or blank line in .standards-db-tooling was reported as refused"; echo "$out"; exit 1; }
 
     # Permission DDL: one fixture per statement outside a declared path, and
@@ -832,7 +832,7 @@ EOF
     refuse ops/db-tooling/perm-default_privileges.ts '[0-9]*' "declared-path ALTER DEFAULT PRIVILEGES was reported"
 
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q '::error.*DB-1' \
+    grep -q '::error.*DB-1' <<< "$out" \
       || { echo "FAIL: human-readable output did not use ::error::"; echo "$out"; exit 1; }
 
     exit 0

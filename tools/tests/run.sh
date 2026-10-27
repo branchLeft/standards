@@ -385,6 +385,42 @@ failing_run_output_is_shown() {
 }
 run "a failing case's own output is shown, not a rerun's" failing_run_output_is_shown
 
+# A gate self-test captures a gate's output in a variable and asserts on it.
+# Piping that variable into `grep -q` under pipefail lets grep exit on its first
+# match while printf is still writing: once the variable outgrows the pipe
+# buffer, printf dies of SIGPIPE, the pipeline reports failure, and a positive
+# assertion fails on a run that was correct. Whether it does depends on
+# scheduling, so it comes and goes with machine load. A here-string cannot.
+PIPE_GUARDED_GATES=("$TOOLS/check-raw-sql.sh" "$TOOLS/check-workflows.sh" "$TOOLS/check-clause-index.sh")
+piped_variable_greps() { # files...; prints each line that pipes a variable into grep -q
+  grep -nE '(printf .%s.|echo) "\$[A-Za-z_]+" \| grep -[A-Za-z]*q' "$@"
+}
+no_variable_piped_into_grep_q() {
+  local hits
+  hits=$(piped_variable_greps "${PIPE_GUARDED_GATES[@]}") || return 0
+  printf '%s\n' "$hits"
+  return 1
+}
+run "no gate self-test pipes a variable into grep -q" no_variable_piped_into_grep_q
+
+pipe_guard_flags_the_idiom() {
+  local copy="$fixture_dir/piped-grep.sh"
+  printf '%s\n' "printf '%s' \"\$out\" | grep -q 'x' \\" > "$copy"
+  piped_variable_greps "$copy" >/dev/null || return 1
+  printf '%s\n' "grep -q 'x' <<< \"\$out\" \\" > "$copy"
+  ! piped_variable_greps "$copy" >/dev/null
+}
+run "the pipe guard flags the idiom and passes a here-string" pipe_guard_flags_the_idiom
+
+piped_grep_q_fails_on_a_large_variable() {
+  local big
+  big="MATCH"$'\n'"$(head -c 1048576 /dev/zero | tr '\0' x)"
+  # shellcheck disable=SC2312  # the failing pipeline is the thing under test
+  ( set -o pipefail; printf '%s' "$big" | grep -q MATCH ) && return 1
+  ( set -o pipefail; grep -q MATCH <<< "$big" )
+}
+run "premise: a large variable piped into grep -q fails under pipefail" piped_grep_q_fails_on_a_large_variable
+
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
   while IFS= read -r f; do
