@@ -381,7 +381,7 @@ co_case() { # name table_repo table_value payload_repo payload_field live_field|
   local d="$fixture_dir/co/$1"
   mkdir -p "$d/bin" "$d/live" "$d/payloads/$4"
   co_stub "$d/bin/gh"
-  printf '## REPO-1 — shape\n\n| `require_code_owner_review` | Repos |\n| --- | --- |\n| %s | `%s` |\n\n## REPO-2 — next\n' "$3" "$2" > "$d/repo-settings.md"
+  printf "## REPO-1 — shape\n\n| \`require_code_owner_review\` | Repos |\n| --- | --- |\n| %s | \`%s\` |\n\n## REPO-2 — next\n" "$3" "$2" > "$d/repo-settings.md"
   co_ruleset "$d/payloads/$4/main.json" "$5"
   cp "$d/payloads/$4/main.json" "$d/live/detail.json"
   if [ "$6" = blocked ]; then
