@@ -57,4 +57,34 @@ describe('DeployRolloutGate', () => {
     const content = ['jobs:', '  test:', '    steps:', '      - run: npm test'].join('\n');
     expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
   });
+
+  it('does not treat a read-only plan job that holds deploy secrets as a deploy job', () => {
+    const content = [
+      'jobs:',
+      '  plan:',
+      '    steps:',
+      '      - run: pulumi preview',
+      '        env:',
+      '          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}',
+    ].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('still treats a job with a deploy secret and an environment as a deploy job', () => {
+    const content = [
+      'jobs:',
+      '  ship:',
+      '    environment: production',
+      '    steps:',
+      '      - run: ./push.sh',
+      '        env:',
+      '          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}',
+    ].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(2);
+  });
+
+  it('still treats a job named deploy as a deploy job without any secret', () => {
+    const content = ['jobs:', '  deploy:', '    steps:', '      - run: ./push.sh'].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(2);
+  });
 });

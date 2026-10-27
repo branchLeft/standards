@@ -4,7 +4,12 @@ import type { Gate, GateContext } from './gate.ts';
 import { extractRunStepBodies, stripYamlComments } from './pythonToolInvocation.ts';
 import type { Ratchet } from './ratchet.ts';
 import { readThresholdSetting, splitThresholdList } from './thresholdSettings.ts';
-import { splitWorkflowJobs, usesDeploySecret } from './workflowJobs.ts';
+import {
+  hasApplyStep,
+  hasEnvironmentKey,
+  splitWorkflowJobs,
+  usesDeploySecret,
+} from './workflowJobs.ts';
 
 const WORKFLOW_PATTERN = /^\.github\/workflows\/.*\.ya?ml$/;
 const DEFAULT_DEPLOY_JOB_NAME_SUBSTRINGS: readonly string[] = ['deploy'];
@@ -13,9 +18,10 @@ const HEALTH_PATTERN = /health[-_ ]?check/i;
 const ROLLBACK_PATTERN = /roll[-_ ]?back/i;
 
 // OPS-2: every deploy job has a health-check step and an automatic rollback
-// step. `pending` in docs/index.md — a deploy job is identified the same way
-// CI-12 identifies one, plus a job-name heuristic, since a rollback step
-// itself carries no deploy-shaped secret to key off.
+// step. `pending` in docs/index.md — a deploy job is identified by its name,
+// or by holding a deploy-shaped secret together with an `environment:` or an
+// apply step. A secret alone is not enough: a read-only plan or preview job
+// holds the same credentials and has nothing to roll back.
 export class DeployRolloutGate implements Gate {
   readonly id = 'deploy-rollout';
   readonly clauses = ['OPS-2'];
@@ -46,7 +52,10 @@ export class DeployRolloutGate implements Gate {
     if (this.jobNameSubstrings().some((substring) => lowerName.includes(substring.toLowerCase()))) {
       return true;
     }
-    return usesDeploySecret(body, DEPLOY_SECRET_SUBSTRINGS);
+    if (!usesDeploySecret(body, DEPLOY_SECRET_SUBSTRINGS)) {
+      return false;
+    }
+    return hasEnvironmentKey(body) || hasApplyStep(`${body}\n${extractRunStepBodies(body)}`);
   }
 
   run(_context: GateContext): readonly Finding[] {

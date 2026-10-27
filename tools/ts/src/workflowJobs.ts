@@ -133,3 +133,15 @@ export function usesDeploySecret(body: string, substrings: readonly string[]): b
 export function hasEnvironmentKey(body: string): boolean {
   return /^\s*environment:/m.test(body);
 }
+
+const APPLY_STEP =
+  /\bpulumi\s+up\b|\bterraform\s+apply\b|\btofu\s+apply\b|\bansible-playbook\b|\bkubectl\s+(apply|rollout)\b|\bhelm\s+(upgrade|install)\b|\bbranchleft-deploy\b|\bdocker\s+(compose\s+up|stack\s+deploy)\b|\bcommand:\s*['"]?up\b/;
+
+/**
+ * True when a job body runs a command that rolls a change out, as opposed to
+ * one that only plans or previews it. Matched against `run:` text and the
+ * `command:` input of a `uses:` step, so it is given both.
+ */
+export function hasApplyStep(runText: string): boolean {
+  return APPLY_STEP.test(runText);
+}
