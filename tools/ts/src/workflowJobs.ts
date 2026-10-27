@@ -1,3 +1,5 @@
+import { extractRunStepBodies } from './pythonToolInvocation.ts';
+
 /** One `jobs:` entry, split out of a workflow file's raw text. */
 export interface WorkflowJob {
   readonly name: string;
@@ -144,4 +146,47 @@ const APPLY_STEP =
  */
 export function hasApplyStep(runText: string): boolean {
   return APPLY_STEP.test(runText);
+}
+
+/**
+ * Splits a job body into its `steps:` entries by indentation, in the same
+ * no-YAML-parser spirit as `splitWorkflowJobs`. A job with no `steps:` key (a
+ * reusable-workflow call) comes back as one entry holding the whole body.
+ */
+export function splitJobSteps(body: string): readonly string[] {
+  const lines = body.split('\n');
+  const stepsAt = lines.findIndex((line) => /^\s*steps:\s*$/.test(line));
+  if (stepsAt === -1) {
+    return [body];
+  }
+  const stepsIndent = indentOf(lines[stepsAt] ?? '');
+  const steps: string[][] = [];
+  for (const line of lines.slice(stepsAt + 1)) {
+    if (line.trim() === '') {
+      continue;
+    }
+    if (indentOf(line) <= stepsIndent) {
+      break;
+    }
+    if (/^\s*-\s/.test(line) && (steps.length === 0 || indentOf(line) === itemIndent(steps))) {
+      steps.push([line]);
+    } else {
+      steps.at(-1)?.push(line);
+    }
+  }
+  return steps.map((step) => step.join('\n'));
+}
+
+function itemIndent(steps: readonly (readonly string[])[]): number {
+  return indentOf(steps[0]?.[0] ?? '');
+}
+
+const STEP_USES_KEY = /^\s*(?:-\s*)?uses:\s*\S/m;
+
+/**
+ * True when a step executes something: a `run:` with a body or a `uses:`.
+ * A step that only carries a `name:` (or an `if:`, `env:`) does nothing.
+ */
+export function stepRunsSomething(step: string): boolean {
+  return STEP_USES_KEY.test(step) || extractRunStepBodies(step).trim() !== '';
 }

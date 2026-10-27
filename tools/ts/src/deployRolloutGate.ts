@@ -7,7 +7,9 @@ import { readThresholdSetting, splitThresholdList } from './thresholdSettings.ts
 import {
   hasApplyStep,
   hasEnvironmentKey,
+  splitJobSteps,
   splitWorkflowJobs,
+  stepRunsSomething,
   usesDeploySecret,
 } from './workflowJobs.ts';
 
@@ -21,7 +23,9 @@ const ROLLBACK_PATTERN = /roll[-_ ]?back/i;
 // step. `pending` in docs/index.md — a deploy job is identified by its name,
 // or by holding a deploy-shaped secret together with an `environment:` or an
 // apply step. A secret alone is not enough: a read-only plan or preview job
-// holds the same credentials and has nothing to roll back.
+// holds the same credentials and has nothing to roll back. A health-check or
+// rollback only counts when it sits in a step that runs something: a step that
+// carries the name and nothing else would otherwise satisfy the clause.
 export class DeployRolloutGate implements Gate {
   readonly id = 'deploy-rollout';
   readonly clauses = ['OPS-2'];
@@ -70,7 +74,8 @@ export class DeployRolloutGate implements Gate {
         if (!this.isDeployJob(job.name, job.body)) {
           continue;
         }
-        const searchText = `${job.body}\n${extractRunStepBodies(job.body)}`;
+        const steps = splitJobSteps(job.body).filter(stepRunsSomething);
+        const searchText = steps.join('\n');
         if (!HEALTH_PATTERN.test(searchText)) {
           findings.push(
             this.ratchet.findingAdvisory(
