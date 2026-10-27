@@ -371,6 +371,7 @@ gate_fixture_passes() {
 }
 run "OPS-2: a read-only plan job is not a deploy job" gate_fixture_passes 'read-only plan job'
 run "OPS-2: a step carrying only the health-check name is refused" gate_fixture_passes 'placebo step|empty block body'
+run "REPO-8: env-config and gitconfig edits that disable signing are reported" gate_fixture_passes 'env-config and gitconfig|tracked gitconfig file'
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
