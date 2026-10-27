@@ -132,11 +132,15 @@ accepted_shape() { # workflow_sed audit_sed
 }
 
 # Runs the checker on arguments the caller chooses, with a timeout so a checker
-# that blocks on a FIFO fails the fixture instead of hanging the run.
+# that blocks on a FIFO fails the fixture instead of hanging the run. The
+# timeout only stops a hang, so it is generous: one a loaded machine can overrun
+# fails a correct checker. SHAPE_CHECKER lets a case substitute a slower one.
+HANG_GUARD_SECONDS=120
+SLOW_START_SECONDS=11 # longer than the 10 seconds this guard used to allow
 refused_directly() { # expected_exit expected_message args...
   local expected_exit="$1" expected_message="$2" output rc
   shift 2
-  output="$(timeout 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
+  output="$(timeout "$HANG_GUARD_SECONDS" bash "${SHAPE_CHECKER:-$TOOLS/tests/check_audit_shape.sh}" "$@" 2>&1)"
   rc=$?
   [ "$rc" -eq "$expected_exit" ] || return 1
   case "$output" in *"$expected_message"*) return 0 ;; esac
@@ -356,6 +360,13 @@ fifo_is_refused() {
   rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
+
+slow_checker_is_still_judged() {
+  local slow="$fixture_dir/slow-shape-check.sh"
+  printf '#!/bin/sh\nsleep %s\nexec bash "%s" "$@"\n' "$SLOW_START_SECONDS" "$TOOLS/tests/check_audit_shape.sh" > "$slow"
+  SHAPE_CHECKER="$slow" refused_directly 2 'usage: check_audit_shape.sh'
+}
+run "shape check: a checker that starts late is judged on its result, not its speed" slow_checker_is_still_judged
 
 echo "runner:"
 # A case that fails on its first run and passes on its second stands in for an

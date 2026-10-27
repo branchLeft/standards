@@ -134,6 +134,14 @@ in_declared_tooling() {
 DEFAULT_CEILING_SECONDS=120
 POLL_INTERVAL_SECONDS=0.2
 POLLS_PER_SECOND=5
+
+# The self-test's own waits. Each only stops a hang, so each is generous: a
+# bound a loaded machine can overrun turns a correct gate red, and the case it
+# guards is proved by the exit status and the message, not by being quick.
+SELFTEST_GATE_BOUND_SECONDS=300
+SELFTEST_STOP_BOUND_SECONDS=60
+# Longer than the bounds this replaced, so a case that regresses to them goes red.
+SELFTEST_SLOW_START_SECONDS=11
 SCAN_COMPLETE_MARKER="check-raw-sql: scan-complete"
 SCAN_PID=""
 SCAN_FILE_COUNT=0
@@ -444,8 +452,8 @@ count_awk_calls() {
 check_batched_scan() {
   local base="$1" small="$2" big="$3" calls_small calls_big
   mkdir -p "$base/batched-small" "$base/batched-big"
-  run_gate_standin log "$small" 60 "$base/batched-small" --mode enforce
-  run_gate_standin log "$big" 60 "$base/batched-big" --mode enforce
+  run_gate_standin log "$small" "$SELFTEST_GATE_BOUND_SECONDS" "$base/batched-small" --mode enforce
+  run_gate_standin log "$big" "$SELFTEST_GATE_BOUND_SECONDS" "$base/batched-big" --mode enforce
   calls_small=$(count_awk_calls "$base/batched-small")
   calls_big=$(count_awk_calls "$base/batched-big")
   [ "$calls_big" -ge 1 ] \
@@ -478,7 +486,7 @@ check_no_finding_lost() {
     busy_pids+=("$!")
     loops=$((loops + 1))
   done
-  (cd "$tree" && run_bounded 120 "$work/out" "$work/err" "$CHECK_SCRIPT" --mode enforce --json)
+  (cd "$tree" && run_bounded "$SELFTEST_GATE_BOUND_SECONDS" "$work/out" "$work/err" "$CHECK_SCRIPT" --mode enforce --json)
   gate_status=$?
   stop_busy_loops "${busy_pids[@]}"
   [ "$(grep -c '"clause":"DB-1"' "$work/out")" -eq 105 ] \
@@ -530,7 +538,7 @@ check_scan_fails_closed() {
       dropmarker) label="a scan with its completion marker cut off" ;;
       *) label="a scan that counted fewer files than it was given" ;;
     esac
-    run_gate_standin "$mode" "$small" 60 "$work" --mode enforce
+    run_gate_standin "$mode" "$small" "$SELFTEST_GATE_BOUND_SECONDS" "$work" --mode enforce
     gate_status=$?
     [ "$gate_status" -eq 3 ] \
       || { echo "FAIL: $label did not fail the gate with status 3 (status $gate_status)"; return 1; }
@@ -558,21 +566,27 @@ check_ceiling_value() {
   return 0
 }
 
-check_ceiling() {
-  local base="$1" small="$2" work="$1/ceiling" last_file gate_status
+check_ceiling_stop() {
+  local work="$1" small="$2" last_file gate_status
   mkdir -p "$work"
-  check_ceiling_value "$small" "$work" || return 1
   last_file=$(cd "$small" && git ls-files | grep -E '\.(ts|tsx|js|py)$' | tail -n 1)
-  CHECK_RAW_SQL_CEILING_SECONDS=1 run_gate_standin hang "$small" 6 "$work" --mode enforce
+  CHECK_RAW_SQL_CEILING_SECONDS=1 run_gate_standin hang "$small" "$SELFTEST_STOP_BOUND_SECONDS" "$work" --mode enforce
   gate_status=$?
   kill_recorded_pids "$work/standin" "$work/sleep"
   [ "$gate_status" -eq 124 ] \
-    || { echo "FAIL: a scan past the 1 second ceiling did not make the gate exit 124 within 6 seconds (status $gate_status)"; return 1; }
+    || { echo "FAIL: a scan past the 1 second ceiling did not make the gate exit 124 within $SELFTEST_STOP_BOUND_SECONDS seconds (status $gate_status)"; return 1; }
   grep -q '^check-raw-sql: ceiling of 1 seconds' "$work/err" \
     || { echo "FAIL: the ceiling stop printed no 'check-raw-sql: ceiling' line giving the seconds"; return 1; }
   grep -qF "$last_file" "$work/err" \
     || { echo "FAIL: the ceiling stop did not name the file the scan had reached"; return 1; }
   return 0
+}
+
+check_ceiling() {
+  local base="$1" small="$2" work="$1/ceiling"
+  mkdir -p "$work"
+  check_ceiling_value "$small" "$work" || return 1
+  check_ceiling_stop "$work" "$small"
 }
 
 check_sigterm_body() {
@@ -588,7 +602,7 @@ check_sigterm_body() {
   gate_pid=$!
   echo "$gate_pid" > "$work/gate"
   while [ ! -f "$work/sleep" ] || [ ! -f "$work/standin" ] || [ -z "$(find "$work/tmp" -name scan-progress)" ]; do
-    [ "$polls" -lt $((10 * POLLS_PER_SECOND)) ] \
+    [ "$polls" -lt $((SELFTEST_STOP_BOUND_SECONDS * POLLS_PER_SECOND)) ] \
       || { echo "FAIL: the SIGTERM case's scan never reached its hang"; return 1; }
     sleep "$POLL_INTERVAL_SECONDS"
     polls=$((polls + 1))
@@ -596,8 +610,8 @@ check_sigterm_body() {
   kill -TERM "$gate_pid"
   polls=0
   until is_process_gone "$gate_pid" && is_process_gone "$(cat "$work/standin")" && is_process_gone "$(cat "$work/sleep")"; do
-    [ "$polls" -lt $((5 * POLLS_PER_SECOND)) ] \
-      || { echo "FAIL: 5 seconds after SIGTERM the gate, its scan or the scan's child was still running"; return 1; }
+    [ "$polls" -lt $((SELFTEST_STOP_BOUND_SECONDS * POLLS_PER_SECOND)) ] \
+      || { echo "FAIL: $SELFTEST_STOP_BOUND_SECONDS seconds after SIGTERM the gate, its scan or the scan's child was still running"; return 1; }
     sleep "$POLL_INTERVAL_SECONDS"
     polls=$((polls + 1))
   done
@@ -619,6 +633,21 @@ check_sigterm() {
   return "$status"
 }
 
+# A gate that starts late, as one does on a loaded machine, must still be
+# stopped by its ceiling and by SIGTERM. The delay is longer than the bounds the
+# stop cases used to wait, so a bound back at those values fails here every time.
+check_slow_start() {
+  local base="$1" small="$2" slow="$1/slow-start/gate" status
+  mkdir -p "$base/slow-start"
+  printf '#!/bin/sh\nsleep %s\nexec bash "%s" "$@"\n' "$SELFTEST_SLOW_START_SECONDS" "$HERE/check-raw-sql.sh" > "$slow"
+  chmod +x "$slow"
+  CHECK_SCRIPT="$slow" check_ceiling_stop "$base/slow-start/ceiling" "$small" || return 1
+  CHECK_SCRIPT="$slow" check_sigterm_body "$base/slow-start/sigterm" "$small"
+  status=$?
+  kill_recorded_pids "$base/slow-start/sigterm/gate" "$base/slow-start/sigterm/standin" "$base/slow-start/sigterm/sleep"
+  return "$status"
+}
+
 run_scan_self_tests() {
   local base="$1/scan-cases"
   STANDIN_REAL_AWK=$(command -v awk)
@@ -632,6 +661,7 @@ run_scan_self_tests() {
   check_scan_fails_closed "$base" "$base/small" || return 1
   check_ceiling "$base" "$base/small" || return 1
   check_sigterm "$base" "$base/small" || return 1
+  check_slow_start "$base" "$base/small" || return 1
   return 0
 }
 
