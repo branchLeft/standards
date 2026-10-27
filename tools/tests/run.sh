@@ -35,6 +35,7 @@ run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
+run "ruleset_code_owner.py" python3 "$TOOLS/ruleset_code_owner.py" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
 # check-coverage.sh: self-tested like every other gate, but deliberately
 # absent from GATES in standards-audit.sh and from
@@ -353,6 +354,89 @@ fifo_is_refused() {
   rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
+
+# REPO-1's code-owner field. The audit reads the table, each committed payload and
+# each live default-branch ruleset. Every case is a scratch tree with a stub gh, so
+# no live call is made.
+co_stub() {
+  cat > "$1" <<'STUB'
+#!/usr/bin/env bash
+# Stub gh: answers the audit's two GET calls from STUB_LIVE_DIR.
+case "$*" in
+  *"/rulesets/"*) cat "$STUB_LIVE_DIR/detail.json" ;;
+  *"/rulesets"*) cat "$STUB_LIVE_DIR/list.json" ;;
+  *) echo "stub gh: unexpected call: $*" >&2; exit 1 ;;
+esac
+STUB
+  chmod +x "$1"
+}
+
+co_ruleset() { # file field_json (empty means the field is absent)
+  local params='{}'
+  [ -n "$2" ] && params="{\"require_code_owner_review\":$2}"
+  printf '%s\n' "{\"name\":\"Protect default branch\",\"target\":\"branch\",\"enforcement\":\"active\",\"conditions\":{\"ref_name\":{\"include\":[\"~DEFAULT_BRANCH\"],\"exclude\":[]}},\"rules\":[{\"type\":\"pull_request\",\"parameters\":${params}}],\"bypass_actors\":[]}" > "$1"
+}
+
+co_case() { # name table_repo table_value payload_repo payload_field live_field|blocked
+  local d="$fixture_dir/co/$1"
+  mkdir -p "$d/bin" "$d/live" "$d/payloads/$4"
+  co_stub "$d/bin/gh"
+  printf "## REPO-1 — shape\n\n| \`require_code_owner_review\` | Repos |\n| --- | --- |\n| %s | \`%s\` |\n\n## REPO-2 — next\n" "$3" "$2" > "$d/repo-settings.md"
+  co_ruleset "$d/payloads/$4/main.json" "$5"
+  cp "$d/payloads/$4/main.json" "$d/live/detail.json"
+  if [ "$6" = blocked ]; then
+    printf '%s\n' '{"message":"Upgrade to GitHub Pro"}' > "$d/live/list.json"
+  else
+    printf '[{"id":7,"name":"Protect default branch"}]\n' > "$d/live/list.json"
+    co_ruleset "$d/live/detail.json" "$6"
+  fi
+}
+
+co_run() { # case name: the audit's output on stdout, its exit status returned
+  local d="$fixture_dir/co/$1"
+  PATH="$d/bin:$PATH" STUB_LIVE_DIR="$d/live" \
+    RULESET_AUDIT_PAYLOADS="$d/payloads" RULESET_AUDIT_DOC="$d/repo-settings.md" \
+    bash "$REAL_AUDIT" 2>&1
+}
+
+co_expect() { # ok|fail expected_text case_name
+  local out rc=0
+  out="$(co_run "$3")" || rc=$?
+  case "$1" in
+    ok) [ "$rc" -eq 0 ] || return 1 ;;
+    fail) [ "$rc" -ne 0 ] || return 1 ;;
+  esac
+  case "$out" in *"$2"*) return 0 ;; esac
+  return 1
+}
+
+co_estate() { # the committed payloads against the real table, live blocked
+  local d="$fixture_dir/co/estate" rc=0
+  mkdir -p "$d/bin" "$d/live"
+  co_stub "$d/bin/gh"
+  printf '%s\n' '{"message":"Upgrade to GitHub Pro"}' > "$d/live/list.json"
+  PATH="$d/bin:$PATH" STUB_LIVE_DIR="$d/live" bash "$REAL_AUDIT" > "$d/out.txt" 2>&1 || rc=$?
+  [ "$rc" -eq 0 ] && grep -q 'code owner (committed): OK:' "$d/out.txt" \
+    && ! grep -qE 'DISAGREE|OUTSIDE|ERROR' "$d/out.txt"
+}
+
+co_case clean fixture-a true fixture-a true true
+co_case committed-opposite fixture-a true fixture-a false false
+co_case live-opposite fixture-a true fixture-a true false
+co_case outside fixture-other true fixture-b true true
+co_case outside-absent fixture-other true fixture-d '' blocked
+co_case not-audited fixture-c 'NOT AUDITED' fixture-c true blocked
+co_case absent-in-row fixture-a true fixture-a '' blocked
+
+echo "code owner (REPO-1 table):"
+run "code owner: a payload and live ruleset that agree with the table pass" co_expect ok "OK:" clean
+run "code owner: a payload opposite to its table row fails" co_expect fail "DISAGREE" committed-opposite
+run "code owner: a live ruleset opposite to its table row fails" co_expect fail "DISAGREE" live-opposite
+run "code owner: a repo outside the table that sets the field fails" co_expect fail "OUTSIDE" outside
+run "code owner: a repo outside the table that sets no field passes" co_expect ok "OK:" outside-absent
+run "code owner: a private repo in the NOT AUDITED row is reported, not judged" co_expect ok "NOT AUDITED:" not-audited
+run "code owner: a table row for true with no field fails" co_expect fail "DISAGREE" absent-in-row
+run "code owner: the committed estate reads clean against the real table" co_estate
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
