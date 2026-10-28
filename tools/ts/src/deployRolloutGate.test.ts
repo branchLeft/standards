@@ -57,4 +57,79 @@ describe('DeployRolloutGate', () => {
     const content = ['jobs:', '  test:', '    steps:', '      - run: npm test'].join('\n');
     expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
   });
+
+  it('does not treat a read-only plan job that holds deploy secrets as a deploy job', () => {
+    const content = [
+      'jobs:',
+      '  plan:',
+      '    steps:',
+      '      - run: pulumi preview',
+      '        env:',
+      '          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}',
+    ].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('still treats a job with a deploy secret and an environment as a deploy job', () => {
+    const content = [
+      'jobs:',
+      '  ship:',
+      '    environment: production',
+      '    steps:',
+      '      - run: ./push.sh',
+      '        env:',
+      '          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}',
+    ].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(2);
+  });
+
+  it('still treats a job named deploy as a deploy job without any secret', () => {
+    const content = ['jobs:', '  deploy:', '    steps:', '      - run: ./push.sh'].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(2);
+  });
+
+  it('rejects a placebo step that only carries the health-check and rollback names', () => {
+    const content = [
+      'jobs:',
+      '  deploy:',
+      '    steps:',
+      '      - run: pulumi up',
+      '      - name: health-check',
+      '      - name: rollback',
+      '        if: failure()',
+    ].join('\n');
+    const findings = buildGate(content).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(2);
+  });
+
+  it('accepts a health check that is a uses step and a rollback that is a block run', () => {
+    const content = [
+      'jobs:',
+      '  deploy:',
+      '    steps:',
+      '      - run: pulumi up',
+      '      - uses: ./.github/actions/health-check',
+      '      - name: undo',
+      '        if: failure()',
+      '        run: |',
+      '          ./scripts/rollback.sh',
+    ].join('\n');
+    expect(buildGate(content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('rejects a run key with an empty block body', () => {
+    const content = [
+      'jobs:',
+      '  deploy:',
+      '    steps:',
+      '      - run: pulumi up',
+      '      - name: health-check',
+      '        run: |',
+      '      - name: rollback',
+      '        run: ./scripts/rollback.sh',
+    ].join('\n');
+    const findings = buildGate(content).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('health-check');
+  });
 });

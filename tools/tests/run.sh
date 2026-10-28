@@ -354,6 +354,26 @@ fifo_is_refused() {
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
 
+# The OPS-2, REPO-8 and LINT-2/4 gates are TypeScript, so their fixtures are
+# vitest cases in tools/ts/src. Each case below runs only the tests whose name
+# matches the pattern and requires at least one to pass, so a renamed or
+# deleted fixture reads as a failure rather than as a clean run.
+echo "gate heuristics:"
+GATE_TEST_FILES=(tools/ts/src/deployRolloutGate.test.ts tools/ts/src/commitSigningGate.test.ts tools/ts/src/lintCoverageGate.test.ts)
+gate_fixture_passes() {
+  local pattern="$1" out
+  [ -x "$TOOLS/../node_modules/.bin/vitest" ] \
+    || { echo "vitest is not installed: run pnpm install"; return 1; }
+  out=$(cd "$TOOLS/.." && ./node_modules/.bin/vitest --run "${GATE_TEST_FILES[@]}" -t "$pattern" 2>&1) \
+    || { printf '%s\n' "$out"; return 1; }
+  printf '%s' "$out" | grep -qE 'Tests +[0-9]+ passed' \
+    || { echo "no fixture matched: $pattern"; printf '%s\n' "$out"; return 1; }
+}
+run "OPS-2: a read-only plan job is not a deploy job" gate_fixture_passes 'read-only plan job'
+run "OPS-2: a step carrying only the health-check name is refused" gate_fixture_passes 'placebo step|empty block body'
+run "REPO-8: env-config and gitconfig edits that disable signing are reported" gate_fixture_passes 'env-config and gitconfig|tracked gitconfig file'
+run "LINT-2: an unknown tracked source type is reported, not skipped" gate_fixture_passes 'unknown tracked source type'
+
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
   while IFS= read -r f; do
