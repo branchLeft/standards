@@ -43,7 +43,7 @@ scan_workflow() {
     # an empty expression there is inert — reporting it fires the gate on
     # documentation that breaks nothing, which is how a gate earns a suppression.
     if [ "$in_run" -eq 1 ] || [ "${trimmed:0:1}" != "#" ]; then
-      if printf '%s' "$line" | grep -qE '\$\{\{[[:space:]]*\}\}'; then
+      if grep -qE '\$\{\{[[:space:]]*\}\}' <<< "$line"; then
         ratchet_finding "CI-9" "$f" "$ln" \
           "empty \${{ }} expression in an evaluated position — it fails the run at startup with no log"
       fi
@@ -72,15 +72,15 @@ scan_workflow() {
           ./*|'') ;;                                   # local call, nothing to pin
           *@*)
             local sha="${ref##*@}" repo="${ref%@*}"
-            if printf '%s' "$repo" | grep -q '/\.github/workflows/'; then
+            if grep -q '/\.github/workflows/' <<< "$repo"; then
               # CI-5 — reusable workflow: exact tag, never a branch.
               case "$sha" in
                 main|master|HEAD)
                   ratchet_finding "CI-5" "$f" "$ln" "reusable workflow pinned to '$sha' — pin an exact tag" ;;
               esac
-            elif ! printf '%s' "$sha" | grep -qE '^[0-9a-f]{40}$'; then
+            elif ! grep -qE '^[0-9a-f]{40}$' <<< "$sha"; then
               ratchet_finding "CI-1" "$f" "$ln" "action '$repo' is pinned to '$sha', not a 40-character commit SHA"
-            elif ! printf '%s' "$line" | grep -qE '#[[:space:]]*v?[0-9]'; then
+            elif ! grep -qE '#[[:space:]]*v?[0-9]' <<< "$line"; then
               ratchet_finding "CI-1" "$f" "$ln" "action '$repo' is SHA-pinned but has no '# vX.Y.Z' comment"
             fi
             ;;
@@ -309,7 +309,7 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
 
     for c in CI-1 CI-2 CI-3 CI-4 CI-5 CI-9 CI-10; do
-      printf '%s' "$out" | grep -q "$c" || { echo "FAIL: $c not caught"; echo "$out"; exit 1; }
+      grep -q "$c" <<< "$out" || { echo "FAIL: $c not caught"; echo "$out"; exit 1; }
     done
     # Two CI-1 findings: an unpinned tag, and a SHA with no version comment.
     # Trailing space, not a bare "CI-1": CI-10 also contains "CI-1" as a
@@ -349,7 +349,7 @@ jobs:
 EOF
     git add -A && git commit -qm good
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -qE 'CI-[0-9]' && { echo "FAIL: clean workflow reported"; echo "$out"; exit 1; }
+    grep -qE 'CI-[0-9]' <<< "$out" && { echo "FAIL: clean workflow reported"; echo "$out"; exit 1; }
 
     # CI-10 sharper cases: a workflow-level timeout-minutes (a key GitHub
     # does not even read there) must not excuse any job; a step's own
@@ -381,9 +381,9 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 1 ] || {
       echo "FAIL: expected exactly 1 CI-10 finding in mixed.yml"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'unbounded' has no timeout-minutes" || {
+    grep -q "job 'unbounded' has no timeout-minutes" <<< "$out" || {
       echo "FAIL: CI-10 did not name the unbounded job"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'bounded'" && {
+    grep -q "job 'bounded'" <<< "$out" && {
       echo "FAIL: CI-10 fired on a job that sets its own timeout-minutes"; echo "$out"; exit 1; }
 
     # A reusable-workflow caller job takes neither branch of the omission
@@ -418,11 +418,11 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 2 ] || {
       echo "FAIL: expected exactly 2 CI-10 findings in calls.yml"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'invalid' calls a reusable workflow and sets timeout-minutes" || {
+    grep -q "job 'invalid' calls a reusable workflow and sets timeout-minutes" <<< "$out" || {
       echo "FAIL: CI-10 did not report timeout-minutes on a caller job"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'stepsjob' has no timeout-minutes" || {
+    grep -q "job 'stepsjob' has no timeout-minutes" <<< "$out" || {
       echo "FAIL: a caller job suppressed a real finding on its sibling"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'exempt'" && {
+    grep -q "job 'exempt'" <<< "$out" && {
       echo "FAIL: CI-10 fired on a reusable-workflow caller that correctly omits the key"; echo "$out"; exit 1; }
 
     # Quoted keys. `"uses":` and `uses:` are the same YAML key, and matching
@@ -455,10 +455,10 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 1 ] || {
       echo "FAIL: expected exactly 1 CI-10 finding in quoted.yml"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'quotedinvalid' calls a reusable workflow and sets timeout-minutes" || {
+    grep -q "job 'quotedinvalid' calls a reusable workflow and sets timeout-minutes" <<< "$out" || {
       echo "FAIL: a quoted uses: key hid the invalid caller combination"; echo "$out"; exit 1; }
     for j in quotedcaller quotedbound singlequoted; do
-      printf '%s' "$out" | grep -q "job '$j'" && {
+      grep -q "job '$j'" <<< "$out" && {
         echo "FAIL: CI-10 fired on '$j' — a quoted key was read as a missing one"; echo "$out"; exit 1; }
     done
 
@@ -494,11 +494,11 @@ EOF
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     [ "$(printf '%s' "$out" | grep -c 'CI-10')" -eq 2 ] || {
       echo "FAIL: expected exactly 2 CI-10 findings in merge.yml"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'merged'" && {
+    grep -q "job 'merged'" <<< "$out" && {
       echo "FAIL: CI-10 fired on a job bounded via a merge key"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'partialmerge' has no timeout-minutes" || {
+    grep -q "job 'partialmerge' has no timeout-minutes" <<< "$out" || {
       echo "FAIL: CI-10 missed a job whose merge key does not supply timeout-minutes"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "job 'plainunbounded' has no timeout-minutes" || {
+    grep -q "job 'plainunbounded' has no timeout-minutes" <<< "$out" || {
       echo "FAIL: CI-10 missed an ordinary unbounded job in a file that also uses merge keys"; echo "$out"; exit 1; }
 
     # CI-2 and CI-4 read run: as a whole YAML key, not as a substring. A with:
@@ -527,7 +527,7 @@ jobs:
 EOF
     git add -A && git commit -qm dryrun
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'CI-2' && {
+    grep -q 'CI-2' <<< "$out" && {
       echo "FAIL: CI-2 read a with: input ending in run: as a run: body"; echo "$out"; exit 1; }
 
     rm -f .github/workflows/dryrun.yml

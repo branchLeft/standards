@@ -12,13 +12,16 @@ TOOLS="$HERE/.."
 
 pass=0 fail=0
 
+# The output shown for a failure is the failing run's own. A second run to
+# collect it would print nothing for a case that failed intermittently, which is
+# exactly the case whose output is needed.
 run() {
-  local name="$1"; shift
-  if "$@" >/dev/null 2>&1; then
+  local name="$1" output; shift
+  if output=$("$@" 2>&1); then
     printf '  ok    %s\n' "$name"; pass=$((pass + 1))
   else
     printf '  FAIL  %s\n' "$name"; fail=$((fail + 1))
-    "$@" 2>&1 | sed 's/^/        /'
+    printf '%s\n' "$output" | sed 's/^/        /'
   fi
 }
 
@@ -129,11 +132,15 @@ accepted_shape() { # workflow_sed audit_sed
 }
 
 # Runs the checker on arguments the caller chooses, with a timeout so a checker
-# that blocks on a FIFO fails the fixture instead of hanging the run.
+# that blocks on a FIFO fails the fixture instead of hanging the run. The
+# timeout only stops a hang, so it is generous: one a loaded machine can overrun
+# fails a correct checker. SHAPE_CHECKER lets a case substitute a slower one.
+HANG_GUARD_SECONDS=120
+SLOW_START_SECONDS=11 # longer than the 10 seconds this guard used to allow
 refused_directly() { # expected_exit expected_message args...
   local expected_exit="$1" expected_message="$2" output rc
   shift 2
-  output="$(timeout 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
+  output="$(timeout "$HANG_GUARD_SECONDS" bash "${SHAPE_CHECKER:-$TOOLS/tests/check_audit_shape.sh}" "$@" 2>&1)"
   rc=$?
   [ "$rc" -eq "$expected_exit" ] || return 1
   case "$output" in *"$expected_message"*) return 0 ;; esac
@@ -353,6 +360,77 @@ fifo_is_refused() {
   rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
+
+slow_checker_is_still_judged() {
+  local slow="$fixture_dir/slow-shape-check.sh"
+  printf '#!/bin/sh\nsleep %s\nexec bash "%s" "$@"\n' "$SLOW_START_SECONDS" "$TOOLS/tests/check_audit_shape.sh" > "$slow"
+  SHAPE_CHECKER="$slow" refused_directly 2 'usage: check_audit_shape.sh'
+}
+run "shape check: a checker that starts late is judged on its result, not its speed" slow_checker_is_still_judged
+
+echo "runner:"
+# A case that fails on its first run and passes on its second stands in for an
+# intermittent failure: the runner must show what the failing run printed.
+flaky_once() { # invoked through run
+  [ -e "$FLAKY_MARKER" ] && return 0
+  : > "$FLAKY_MARKER"
+  echo "OUTPUT_OF_THE_FAILING_RUN"
+  return 1
+}
+# Runs a command with its own pass and fail counts, so a case under test cannot
+# move the real ones.
+counted_apart() {
+  local pass=0 fail=0
+  "$@"
+}
+failing_run_output_is_shown() {
+  local shown
+  FLAKY_MARKER="$fixture_dir/failed-once"
+  rm -f "$FLAKY_MARKER"
+  shown=$(counted_apart run "flaky case" flaky_once)
+  case "$shown" in
+    *"FAIL  flaky case"*"OUTPUT_OF_THE_FAILING_RUN"*) return 0 ;;
+  esac
+  echo "$shown"
+  return 1
+}
+run "a failing case's own output is shown, not a rerun's" failing_run_output_is_shown
+
+# A gate self-test captures a gate's output in a variable and asserts on it.
+# Piping that variable into `grep -q` under pipefail lets grep exit on its first
+# match while printf is still writing: once the variable outgrows the pipe
+# buffer, printf dies of SIGPIPE, the pipeline reports failure, and a positive
+# assertion fails on a run that was correct. Whether it does depends on
+# scheduling, so it comes and goes with machine load. A here-string cannot.
+PIPE_GUARDED_GATES=("$TOOLS/check-raw-sql.sh" "$TOOLS/check-workflows.sh" "$TOOLS/check-clause-index.sh")
+piped_variable_greps() { # files...; prints each line that pipes a variable into grep -q
+  grep -nE '(printf .%s.|echo) "\$[A-Za-z_]+" \| grep -[A-Za-z]*q' "$@"
+}
+no_variable_piped_into_grep_q() {
+  local hits
+  hits=$(piped_variable_greps "${PIPE_GUARDED_GATES[@]}") || return 0
+  printf '%s\n' "$hits"
+  return 1
+}
+run "no gate self-test pipes a variable into grep -q" no_variable_piped_into_grep_q
+
+pipe_guard_flags_the_idiom() {
+  local copy="$fixture_dir/piped-grep.sh"
+  printf '%s\n' "printf '%s' \"\$out\" | grep -q 'x' \\" > "$copy"
+  piped_variable_greps "$copy" >/dev/null || return 1
+  printf '%s\n' "grep -q 'x' <<< \"\$out\" \\" > "$copy"
+  ! piped_variable_greps "$copy" >/dev/null
+}
+run "the pipe guard flags the idiom and passes a here-string" pipe_guard_flags_the_idiom
+
+piped_grep_q_fails_on_a_large_variable() {
+  local big
+  big="MATCH"$'\n'"$(head -c 1048576 /dev/zero | tr '\0' x)"
+  # shellcheck disable=SC2312  # the failing pipeline is the thing under test
+  ( set -o pipefail; printf '%s' "$big" | grep -q MATCH ) && return 1
+  ( set -o pipefail; grep -q MATCH <<< "$big" )
+}
+run "premise: a large variable piped into grep -q fails under pipefail" piped_grep_q_fails_on_a_large_variable
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
