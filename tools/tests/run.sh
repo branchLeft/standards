@@ -149,14 +149,15 @@ accepted_shape() { # workflow_sed audit_sed
 
 # Bounds a command to a number of seconds. macOS ships no `timeout`, so GNU
 # coreutils' `timeout` or `gtimeout` is used when present and a perl `alarm`
-# otherwise. Either way a command killed by the bound exits non-zero (124 for
-# timeout, 142 for the alarm), so the caller's exit-status assertion still fails.
+# otherwise, where the perl path kills the command's whole process group on the
+# alarm. Either way a command killed by the bound exits non-zero (124 for
+# timeout, 137 for the perl group kill), so the caller's exit-status assertion still fails.
 bounded() { # seconds command...
   local secs="$1"
   shift
   if command -v timeout >/dev/null 2>&1; then timeout "$secs" "$@"
   elif command -v gtimeout >/dev/null 2>&1; then gtimeout "$secs" "$@"
-  else perl -e 'alarm shift; exec @ARGV or exit 127' "$secs" "$@"
+  else perl -e 'my $s = shift; setpgrp(0, 0); my $pid = fork; if (!$pid) { exec @ARGV or exit 127 } $SIG{ALRM} = sub { kill "KILL", -$$ }; alarm $s; waitpid $pid, 0; exit($? & 127 ? 128 + ($? & 127) : $? >> 8)' "$secs" "$@"
   fi
 }
 
