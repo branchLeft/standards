@@ -67,6 +67,25 @@ workflow_runs_every_gate() {
 }
 run "reusable workflow runs every gate" workflow_runs_every_gate
 
+# The job takes its runner from the caller's runs-on input, defaulting to
+# GitHub-hosted ubuntu-latest so a caller that passes nothing runs as before.
+# Exact-line text checks, since this repo carries no YAML parser for workflows.
+workflow_takes_its_runner_from_input() {
+  local wf="${1:-$TOOLS/../.github/workflows/standards.yml}" block n rc=0
+  block=$(grep -A4 -x -e '      runs-on:' "$wf")
+  printf '%s\n' "$block" | grep -qxF -e "        default: '[\"ubuntu-latest\"]'" \
+    || { echo "runs-on input does not default to ubuntu-latest"; rc=1; }
+  printf '%s\n' "$block" | grep -qxF -e '        type: string' \
+    || { echo "runs-on input is not a string"; rc=1; }
+  # shellcheck disable=SC2016  # the expression is literal workflow text to match, not a shell expansion
+  n=$(grep -cxF -e '    runs-on: ${{ fromJSON(inputs.runs-on) }}' "$wf")
+  [ "$n" -eq 1 ] || { echo "job does not take its runner from the input: $n matching lines"; rc=1; }
+  n=$(grep -c -e '^    runs-on:' "$wf")
+  [ "$n" -eq 1 ] || { echo "expected one job-level runs-on, found $n"; rc=1; }
+  return "$rc"
+}
+run "reusable workflow takes its runner from the runs-on input" workflow_takes_its_runner_from_input
+
 # REPO-6: the audit is what makes drift visible, so it must keep running on a
 # schedule. The schedule, the manual trigger and the audit step are asserted
 # here; the shape of the rest (permissions, triggers, the token guard, the gh api
