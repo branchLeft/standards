@@ -67,6 +67,25 @@ workflow_runs_every_gate() {
 }
 run "reusable workflow runs every gate" workflow_runs_every_gate
 
+# The job takes its runner from the caller's runs-on input, defaulting to
+# GitHub-hosted ubuntu-latest so a caller that passes nothing runs as before.
+# Exact-line text checks, since this repo carries no YAML parser for workflows.
+workflow_takes_its_runner_from_input() {
+  local wf="${1:-$TOOLS/../.github/workflows/standards.yml}" block n rc=0
+  block=$(grep -A4 -x -e '      runs-on:' "$wf")
+  printf '%s\n' "$block" | grep -qxF -e "        default: '[\"ubuntu-latest\"]'" \
+    || { echo "runs-on input does not default to ubuntu-latest"; rc=1; }
+  printf '%s\n' "$block" | grep -qxF -e '        type: string' \
+    || { echo "runs-on input is not a string"; rc=1; }
+  # shellcheck disable=SC2016  # the expression is literal workflow text to match, not a shell expansion
+  n=$(grep -cxF -e '    runs-on: ${{ fromJSON(inputs.runs-on) }}' "$wf")
+  [ "$n" -eq 1 ] || { echo "job does not take its runner from the input: $n matching lines"; rc=1; }
+  n=$(grep -c -e '^    runs-on:' "$wf")
+  [ "$n" -eq 1 ] || { echo "expected one job-level runs-on, found $n"; rc=1; }
+  return "$rc"
+}
+run "reusable workflow takes its runner from the runs-on input" workflow_takes_its_runner_from_input
+
 # REPO-6: the audit is what makes drift visible, so it must keep running on a
 # schedule. The schedule, the manual trigger and the audit step are asserted
 # here; the shape of the rest (permissions, triggers, the token guard, the gh api
@@ -128,12 +147,26 @@ accepted_shape() { # workflow_sed audit_sed
   scheduled_audit_guarded "$copy_wf" "$copy_audit" >/dev/null 2>&1
 }
 
+# Bounds a command to a number of seconds. macOS ships no `timeout`, so GNU
+# coreutils' `timeout` or `gtimeout` is used when present and a perl `alarm`
+# otherwise, where the perl path kills the command's whole process group on the
+# alarm. Either way a command killed by the bound exits non-zero (124 for
+# timeout, 137 for the perl group kill), so the caller's exit-status assertion still fails.
+bounded() { # seconds command...
+  local secs="$1"
+  shift
+  if command -v timeout >/dev/null 2>&1; then timeout "$secs" "$@"
+  elif command -v gtimeout >/dev/null 2>&1; then gtimeout "$secs" "$@"
+  else perl -e 'my $s = shift; setpgrp(0, 0); my $pid = fork; if (!$pid) { exec @ARGV or exit 127 } $SIG{ALRM} = sub { kill "KILL", -$$ }; alarm $s; waitpid $pid, 0; exit($? & 127 ? 128 + ($? & 127) : $? >> 8)' "$secs" "$@"
+  fi
+}
+
 # Runs the checker on arguments the caller chooses, with a timeout so a checker
 # that blocks on a FIFO fails the fixture instead of hanging the run.
 refused_directly() { # expected_exit expected_message args...
   local expected_exit="$1" expected_message="$2" output rc
   shift 2
-  output="$(timeout 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
+  output="$(bounded 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
   rc=$?
   [ "$rc" -eq "$expected_exit" ] || return 1
   case "$output" in *"$expected_message"*) return 0 ;; esac

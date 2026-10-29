@@ -25,6 +25,11 @@ on:
         type: string
         required: false
         default: ''
+      runs-on:
+        description: Runner labels for the job, as a JSON array string. The default is GitHub-hosted ubuntu-latest.
+        type: string
+        required: false
+        default: '["ubuntu-latest"]'
 
 permissions:
   contents: read
@@ -32,7 +37,9 @@ permissions:
 jobs:
   standards:
     name: Standards gates
-    runs-on: ubuntu-latest
+    # The caller picks the runner. A caller that passes nothing keeps
+    # GitHub-hosted ubuntu-latest, so existing pins behave as before.
+    runs-on: ${{ fromJSON(inputs.runs-on) }}
     timeout-minutes: 8
     steps:
       - name: Check out the caller

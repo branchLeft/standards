@@ -621,6 +621,12 @@ check_sigterm() {
 
 run_scan_self_tests() {
   local base="$1/scan-cases"
+  # Git exports GIT_INDEX_FILE and GIT_DIR to a hook. These cases run the gate and
+  # git from this shell, so inherited they point both at the repository being
+  # committed instead of the synthetic trees. The fixture subshells clear them
+  # through ratchet_scratch_repo_init; this shell has to as well.
+  # shellcheck disable=SC2046
+  unset $(git rev-parse --local-env-vars)
   STANDIN_REAL_AWK=$(command -v awk)
   STANDIN_BIN="$base/bin"
   write_awk_standin "$STANDIN_BIN"

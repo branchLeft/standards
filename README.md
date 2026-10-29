@@ -45,6 +45,11 @@ jobs:
     uses: branchLeft/standards/.github/workflows/standards.yml@v0.4.0
 ```
 
+A caller that needs its own runner passes the optional `runs-on` input, a JSON
+array of runner labels as a string, for example
+`runs-on: '["self-hosted","Linux","branchleft-gpd"]'`. It defaults to
+`'["ubuntu-latest"]'`, so a caller that passes nothing is unchanged.
+
 Then write `warn` into `.standards.mode`, clear the tree at your own pace, and
 delete the file. That is the whole ratchet — see
 [`docs/ratchet.md`](docs/ratchet.md).
