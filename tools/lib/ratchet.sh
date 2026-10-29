@@ -57,7 +57,8 @@ ratchet_init() {
        return 2 ;;
   esac
 
-  RATCHET_TMP=$(mktemp -d) || return 2
+  # An explicit template, because macOS mktemp -d ignores TMPDIR without one.
+  RATCHET_TMP=$(mktemp -d "${TMPDIR:-/tmp}/ratchet.XXXXXX") || return 2
   trap 'rm -rf "$RATCHET_TMP"' EXIT
 
   if [ ${#files_from_args[@]} -gt 0 ]; then

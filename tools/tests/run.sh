@@ -128,12 +128,25 @@ accepted_shape() { # workflow_sed audit_sed
   scheduled_audit_guarded "$copy_wf" "$copy_audit" >/dev/null 2>&1
 }
 
+# Bounds a command to a number of seconds. macOS ships no `timeout`, so GNU
+# coreutils' `timeout` or `gtimeout` is used when present and a perl `alarm`
+# otherwise. Either way a command killed by the bound exits non-zero (124 for
+# timeout, 142 for the alarm), so the caller's exit-status assertion still fails.
+bounded() { # seconds command...
+  local secs="$1"
+  shift
+  if command -v timeout >/dev/null 2>&1; then timeout "$secs" "$@"
+  elif command -v gtimeout >/dev/null 2>&1; then gtimeout "$secs" "$@"
+  else perl -e 'alarm shift; exec @ARGV or exit 127' "$secs" "$@"
+  fi
+}
+
 # Runs the checker on arguments the caller chooses, with a timeout so a checker
 # that blocks on a FIFO fails the fixture instead of hanging the run.
 refused_directly() { # expected_exit expected_message args...
   local expected_exit="$1" expected_message="$2" output rc
   shift 2
-  output="$(timeout 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
+  output="$(bounded 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
   rc=$?
   [ "$rc" -eq "$expected_exit" ] || return 1
   case "$output" in *"$expected_message"*) return 0 ;; esac
