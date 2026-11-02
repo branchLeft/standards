@@ -72,6 +72,22 @@ const CODE_LIKE_RULES: readonly CodeLikeRule[] = [
   },
 ];
 
+// Source types the rule table above has no entry for. They are named so a
+// repo written in one of them is reported as unchecked instead of passing
+// with nothing measured; adding a rule to CODE_LIKE_RULES retires the entry.
+const UNCHECKED_SOURCE_TYPES: readonly { label: string; extensions: readonly string[] }[] = [
+  { label: 'Go', extensions: ['go'] },
+  { label: 'Rust', extensions: ['rs'] },
+  { label: 'Terraform', extensions: ['tf', 'tfvars'] },
+  { label: 'Java', extensions: ['java'] },
+  { label: 'Kotlin', extensions: ['kt', 'kts'] },
+  { label: 'Ruby', extensions: ['rb'] },
+  { label: 'PHP', extensions: ['php'] },
+  { label: 'C#', extensions: ['cs'] },
+  { label: 'C/C++', extensions: ['c', 'h', 'cc', 'cpp', 'hpp'] },
+  { label: 'Swift', extensions: ['swift'] },
+];
+
 /**
  * LINT-2 and LINT-4: every tracked code-like file type has a linter or
  * formatter wired into pre-commit, and the same tool runs in CI too. Both
@@ -108,11 +124,31 @@ export class LintCoverageGate implements Gate {
       .join('\n');
   }
 
+  private uncheckedTypeFindings(files: readonly string[]): readonly Finding[] {
+    const findings: Finding[] = [];
+    for (const type of UNCHECKED_SOURCE_TYPES) {
+      const first = files.find(byExtension(type.extensions));
+      if (first === undefined) {
+        continue;
+      }
+      findings.push(
+        this.ratchet.findingAdvisory(
+          'LINT-2',
+          first,
+          1,
+          `${type.label} files are tracked but this gate has no rule for them, so their linting is unchecked`
+        )
+      );
+    }
+    return findings;
+  }
+
   run(_context: GateContext): readonly Finding[] {
     const files = this.ratchet.trackedFiles;
+    const unchecked = this.uncheckedTypeFindings(files);
     const applicableRules = CODE_LIKE_RULES.filter((rule) => files.some(rule.matches));
     if (applicableRules.length === 0) {
-      return [];
+      return unchecked;
     }
 
     const precommitFile = this.precommitFile('LINT-2');
@@ -125,6 +161,7 @@ export class LintCoverageGate implements Gate {
           1,
           `no ${precommitFile} found to lint or format ${applicableRules.map((rule) => rule.label).join(', ')} files`
         ),
+        ...unchecked,
       ];
     }
 
@@ -153,6 +190,6 @@ export class LintCoverageGate implements Gate {
         );
       }
     }
-    return findings;
+    return [...findings, ...unchecked];
   }
 }

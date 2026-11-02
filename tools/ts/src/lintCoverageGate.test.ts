@@ -90,4 +90,38 @@ describe('LintCoverageGate', () => {
     const findings = buildGate(['src/index.ts']).run({ root: ROOT, mode: 'enforce' });
     expect(findings.filter((finding) => finding.clause === 'LINT-4')).toHaveLength(0);
   });
+
+  it.each([
+    ['main.go', 'Go'],
+    ['src/lib.rs', 'Rust'],
+    ['infra/main.tf', 'Terraform'],
+  ])('reports LINT-2 for an unknown tracked source type: %s', (file, label) => {
+    const findings = buildGate([file]).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ clause: 'LINT-2', file });
+    expect(findings[0]?.message).toContain(label);
+  });
+
+  it('reports an unknown tracked source type alongside a missing pre-commit config', () => {
+    const findings = buildGate(['src/index.ts', 'main.go']).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(2);
+    expect(findings.some((finding) => finding.message.includes('Go files'))).toBe(true);
+  });
+
+  it('reports an unknown tracked source type once however many files it has', () => {
+    const findings = buildGate(['a.go', 'b.go', 'c.go']).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+  });
+
+  it('reports an unknown tracked source type when the known types are covered', () => {
+    const precommit = `repos:\n  - repo: local\n    hooks:\n      - id: eslint\n${YAML_HOOK}`;
+    const workflow = `jobs:\n  lint:\n    steps:\n      - run: eslint .\n${YAML_RUN}`;
+    const findings = buildGate(
+      ['src/index.ts', 'cmd/main.go', PRECOMMIT_FILE, WORKFLOW_FILE],
+      precommit,
+      workflow
+    ).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.file).toBe('cmd/main.go');
+  });
 });
