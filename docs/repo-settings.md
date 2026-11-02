@@ -8,7 +8,7 @@ The default branch allows no deletion and no force-push, requires linear history
 
 **Why:** the ruleset is the only control between a push and a production deploy (`PRIN-2`), and `require_extra_approval_for_unattributed_changes` was adopted by choice so a payload that omits it reads as a deliberate reduction. On `ghost-platform` the owner's ruling of 25 Oct 2026 set this flag to `false` (live wins), so its payload records `false` rather than the default above.
 
-**Check:** `templates/rulesets/` payloads and `tools/ruleset-audit.sh`, which reads `.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review` live and committed and fails a public repo that differs from its row or sits outside the rows.
+**Check:** `templates/rulesets/` payloads and `tools/ruleset-audit.sh`, which reads `.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review` live and committed and fails a public repo that differs from its row or sits outside the rows. The comparison is `tools/ruleset_code_owner.py`, which parses the rows below; the audit runs it on each committed payload and each live default-branch ruleset.
 
 | `require_code_owner_review` | Repos                                                                                                                                                                                 |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
