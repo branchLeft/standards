@@ -13,6 +13,8 @@ Comment-only, by extension:
 - `.py` — `#` lines, and a triple-quoted docstring block opened by a bare
   `"""`/`'''` at the start of a line, on the same reasoning: the whole run
   counts as long as only the delimiter shares the line.
+  A closing delimiter followed by `,` or `)` (a string passed as a call
+  argument) still closes the docstring; one followed by other code does not.
 - `.sh` — `#` lines. A line-1 shebang is never a comment line, so a script
   starting `#!/usr/bin/env bash` does not begin its first block there.
 
