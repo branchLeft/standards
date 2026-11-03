@@ -126,7 +126,9 @@ comment_flags_hash_style() {
         idx = index(t, docdelim)
         if (idx > 0) {
           after = trim(substr(t, idx + 3))
-          if (after == "") indoc = 0
+          # A comma or paren after the closer still closes it: the string was
+          # a call argument, as in dedent("""...""", x) or f("""...""").
+          if (after == "" || after ~ /^[,)]/) indoc = 0
         }
       } else if (instr) {
         # An open non-docstring string: never a comment, however it closes.

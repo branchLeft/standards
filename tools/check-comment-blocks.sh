@@ -242,6 +242,31 @@ self_test() {
       printf '    return 1\r\n'
     } > crlf.py
 
+    # A triple-quoted string passed as a call argument, closed with a comma
+    # or a paren on the delimiter's own line: both shapes still close the
+    # string. Before the fix the closer was read as "not bare", the string
+    # never closed, and the 12 code lines after it joined one long block.
+    for q in dq sq; do
+      case "$q" in dq) d='"""' ;; sq) d="'''" ;; esac
+      {
+        echo 'x = dedent('
+        echo "    $d"
+        echo '    body line 1'
+        echo '    body line 2'
+        echo "    $d,"
+        echo ')'
+        for i in $(seq 1 12); do echo "real_code_line_$i = $i"; done
+      } > "trailing-comma-$q.py"
+      {
+        echo 'y = dedent('
+        echo "    $d"
+        echo '    body line 1'
+        echo '    body line 2'
+        echo "$d)"
+        for i in $(seq 1 12); do echo "real_code_line_$i = $i"; done
+      } > "trailing-paren-$q.py"
+    done
+
     git add -A && git commit -qm init
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
@@ -284,6 +309,27 @@ self_test() {
       || { echo "FAIL: a CRLF-terminated closing delimiter did not read as bare"; echo "$out"; exit 1; }
     printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"backtick-in-slash-comment.ts"' \
       && { echo "FAIL: a backtick inside a // comment was misread as something other than content"; echo "$out"; exit 1; }
+    for f in trailing-comma-dq trailing-comma-sq trailing-paren-dq trailing-paren-sq; do
+      printf '%s' "$out" | grep -q "\"clause\":\"CMT-3\".*\"file\":\"$f.py\"" \
+        && { echo "FAIL: $f.py: a closer followed by , or ) did not close the string, swallowing real code"; echo "$out"; exit 1; }
+    done
+
+    # CONTROL: the same fixtures against a copy of the classifier with the
+    # fix reverted must read as one long block (an error at the fixture
+    # limit of 11). Proves the checks above can fail, on every run.
+    mut="$tmp.mutant"
+    mkdir -p "$mut/lib"
+    cp "$HERE/check-comment-blocks.sh" "$HERE/thresholds.tsv" "$mut/"
+    cp "$HERE"/lib/*.sh "$mut/lib/"
+    sed 's#after == "" || after ~ /^\[,)]/#after == ""#' "$HERE/lib/comments.sh" > "$mut/lib/comments.sh"
+    cmp -s "$HERE/lib/comments.sh" "$mut/lib/comments.sh" \
+      && { echo "FAIL: control could not revert the fix in a copy of comments.sh (the condition changed shape)"; rm -rf "$mut"; exit 1; }
+    mutout=$("$mut/check-comment-blocks.sh" --mode enforce --json 2>&1)
+    for f in trailing-comma-dq trailing-comma-sq trailing-paren-dq trailing-paren-sq; do
+      printf '%s' "$mutout" | grep -q "\"clause\":\"CMT-3\".*\"file\":\"$f.py\".*\"level\":\"error\".*is 1[1-9] lines" \
+        || { echo "FAIL: control: with the fix reverted, $f.py was not reported as one long block"; echo "$mutout"; rm -rf "$mut"; exit 1; }
+    done
+    rm -rf "$mut"
 
     # A CMT-3 error fails the build; a CMT-3 warning alone never does.
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
