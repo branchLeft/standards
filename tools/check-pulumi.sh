@@ -137,7 +137,7 @@ EOF
     git add -A && git commit -qm init
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     for c in PUL-1 PUL-2 PUL-3 PUL-4 PUL-5; do
-      printf '%s' "$out" | grep -q "$c" || { echo "FAIL: $c not caught"; echo "$out"; exit 1; }
+      grep -q "$c" <<< "$out" || { echo "FAIL: $c not caught"; echo "$out"; exit 1; }
     done
 
     cat > bad.ts <<'EOF'
@@ -164,7 +164,7 @@ export class GoodThing extends pulumi.ComponentResource {
 EOF
     git add -A && git commit -qm good
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -qE 'PUL-[0-9]' && { echo "FAIL: clean component reported"; echo "$out"; exit 1; }
+    grep -qE 'PUL-[0-9]' <<< "$out" && { echo "FAIL: clean component reported"; echo "$out"; exit 1; }
 
     exit 0
   ) || rc=$?

@@ -217,7 +217,7 @@ self_test() {
     gate
     [ "$grc" -eq 0 ] \
       || { echo "FAIL: conformant tree exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'SYNC-1' \
+    grep -q 'SYNC-1' <<< "$out" \
       && { echo "FAIL: conformant tree reported"; echo "$out"; exit 1; }
 
     # The reason the comparison is byte-for-byte rather than a diff: a dropped
@@ -227,14 +227,14 @@ self_test() {
     gate
     [ "$grc" -eq 1 ] \
       || { echo "FAIL: drift exited $grc, expected 1"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE 'file=\.nvmrc.*SYNC-1' \
+    grep -qE 'file=\.nvmrc.*SYNC-1' <<< "$out" \
       || { echo "FAIL: trailing-newline drift missed"; echo "$out"; exit 1; }
 
     printf 'v26.5.0\n' > .nvmrc
     printf 'node_modules/\n.env.local\n' > .gitignore
     git add -A && git commit -qm dropped
     gate
-    printf '%s' "$out" | grep -qE 'file=\.gitignore.*graphify-out/' \
+    grep -qE 'file=\.gitignore.*graphify-out/' <<< "$out" \
       || { echo "FAIL: dropped shared line missed"; echo "$out"; exit 1; }
 
     # Absence is not drift — two repos deliberately pin no Node version.
@@ -244,7 +244,7 @@ self_test() {
     gate
     [ "$grc" -eq 0 ] \
       || { echo "FAIL: absent files exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'SYNC-1' \
+    grep -q 'SYNC-1' <<< "$out" \
       && { echo "FAIL: absent file reported as drift"; echo "$out"; exit 1; }
 
     printf 'x\n' > tpl/codeowners
@@ -262,7 +262,7 @@ self_test() {
       || { echo "FAIL: --apply did not conform an identical file"; echo "$out"; exit 1; }
     [ -e .nvmrc ] \
       && { echo "FAIL: --apply created a file the repo deliberately lacks"; exit 1; }
-    printf '%s' "$out" | grep -q 'graphify-out/' \
+    grep -q 'graphify-out/' <<< "$out" \
       || { echo "FAIL: --apply did not report the missing shared line"; echo "$out"; exit 1; }
     grep -q 'graphify-out/' .gitignore \
       && { echo "FAIL: --apply rewrote a contains-mode file"; exit 1; }
@@ -306,7 +306,7 @@ self_test_suffix() {
     gate
     [ "$grc" -eq 1 ] \
       || { echo "FAIL: suffix — trailing catch-all exited $grc, expected 1"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE 'file=\.github/CODEOWNERS.*SYNC-1' \
+    grep -qE 'file=\.github/CODEOWNERS.*SYNC-1' <<< "$out" \
       || { echo "FAIL: suffix — trailing catch-all not reported"; echo "$out"; exit 1; }
 
     # A repo line inserted between the shared ones: fails.

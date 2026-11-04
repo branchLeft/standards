@@ -51,7 +51,7 @@ for repo in "${repos[@]}"; do
     # fails at the PUT and takes the whole run down with it under `set -e` —
     # including the repos later in the alphabet that had nothing wrong.
     listing=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
-    if printf '%s' "$listing" | grep -q "Upgrade to GitHub Pro"; then
+    if grep -q "Upgrade to GitHub Pro" <<< "$listing"; then
       echo "  skipped: rulesets are unreadable on this repo (private, GitHub Free)"
       continue
     fi

@@ -392,10 +392,10 @@ EOF
     # Extending only base.json is short of the strict-1 floor, so TS-1 now
     # fires too — same defect TS-4 already named by tier, now also named by
     # value.
-    printf '%s' "$out" | grep -q 'TS-1' || { echo "FAIL: extending base only should miss the strict-1 floor"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'TS-2' || { echo "FAIL: flat glob not caught"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'TS-3' || { echo "FAIL: redundant inherited option not caught"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'TS-4' || { echo "FAIL: tier below floor not caught"; echo "$out"; exit 1; }
+    grep -q 'TS-1' <<< "$out" || { echo "FAIL: extending base only should miss the strict-1 floor"; echo "$out"; exit 1; }
+    grep -q 'TS-2' <<< "$out" || { echo "FAIL: flat glob not caught"; echo "$out"; exit 1; }
+    grep -q 'TS-3' <<< "$out" || { echo "FAIL: redundant inherited option not caught"; echo "$out"; exit 1; }
+    grep -q 'TS-4' <<< "$out" || { echo "FAIL: tier below floor not caught"; echo "$out"; exit 1; }
 
     # A conforming config must produce none of those.
     cat > tsconfig.json <<'EOF'
@@ -406,7 +406,7 @@ EOF
 EOF
     git add -A && git commit -qm fix
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -qE 'TS-(1|2|3|4)' && { echo "FAIL: clean config reported"; echo "$out"; exit 1; }
+    grep -qE 'TS-(1|2|3|4)' <<< "$out" && { echo "FAIL: clean config reported"; echo "$out"; exit 1; }
 
     # A child that reaches the shared base through a relative parent has
     # adopted it. Judging its own `extends` line alone fails the normal shape
@@ -421,9 +421,9 @@ EOF
 EOF
     git add -A && git commit -qm child
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'TS-1' && {
+    grep -q 'TS-1' <<< "$out" && {
       echo "FAIL: child inheriting the base through a relative parent reported TS-1"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'TS-4' && {
+    grep -q 'TS-4' <<< "$out" && {
       echo "FAIL: child's tier read as none rather than inherited"; echo "$out"; exit 1; }
 
     # Mutation: break the chain at the parent. Both configs must now fail,
@@ -437,9 +437,9 @@ EOF
 EOF
     git add -A && git commit -qm break
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep 'TS-1' | grep -qE 'file=tsconfig\.json,' || {
+    grep -qE 'file=tsconfig\.json,' <<< "$(grep 'TS-1' <<< "$out")" || {
       echo "FAIL: broken chain should report TS-1 on tsconfig.json"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep 'TS-1' | grep -qE 'file=tsconfig\.build\.json,' || {
+    grep -qE 'file=tsconfig\.build\.json,' <<< "$(grep 'TS-1' <<< "$out")" || {
       echo "FAIL: broken chain should report TS-1 on tsconfig.build.json"; echo "$out"; exit 1; }
 
     cat > tsconfig.json <<'EOF'
@@ -459,9 +459,9 @@ EOF
     # node_modules, so it must still pass.
     rm node_modules/@branchleft/tsconfig
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1); rc=$?
-    printf '%s' "$out" | grep -q '::warning.*TS-3 not checked' || {
+    grep -q '::warning.*TS-3 not checked' <<< "$out" || {
       echo "FAIL: missing base should warn"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'TS-1' && {
+    grep -q 'TS-1' <<< "$out" && {
       echo "FAIL: TS-1 depended on the repo's own node_modules"; echo "$out"; exit 1; }
     [ "$rc" -eq 0 ] || { echo "FAIL: missing base should not fail the run"; echo "$out"; exit 1; }
 
@@ -484,7 +484,7 @@ EOF
 EOF
     git add -A && git commit -qm inline-strict
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'TS-1' && {
+    grep -q 'TS-1' <<< "$out" && {
       echo "FAIL: an inline config meeting the floor by value reported TS-1"; echo "$out"; exit 1; }
 
     # Weakening one floor flag inline must fail, naming the flag and the file
@@ -503,7 +503,7 @@ EOF
 EOF
     git add -A && git commit -qm inline-weakened
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q "noFallthroughCasesInSwitch is false in tsconfig.json" || {
+    grep -q "noFallthroughCasesInSwitch is false in tsconfig.json" <<< "$out" || {
       echo "FAIL: a weakened inline flag was not named with its value and file"; echo "$out"; exit 1; }
 
     # A chain that weakens a flag partway up, rather than at the file under
@@ -523,7 +523,7 @@ EOF
 EOF
     git add -A && git commit -qm chain-weakened
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'strict is false in internal-base.json' || {
+    grep -q 'strict is false in internal-base.json' <<< "$out" || {
       echo "FAIL: a flag weakened partway up an extends chain was not named with its own file"; echo "$out"; exit 1; }
 
     # The positive twin: the same chain with the override removed passes.
@@ -534,7 +534,7 @@ EOF
 EOF
     git add -A && git commit -qm chain-fixed
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'TS-1' && {
+    grep -q 'TS-1' <<< "$out" && {
       echo "FAIL: an extends chain reaching the floor through a local wrapper reported TS-1"; echo "$out"; exit 1; }
     rm -f internal-base.json
 

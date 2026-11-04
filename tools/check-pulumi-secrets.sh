@@ -83,9 +83,9 @@ config:
 EOF
     git add -A && git commit -qm salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       || { echo "FAIL: committed encryptionsalt not caught"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'encryptionsalt' \
+    grep -q 'encryptionsalt' <<< "$out" \
       || { echo "FAIL: message does not name the salt"; echo "$out"; exit 1; }
 
     # No secretsprovider at all, no salt — PASS. The provider a stack config
@@ -97,7 +97,7 @@ config:
 EOF
     git add -A && git commit -qm no-provider-no-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: absent secretsprovider with no salt was reported"; echo "$out"; exit 1; }
 
     # Explicit passphrase provider, no salt — PASS. This is one `pulumi
@@ -110,7 +110,7 @@ config:
 EOF
     git add -A && git commit -qm explicit-passphrase-no-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: explicit passphrase provider with no salt was reported"; echo "$out"; exit 1; }
 
     # secretsprovider: (blank), no salt — PASS, same reasoning.
@@ -121,7 +121,7 @@ config:
 EOF
     git add -A && git commit -qm blank-provider-no-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: blank secretsprovider with no salt was reported"; echo "$out"; exit 1; }
 
     # The escape hatch itself — no secretsprovider, no encryptionsalt, but a
@@ -138,7 +138,7 @@ config:
 EOF
     git add -A && git commit -qm injection-pattern
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: salt-injected-at-deploy shape (no salt, no provider, ciphertext present) was reported"; echo "$out"; exit 1; }
 
     # The pass path: a real KMS provider, no salt.
@@ -149,7 +149,7 @@ config:
 EOF
     git add -A && git commit -qm gcpkms
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: gcpkms provider reported"; echo "$out"; exit 1; }
 
     # A comment mentioning the banned key must not itself be read as the key —
@@ -162,7 +162,7 @@ config:
 EOF
     git add -A && git commit -qm commented-mention
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: commented mention of encryptionsalt reported as a finding"; echo "$out"; exit 1; }
 
     # The project file Pulumi.yaml is never in scope, even with a salt-shaped
@@ -175,7 +175,7 @@ EOF
     printf '# encryptionsalt: this file has no such key in real Pulumi output\n' >> Pulumi.yaml
     git add -A && git commit -qm project-file
     out=$("$CHECK_SCRIPT" --mode enforce -- Pulumi.yaml 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       && { echo "FAIL: project Pulumi.yaml was scanned"; echo "$out"; exit 1; }
     rm Pulumi.yaml
     git add -A && git commit -qm rm-project-file
@@ -189,7 +189,7 @@ EOF
     printf 'secretsprovider: gcpkms://projects/p/locations/global/keyRings/r/cryptoKeys/k\n' >> Pulumi.production.yaml
     git add -A && git commit -qm bom-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       || { echo "FAIL: BOM-prefixed encryptionsalt not caught"; echo "$out"; exit 1; }
 
     # Finding 3 — a case-mangled key. Pulumi itself would not parse this exact
@@ -201,7 +201,7 @@ EncryptionSalt: v1:9x0abc123==:v1:def456==
 EOF
     git add -A && git commit -qm case-mangled-salt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       || { echo "FAIL: case-mangled EncryptionSalt not caught"; echo "$out"; exit 1; }
 
     # Finding 2 — warn mode must not launder a committed salt into advisory.
@@ -217,7 +217,7 @@ EOF
     git add -A && git commit -qm enter-warn-mode
     out=$("$CHECK_SCRIPT" 2>&1)
     rc_warn=$?
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       || { echo "FAIL: warn mode silenced a committed salt"; echo "$out"; exit 1; }
     [ "$rc_warn" -ne 0 ] \
       || { echo "FAIL: warn mode exited 0 with a committed salt present"; echo "$out"; exit 1; }
@@ -231,7 +231,7 @@ EOF
     git add -A && git commit -qm ignore-attempt
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
     rc_ignore=$?
-    printf '%s' "$out" | grep -q 'PUL-12' \
+    grep -q 'PUL-12' <<< "$out" \
       || { echo "FAIL: .standardsignore silenced a committed salt"; echo "$out"; exit 1; }
     [ "$rc_ignore" -ne 0 ] \
       || { echo "FAIL: .standardsignore made a committed-salt run exit 0"; echo "$out"; exit 1; }

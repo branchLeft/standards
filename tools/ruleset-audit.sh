@@ -32,7 +32,7 @@ status=0
 for repo in "${repos[@]}"; do
   echo "== ${repo} =="
   live=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
-  if echo "$live" | grep -q "Upgrade to GitHub Pro"; then
+  if grep -q "Upgrade to GitHub Pro" <<< "$live"; then
     echo "  live: blocked (GitHub Free) — payloads not applied"
     continue
   fi

@@ -155,13 +155,13 @@ self_test() {
   STATUS=0
   out=$(run_audit on-latest behind no-caller) && rc=0 || rc=$?
 
-  printf '%s\n' "$out" | grep -q 'ok: docs-lint.yml@v1.0.7' \
+  grep -q 'ok: docs-lint.yml@v1.0.7' <<< "$out" \
     || { echo "FAIL: on-latest caller not reported ok"; printf '%s\n' "$out"; return 1; }
-  printf '%s\n' "$out" | grep -q 'DRIFT: docs-lint.yml@v1.0.6' \
+  grep -q 'DRIFT: docs-lint.yml@v1.0.6' <<< "$out" \
     || { echo "FAIL: behind caller not reported as DRIFT"; printf '%s\n' "$out"; return 1; }
-  printf '%s\n' "$out" | grep -q 'no-caller' \
+  grep -q 'no-caller' <<< "$out" \
     || { echo "FAIL: no-caller repo not named in output"; printf '%s\n' "$out"; return 1; }
-  printf '%s\n' "$out" | sed -n '/== no-caller ==/,$p' | grep -q 'DRIFT' \
+  grep -q 'DRIFT' <<< "$(sed -n '/== no-caller ==/,$p' <<< "$out")" \
     && { echo "FAIL: no-caller repo reported a DRIFT it does not have"; printf '%s\n' "$out"; return 1; }
   [ "$rc" -ne 0 ] || { echo "FAIL: a run with one drifted caller exited 0"; return 1; }
 
@@ -187,7 +187,7 @@ self_test() {
   rc=0
   out=$(run_audit 2>&1) && rc=0 || rc=$?
   [ "$rc" -eq 0 ] && { echo "FAIL: a run with zero repos exited 0 — an empty scan reported as clean"; printf '%s\n' "$out"; return 1; }
-  printf '%s\n' "$out" | grep -q 'no repos to check' \
+  grep -q 'no repos to check' <<< "$out" \
     || { echo "FAIL: a zero-repo run did not name the reason"; printf '%s\n' "$out"; return 1; }
 
   # The fleet list itself must never be empty, or `main`'s default path
@@ -201,7 +201,7 @@ self_test() {
   STATUS=0
   rc=0
   out=$(run_audit broken 2>/dev/null) && rc=0 || rc=$?
-  printf '%s\n' "$out" | grep -q 'ERROR' \
+  grep -q 'ERROR' <<< "$out" \
     || { echo "FAIL: a fetch failure was not reported as ERROR"; printf '%s\n' "$out"; return 1; }
   [ "$rc" -ne 0 ] || { echo "FAIL: a run with a fetch error exited 0"; return 1; }
 
@@ -218,13 +218,13 @@ self_test() {
     '#     uses: branchLeft/github-workflows/.github/workflows/docs-lint.yml@v1.0.1' \
     | extract_uses) || true
 
-  printf '%s\n' "$parsed" | grep -q '^docs-lint\.yml@v1\.0\.6$' \
+  grep -q '^docs-lint\.yml@v1\.0\.6$' <<< "$parsed" \
     || { echo "FAIL: extract_uses missed an unquoted caller"; printf '%s\n' "$parsed"; return 1; }
-  printf '%s\n' "$parsed" | grep -q '^graphify\.yml@v1\.0\.7$' \
+  grep -q '^graphify\.yml@v1\.0\.7$' <<< "$parsed" \
     || { echo "FAIL: extract_uses missed a double-quoted caller (silent false negative)"; printf '%s\n' "$parsed"; return 1; }
-  printf '%s\n' "$parsed" | grep -q '^standards\.yml@v1\.0\.5$' \
+  grep -q '^standards\.yml@v1\.0\.5$' <<< "$parsed" \
     || { echo "FAIL: extract_uses missed a single-quoted caller (silent false negative)"; printf '%s\n' "$parsed"; return 1; }
-  printf '%s\n' "$parsed" | grep -q 'v1\.0\.1' \
+  grep -q 'v1\.0\.1' <<< "$parsed" \
     && { echo "FAIL: extract_uses read a commented-out uses: line as a live caller"; printf '%s\n' "$parsed"; return 1; }
 
   echo "check-caller-drift.sh: self-test passed"

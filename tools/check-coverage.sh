@@ -96,9 +96,9 @@ self_test() {
     git add -A && git commit -qm init
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"level":"info"' \
+    grep -q '"level":"info"' <<< "$out" \
       || { echo "FAIL: missing coverage file did not report level info"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '"level":"(advisory|error|warning)"' \
+    grep -qE '"level":"(advisory|error|warning)"' <<< "$out" \
       && { echo "FAIL: missing coverage file reported something other than info"; echo "$out"; exit 1; }
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: missing coverage file made the run exit non-zero"; exit 1; }
@@ -145,13 +145,13 @@ EOF
     # Enforce mode: every tracked file is in scope, so low.ts and
     # untouched.ts are both below floor and reported; high.ts is not.
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"clause":"COV-1".*"file":"src/low.ts".*"level":"advisory"' \
+    grep -q '"clause":"COV-1".*"file":"src/low.ts".*"level":"advisory"' <<< "$out" \
       || { echo "FAIL: src/low.ts (50%) not reported below the 90% floor"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"src/low.ts".*50%' \
+    grep -q '"file":"src/low.ts".*50%' <<< "$out" \
       || { echo "FAIL: src/low.ts percentage wrong (want 50%)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"src/untouched.ts".*"level":"advisory"' \
+    grep -q '"file":"src/untouched.ts".*"level":"advisory"' <<< "$out" \
       || { echo "FAIL: src/untouched.ts not reported in enforce mode"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"src/high.ts"' \
+    grep -q '"file":"src/high.ts"' <<< "$out" \
       && { echo "FAIL: src/high.ts (100%) reported"; echo "$out"; exit 1; }
     "$CHECK_SCRIPT" --mode enforce >/dev/null 2>&1 \
       || { echo "FAIL: advisory coverage findings made the run exit non-zero"; exit 1; }
@@ -165,9 +165,9 @@ EOF
     printf '// touched by this branch\n' >> src/low.ts
 
     out=$("$CHECK_SCRIPT" --json 2>&1)
-    printf '%s' "$out" | grep -q '"file":"src/low.ts"' \
+    grep -q '"file":"src/low.ts"' <<< "$out" \
       || { echo "FAIL: warn mode did not report the branch-touched file"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"src/untouched.ts"' \
+    grep -q '"file":"src/untouched.ts"' <<< "$out" \
       && { echo "FAIL: warn mode reported a file the branch never touched"; echo "$out"; exit 1; }
     rm .standards.mode
     git add -A && git commit -qm back-to-enforce
@@ -175,7 +175,7 @@ EOF
     # Node genuinely absent (as opposed to no coverage file): a different
     # informational message, still not a failure.
     out=$(PATH=/usr/bin:/bin "$CHECK_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"level":"info".*no node' \
+    grep -q '"level":"info".*no node' <<< "$out" \
       || { echo "FAIL: node-absent case did not report the expected info message"; echo "$out"; exit 1; }
 
     exit 0
