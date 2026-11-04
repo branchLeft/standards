@@ -36,6 +36,7 @@ run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
+run "check-docs-site.sh"   bash "$TOOLS/check-docs-site.sh" --self-test
 # check-coverage.sh: self-tested like every other gate, but deliberately
 # absent from GATES in standards-audit.sh and from
 # .github/workflows/standards.yml — see standards-audit.sh's ADVISORY_GATES
@@ -52,18 +53,56 @@ run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
 # asserted, because a gate the workflow runs without self-testing first is a
 # matcher trusted without evidence it still matches.
 echo "workflow:"
-workflow_runs_every_gate() {
-  local wf="$TOOLS/../.github/workflows/standards.yml" gates g pattern rc=0
-  gates=$(sed -n 's/^GATES=(\(.*\))$/\1/p' "$TOOLS/standards-audit.sh")
-  [ -n "$gates" ] || { echo "could not read GATES from standards-audit.sh"; return 1; }
-  for g in $gates; do
+REAL_STANDARDS_WORKFLOW="$TOOLS/../.github/workflows/standards.yml"
+
+# Gates the workflow runs that standards-audit.sh's GATES list deliberately
+# omits (that list is mirrored in tools/ts, so adding to it drags a parity
+# set along). Add any such gate here, and only here: the workflow is then
+# asserted to run it, and a workflow gate in neither list fails the check.
+WORKFLOW_ONLY_GATES=(check-docs-site.sh)
+
+# The workflow file is asserted to self-test and to run each named gate.
+# Comment lines are dropped first, so a comment naming a gate cannot stand in
+# for the line that runs it.
+workflow_runs_gates() { # workflow_file gate...
+  local wf="$1" live g pattern rc=0
+  shift
+  [ -f "$wf" ] || { echo "no workflow at $wf"; return 1; }
+  live=$(grep -v '^[[:space:]]*#' "$wf")
+  for g in "$@"; do
     pattern="tools/${g//./\\.}"
-    grep -qE "${pattern}[[:space:]]+--self-test" "$wf" \
+    printf '%s\n' "$live" | grep -qE "${pattern}[[:space:]]+--self-test" \
       || { echo "standards.yml does not self-test $g"; rc=1; }
-    grep -E "$pattern" "$wf" | grep -qv -- '--self-test' \
+    printf '%s\n' "$live" | grep -E "$pattern" | grep -qv -- '--self-test' \
       || { echo "standards.yml does not run $g"; rc=1; }
   done
   return "$rc"
+}
+
+# The reverse direction: every tools/*.sh the workflow calls is a gate this
+# file knows about, so a gate added to the workflow alone is not unasserted.
+workflow_calls_only_listed_gates() { # workflow_file gate...
+  local wf="$1" called g k known rc=0
+  shift
+  called=$(grep -v '^[[:space:]]*#' "$wf" \
+    | grep -oE '\.standards/tools/[A-Za-z0-9_.-]+\.sh' | sed 's|.*/||' | sort -u)
+  [ -n "$called" ] || { echo "found no gate calls in $wf"; return 1; }
+  for g in $called; do
+    known=0
+    for k in "$@"; do [ "$k" = "$g" ] && known=1; done
+    [ "$known" -eq 1 ] || { echo "standards.yml calls $g, which neither GATES nor WORKFLOW_ONLY_GATES lists"; rc=1; }
+  done
+  return "$rc"
+}
+
+workflow_runs_every_gate() {
+  local gates
+  gates=$(sed -n 's/^GATES=(\(.*\))$/\1/p' "$TOOLS/standards-audit.sh")
+  [ -n "$gates" ] || { echo "could not read GATES from standards-audit.sh"; return 1; }
+  # shellcheck disable=SC2086  # GATES is a space-separated list of bare words
+  workflow_runs_gates "$REAL_STANDARDS_WORKFLOW" $gates "${WORKFLOW_ONLY_GATES[@]}" || return 1
+  # shellcheck disable=SC2086
+  workflow_calls_only_listed_gates "$REAL_STANDARDS_WORKFLOW" $gates "${WORKFLOW_ONLY_GATES[@]}"
 }
 run "reusable workflow runs every gate" workflow_runs_every_gate
 
@@ -386,6 +425,116 @@ fifo_is_refused() {
   rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
+
+# Wiring sabotage: each fixture is an edited copy of the real standards.yml
+# (edited_copy rejects a sed that matches nothing), so the wiring test is
+# shown red with a line deleted and green with it restored.
+wiring_copy() { # sed_script; an empty script keeps the real file
+  copy_standards_wf="$fixture_dir/standards.yml"
+  if [ -n "$1" ]; then edited_copy "$REAL_STANDARDS_WORKFLOW" "$1" "$copy_standards_wf"
+  else cp "$REAL_STANDARDS_WORKFLOW" "$copy_standards_wf"; fi
+}
+
+wiring_refused() { # expected_message gate sed_script
+  local output
+  wiring_copy "$3" || return 1
+  output="$(workflow_runs_gates "$copy_standards_wf" "$2" 2>&1)" && return 1
+  case "$output" in *"$1"*) return 0 ;; esac
+  return 1
+}
+
+wiring_accepted() { # gate sed_script
+  wiring_copy "$2" && workflow_runs_gates "$copy_standards_wf" "$1" >/dev/null 2>&1
+}
+
+unlisted_gate_refused() { # sed_script
+  local output gates
+  gates=$(sed -n 's/^GATES=(\(.*\))$/\1/p' "$TOOLS/standards-audit.sh")
+  wiring_copy "$1" || return 1
+  # shellcheck disable=SC2086  # GATES is a space-separated list of bare words
+  output="$(workflow_calls_only_listed_gates "$copy_standards_wf" $gates "${WORKFLOW_ONLY_GATES[@]}" 2>&1)" && return 1
+  case "$output" in *"neither GATES nor WORKFLOW_ONLY_GATES lists"*) return 0 ;; esac
+  return 1
+}
+
+DOCS_SELF='check-docs-site\.sh'
+DOCS_SELF_LINE="/${DOCS_SELF} --self-test/d"
+DOCS_RUN_LINE="/${DOCS_SELF} .*|| rc=1/d"
+
+echo "workflow wiring sabotage:"
+run "wiring: the unmodified workflow runs check-docs-site.sh (green control)" \
+  wiring_accepted check-docs-site.sh ''
+run "wiring: deleting the check-docs-site.sh self-test line is refused (red)" \
+  wiring_refused "does not self-test check-docs-site.sh" check-docs-site.sh "$DOCS_SELF_LINE"
+run "wiring: deleting the check-docs-site.sh run line is refused (red)" \
+  wiring_refused "does not run check-docs-site.sh" check-docs-site.sh "$DOCS_RUN_LINE"
+run "wiring: commenting out the check-docs-site.sh run line is refused (red)" \
+  wiring_refused "does not run check-docs-site.sh" check-docs-site.sh \
+  "s@^\\( *\\)\\(\\.standards/tools/${DOCS_SELF} .*|| rc=1\\)\$@\\1# \\2@"
+run "wiring: commenting out the check-docs-site.sh self-test line is refused (red)" \
+  wiring_refused "does not self-test check-docs-site.sh" check-docs-site.sh \
+  "s@^\\( *\\)\\(\\.standards/tools/${DOCS_SELF} --self-test\\)\$@\\1# \\2@"
+run "wiring: deleting a GATES gate's run line is still refused (generality control)" \
+  wiring_refused "does not run check-raw-sql.sh" check-raw-sql.sh '/check-raw-sql\.sh .*|| rc=1/d'
+run "wiring: deleting a GATES gate's self-test line is still refused (generality control)" \
+  wiring_refused "does not self-test check-raw-sql.sh" check-raw-sql.sh '/check-raw-sql\.sh --self-test/d'
+run "wiring: the workflow restored passes again" \
+  wiring_accepted check-docs-site.sh ''
+run "wiring: a gate added to the workflow but to neither list is refused" \
+  unlisted_gate_refused 's|^\( *\)\.standards/tools/check-docs-site\.sh --self-test$|&\n\1.standards/tools/check-unlisted.sh --self-test|'
+
+# Gate mutations: the gate's own self-test must turn red when the mechanism
+# it proves is broken. The copy sits in a mirror of the tools/ layout so the
+# only difference from the real gate is the edit.
+mutated_gate_copy() { # sed_script; an empty script keeps the real gate
+  local mut="$fixture_dir/mutated-gate"
+  rm -rf "${mut:?}" && mkdir -p "$mut/tools/lib" "$mut/docs" || return 1
+  cp "$TOOLS/lib/ratchet.sh" "$mut/tools/lib/ratchet.sh" || return 1
+  cp "$TOOLS/docs-site-tiers.tsv" "$mut/tools/docs-site-tiers.tsv" || return 1
+  cp "$TOOLS/../docs/documentation.md" "$mut/docs/documentation.md" || return 1
+  if [ -n "$1" ]; then edited_copy "$TOOLS/check-docs-site.sh" "$1" "$mut/tools/check-docs-site.sh"
+  else cp "$TOOLS/check-docs-site.sh" "$mut/tools/check-docs-site.sh"; fi
+}
+
+mutated_gate_passes() {
+  mutated_gate_copy '' && bash "$fixture_dir/mutated-gate/tools/check-docs-site.sh" --self-test >/dev/null 2>&1
+}
+
+mutated_gate_goes_red() { # expected_message sed_script
+  local output
+  mutated_gate_copy "$2" || return 1
+  output="$(bash "$fixture_dir/mutated-gate/tools/check-docs-site.sh" --self-test 2>&1)" && return 1
+  case "$output" in *"$1"*) return 0 ;; esac
+  return 1
+}
+
+# The sed scripts are literal text matched against the gate's source.
+# shellcheck disable=SC2016
+M_ENFORCE_CANNOT_FAIL='s/RATCHET_FAILURES=\$((RATCHET_FAILURES + 1))/RATCHET_WARNINGS=\$((RATCHET_WARNINGS + 1))/'
+# shellcheck disable=SC2016
+M_ENFORCE_VIA_RATCHET_FINDING='s/^    finding_enforce "\$1" "\$2" "\$3"$/    ratchet_finding "$CLAUSE" "$1" "$2" "$3"/'
+# shellcheck disable=SC2016
+M_WARN_CAN_FAIL='s/^  GATE_LEVEL="\$mode"$/  GATE_LEVEL=enforce/'
+# shellcheck disable=SC2016
+M_NO_SYMLINK_CHECK='s/^  \[ -e "\$p" \] || \[ -L "\$p" \] || return 1$/  return 1/'
+# shellcheck disable=SC2016
+M_IGNORE_TRACKED_OUTPUT='s/\[ "\$count" -gt 0 \]/[ "$count" -gt 999999 ]/'
+M_NO_EMPTY_REGISTER_REFUSAL='s/^  register_usable || return 2$/  :/'
+
+echo "docs-site gate mutations:"
+run "gate mutation: the unmodified copy's self-test passes (green control)" mutated_gate_passes
+run "gate mutation: an enforce path that cannot fail turns the self-test red" \
+  mutated_gate_goes_red "expected a failure" "$M_ENFORCE_CANNOT_FAIL"
+run "gate mutation: enforce through ratchet_finding (fail-open on a missing file) turns it red" \
+  mutated_gate_goes_red "expected a failure" "$M_ENFORCE_VIA_RATCHET_FINDING"
+run "gate mutation: a warn-mode repo that can fail turns the self-test red" \
+  mutated_gate_goes_red "a warn-mode repo must never fail" "$M_WARN_CAN_FAIL"
+run "gate mutation: no symlink containment turns the self-test red" \
+  mutated_gate_goes_red "symlink out of the tree" "$M_NO_SYMLINK_CHECK"
+run "gate mutation: ignoring tracked output turns the self-test red" \
+  mutated_gate_goes_red "RED: a built file is tracked" "$M_IGNORE_TRACKED_OUTPUT"
+run "gate mutation: dropping the empty tier list refusal turns the self-test red" \
+  mutated_gate_goes_red "expected 2" "$M_NO_EMPTY_REGISTER_REFUSAL"
 
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then

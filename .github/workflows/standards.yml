@@ -111,6 +111,7 @@ jobs:
           .standards/tools/standards-sync.sh --self-test
           .standards/tools/check-raw-sql.sh --self-test
           .standards/tools/check-comment-blocks.sh --self-test
+          .standards/tools/check-docs-site.sh --self-test
 
       - name: Run the gates
         env:
@@ -138,6 +139,7 @@ jobs:
           .standards/tools/standards-sync.sh  "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/check-raw-sql.sh   "${args[@]+"${args[@]}"}" || rc=1
           .standards/tools/check-comment-blocks.sh "${args[@]+"${args[@]}"}" || rc=1
+          .standards/tools/check-docs-site.sh "${args[@]+"${args[@]}"}" || rc=1
           exit "$rc"
 
       # The TypeScript audit's gates are all pending: advisory evidence, never
