@@ -146,19 +146,19 @@ EOF
     printf 'app/routes/blog.tsx\n' > files.txt
     run_args files.txt
     [ "$grc" -eq 0 ] || { echo "FAIL: run exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'discovery only' \
+    grep -q 'discovery only' <<< "$out" \
       || { echo "FAIL: banner missing"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'does not gate anything' \
+    grep -q 'does not gate anything' <<< "$out" \
       || { echo "FAIL: banner does not disclaim gating"; echo "$out"; exit 1; }
 
     # The whole point: a route file matches ZZ-2 (with the file named,
     # since it is a `review` clause) and the universal ZZ-3, and must not
     # match ZZ-1, which is scoped to workflow files.
-    printf '%s' "$out" | grep -qE '^ZZ-2	review	app/routes/blog\.tsx$' \
+    grep -qE '^ZZ-2	review	app/routes/blog\.tsx$' <<< "$out" \
       || { echo "FAIL: route file did not produce ZZ-2 with its file"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '^ZZ-3	pending	-$' \
+    grep -qE '^ZZ-3	pending	-$' <<< "$out" \
       || { echo "FAIL: route file did not produce the universal ZZ-3"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-1	' \
+    grep -q '^ZZ-1	' <<< "$out" \
       && { echo "FAIL: route file falsely matched ZZ-1"; echo "$out"; exit 1; }
 
     # The negative twin: an unrelated file matches only the universal
@@ -166,26 +166,26 @@ EOF
     printf 'README.md\n' > files.txt
     run_args files.txt
     [ "$grc" -eq 0 ] || { echo "FAIL: run exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-3	' \
+    grep -q '^ZZ-3	' <<< "$out" \
       || { echo "FAIL: unrelated file did not produce the universal ZZ-3"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-2	' \
+    grep -q '^ZZ-2	' <<< "$out" \
       && { echo "FAIL: unrelated file falsely matched ZZ-2"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-1	' \
+    grep -q '^ZZ-1	' <<< "$out" \
       && { echo "FAIL: unrelated file falsely matched ZZ-1"; echo "$out"; exit 1; }
 
     # A workflow file matches ZZ-1 and ZZ-3, never ZZ-2.
     printf '.github/workflows/ci.yml\n' > files.txt
     run_args files.txt
-    printf '%s' "$out" | grep -qE '^ZZ-1	auto	-$' \
+    grep -qE '^ZZ-1	auto	-$' <<< "$out" \
       || { echo "FAIL: workflow file did not produce ZZ-1"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-2	' \
+    grep -q '^ZZ-2	' <<< "$out" \
       && { echo "FAIL: workflow file falsely matched ZZ-2"; echo "$out"; exit 1; }
 
     # No changed files at all is reported, not silently empty.
     printf '' > files.txt
     run_args files.txt
     [ "$grc" -eq 0 ] || { echo "FAIL: empty file list exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'no changed files' \
+    grep -q 'no changed files' <<< "$out" \
       || { echo "FAIL: empty file list not reported"; echo "$out"; exit 1; }
 
     # A changed set that matches no glob at all — clear every clause-paths
@@ -194,7 +194,7 @@ EOF
     printf 'unrelated.txt\n' > files.txt
     run_args files.txt
     [ "$grc" -eq 0 ] || { echo "FAIL: no-match run exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'no mapped clause matched' \
+    grep -q 'no mapped clause matched' <<< "$out" \
       || { echo "FAIL: no-match case not reported"; echo "$out"; exit 1; }
 
     # Missing clause-paths.tsv and missing index.md are both hard errors —
@@ -206,7 +206,7 @@ EOF
     rm -f tools/clause-paths.tsv
     run_args files.txt
     [ "$grc" -eq 2 ] || { echo "FAIL: missing clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'no clause-paths file at' \
+    grep -q 'no clause-paths file at' <<< "$out" \
       || { echo "FAIL: missing clause-paths.tsv not reported"; echo "$out"; exit 1; }
 
     cat > tools/clause-paths.tsv <<'EOF'
@@ -216,7 +216,7 @@ EOF
     rm -f docs/index.md
     run_args files.txt
     [ "$grc" -eq 2 ] || { echo "FAIL: missing index exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'no index at' \
+    grep -q 'no index at' <<< "$out" \
       || { echo "FAIL: missing index not reported"; echo "$out"; exit 1; }
 
     cat > docs/index.md <<'EOF'
@@ -230,7 +230,7 @@ EOF
     # `--files -` reads from stdin rather than a path.
     out=$(printf '.github/workflows/x.yml\n' | run "$tmp" -); grc=$?
     [ "$grc" -eq 0 ] || { echo "FAIL: stdin input exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-1	' \
+    grep -q '^ZZ-1	' <<< "$out" \
       || { echo "FAIL: stdin input did not match ZZ-1"; echo "$out"; exit 1; }
 
     # The default (no --files) path: reuse ratchet's own merge-base logic
@@ -267,7 +267,7 @@ EOF
       cd "$tmp/scratch" && run "$tmp/scratch" ""
     ); grc=$?
     [ "$grc" -eq 0 ] || { echo "FAIL: default merge-base path exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '^ZZ-1	' \
+    grep -q '^ZZ-1	' <<< "$out" \
       || { echo "FAIL: default merge-base path did not see the new workflow file"; echo "$out"; exit 1; }
 
     exit 0

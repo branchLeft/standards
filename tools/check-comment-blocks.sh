@@ -271,46 +271,46 @@ self_test() {
 
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
 
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"error"' \
+    grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"error"' <<< "$out" \
       || { echo "FAIL: long.ts (11 lines) not caught as a CMT-3 error"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"file":"long.ts".*is 11 lines' \
+    grep -q '"file":"long.ts".*is 11 lines' <<< "$out" \
       || { echo "FAIL: long.ts block length wrong (want 11)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"longslash.ts","line":1,"level":"warning".*is 10 lines' \
+    grep -q '"clause":"CMT-3".*"file":"longslash.ts","line":1,"level":"warning".*is 10 lines' <<< "$out" \
       || { echo "FAIL: longslash.ts (10 lines) not caught as a CMT-3 warning"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"clean.ts"' \
+    grep -q '"clause":"CMT-3".*"file":"clean.ts"' <<< "$out" \
       && { echo "FAIL: clean.ts reported for CMT-3"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"closes-with-code.ts"' \
+    grep -q '"clause":"CMT-3".*"file":"closes-with-code.ts"' <<< "$out" \
       && { echo "FAIL: block-close-shares-a-line-with-code miscounted as a pure comment line"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.py","line":2,"level":"error".*is 11 lines' \
+    grep -q '"clause":"CMT-3".*"file":"long.py","line":2,"level":"error".*is 11 lines' <<< "$out" \
       || { echo "FAIL: python docstring block wrong length or level (want 11, error)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.sh","line":2,"level":"warning".*is 9 lines' \
+    grep -q '"clause":"CMT-3".*"file":"long.sh","line":2,"level":"warning".*is 9 lines' <<< "$out" \
       || { echo "FAIL: shell comment run wrong length or level (want 9, warning)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-4"' \
+    grep -q '"clause":"CMT-4"' <<< "$out" \
       && { echo "FAIL: CMT-4 reported by check-comment-blocks.sh — that clause moved to TypeScript"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"fstring-close.py"' \
+    grep -q '"clause":"CMT-3".*"file":"fstring-close.py"' <<< "$out" \
       && { echo "FAIL: an f-string's own closing \"\"\" read as a docstring opener, swallowing real code"; echo "$out"; exit 1; }
     # The real class docstring (5 lines) still warns on its own — only the
     # merge with the preceding data string, which would report a block
     # starting at the data string's close and running well past 5 lines, is
     # the bug under test.
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"data-string-merge.py","line":9,"level":"warning".*is 5 lines' \
+    grep -q '"clause":"CMT-3".*"file":"data-string-merge.py","line":9,"level":"warning".*is 5 lines' <<< "$out" \
       || { echo "FAIL: data-string-merge.py's real class docstring (5 lines, line 9) not reported on its own"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '"clause":"CMT-3".*"file":"data-string-merge\.py".*is (6|7|8|9|1[0-9]) lines' \
+    grep -qE '"clause":"CMT-3".*"file":"data-string-merge\.py".*is (6|7|8|9|1[0-9]) lines' <<< "$out" \
       && { echo "FAIL: a data string's closing \"\"\" merged into the following class docstring"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"bom-bypass.sh".*"level":"error".*is 11 lines' \
+    grep -q '"clause":"CMT-3".*"file":"bom-bypass.sh".*"level":"error".*is 11 lines' <<< "$out" \
       || { echo "FAIL: a BOM-prefixed first # line undercounted the block below the fail threshold"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"trailing-comment-triple-quote.py".*"level":"error".*is 11 lines' \
+    grep -q '"clause":"CMT-3".*"file":"trailing-comment-triple-quote.py".*"level":"error".*is 11 lines' <<< "$out" \
       || { echo "FAIL: a trailing # comment containing \"\"\" swallowed the real docstring below it"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"quote-in-string.py".*"level":"error".*is 11 lines' \
+    grep -q '"clause":"CMT-3".*"file":"quote-in-string.py".*"level":"error".*is 11 lines' <<< "$out" \
       || { echo "FAIL: a \"\"\" inside an ordinary quoted string opened an untracked string state"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"escaped-quote.py".*"level":"error".*is 11 lines' \
+    grep -q '"clause":"CMT-3".*"file":"escaped-quote.py".*"level":"error".*is 11 lines' <<< "$out" \
       || { echo "FAIL: an escaped quote ended its string early, corrupting the docstring below it"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"crlf.py".*"level":"error".*is 11 lines' \
+    grep -q '"clause":"CMT-3".*"file":"crlf.py".*"level":"error".*is 11 lines' <<< "$out" \
       || { echo "FAIL: a CRLF-terminated closing delimiter did not read as bare"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"backtick-in-slash-comment.ts"' \
+    grep -q '"clause":"CMT-3".*"file":"backtick-in-slash-comment.ts"' <<< "$out" \
       && { echo "FAIL: a backtick inside a // comment was misread as something other than content"; echo "$out"; exit 1; }
     for f in trailing-comma-dq trailing-comma-sq trailing-paren-dq trailing-paren-sq; do
-      printf '%s' "$out" | grep -q "\"clause\":\"CMT-3\".*\"file\":\"$f.py\"" \
+      grep -q "\"clause\":\"CMT-3\".*\"file\":\"$f.py\"" <<< "$out" \
         && { echo "FAIL: $f.py: a closer followed by , or ) did not close the string, swallowing real code"; echo "$out"; exit 1; }
     done
 
@@ -326,7 +326,7 @@ self_test() {
       && { echo "FAIL: control could not revert the fix in a copy of comments.sh (the condition changed shape)"; rm -rf "$mut"; exit 1; }
     mutout=$("$mut/check-comment-blocks.sh" --mode enforce --json 2>&1)
     for f in trailing-comma-dq trailing-comma-sq trailing-paren-dq trailing-paren-sq; do
-      printf '%s' "$mutout" | grep -q "\"clause\":\"CMT-3\".*\"file\":\"$f.py\".*\"level\":\"error\".*is 1[1-9] lines" \
+      grep -q "\"clause\":\"CMT-3\".*\"file\":\"$f.py\".*\"level\":\"error\".*is 1[1-9] lines" <<< "$mutout" \
         || { echo "FAIL: control: with the fix reverted, $f.py was not reported as one long block"; echo "$mutout"; rm -rf "$mut"; exit 1; }
     done
     rm -rf "$mut"
@@ -340,9 +340,9 @@ self_test() {
     printf 'long.ts\tCMT-3\t# fixture, narrative retained deliberately\n' > .standardsignore
     git add -A && git commit -qm exempt
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"exempt"' \
+    grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"exempt"' <<< "$out" \
       || { echo "FAIL: .standardsignore did not exempt long.ts"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"longslash.ts".*"level":"warning"' \
+    grep -q '"clause":"CMT-3".*"file":"longslash.ts".*"level":"warning"' <<< "$out" \
       || { echo "FAIL: exempting long.ts silenced an unrelated file"; echo "$out"; exit 1; }
     rm .standardsignore
     git add -A && git commit -qm unexempt
@@ -350,11 +350,11 @@ self_test() {
     # Human-readable mode: ::error:: for the fail tier, ::warning:: for the
     # warn tier, never ::notice:: — this gate fails a build now.
     out=$("$CHECK_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q '::error.*CMT-3' \
+    grep -q '::error.*CMT-3' <<< "$out" \
       || { echo "FAIL: human-readable output missing ::error:: for the fail tier"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '::warning.*CMT-3' \
+    grep -q '::warning.*CMT-3' <<< "$out" \
       || { echo "FAIL: human-readable output missing ::warning:: for the warn tier"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '::notice' \
+    grep -qE '::notice' <<< "$out" \
       && { echo "FAIL: human-readable output still used ::notice:: (advisory)"; echo "$out"; exit 1; }
 
     # The shipped limits, read from the real tools/thresholds.tsv: a 24-line
@@ -373,9 +373,9 @@ self_test() {
     done
     git add -A && git commit -qm edge
     out=$("$CHECK_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"edge24.ts".*"level":"warning".*is 24 lines' \
+    grep -q '"clause":"CMT-3".*"file":"edge24.ts".*"level":"warning".*is 24 lines' <<< "$out" \
       || { echo "FAIL: a 24-line block is not a warning under the shipped limits"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"edge25.ts".*"level":"error".*is 25 lines' \
+    grep -q '"clause":"CMT-3".*"file":"edge25.ts".*"level":"error".*is 25 lines' <<< "$out" \
       || { echo "FAIL: a 25-line block is not an error under the shipped limits"; echo "$out"; exit 1; }
 
     exit 0

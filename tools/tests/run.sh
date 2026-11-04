@@ -46,6 +46,44 @@ run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
 
+# A pipe into grep -q takes SIGPIPE on large output and reports a false result
+# under pipefail. The lint refuses a new pipe in a pipefail script, and its
+# baseline names the ones not yet converted. The fixtures show it red on a pipe
+# and green on a here-string; the regression runs a here-string assertion on
+# 300 KiB of output with an early match.
+pipefail_lint_fixtures() {
+  local d rc=0 pipe='|' lint="$TOOLS/tests/check_pipefail_grep.sh" out
+  d="$(mktemp -d)" || return 1
+  mkdir -p "$d/red" "$d/green"
+  cat > "$d/red/red.sh" <<EOF
+set -uo pipefail
+printf %s "\$x" $pipe grep -q a
+EOF
+  cat > "$d/green/green.sh" <<'EOF'
+set -uo pipefail
+grep -q a <<< "$x"
+EOF
+  cat > "$d/green/plain.sh" <<EOF
+printf %s "\$x" $pipe grep -q a
+EOF
+  printf 'red.sh 1\n' > "$d/one"
+  printf 'red.sh 2\n' > "$d/two"
+  out=$(bash "$lint" "$d/red" /dev/null 2>&1) && { echo "red: a pipe into grep -q passed the lint"; rc=1; }
+  grep -q 'red.sh' <<< "$out" || { echo "red: the lint did not name the file"; rc=1; }
+  bash "$lint" "$d/green" /dev/null >/dev/null 2>&1 \
+    || { echo "green: a here-string, or a pipe outside a pipefail script, was refused"; rc=1; }
+  bash "$lint" "$d/red" "$d/one" >/dev/null 2>&1 \
+    || { echo "ratchet: a baseline equal to the count was refused"; rc=1; }
+  bash "$lint" "$d/red" "$d/two" >/dev/null 2>&1 \
+    && { echo "ratchet: a baseline above the count passed"; rc=1; }
+  rm -rf "${d:?}"
+  return "$rc"
+}
+echo "pipefail grep -q:"
+run "no new grep -q pipe in a pipefail script" bash "$TOOLS/tests/check_pipefail_grep.sh"
+run "lint refuses a pipe, passes a here-string, enforces the baseline" pipefail_lint_fixtures
+run "assertion holds on 300 KiB output with an early match" bash "$TOOLS/tests/pipefail_big_output.sh"
+
 # The gate list and the reusable workflow are two lists in two files, and until
 # this check existed nothing tied them together: a gate could be written,
 # self-tested, indexed and documented while running in no consumer at all, and
@@ -65,16 +103,18 @@ WORKFLOW_ONLY_GATES=(check-docs-site.sh)
 # Comment lines are dropped first, so a comment naming a gate cannot stand in
 # for the line that runs it.
 workflow_runs_gates() { # workflow_file gate...
-  local wf="$1" live g pattern rc=0
+  local wf="$1" live g pattern hits rc=0
   shift
   [ -f "$wf" ] || { echo "no workflow at $wf"; return 1; }
   live=$(grep -v '^[[:space:]]*#' "$wf")
   for g in "$@"; do
     pattern="tools/${g//./\\.}"
-    printf '%s\n' "$live" | grep -qE "${pattern}[[:space:]]+--self-test" \
+    grep -qE "${pattern}[[:space:]]+--self-test" <<< "$live" \
       || { echo "standards.yml does not self-test $g"; rc=1; }
-    printf '%s\n' "$live" | grep -E "$pattern" | grep -qv -- '--self-test' \
-      || { echo "standards.yml does not run $g"; rc=1; }
+    hits=$(grep -E "$pattern" <<< "$live")
+    if [ -z "$hits" ] || ! grep -qv -- '--self-test' <<< "$hits"; then
+      echo "standards.yml does not run $g"; rc=1
+    fi
   done
   return "$rc"
 }

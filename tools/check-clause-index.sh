@@ -354,7 +354,7 @@ self_test() {
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: honest index exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'index, docs and artefacts agree' \
+    grep -q 'index, docs and artefacts agree' <<< "$out" \
       || { echo "FAIL: honest index did not report agreement"; echo "$out"; exit 1; }
 
     # A passing run that emitted warnings must not claim agreement. The summary
@@ -371,11 +371,11 @@ EOF
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: undocumented pending clause exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'AA-9 is indexed but not yet defined' \
+    grep -q 'AA-9 is indexed but not yet defined' <<< "$out" \
       || { echo "FAIL: undocumented clause not warned about"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'index, docs and artefacts agree' \
+    grep -q 'index, docs and artefacts agree' <<< "$out" \
       && { echo "FAIL: claimed agreement while warning about AA-9"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '1 indexed clause(s) have no doc' \
+    grep -q '1 indexed clause(s) have no doc' <<< "$out" \
       || { echo "FAIL: summary did not count the undocumented clause"; echo "$out"; exit 1; }
 
     # The whole point: `auto` with nothing behind it.
@@ -389,7 +389,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: unimplemented auto exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-2 is marked .auto. but no script under tools/" \
+    grep -q "AA-2 is marked .auto. but no script under tools/" <<< "$out" \
       || { echo "FAIL: unimplemented auto not named"; echo "$out"; exit 1; }
 
     # A `pending` clause that a real artefact names is no longer an error:
@@ -407,7 +407,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: a named pending clause exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "::error::AA-2" \
+    grep -q "::error::AA-2" <<< "$out" \
       && { echo "FAIL: a named pending clause still raised an error"; echo "$out"; exit 1; }
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
 
@@ -434,7 +434,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: missing artefact path exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "does not exist" \
+    grep -q "does not exist" <<< "$out" \
       || { echo "FAIL: missing artefact path not reported"; echo "$out"; exit 1; }
 
     write_index <<'EOF'
@@ -474,7 +474,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: package-only auto clause exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-1 is marked .auto. but no script under tools/ names it" \
+    grep -q "AA-1 is marked .auto. but no script under tools/ names it" <<< "$out" \
       || { echo "FAIL: package-only auto clause not reported"; echo "$out"; exit 1; }
 
     # The positive twin: the same package, and the same mention still sits in
@@ -508,7 +508,7 @@ EOF
 ' > tools/package-consumers.tsv
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: unlisted package exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "no row in tools/package-consumers.tsv" \
+    grep -q "no row in tools/package-consumers.tsv" <<< "$out" \
       || { echo "FAIL: unlisted package not reported"; echo "$out"; exit 1; }
     rm -f tools/package-consumers.tsv
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
@@ -546,7 +546,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: undocumented clause exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'AA-3 is defined in docs/ but missing' \
+    grep -q 'AA-3 is defined in docs/ but missing' <<< "$out" \
       || { echo "FAIL: unindexed clause not reported"; echo "$out"; exit 1; }
 
     # A family header with no path is a declared-thin family, not a promise —
@@ -579,7 +579,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: dead family header exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+    grep -q "family header links to 'family-missing.md', which does not exist" <<< "$out" \
       || { echo "FAIL: dead family header not reported"; echo "$out"; exit 1; }
 
     # A plain hyphen and an en dash are not the em dash used elsewhere in the
@@ -597,7 +597,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: hyphen-separated dead header exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+    grep -q "family header links to 'family-missing.md', which does not exist" <<< "$out" \
       || { echo "FAIL: hyphen-separated dead header not reported"; echo "$out"; exit 1; }
 
     write_index <<'EOF'
@@ -611,7 +611,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: en-dash-separated dead header exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+    grep -q "family header links to 'family-missing.md', which does not exist" <<< "$out" \
       || { echo "FAIL: en-dash-separated dead header not reported"; echo "$out"; exit 1; }
 
     # A header naming two files must not silently check only one of them.
@@ -626,7 +626,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: two-path header exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "family header links to 'family-missing.md', which does not exist" \
+    grep -q "family header links to 'family-missing.md', which does not exist" <<< "$out" \
       || { echo "FAIL: dead path in a two-path header not reported"; echo "$out"; exit 1; }
 
     # A directory exists at that path but names nothing readable — `-e` would
@@ -643,7 +643,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: directory family header exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "family header links to 'a-directory', which does not exist" \
+    grep -q "family header links to 'a-directory', which does not exist" <<< "$out" \
       || { echo "FAIL: directory family header not reported"; echo "$out"; exit 1; }
     rm -rf docs/a-directory
 
@@ -660,7 +660,7 @@ EOF
 EOF
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: escaping family header exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "family header links to '../README.md', which escapes" \
+    grep -q "family header links to '../README.md', which escapes" <<< "$out" \
       || { echo "FAIL: escaping family header not reported as an escape"; echo "$out"; exit 1; }
 
     # A header shown as a fenced example in prose is not a promise — it must
@@ -699,7 +699,7 @@ EOF
     : > tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, unmapped indexed clause exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" \
+    grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" <<< "$out" \
       || { echo "FAIL: unmapped indexed clause not reported"; echo "$out"; exit 1; }
 
     # Assertion 6, clause-paths.tsv's own version of a ghost floor: a row for
@@ -707,7 +707,7 @@ EOF
     printf 'AA-1\t*\tfixture\nZZ-9\t*\tfixture\n' > tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, ghost clause-paths row exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "ZZ-9 has a row in tools/clause-paths.tsv but is not indexed" \
+    grep -q "ZZ-9 has a row in tools/clause-paths.tsv but is not indexed" <<< "$out" \
       || { echo "FAIL: ghost clause-paths row not reported"; echo "$out"; exit 1; }
 
     # A comment-only clause-paths.tsv names no clause, so the one indexed
@@ -716,7 +716,7 @@ EOF
     printf '# clause\tglobs\tscope\n' > tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, comment-only clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" \
+    grep -q "AA-1 is indexed in .* but has no row in tools/clause-paths.tsv" <<< "$out" \
       || { echo "FAIL: comment-only clause-paths.tsv did not report the unmapped clause"; echo "$out"; exit 1; }
 
     # An absent file is one warning rather than one per clause —
@@ -724,7 +724,7 @@ EOF
     rm -f tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, missing clause-paths.tsv exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "no clause-paths file at" \
+    grep -q "no clause-paths file at" <<< "$out" \
       || { echo "FAIL: missing clause-paths.tsv not reported"; echo "$out"; exit 1; }
 
     # --- clause-paths.tsv: the [gate] tag, also advisory -------------------
@@ -735,7 +735,7 @@ EOF
     printf 'AA-1\t*\t[fleet] a guess, not read from the gate\n' > tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: advisory only, unscoped-looking tag on a real scoped gate exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "AA-1 is reported by a tools/\*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged .\[gate\]." \
+    grep -q "AA-1 is reported by a tools/\*.sh gate that scopes files with ratchet_scope_files, but its tools/clause-paths.tsv row is not tagged .\[gate\]." <<< "$out" \
       || { echo "FAIL: stale non-gate tag on a scoped gate not reported"; echo "$out"; exit 1; }
 
     # The fix: tag it [gate], nothing else about the fixture changes.
@@ -752,7 +752,7 @@ EOF
     printf 'AA-1\t*\t[fleet] not scoped by this gate\n' > tools/clause-paths.tsv
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: unscoped gate wrongly required a [gate] tag, exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "is not tagged" \
+    grep -q "is not tagged" <<< "$out" \
       && { echo "FAIL: unscoped gate was warned about its tag"; echo "$out"; exit 1; }
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     SYNC_PATHS=1
@@ -763,13 +763,13 @@ EOF
     FIXTURE_OVERRIDE="AA-1"
     gate
     [ "$grc" -eq 0 ] || { echo "FAIL: override naming a live gate exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "GATE_SCOPE_OVERRIDE lists" \
+    grep -q "GATE_SCOPE_OVERRIDE lists" <<< "$out" \
       && { echo "FAIL: live override entry flagged as stale"; echo "$out"; exit 1; }
 
     FIXTURE_OVERRIDE="AA-1 ZZ-8"
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: bogus override entry exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "GATE_SCOPE_OVERRIDE lists ZZ-8" \
+    grep -q "GATE_SCOPE_OVERRIDE lists ZZ-8" <<< "$out" \
       || { echo "FAIL: bogus override entry not named"; echo "$out"; exit 1; }
 
     # Word boundary: AA-1 must not be vouched for by a gate naming AA-10.
@@ -777,7 +777,7 @@ EOF
     FIXTURE_OVERRIDE="AA-1"
     gate
     [ "$grc" -eq 1 ] || { echo "FAIL: AA-10 vouched for override AA-1, exited $grc"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q "GATE_SCOPE_OVERRIDE lists AA-1" \
+    grep -q "GATE_SCOPE_OVERRIDE lists AA-1" <<< "$out" \
       || { echo "FAIL: prefix-only override not named"; echo "$out"; exit 1; }
     printf 'ratchet_finding "AA-1"\n' > tools/gate.sh
     FIXTURE_OVERRIDE=""

@@ -427,22 +427,23 @@ EOF
 
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
 
-    printf '%s' "$out" | grep -q 'CI-1 *fail' \
+    grep -q 'CI-1 *fail' <<< "$out" \
       || { echo "FAIL: CI-1 not reported as fail"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'STD-002' \
+    grep -q 'STD-002' <<< "$out" \
       || { echo "FAIL: stale exemption not reported"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'live — suppressing' \
+    grep -q 'live — suppressing' <<< "$out" \
       || { echo "FAIL: live exemption not inventoried"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'STALE — matches no tracked file' \
+    grep -q 'STALE — matches no tracked file' <<< "$out" \
       || { echo "FAIL: vanished-path exemption not flagged"; echo "$out"; exit 1; }
     "$AUDIT_SCRIPT" --mode enforce >/dev/null 2>&1 \
       && { echo "FAIL: exited 0 with findings present"; exit 1; }
 
     # A JSON line per finding, and nothing else on stdout.
     out=$("$AUDIT_SCRIPT" --mode enforce --json 2>/dev/null)
-    printf '%s' "$out" | grep -qv '^{.*}$' \
+    # A here-string adds a newline, which -v reads as a line when the output is empty.
+    grep -qv '^{.*}$' < <(printf '%s' "$out") \
       && { echo "FAIL: --json emitted a non-JSON line"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"CI-1"' \
+    grep -q '"clause":"CI-1"' <<< "$out" \
       || { echo "FAIL: --json missing the CI-1 finding"; echo "$out"; exit 1; }
 
     # An exemption covering a clean file suppresses nothing, so it is stale.
@@ -464,7 +465,7 @@ EOF
     git add -A && git commit -qm clean
 
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'STALE — 1 files, no finding to suppress' \
+    grep -q 'STALE — 1 files, no finding to suppress' <<< "$out" \
       || { echo "FAIL: exemption over a clean file not flagged stale"; echo "$out"; exit 1; }
 
     # STD-000 — a token with no clause and no reason, next to one that is
@@ -476,7 +477,7 @@ EOF
       "$RATCHET_ALLOW_TOKEN" "$RATCHET_ALLOW_TOKEN" > .github/workflows/allow.yml
     git add -A && git commit -qm bare-allow
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q 'STD-000' \
+    grep -q 'STD-000' <<< "$out" \
       || { echo "FAIL: bare suppression not reported"; echo "$out"; exit 1; }
     [ "$(printf '%s' "$out" | grep -c 'MALFORMED')" -eq 1 ] \
       || { echo "FAIL: quoted mention counted as a suppression"; echo "$out"; exit 1; }
@@ -510,7 +511,7 @@ EOF
     # tab (that's a GNU-only extension of -P), so this passed only under a
     # PCRE-flavoured grep (this repo's dev machines) and failed deterministically
     # in CI's plain GNU grep — this exact line, every run, regardless of #126.
-    printf '%s' "$out" | grep -qE '\.github/workflows/live-allow\.yml:[0-9]+[[:blank:]]CI-1[[:blank:]]live$' \
+    grep -qE '\.github/workflows/live-allow\.yml:[0-9]+[[:blank:]]CI-1[[:blank:]]live$' <<< "$out" \
       || { echo "FAIL: a live inline allow read stale"; echo "$out"; exit 1; }
     rm .github/workflows/live-allow.yml
     git add -A && git commit -qm drop-live-allow
@@ -531,17 +532,17 @@ EOF
     git add -A && git commit -qm db-tooling-fixture
 
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" | grep -q "ops/db-tooling/backup.ts.*live — declaring 1 file" \
+    grep -q "ops/db-tooling/backup.ts.*live — declaring 1 file" <<< "$out" \
       || { echo "FAIL: a live tooling declaration not inventoried"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep 'no-such-dir/nested' | grep -q STALE \
+    grep -q STALE <<< "$(grep 'no-such-dir/nested' <<< "$out")" \
       || { echo "FAIL: a stale tooling declaration not flagged"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q 'REFUSED — a wildcard with no literal' \
+    grep -q 'REFUSED — a wildcard with no literal' <<< "$out" \
       || { echo "FAIL: a refused tooling declaration not inventoried"; echo "$out"; exit 1; }
 
     out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)
     [ "$(printf '%s' "$out" | grep -c '"clause":"DB-1".*standards-db-tooling')" -eq 1 ] \
       || { echo "FAIL: the refused declaration was reported more than once"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"STD-002".*"file":"\.standards-db-tooling"' \
+    grep -q '"clause":"STD-002".*"file":"\.standards-db-tooling"' <<< "$out" \
       || { echo "FAIL: the stale tooling declaration did not raise STD-002"; echo "$out"; exit 1; }
 
     rm -rf ops .standards-db-tooling
@@ -566,9 +567,9 @@ EOF
     git add -A && git commit -qm warning-fixture
 
     out=$("$AUDIT_SCRIPT" --mode enforce --json 2>&1)
-    printf '%s' "$out" | grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"warning"' \
+    grep -q '"clause":"CMT-3".*"file":"long.ts".*"level":"warning"' <<< "$out" \
       || { echo "FAIL: standards-audit.sh did not aggregate a CMT-3 finding"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"clause":"COV-1".*"level":"info"' \
+    grep -q '"clause":"COV-1".*"level":"info"' <<< "$out" \
       || { echo "FAIL: standards-audit.sh did not aggregate the COV-1 no-data finding"; echo "$out"; exit 1; }
 
     # Clause coverage is read from this checkout's own docs/index.md and
@@ -589,10 +590,9 @@ EOF
       | grep -c .)
     exp_not_checked=$((exp_total - exp_enforced - exp_measured))
 
-    printf '%s' "$out" \
-      | grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" \
+    grep -qE "^\\{\"clause_coverage\":\\{\"enforced\":$exp_enforced,\"measured_not_enforced\":$exp_measured,\"not_checked\":$exp_not_checked,\"measured_clauses\":\\[.*\"CMT-3\".*\\]\\}\\}\$" <<< "$out" \
       || { echo "FAIL: --json clause_coverage did not match docs/index.md + thresholds.tsv ($exp_enforced/$exp_measured/$exp_not_checked expected)"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -q '"measured_clauses":\["ARCH-4","ARCH-7","CFG-2","CI-12","CMT-2","CMT-3","CMT-4","CON-1","CON-10","CON-14","CON-3","CON-4","CON-5","CON-6","CON-7","CON-8","CON-9","COV-1","CRED-10","DB-1","DB-3","DB-4","DB-5","DB-6","DEP-8","ERR-1","ERR-2","ERR-3","LINT-2","LINT-4","NAM-1","NAM-2","OPS-2","PY-2","PY-3","REPO-8","TYP-1","TYP-2","TYP-5"\]' \
+    grep -q '"measured_clauses":\["ARCH-4","ARCH-7","CFG-2","CI-12","CMT-2","CMT-3","CMT-4","CON-1","CON-10","CON-14","CON-3","CON-4","CON-5","CON-6","CON-7","CON-8","CON-9","COV-1","CRED-10","DB-1","DB-3","DB-4","DB-5","DB-6","DEP-8","ERR-1","ERR-2","ERR-3","LINT-2","LINT-4","NAM-1","NAM-2","OPS-2","PY-2","PY-3","REPO-8","TYP-1","TYP-2","TYP-5"\]' <<< "$out" \
       || { echo "FAIL: measured_clauses did not list CMT-3 (must not fall into not_checked)"; echo "$out"; exit 1; }
     # By this point in the fixture history every other finding is clean or
     # self-exempted (see the STD-002 step just above), so a nonzero exit here
@@ -602,14 +602,13 @@ EOF
       || { echo "FAIL: a warning or info finding made the run exit non-zero"; exit 1; }
 
     out=$("$AUDIT_SCRIPT" --mode enforce 2>&1)
-    printf '%s' "$out" \
-      | grep -qE "standards: enforced=$exp_enforced measured-not-enforced=$exp_measured not-checked=$exp_not_checked" \
+    grep -qE "standards: enforced=$exp_enforced measured-not-enforced=$exp_measured not-checked=$exp_not_checked" <<< "$out" \
       || { echo "FAIL: human-readable summary missing the three-way clause-coverage line"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '^  CMT-3 +advisory' \
+    grep -qE '^  CMT-3 +advisory' <<< "$out" \
       || { echo "FAIL: findings table did not render CMT-3 as advisory"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '^  COV-1 +info' \
+    grep -qE '^  COV-1 +info' <<< "$out" \
       || { echo "FAIL: findings table did not render COV-1 as info"; echo "$out"; exit 1; }
-    printf '%s' "$out" | grep -qE '^  1 +long\.ts  CMT-3$' \
+    grep -qE '^  1 +long\.ts  CMT-3$' <<< "$out" \
       || { echo "FAIL: the by-file rollup did not list long.ts with its clause"; echo "$out"; exit 1; }
 
     exit 0
