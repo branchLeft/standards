@@ -1,0 +1,33 @@
+# The tier list for DOC-11: which repo publishes which docs site, and whether
+# its gate warns or fails. The one home of both; docs/documentation.md cites
+# this file and never restates it.
+#
+# page<TAB>slug<TAB>Title<TAB>tiers
+#   tiers is a comma-separated list of the tiers that require the page. The
+#   Title is the page name DOC-11 uses in prose.
+#
+# repo<TAB>name<TAB>tier<TAB>mode<TAB># reason
+#   tier is full, overview or exempt. mode is warn or enforce. Under warn the
+#   gate only reports; setting a repo's mode to enforce is the reviewed edit
+#   that turns the gate on for it. A repo absent from this list is not checked.
+#   The caller's own mode setting does not change this: the mode here governs.
+page	overview	Overview	full,overview
+page	where-it-fits	Where it fits	full
+page	how-it-works	How it works	full
+page	change-to-live	Change to live	full
+page	running-or-using-it	Running or using it	full
+page	decisions-and-limits	Decisions and limits	full
+page	reference	Reference	full
+page	glossary	Glossary	full
+repo	shared-infra	full	warn	# the pilot site; enforced first, once the pilot is approved
+repo	ghost-platform	full	warn	# tier set by the owner-approved tier plan
+repo	standards	full	warn	# tier set by the owner-approved tier plan
+repo	components	full	warn	# tier set by the owner-approved tier plan
+repo	speckify	full	warn	# tier set by the owner-approved tier plan
+repo	ghost-platform-tenant-template	full	warn	# tier set by the owner-approved tier plan
+repo	github-workflows	full	warn	# tier set by the owner-approved tier plan
+repo	website	overview	warn	# tier set by the owner-approved tier plan
+repo	pdq-ts	overview	warn	# tier set by the owner-approved tier plan
+repo	control-plane	overview	warn	# tier set by the owner-approved tier plan
+repo	content-safety	overview	warn	# tier set by the owner-approved tier plan
+repo	ghost-tenant-blog	exempt	warn	# tier set by the owner-approved tier plan

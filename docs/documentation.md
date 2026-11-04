@@ -4,11 +4,11 @@ The org documentation standard (`branchLeft/.github`) and the docs-lint rules th
 
 ## DOC-3 — durable documentation is markdown
 
-Durable documentation is markdown; HTML pages are working aids for a session and are not committed, except the committed try-it-now design documents.
+Durable documentation is markdown; HTML pages are working aids for a session and are not committed, except the committed try-it-now design documents. A docs site may be built by CI from committed markdown source (`DOC-11`); its built HTML is never committed.
 
 **Why:** markdown diffs, reviews and renders everywhere, while an HTML page is a view of content whose durable form belongs in markdown.
 
-**Check:** pending; a check fails on a committed `.html` file under a documentation directory, the one exception recorded in `.standardsignore`.
+**Check:** pending; a check fails on a committed `.html` file under a documentation directory, the one exception recorded in `.standardsignore`. For a docs site's built output, the `DOC-11` gate fails on any tracked file under the declared output directory.
 
 ## DOC-4 — every document names its audience
 
@@ -65,3 +65,17 @@ A document marks who drafted its text: owner-written or owner-approved text carr
 **Why:** it protects the owner's words from being reworded and tells a reader how a text came to be; the marker records who drafted the words, not who decided them.
 
 **Check:** pending; a docs-lint rule, once the marker syntax is settled.
+
+## DOC-11 — every repo on the tier list publishes a docs site
+
+Every repo named in `tools/docs-site-tiers.tsv` publishes a docs site for a technical newcomer, to the tier the list gives it:
+
+- **Full:** eight pages, Overview, Where it fits, How it works, Change to live, Running or using it, Decisions and limits, Reference and Glossary.
+- **Overview:** the Overview page only.
+- **Exempt:** no site.
+
+The source is markdown committed in the repo. CI builds and publishes the site; built HTML is never committed (`DOC-3`). A page needs no third-party request and no client JavaScript to read. A fact generated into a page is regenerated or checked, never left to go stale (`DOC-7`, `DOC-8`). The tier list is the one home of which repo is in which tier and whether its gate warns or fails; this clause does not restate it.
+
+**Why:** a newcomer should be able to learn what a repo does, how it fits and how to change it without reading its code, and a site that only exists as built HTML, or that has drifted from the code, teaches the wrong thing.
+
+**Check:** `tools/check-docs-site.sh` reads the repo's `.docs-site` file and the tier list: every page its tier requires is declared and non-empty, a build command and an output directory are declared, and no tracked file sits under the output directory. It warns until a repo's row in the tier list is set to enforce, which happens repo by repo after the pilot site is approved. It does not itself run a site build unless asked; the repo's own publish job builds and publishes.

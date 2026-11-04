@@ -218,6 +218,7 @@ DOC-7	*	[none] a change to any file can make a document stale
 DOC-8	*.md	[fleet] same as DOC-4
 DOC-9	*.md	[fleet] same as DOC-4
 DOC-10	*.md	[fleet] same as DOC-4
+DOC-11	.docs-site;docs/*;*.md	[fleet] the declaration file the gate reads, plus the site's markdown sources; the gate does not scope files with the shared scope helper
 
 ## Architecture — architecture.md
 ARCH-1	*.ts;*.tsx;*.py	[fleet] the doc names TypeScript and Python; these are their source extensions

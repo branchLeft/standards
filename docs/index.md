@@ -447,18 +447,23 @@ elsewhere and are **cited, never restated**:
 - `branchLeft/.github` → `docs/DOCUMENTATION-STANDARD.md`
 - `branchLeft/github-workflows` → `tools/docs-lint-rules.md`
 
-| ID     | Gate      | Encoded by |
-| ------ | --------- | ---------- |
-| DOC-1  | `pending` | —          |
-| DOC-2  | `review`  | —          |
-| DOC-3  | `pending` | —          |
-| DOC-4  | `review`  | —          |
-| DOC-5  | `review`  | —          |
-| DOC-6  | `review`  | —          |
-| DOC-7  | `review`  | —          |
-| DOC-8  | `pending` | —          |
-| DOC-9  | `pending` | —          |
-| DOC-10 | `pending` | —          |
+| ID     | Gate      | Encoded by                 |
+| ------ | --------- | -------------------------- |
+| DOC-1  | `pending` | —                          |
+| DOC-2  | `review`  | —                          |
+| DOC-3  | `pending` | —                          |
+| DOC-4  | `review`  | —                          |
+| DOC-5  | `review`  | —                          |
+| DOC-6  | `review`  | —                          |
+| DOC-7  | `review`  | —                          |
+| DOC-8  | `pending` | —                          |
+| DOC-9  | `pending` | —                          |
+| DOC-10 | `pending` | —                          |
+| DOC-11 | `pending` | `tools/check-docs-site.sh` |
+
+`DOC-11` stays `pending` while every repo's row in `tools/docs-site-tiers.tsv`
+is `warn`: the gate runs in every consumer and can only warn. It moves to
+`auto` in the change that sets the first repo's row to `enforce`.
 
 ## Architecture — `architecture.md`
 
