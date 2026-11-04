@@ -12,7 +12,7 @@ in the `exempt` tier, is not checked: one notice, exit 0.
 
 A consumer declares its site in a tab-separated `.docs-site` at its root:
 
-```
+```text
 page<TAB>slug<TAB>path
 build<TAB>command
 output<TAB>directory

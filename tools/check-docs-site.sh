@@ -41,10 +41,10 @@ register_rows_count() { # kind
 # A missing or empty list must never read as a clean scan.
 register_usable() {
   [ -f "$TIERS_FILE" ] || { echo "check-docs-site: no tier list at $TIERS_FILE" >&2; return 1; }
-  [ "$(register_rows_count page)" -gt 0 ] && [ "$(register_rows_count repo)" -gt 0 ] || {
+  if [ "$(register_rows_count page)" -eq 0 ] || [ "$(register_rows_count repo)" -eq 0 ]; then
     echo "check-docs-site: the tier list at $TIERS_FILE has no page or repo rows; refusing to report a clean run with nothing to check" >&2
     return 1
-  }
+  fi
 }
 
 note() {
