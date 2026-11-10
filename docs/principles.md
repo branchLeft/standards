@@ -4,11 +4,11 @@ The decisions that sit above code and pipelines: which repos are public, what me
 
 ## PRIN-1 — build in public
 
-Repositories are public by default; a private repository needs a written reason, limited to documentation that cannot be sanitised, temporary scratch space, a workspace-scaffolding backup, or a client who requested privacy (a per-tenant decision made by the org owner, never a default). A work-tracking issue whose title would disclose an unfixed security gap is filed in a private tracker until the gap is fixed.
+Repositories are public by default; a private repository or package needs a written reason, limited to documentation that cannot be sanitised, temporary scratch space, a workspace-scaffolding backup, a client who requested privacy (a per-tenant decision made by the org owner, never a default), a build artifact (a mirror copy or a derived image) whose publication would not benefit the open-source community, or a package or image whose upstream licence sets conditions we do not meet for a public copy. A work-tracking issue whose title would disclose an unfixed security gap is filed in a private tracker until the gap is fixed.
 
 **Why:** a private repository accumulates committed secrets, internal shorthand and unreviewable practice because nobody expects a reader, and publishing is what forces the hygiene "engineer as if public" only aspires to.
 
-**Check:** review; each private repository names its reason from the list above.
+**Check:** review; each private repository or package names its reason from the list above.
 
 ## PRIN-2 — merge is deploy, and it is protected
 
