@@ -108,7 +108,7 @@ The approval click is the only human step in any routine change (no local applie
 
 ## CI-14 — every test and gate blocks
 
-Every test suite and quality gate runs in CI and blocks merge, with the ratchet's `warn` mode ([`ratchet.md`](ratchet.md)) as the one sanctioned softening.
+Every test suite and quality gate runs in CI and blocks merge, with two sanctioned softenings: the ratchet's `warn` mode ([`ratchet.md`](ratchet.md)), and the container tests outside the blocking list (`ANS-15`), which stay visible without blocking.
 
 **Why:** a gate that cannot fail is only a report.
 
