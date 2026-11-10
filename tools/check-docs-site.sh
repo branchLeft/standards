@@ -356,12 +356,12 @@ check_real_register() {
   section=$(sed -n '/^## DOC-11/,$p' "$DOC_FILE")
   [ -n "$section" ] || { echo "FAIL: DOC-11 is not defined in $DOC_FILE"; return 1; }
   while IFS= read -r title; do
-    printf '%s\n' "$section" | grep -qF -- "$title" \
+    grep -qF -- "$title" <<< "$section" \
       || { echo "FAIL: page title '$title' is in the tier list but not in DOC-11's prose"; return 1; }
   done < <(awk -F'\t' '/^[ \t]*#/ || NF < 4 { next } $1 == "page" { print $3 }' "$reg")
   n=$(tier_pages full | grep -c .)
   [ "$n" -eq 8 ] || { echo "FAIL: the full tier lists $n pages; DOC-11 says eight"; return 1; }
-  printf '%s\n' "$section" | grep -qF 'tools/docs-site-tiers.tsv' \
+  grep -qF 'tools/docs-site-tiers.tsv' <<< "$section" \
     || { echo "FAIL: DOC-11 does not cite tools/docs-site-tiers.tsv"; return 1; }
 }
 

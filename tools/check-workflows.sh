@@ -43,7 +43,7 @@ scan_workflow() {
     # an empty expression there is inert — reporting it fires the gate on
     # documentation that breaks nothing, which is how a gate earns a suppression.
     if [ "$in_run" -eq 1 ] || [ "${trimmed:0:1}" != "#" ]; then
-      if printf '%s' "$line" | grep -qE '\$\{\{[[:space:]]*\}\}'; then
+      if grep -qE '\$\{\{[[:space:]]*\}\}' <<< "$line"; then
         ratchet_finding "CI-9" "$f" "$ln" \
           "empty \${{ }} expression in an evaluated position — it fails the run at startup with no log"
       fi
@@ -72,15 +72,15 @@ scan_workflow() {
           ./*|'') ;;                                   # local call, nothing to pin
           *@*)
             local sha="${ref##*@}" repo="${ref%@*}"
-            if printf '%s' "$repo" | grep -q '/\.github/workflows/'; then
+            if grep -q '/\.github/workflows/' <<< "$repo"; then
               # CI-5 — reusable workflow: exact tag, never a branch.
               case "$sha" in
                 main|master|HEAD)
                   ratchet_finding "CI-5" "$f" "$ln" "reusable workflow pinned to '$sha' — pin an exact tag" ;;
               esac
-            elif ! printf '%s' "$sha" | grep -qE '^[0-9a-f]{40}$'; then
+            elif ! grep -qE '^[0-9a-f]{40}$' <<< "$sha"; then
               ratchet_finding "CI-1" "$f" "$ln" "action '$repo' is pinned to '$sha', not a 40-character commit SHA"
-            elif ! printf '%s' "$line" | grep -qE '#[[:space:]]*v?[0-9]'; then
+            elif ! grep -qE '#[[:space:]]*v?[0-9]' <<< "$line"; then
               ratchet_finding "CI-1" "$f" "$ln" "action '$repo' is SHA-pinned but has no '# vX.Y.Z' comment"
             fi
             ;;

@@ -158,8 +158,8 @@ audit_exemptions() {
       # by not working, it leaves no finding naming the line to fix, so the
       # author sees an unrelated failure and no explanation of why their
       # suppression was ignored.
-      if ! printf '%s' "${rest#*:}" | grep -qE \
-        "${RATCHET_ALLOW_TOKEN}[[:space:]]+[A-Z]{2,5}-[0-9]{1,3}[[:space:]]+[[:alnum:]]"; then
+      if ! grep -qE \
+        "${RATCHET_ALLOW_TOKEN}[[:space:]]+[A-Z]{2,5}-[0-9]{1,3}[[:space:]]+[[:alnum:]]" <<< "${rest#*:}"; then
         printf '    %s:%s\t—\tMALFORMED — suppresses nothing\n' "$f" "$aln" >> "$inv"
         ratchet_finding "STD-000" "$f" "$aln" \
           "a suppression must name a clause ID and give a reason, so this one suppresses nothing"

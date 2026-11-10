@@ -82,7 +82,7 @@ EOF
 echo "pipefail grep -q:"
 run "no new grep -q pipe in a pipefail script" bash "$TOOLS/tests/check_pipefail_grep.sh"
 run "lint refuses a pipe, passes a here-string, enforces the baseline" pipefail_lint_fixtures
-run "assertion holds on 300 KiB output with an early match" bash "$TOOLS/tests/pipefail_big_output.sh"
+run "assertion holds on 200 KiB output with an early match" bash "$TOOLS/tests/pipefail_big_output.sh"
 
 # The gate list and the reusable workflow are two lists in two files, and until
 # this check existed nothing tied them together: a gate could be written,
@@ -152,9 +152,9 @@ run "reusable workflow runs every gate" workflow_runs_every_gate
 workflow_takes_its_runner_from_input() {
   local wf="${1:-$TOOLS/../.github/workflows/standards.yml}" block n rc=0
   block=$(grep -A4 -x -e '      runs-on:' "$wf")
-  printf '%s\n' "$block" | grep -qxF -e "        default: '[\"ubuntu-latest\"]'" \
+  grep -qxF -e "        default: '[\"ubuntu-latest\"]'" <<< "$block" \
     || { echo "runs-on input does not default to ubuntu-latest"; rc=1; }
-  printf '%s\n' "$block" | grep -qxF -e '        type: string' \
+  grep -qxF -e '        type: string' <<< "$block" \
     || { echo "runs-on input is not a string"; rc=1; }
   # shellcheck disable=SC2016  # the expression is literal workflow text to match, not a shell expansion
   n=$(grep -cxF -e '    runs-on: ${{ fromJSON(inputs.runs-on) }}' "$wf")
@@ -188,7 +188,8 @@ scheduled_audit_guarded() {
     || { echo "$wf has no workflow_dispatch trigger"; rc=1; }
   grep -qE '^[[:space:]]*run:[[:space:]]+tools/ruleset-audit\.sh[[:space:]]*$' "$wf" \
     || { echo "$wf does not run tools/ruleset-audit.sh"; rc=1; }
-  grep -v '^[[:space:]]*#' "$wf" | grep -q 'ruleset-apply' \
+  stripped="$(grep -v '^[[:space:]]*#' "$wf")"
+  grep -q 'ruleset-apply' <<< "$stripped" \
     && { echo "$wf invokes the apply script, which must stay manual"; rc=1; }
   bash "$TOOLS/tests/check_audit_shape.sh" "$wf" "$audit" || rc=1
   return "$rc"

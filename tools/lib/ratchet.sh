@@ -198,8 +198,7 @@ ratchet_is_allowed() {
   prev=$(sed -n "$((ln - 1))p" "$file" 2>/dev/null)
   # Braces are required: `$VAR[` parses as an array subscript, not as a literal
   # bracket starting a character class.
-  printf '%s' "$prev" \
-    | grep -qE "${RATCHET_ALLOW_TOKEN}[[:space:]]+${clause}[[:space:]]+[[:alnum:]]" || return 1
+  grep -qE "${RATCHET_ALLOW_TOKEN}[[:space:]]+${clause}[[:space:]]+[[:alnum:]]" <<< "$prev" || return 1
   return 0
 }
 

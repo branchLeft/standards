@@ -64,7 +64,7 @@ scan_parenting() {
       { buf = buf $0 " "; n = gsub(/\(/, "(") ; m = gsub(/\)/, ")")
         depth += n - m; if (NR > 1 && depth <= 0) { print buf; exit } }
       END { if (buf && depth > 0) print buf }')
-    printf '%s' "$body" | grep -q 'parent' || \
+    grep -q 'parent' <<< "$body" || \
       ratchet_finding "PUL-3" "$f" "$ln" \
         "resource created without { parent } — it escapes the component in the URN tree"
   done < <(grep -nE 'new[[:space:]]+(gcp|aws|azure|hcloud|random|tls|cloudflare)\.' "$f" 2>/dev/null)
