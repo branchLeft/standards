@@ -43,6 +43,13 @@ run "check-docs-site.sh"   bash "$TOOLS/check-docs-site.sh" --self-test
 # comment.
 run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
 
+# The publish workflow signs what it publishes and holds exactly the two extra
+# permissions for it. The self-test is the sabotage: it must see the real
+# workflow green and each of fourteen broken copies red.
+echo "publish attestation:"
+run "publish.yml attests every tarball it publishes" python3 -I "$TOOLS/tests/check_publish_attests.py"
+run "check_publish_attests.py self-test (sabotage red, real green)" python3 -I "$TOOLS/tests/check_publish_attests.py" --self-test
+
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
 
