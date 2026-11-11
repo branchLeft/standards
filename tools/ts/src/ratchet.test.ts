@@ -181,6 +181,49 @@ describe('Ratchet.findingAdvisory', () => {
   });
 });
 
+describe('Ratchet.findingPromotable', () => {
+  function unchangedWarnRatchet(promoted: ReadonlySet<string>): Ratchet {
+    const git = new FakeGitClient({
+      root: ROOT,
+      files: ['f.ts'],
+      mergeBases: { 'origin/main..HEAD': 'base' },
+      diffs: { 'base...HEAD': [], HEAD: [] },
+    });
+    return Ratchet.init(git, new FakeFileSystem(), ROOT, { mode: 'warn', promoted });
+  }
+
+  it('is advisory for a clause that is not promoted, in either mode', () => {
+    const r = Ratchet.init(makeGit(['f.ts']), new FakeFileSystem(), ROOT, { mode: 'enforce' });
+    expect(r.isPromoted('CMT-4')).toBe(false);
+    expect(r.findingPromotable('CMT-4', 'f.ts', 1, 'msg').level).toBe('advisory');
+    expect(r.summary()).toMatchObject({ failures: 0, advisory: 1 });
+  });
+
+  it('fails a promoted clause in enforce mode', () => {
+    const r = Ratchet.init(makeGit(['f.ts']), new FakeFileSystem(), ROOT, {
+      mode: 'enforce',
+      promoted: new Set(['CMT-4']),
+    });
+    expect(r.isPromoted('CMT-4')).toBe(true);
+    expect(r.findingPromotable('CMT-4', 'f.ts', 1, 'msg').level).toBe('error');
+    expect(r.findingPromotable('CMT-2', 'f.ts', 1, 'msg').level).toBe('advisory');
+    expect(r.summary()).toMatchObject({ failures: 1, advisory: 1 });
+  });
+
+  it('only warns for a promoted clause on an unchanged file in warn mode', () => {
+    const r = unchangedWarnRatchet(new Set(['CMT-4']));
+    expect(r.findingPromotable('CMT-4', 'f.ts', 1, 'msg').level).toBe('warning');
+    expect(r.summary()).toMatchObject({ failures: 0, warnings: 1 });
+  });
+
+  it('still honours an exemption on a promoted clause', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, '.standardsignore', 'f.ts\tCMT-4\t# reason\n');
+    const r = Ratchet.init(makeGit(['f.ts']), fs, ROOT, { promoted: new Set(['CMT-4']) });
+    expect(r.findingPromotable('CMT-4', 'f.ts', 1, 'msg').level).toBe('exempt');
+  });
+});
+
 // Re-asserted here (rather than only via Glob.test.ts) because ratchet.sh's
 // own self-test exercises the matcher through the ratchet, not in isolation.
 describe('Ratchet delegates path matching to Glob', () => {

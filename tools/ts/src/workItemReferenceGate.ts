@@ -20,12 +20,12 @@ function findReference(text: string): string | undefined {
   return REFERENCE.exec(blank(blank(text, URL_SPAN), VERSION_PIN))?.[0];
 }
 
-// CMT-2's cross-repo shape (`org/repo#N`) in a source comment. TypeScript-only
-// — docs/index.md keeps CMT-2 `pending` until wave-1 adopts it in enforce.
+// CMT-2's cross-repo shape (`org/repo#N`) in a source comment. TypeScript-only;
+// it fails a build because CMT-2 is listed in tools/ts-promoted.tsv.
 export class WorkItemReferenceGate implements Gate {
   readonly id = 'work-item-refs';
   readonly clauses = ['CMT-2'];
-  readonly advisory = true;
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
@@ -36,6 +36,7 @@ export class WorkItemReferenceGate implements Gate {
     this.ratchet = ratchet;
     this.fs = fs;
     this.toolsRoot = toolsRoot;
+    this.advisory = !ratchet.isPromoted('CMT-2');
   }
 
   run(_context: GateContext): readonly Finding[] {
@@ -56,7 +57,7 @@ export class WorkItemReferenceGate implements Gate {
   }
 
   private referenceFinding(file: string, line: number, hit: string): Finding {
-    return this.ratchet.findingAdvisory(
+    return this.ratchet.findingPromotable(
       'CMT-2',
       file,
       line,

@@ -1,0 +1,11 @@
+# The TypeScript gates that fail a build. clause<TAB>gate file<TAB># reason
+#
+# A TypeScript gate is advisory unless its clause is listed here. A listed
+# clause grades like a bash gate: in `warn` mode only a file the branch changed
+# fails, in `enforce` mode every file does. Promoting a clause is one row here,
+# the `auto` row in docs/index.md and the gate's own test; docs/ratchet.md has
+# the recipe. A row whose gate file does not name the clause, or whose clause is
+# missing from the index or from the end-to-end test, fails the unit tests.
+CMT-2	workItemReferenceGate.ts	# value is the classifier's own extension set, see thresholds.tsv
+CMT-4	commentRatioGate.ts	# value is the classifier's own extension set, see thresholds.tsv
+DEP-8	dependabotEcosystemGate.ts	# value is GitHub's fixed config path, see thresholds.tsv
