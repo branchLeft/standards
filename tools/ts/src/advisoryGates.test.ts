@@ -54,7 +54,9 @@ const promotedClauses = promotedRows.map((row) => row.clause);
 
 describe('buildAdvisoryGates', () => {
   it('wires every provisional threshold clause to an advisory gate', () => {
-    expect(provisionalClauses).toEqual(expect.arrayContaining(['CON-1', 'COV-1', 'CI-12']));
+    expect(provisionalClauses).toEqual(
+      expect.arrayContaining(['CON-1', 'COV-1', 'CI-12', 'CI-15'])
+    );
     expect(unwiredClauses(buildGates(), provisionalClauses)).toEqual([]);
   });
 
