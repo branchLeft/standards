@@ -42,8 +42,11 @@ clause_is_named() {
     # just below: it names every clause it carries a setting for by
     # construction, so a provisional threshold row alone would otherwise read
     # as "an artefact names this clause" before any reader exists at all.
+    # tools/ts-promoted.tsv is excluded likewise: a promotion row names its
+    # clause by construction, and the gate file it points at must do so itself.
     hits=$(printf '%s\n' "$hits" | grep -vFx "$ROOT/tools/clause-paths.tsv" \
-                                  | grep -vFx "$ROOT/tools/thresholds.tsv")
+                                  | grep -vFx "$ROOT/tools/thresholds.tsv" \
+                                  | grep -vFx "$ROOT/tools/ts-promoted.tsv")
     [ -n "$hits" ] && return 0
   done
   return 1

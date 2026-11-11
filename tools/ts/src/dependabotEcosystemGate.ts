@@ -52,11 +52,12 @@ function configuredEcosystems(content: string): ReadonlySet<string> {
 }
 
 // DEP-8: `.github/dependabot.yml` lists every package ecosystem a repo's
-// tracked files use. `pending` in docs/index.md.
+// tracked files use. It fails a build because DEP-8 is listed in
+// tools/ts-promoted.tsv.
 export class DependabotEcosystemGate implements Gate {
   readonly id = 'dependabot-ecosystem';
   readonly clauses = ['DEP-8'];
-  readonly advisory = true;
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
@@ -66,6 +67,7 @@ export class DependabotEcosystemGate implements Gate {
     this.ratchet = ratchet;
     this.fs = fs;
     this.toolsRoot = toolsRoot;
+    this.advisory = !ratchet.isPromoted('DEP-8');
   }
 
   private dependabotFile(): string {
@@ -95,7 +97,7 @@ export class DependabotEcosystemGate implements Gate {
     const content = this.fs.readFile(this.ratchet.root, file);
     if (content === undefined) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'DEP-8',
           file,
           1,
@@ -109,7 +111,7 @@ export class DependabotEcosystemGate implements Gate {
       return [];
     }
     return [
-      this.ratchet.findingAdvisory(
+      this.ratchet.findingPromotable(
         'DEP-8',
         file,
         1,

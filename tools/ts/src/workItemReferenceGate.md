@@ -7,9 +7,10 @@ does not look for a cross-repo issue or PR reference, `org/repo#N` — a shape
 this org's own commit and PR conventions use constantly, and the one most
 likely to leak into a comment by copy-paste. This gate closes that gap.
 
-TypeScript-only: `docs/index.md` keeps CMT-2 `pending` (a provisional
-`tools/thresholds.tsv` row records the reader) until wave-1 adopts it in
-enforce.
+TypeScript-only, and enforcing: CMT-2 is listed in `tools/ts-promoted.tsv`, so a
+finding fails the Standards job (changed files only in `warn` mode, every file
+in `enforce` mode). Its `scan_extensions` row in `tools/thresholds.tsv` is the
+classifier's own extension set, not a placeholder.
 
 ## Scope
 
