@@ -27,6 +27,7 @@ import type { Ratchet } from './ratchet.ts';
 import { ScannerWiringGate } from './scannerWiringGate.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
+import { SharedLintConfigGate } from './sharedLintConfigGate.ts';
 import { WorkItemReferenceGate } from './workItemReferenceGate.ts';
 
 export function buildAdvisoryGates(
@@ -61,6 +62,7 @@ export function buildAdvisoryGates(
     new HealthcheckGate(ratchet, fs),
     new SecretsFileGate(ratchet, fs),
     new BakedConfigGate(ratchet, fs),
+    new SharedLintConfigGate(ratchet, fs),
     new ScannerWiringGate(ratchet, fs, toolsRoot),
     new DownloadChecksumGate(ratchet, fs, toolsRoot),
     new AgentRecordPathGate(ratchet, fs, toolsRoot),
