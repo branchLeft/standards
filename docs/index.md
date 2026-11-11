@@ -623,7 +623,7 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | SH-1 | `pending` | —                                        |
 | SH-2 | `review`  | Shell in runbooks versus shell elsewhere |
 | SH-3 | `review`  | New scripts in the diff                  |
-| SH-4 | `pending` | —                                        |
+| SH-4 | `pending` | `tools/ts/src/shellPlaceholderGate.ts`   |
 
 ## Python — `shell-and-python.md`
 

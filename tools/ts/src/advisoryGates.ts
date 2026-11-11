@@ -28,6 +28,7 @@ import type { Ratchet } from './ratchet.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
 import { SharedLintConfigGate } from './sharedLintConfigGate.ts';
+import { ShellPlaceholderGate } from './shellPlaceholderGate.ts';
 import { WorkItemReferenceGate } from './workItemReferenceGate.ts';
 
 export function buildAdvisoryGates(
@@ -64,5 +65,6 @@ export function buildAdvisoryGates(
     new BakedConfigGate(ratchet, fs),
     new PersonalDataGate(ratchet, fs, toolsRoot),
     new SharedLintConfigGate(ratchet, fs),
+    new ShellPlaceholderGate(ratchet, fs),
   ];
 }
