@@ -58,6 +58,58 @@ describe('MigrationClassifierGate', () => {
     expect(findings[0]?.clause).toBe('DB-6');
   });
 
+  it('reports nothing for drizzle-kit SQLite output that adds a nullable column', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0002_add.sql', readFixture('sqlite-add-column.sql'));
+    const gate = buildGate(['drizzle/0002_add.sql'], fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('reports DB-5 and not DB-6 for an added NOT NULL column beside ADD CONSTRAINT', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0005_kind.sql', readFixture('add-not-null-with-constraint.sql'));
+    const gate = buildGate(['drizzle/0005_kind.sql'], fs);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings.map((f) => f.clause)).toEqual(['DB-5']);
+    expect(findings[0]?.line).toBe(1);
+  });
+
+  it('reports both DB-6 and DB-5 for a mixed migration that also adds a bare NOT NULL column', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0006_both.sql', readFixture('mixed-missing-default.sql'));
+    const gate = buildGate(['drizzle/0006_both.sql'], fs);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings.map((f) => f.clause).sort()).toEqual(['DB-5', 'DB-6']);
+  });
+
+  it('reports nothing for a new table whose columns are NOT NULL with no DEFAULT', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0000_tenants.sql', readFixture('create-table-not-null.sql'));
+    const gate = buildGate(['drizzle/0000_tenants.sql'], fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('reports nothing for a schema, table, row-level-security and policy migration', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0001_register.sql', readFixture('postgres-schema-policy.sql'));
+    const gate = buildGate(['drizzle/0001_register.sql'], fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('reports nothing for a function whose dollar-quoted body holds semicolons', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0000_fn.sql', readFixture('postgres-function.sql'));
+    const gate = buildGate(['drizzle/0000_fn.sql'], fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('reports nothing for a string default that holds a semicolon', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'drizzle/0003_note.sql', readFixture('semicolon-in-string.sql'));
+    const gate = buildGate(['drizzle/0003_note.sql'], fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
   it('ignores a .sql file outside the migration folder', () => {
     const fs = new FakeFileSystem();
     fs.set(ROOT, 'db/seed.sql', readFixture('data-insert.sql'));
