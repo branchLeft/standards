@@ -52,3 +52,14 @@ CON-10	required_limit_keys	mem_limit,cpus,pids_limit	#provisional, a reader only
 CON-14	required_instruction	HEALTHCHECK	#provisional, a reader only until the owner moves the gate class
 CRED-10	file_suffix	_FILE	#provisional, a reader only until the owner moves the gate class
 CFG-2	deployment_value_shape	url, ip address or hostname	#provisional, a reader only until the owner moves the gate class
+ANS-2	module_required_blocks	DOCUMENTATION,EXAMPLES,RETURN	#provisional, a reader only until the owner moves the gate class
+ANS-3	forbidden_modules	shell,raw,script	#provisional, a reader only until the owner moves the gate class
+ANS-4	pinned_requirements	ansible-core|ansible,ansible-lint,molecule,molecule-plugins,mypy,ruff	#provisional, a reader only until the owner moves the gate class
+ANS-5	forbidden_config_keys	skip_list,exclude_paths,mock_modules,mock_roles,kinds	#provisional, a reader only until the owner moves the gate class
+ANS-5	ignore_files	.ansible-lint-ignore,.config/ansible-lint-ignore.txt	#provisional, a reader only until the owner moves the gate class
+ANS-6	config_file	.yamllint	#provisional, a reader only until the owner moves the gate class
+ANS-7	spec_file	meta/argument_specs.yml	#provisional, a reader only until the owner moves the gate class
+ANS-8	forbidden_keyword	collections	#provisional, a reader only until the owner moves the gate class
+ANS-9	command_argument_key	argv	#provisional, a reader only until the owner moves the gate class
+ANS-11	required_test_step	idempotence	#provisional, a reader only until the owner moves the gate class
+ANS-15	allowed_drivers	docker,podman	#provisional, a reader only until the owner moves the gate class

@@ -2,6 +2,11 @@
 // test can only read the advisory gate list from here. Each gate still gets its
 // own unit tests; this list is what asserts the audit runs them.
 import { join } from 'node:path';
+import { AnsibleLintGate } from './ansibleLintGate.ts';
+import { AnsibleMoleculeGate } from './ansibleMoleculeGate.ts';
+import { AnsibleRoleGate } from './ansibleRoleGate.ts';
+import { AnsibleTaskGate } from './ansibleTaskGate.ts';
+import { AnsibleToolchainGate } from './ansibleToolchainGate.ts';
 import { BakedConfigGate } from './bakedConfigGate.ts';
 import { BashGate } from './bashGate.ts';
 import { CommentRatioGate } from './commentRatioGate.ts';
@@ -58,5 +63,10 @@ export function buildAdvisoryGates(
     new HealthcheckGate(ratchet, fs),
     new SecretsFileGate(ratchet, fs),
     new BakedConfigGate(ratchet, fs),
+    new AnsibleTaskGate(ratchet, fs, toolsRoot),
+    new AnsibleRoleGate(ratchet, fs, toolsRoot),
+    new AnsibleMoleculeGate(ratchet, fs, toolsRoot),
+    new AnsibleToolchainGate(ratchet, fs, toolsRoot),
+    new AnsibleLintGate(ratchet, fs, toolsRoot),
   ];
 }
