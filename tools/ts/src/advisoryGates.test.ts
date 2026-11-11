@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { buildAdvisoryGates } from './advisoryGates.ts';
-import { DockerImageGate } from './dockerImageGate.ts';
+import { HardenedBaseGate } from './hardenedBaseGate.ts';
 import type { Gate } from './gate.ts';
 import { NodeFileSystem } from './fileSystemPort.ts';
 import { readPromotedRows } from './promotedClauses.ts';
@@ -70,8 +70,8 @@ describe('buildAdvisoryGates', () => {
   });
 
   it('reports the clauses of a removed gate, so the check cannot pass vacuously', () => {
-    const withoutDocker = buildGates().filter((gate) => !(gate instanceof DockerImageGate));
-    expect(unwiredClauses(withoutDocker, provisionalClauses)).toEqual(['CON-1', 'CON-3', 'CON-4']);
+    const withoutHardened = buildGates().filter((gate) => !(gate instanceof HardenedBaseGate));
+    expect(unwiredClauses(withoutHardened, provisionalClauses)).toEqual(['CON-1']);
   });
 });
 

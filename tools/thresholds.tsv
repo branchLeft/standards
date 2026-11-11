@@ -42,14 +42,14 @@ REPO-8	disable_signing_patterns	commit.gpgsign=false,commit.gpgsign false,--no-g
 LINT-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 LINT-4	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 CON-1	hardened_image_patterns	docker/dhi-,dockerhardenedimages/	#provisional, a reader only until the owner moves the gate class
-CON-3	digest_pattern	name:tag@sha256:64-hex-digest	#provisional, a reader only until the owner moves the gate class
-CON-4	numeric_user_pattern	uid or uid:gid, digits only, not 0	#provisional, a reader only until the owner moves the gate class
-CON-5	required_setting	read_only: true	#provisional, a reader only until the owner moves the gate class
-CON-6	required_cap_drop	ALL	#provisional, a reader only until the owner moves the gate class
+CON-3	digest_pattern	name:tag@sha256:64-hex-digest	# the clause's own shape, name:tag@sha256 and 64 hex digits; promoted in ts-promoted.tsv
+CON-4	numeric_user_pattern	uid or uid:gid, digits only, not 0	# the clause's own words, a numeric non-root user; promoted in ts-promoted.tsv
+CON-5	required_setting	read_only: true	# the Compose key the clause names; promoted in ts-promoted.tsv
+CON-6	required_cap_drop	ALL	# the clause's own words, every capability dropped; promoted in ts-promoted.tsv
 CON-7	edge_service_names	edge	#provisional, a reader only until the owner moves the gate class
 CON-8	internal_network_key	internal	#provisional, a reader only until the owner moves the gate class
 CON-9	egress_key	x-egress	#provisional, a reader only until the owner moves the gate class
-CON-10	required_limit_keys	mem_limit,cpus,pids_limit	#provisional, a reader only until the owner moves the gate class
-CON-14	required_instruction	HEALTHCHECK	#provisional, a reader only until the owner moves the gate class
+CON-10	required_limit_keys	mem_limit,cpus,pids_limit	# the clause's three limits (memory, CPU, process count), as Compose spells them; promoted in ts-promoted.tsv
+CON-14	required_instruction	HEALTHCHECK	# the Dockerfile instruction the clause names; promoted in ts-promoted.tsv
 CRED-10	file_suffix	_FILE	#provisional, a reader only until the owner moves the gate class
 CFG-2	deployment_value_shape	url, ip address or hostname	#provisional, a reader only until the owner moves the gate class

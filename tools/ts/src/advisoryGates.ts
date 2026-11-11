@@ -18,6 +18,7 @@ import { DockerImageGate } from './dockerImageGate.ts';
 import { EslintGate } from './eslintGate.ts';
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Gate } from './gate.ts';
+import { HardenedBaseGate } from './hardenedBaseGate.ts';
 import { HealthcheckGate } from './healthcheckGate.ts';
 import { LintCoverageGate } from './lintCoverageGate.ts';
 import { MigrationClassifierGate } from './migrationClassifierGate.ts';
@@ -53,7 +54,8 @@ export function buildAdvisoryGates(
     new DependabotEcosystemGate(ratchet, fs, toolsRoot),
     new CommitSigningGate(ratchet, fs, toolsRoot),
     new LintCoverageGate(ratchet, fs, toolsRoot),
-    new DockerImageGate(ratchet, fs, toolsRoot),
+    new DockerImageGate(ratchet, fs),
+    new HardenedBaseGate(ratchet, fs, toolsRoot),
     new ComposeRuntimeGate(ratchet, fs),
     new ComposeNetworkGate(ratchet, fs, toolsRoot),
     new ComposeResourceGate(ratchet, fs),
