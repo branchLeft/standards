@@ -71,6 +71,60 @@ withdrew the licence to reintroduce it.
 STD-001 follows from this: a PR may not add an exemption to make its own gate
 pass. If a clause is wrong in a given repo, the fix is a PR here.
 
+## Promoting a reader to `auto`
+
+A reader that reports at level `advisory` can never fail a build. Promoting it
+means several things change together, and a row edited alone claims enforcement
+nothing delivers.
+
+For a bash gate, the path CMT-3 and DB-1 took:
+
+1. The reader reports through `ratchet_finding`, whose level follows the mode,
+   instead of `ratchet_finding_advisory`, whose level is fixed.
+2. Its script moves from `ADVISORY_GATES` to `GATES` in
+   `tools/standards-audit.sh`, and its clause joins `COVERED`.
+3. `.github/workflows/standards.yml` gets a `--self-test` line and a run line
+   for it. `tools/tests/run.sh` fails when `GATES` and the workflow disagree.
+4. `tools/ts/bin/audit.ts` and `tools/ts/test/audit.parity.test.ts` list it in
+   `GATE_NAMES`, and `COVERED_CLAUSES` and `GATE_ONLY_CLAUSES` in
+   `tools/ts/src/audit.ts` name its clauses.
+5. The `thresholds.tsv` row loses its `#provisional` marker, only once the owner
+   has signed the value off, and the `docs/index.md` row becomes `auto` naming
+   the script.
+
+For a TypeScript gate, the path CMT-2, CMT-4 and DEP-8 took. A gate there is
+advisory unless its clause is a row of `tools/ts-promoted.tsv`:
+
+1. The gate reports through `ratchet.findingPromotable`, which is
+   `findingAdvisory` until its clause is promoted and `finding` after, and sets
+   its own `advisory` flag from `ratchet.isPromoted`. A gate that reports its
+   clause through `findingAdvisory` can never fail, whatever the list says.
+2. Add the row `clause<TAB>gate file<TAB># reason` to `tools/ts-promoted.tsv`.
+3. Add an entry for the clause to `FIXTURES` in
+   `tools/ts/test/promoted.e2e.test.ts`: a scratch repository that breaks the
+   clause, and the change that touches the offending file. That test runs the
+   command the workflow runs and requires a non-zero exit in `enforce` mode and
+   for a changed file in `warn` mode, and a zero exit for an unchanged file in
+   `warn` mode. A row with no fixture fails.
+4. The `thresholds.tsv` row loses its `#provisional` marker, only once the owner
+   has signed the value off, and the `docs/index.md` row becomes `auto` naming
+   the gate file. `check-clause-index.sh` only checks that a file under `tools/`
+   names the clause, which is why the end-to-end test is what makes the row true.
+
+The unit tests refuse a row whose index row is not `auto`, whose gate file does
+not report through `findingPromotable`, or whose threshold is still
+`#provisional`, and an `auto` row backed by a TypeScript gate that is not on the
+list. They also refuse a workflow whose TypeScript audit step could swallow the
+exit code.
+
+Both paths end the same way: in `warn` mode only files the branch changed fail,
+in `enforce` mode every file does. The TypeScript path runs in CI only
+(`tools/standards-audit.sh` and the pre-commit hook run the bash gates), so a
+promoted clause is enforced when the Standards workflow runs, not at commit. A
+promoted ESLint rule is a different case: the workflow installs nothing, so
+`EslintGate` can only report that it could not run until a consumer's own `lint`
+carries the rule.
+
 ## Where a gate runs
 
 On pull requests **and** on push to `main`. The delete guards already established

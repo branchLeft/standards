@@ -48,4 +48,4 @@ Dependabot tracks every package ecosystem a repo uses, including the image diges
 
 **Why:** a pinned digest freezes old vulnerabilities along with working code unless something moves it forward.
 
-**Check:** pending; `.github/dependabot.yml` lists every ecosystem the repo's files use, including `docker` and `docker-compose`.
+**Check:** `tools/ts/src/dependabotEcosystemGate.ts` (the TypeScript audit, which fails the Standards job): `.github/dependabot.yml` lists every ecosystem the repo's files use, including `docker` for both Dockerfiles and Compose files.

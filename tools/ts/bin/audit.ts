@@ -11,6 +11,7 @@ import { parseCliOptions } from '../src/cliOptions.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
+import { readPromotedClauses } from '../src/promotedClauses.ts';
 import { Ratchet } from '../src/ratchet.ts';
 import { RatchetInitError } from '../src/ratchetInitError.ts';
 
@@ -37,7 +38,10 @@ function main(): void {
 
   let ratchet: Ratchet;
   try {
-    ratchet = Ratchet.init(git, fs, process.cwd(), { mode: options.mode });
+    ratchet = Ratchet.init(git, fs, process.cwd(), {
+      mode: options.mode,
+      promoted: readPromotedClauses(fs, TOOLS_ROOT),
+    });
   } catch (error) {
     if (error instanceof RatchetInitError) {
       process.stderr.write(`standards: ${error.message}\n`);

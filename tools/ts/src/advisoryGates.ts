@@ -1,6 +1,8 @@
 // Kept out of bin/audit.ts because that entry point runs main() on import, so a
 // test can only read the advisory gate list from here. Each gate still gets its
-// own unit tests; this list is what asserts the audit runs them.
+// own unit tests; this list is what asserts the audit runs them. Every gate here
+// is advisory unless its clause is in tools/ts-promoted.tsv, which the ratchet
+// carries; such a gate reports `advisory = false` and can fail the run.
 import { join } from 'node:path';
 import { AgentRecordPathGate } from './agentRecordPathGate.ts';
 import { BakedConfigGate } from './bakedConfigGate.ts';
