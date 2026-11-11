@@ -56,7 +56,7 @@ Grype scans lockfiles on every PR and on `main`, and scans every image after it 
 
 **Why:** one scanner over both views catches a vulnerable package whether it arrived through a lockfile or a base image.
 
-**Check:** a reusable scan workflow, and a check that every repo's caller runs it.
+**Check:** a reusable scan workflow, and a check that every repo's caller runs it. An advisory reader (`tools/ts/src/scannerWiringGate.ts`) covers the caller side; the clause stays `pending` until the gate class moves.
 
 ## SEC-8 — static security analysis
 
@@ -72,7 +72,7 @@ KICS scans Dockerfiles, Compose files and workflows and hadolint lints Dockerfil
 
 **Why:** most container and pipeline misconfigurations are well known and a machine can find them.
 
-**Check:** hadolint in pre-commit and CI and KICS in CI, both from the reusable scan workflow.
+**Check:** hadolint in pre-commit and CI and KICS in CI, both from the reusable scan workflow. An advisory reader (`tools/ts/src/scannerWiringGate.ts`) covers the repo side; the clause stays `pending` until the gate class moves.
 
 ## SEC-10 — scanners are pinned
 
@@ -80,7 +80,7 @@ Every scanner is installed by a pinned version and a verified checksum, never by
 
 **Why:** attackers have moved a popular scanner's release tags to malicious code, and a scanner runs with the pipeline's credentials.
 
-**Check:** `tools/check-workflows.sh` extended to flag a tool download with no checksum verification.
+**Check:** a gate that flags a tool download with no checksum verification. An advisory reader (`tools/ts/src/downloadChecksumGate.ts`) does this today; the clause stays `pending` until the gate class moves.
 
 ## SEC-11 — agent working records are never published
 
@@ -88,7 +88,7 @@ Agent prompts, session transcripts and agent memory are never published, in any 
 
 **Why:** they carry operational detail, such as host and tenant names, that cannot be reliably scrubbed, and operational hygiene comes before openness here.
 
-**Check:** `CRED-11`'s secret scan, plus a path rule refusing transcript and memory files in any repo.
+**Check:** `CRED-11`'s secret scan, plus a path rule refusing transcript and memory files in any repo. An advisory reader (`tools/ts/src/agentRecordPathGate.ts`) applies the path rule; the clause stays `pending` until the gate class moves.
 
 ## SEC-12 — encrypted in transit and at rest
 

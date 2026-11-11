@@ -2,6 +2,7 @@
 // test can only read the advisory gate list from here. Each gate still gets its
 // own unit tests; this list is what asserts the audit runs them.
 import { join } from 'node:path';
+import { AgentRecordPathGate } from './agentRecordPathGate.ts';
 import { BakedConfigGate } from './bakedConfigGate.ts';
 import { BashGate } from './bashGate.ts';
 import { CommentRatioGate } from './commentRatioGate.ts';
@@ -13,6 +14,7 @@ import { DependabotEcosystemGate } from './dependabotEcosystemGate.ts';
 import { DeployEnvironmentGate } from './deployEnvironmentGate.ts';
 import { DeployRolloutGate } from './deployRolloutGate.ts';
 import { DockerImageGate } from './dockerImageGate.ts';
+import { DownloadChecksumGate } from './downloadChecksumGate.ts';
 import { EslintGate } from './eslintGate.ts';
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Gate } from './gate.ts';
@@ -22,6 +24,7 @@ import { MigrationClassifierGate } from './migrationClassifierGate.ts';
 import type { ProcessRunner } from './processRunner.ts';
 import { PythonConfigGate } from './pythonConfigGate.ts';
 import type { Ratchet } from './ratchet.ts';
+import { ScannerWiringGate } from './scannerWiringGate.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
 import { WorkItemReferenceGate } from './workItemReferenceGate.ts';
@@ -58,5 +61,8 @@ export function buildAdvisoryGates(
     new HealthcheckGate(ratchet, fs),
     new SecretsFileGate(ratchet, fs),
     new BakedConfigGate(ratchet, fs),
+    new ScannerWiringGate(ratchet, fs, toolsRoot),
+    new DownloadChecksumGate(ratchet, fs, toolsRoot),
+    new AgentRecordPathGate(ratchet, fs, toolsRoot),
   ];
 }
