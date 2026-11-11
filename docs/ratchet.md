@@ -71,6 +71,37 @@ withdrew the licence to reintroduce it.
 STD-001 follows from this: a PR may not add an exemption to make its own gate
 pass. If a clause is wrong in a given repo, the fix is a PR here.
 
+## Promoting a reader to `auto`
+
+A reader that reports at level `advisory` can never fail a build. Promoting it
+means three things change together, and a row edited alone claims enforcement
+nothing delivers.
+
+For a bash gate, the path CMT-3 and DB-1 took:
+
+1. The reader reports through `ratchet_finding`, whose level follows the mode,
+   instead of `ratchet_finding_advisory`, whose level is fixed.
+2. Its script moves from `ADVISORY_GATES` to `GATES` in
+   `tools/standards-audit.sh`, and its clause joins `COVERED`.
+3. `.github/workflows/standards.yml` gets a `--self-test` line and a run line
+   for it. `tools/tests/run.sh` fails when `GATES` and the workflow disagree.
+4. `tools/ts/bin/audit.ts` and `tools/ts/test/audit.parity.test.ts` list it in
+   `GATE_NAMES`, and `COVERED_CLAUSES` and `GATE_ONLY_CLAUSES` in
+   `tools/ts/src/audit.ts` name its clauses.
+5. The `thresholds.tsv` row loses its `#provisional` marker, only once the owner
+   has signed the value off, and the `docs/index.md` row becomes `auto` naming
+   the script.
+
+The ratchet then does the rest: in `warn` mode only files the branch changed
+fail, in enforce mode every file does.
+
+A reader written in TypeScript has no such path today. Every gate in
+`tools/ts/src/advisoryGates.ts` is advisory by construction (a test asserts it),
+the workflow describes that step as advisory, and neither
+`tools/standards-audit.sh` nor the pre-commit hook runs it. Until that path
+exists, a TypeScript reader stays `pending` in the index, however final its
+threshold.
+
 ## Where a gate runs
 
 On pull requests **and** on push to `main`. The delete guards already established
