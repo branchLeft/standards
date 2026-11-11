@@ -331,20 +331,20 @@ creation of a project or account — are enumerated, not judged case by case.
 
 ## Data protection — `data-protection.md`
 
-| ID    | Gate      | Encoded by |
-| ----- | --------- | ---------- |
-| DP-1  | `pending` | —          |
-| DP-2  | `pending` | —          |
-| DP-3  | `pending` | —          |
-| DP-4  | `pending` | —          |
-| DP-5  | `pending` | —          |
-| DP-6  | `pending` | —          |
-| DP-7  | `pending` | —          |
-| DP-8  | `pending` | —          |
-| DP-9  | `pending` | —          |
-| DP-10 | `pending` | —          |
-| DP-11 | `pending` | —          |
-| DP-12 | `review`  | —          |
+| ID    | Gate      | Encoded by                         |
+| ----- | --------- | ---------------------------------- |
+| DP-1  | `pending` | —                                  |
+| DP-2  | `pending` | —                                  |
+| DP-3  | `pending` | —                                  |
+| DP-4  | `pending` | —                                  |
+| DP-5  | `pending` | —                                  |
+| DP-6  | `pending` | —                                  |
+| DP-7  | `pending` | `tools/ts/src/personalDataGate.ts` |
+| DP-8  | `pending` | —                                  |
+| DP-9  | `pending` | —                                  |
+| DP-10 | `pending` | —                                  |
+| DP-11 | `pending` | —                                  |
+| DP-12 | `review`  | —                                  |
 
 Every clause lands `pending`, and the honest reading of that is the one in
 the Columns section above: the rules are binding prose and nothing checks
@@ -352,15 +352,16 @@ them. Marking any of them `auto` today would be the false-coverage failure
 that section describes, and marking them `review` would promise a bounded
 evidence list that does not exist until the estate has artefacts to point at.
 
-`DP-7` is the most likely of the eleven to become `auto`, being the one whose
-subject a matcher can actually recognise. Its ratchet behaviour is left open
-deliberately rather than settled here: `PUL-12` skips the ratchet because a
-repo can always reach green — the salt has a remedy that always exists — and
-whether that holds for `DP-7` depends on a design decision nobody has taken
-yet. A gate scanning only the working tree is remediable in the same way; a
-gate scanning history is not, and would permanently bar a repo that once
-committed an address from adopting any release. That choice belongs in the
-PR that writes the gate, with its reasoning, not in a note written before it.
+`DP-7` is the one of the eleven whose subject a matcher can partly recognise,
+and `tools/ts/src/personalDataGate.ts` reads it, advisory only, so the row
+stays `pending`: it covers email addresses and client IP addresses in log lines
+in the working tree, and not history, trackers, CI logs, tooling transcripts or
+any other kind of personal data. The ratchet choice is the one that gate's
+doc records: a working-tree scan is remediable and rides the ordinary ratchet,
+and a history scan is not, so it is left out: it would permanently bar a repo
+that once committed an address from adopting any release. The other ten have no
+mechanical check; `DP-4` and `DP-8` could gain one once the record of
+processing has a machine-readable form to read.
 
 `DP-1` and `PUL-12` are adjacent and distinct: `PUL-12` keeps key _material_
 out of a committed tree, while `DP-1` governs how the data those keys protect
