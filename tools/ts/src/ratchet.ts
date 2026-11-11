@@ -16,6 +16,12 @@ export interface RatchetOptions {
   readonly mode?: RatchetMode | undefined;
   /** Explicit file list, bypassing `git ls-files` — mirrors `ratchet_init`'s trailing args. */
   readonly files?: readonly string[];
+  /**
+   * Clauses whose TypeScript gate is promoted to `auto`: `findingPromotable`
+   * grades them by mode like `finding`. Empty by default, so a gate stays
+   * advisory until a clause is listed in `tools/ts-promoted.tsv`.
+   */
+  readonly promoted?: ReadonlySet<string>;
 }
 
 export interface RatchetSummary {
@@ -74,6 +80,7 @@ export class Ratchet {
   private readonly fs: FileSystemPort;
   private readonly all: readonly string[];
   private readonly enforced: ReadonlySet<string>;
+  private readonly promoted: ReadonlySet<string>;
 
   private failures = 0;
   private warnings = 0;
@@ -87,13 +94,15 @@ export class Ratchet {
     root: string,
     mode: RatchetMode,
     all: readonly string[],
-    enforced: ReadonlySet<string>
+    enforced: ReadonlySet<string>,
+    promoted: ReadonlySet<string>
   ) {
     this.fs = fs;
     this.root = root;
     this.mode = mode;
     this.all = all;
     this.enforced = enforced;
+    this.promoted = promoted;
   }
 
   static init(
@@ -109,7 +118,7 @@ export class Ratchet {
     const mode = readMode(fs, root, options.mode);
     const all = options.files && options.files.length > 0 ? options.files : git.lsFiles(root);
     const enforced = computeEnforced(git, root, mode, all);
-    return new Ratchet(fs, root, mode, all, enforced);
+    return new Ratchet(fs, root, mode, all, enforced, options.promoted ?? new Set());
   }
 
   /** Every file the ratchet was built from — `git ls-files`, unless overridden. */
@@ -191,6 +200,21 @@ export class Ratchet {
     }
     this.advisory += 1;
     return { clause, file, line, level: 'advisory', message };
+  }
+
+  /** Whether `clause` is on the promoted list, so its findings can fail a build. */
+  isPromoted(clause: string): boolean {
+    return this.promoted.has(clause);
+  }
+
+  /**
+   * What a promotable gate reports through: `finding` (level follows the mode)
+   * for a promoted clause, `findingAdvisory` (never fails) for any other.
+   */
+  findingPromotable(clause: string, file: string, line: number, message: string): Finding {
+    return this.isPromoted(clause)
+      ? this.finding(clause, file, line, message)
+      : this.findingAdvisory(clause, file, line, message);
   }
 
   summary(): RatchetSummary {

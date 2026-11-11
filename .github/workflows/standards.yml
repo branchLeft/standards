@@ -142,11 +142,13 @@ jobs:
           .standards/tools/check-docs-site.sh "${args[@]+"${args[@]}"}" || rc=1
           exit "$rc"
 
-      # The TypeScript audit's gates are all pending: advisory evidence, never
-      # a build failure. Node is needed only for this step — every gate above
-      # runs as plain bash. Read from the pinned `.standards` checkout's own
-      # `.nvmrc` so the version tracks the release, not this workflow file or
-      # the caller's own toolchain (a caller may run an older Node, or none).
+      # The TypeScript audit's gates are advisory evidence, plus the ones whose
+      # clause is listed in tools/ts-promoted.tsv: those grade by mode like the
+      # gates above and fail this step. Node is needed only for this step —
+      # every gate above runs as plain bash. Read from the pinned `.standards`
+      # checkout's own `.nvmrc` so the version tracks the release, not this
+      # workflow file or the caller's own toolchain (a caller may run an older
+      # Node, or none).
       - name: Resolve the pinned Node version for the TypeScript audit
         id: node
         run: |
@@ -173,11 +175,13 @@ jobs:
       # doing one — see eslintGate.ts's isInstalled/hasConfig split.
       #
       # --advisory-only skips the bash gates above a second time: they already
-      # decided this job's pass/fail, and every remaining gate here reports at
-      # level advisory or exempt, never error, so this call cannot fail on a
-      # finding. It can still fail on a crash, which is deliberately left
-      # unguarded so a real defect here is visible rather than swallowed.
-      - name: Run the TypeScript audit (advisory)
+      # decided this job's pass/fail. A gate here reports at level advisory or
+      # exempt, never error, unless its clause is promoted, so this call fails
+      # on a promoted gate's finding and on nothing advisory. It also fails on
+      # a crash or a malformed ts-promoted.tsv, deliberately left unguarded so
+      # a real defect here is visible rather than swallowed. Nothing below may
+      # swallow the exit code: the unit tests assert that.
+      - name: Run the TypeScript audit (advisory gates, plus the promoted list)
         env:
           MODE: ${{ inputs.mode }}
         run: |

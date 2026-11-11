@@ -9,12 +9,12 @@ import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
 import type { Ratchet } from './ratchet.ts';
 
-// CMT-4: a file whose comment lines outnumber its code lines. TypeScript-only
-// — docs/index.md keeps CMT-4 `pending` until wave-1 adopts it in enforce.
+// CMT-4: a file whose comment lines outnumber its code lines. TypeScript-only;
+// it fails a build because CMT-4 is listed in tools/ts-promoted.tsv.
 export class CommentRatioGate implements Gate {
   readonly id = 'comment-ratio';
   readonly clauses = ['CMT-4'];
-  readonly advisory = true;
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
@@ -25,6 +25,7 @@ export class CommentRatioGate implements Gate {
     this.ratchet = ratchet;
     this.fs = fs;
     this.toolsRoot = toolsRoot;
+    this.advisory = !ratchet.isPromoted('CMT-4');
   }
 
   run(_context: GateContext): readonly Finding[] {
@@ -44,7 +45,7 @@ export class CommentRatioGate implements Gate {
   }
 
   private ratioFinding(file: string, comment: number, code: number): Finding {
-    return this.ratchet.findingAdvisory(
+    return this.ratchet.findingPromotable(
       'CMT-4',
       file,
       1,
