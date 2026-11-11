@@ -9,3 +9,4 @@
 CMT-2	workItemReferenceGate.ts	# value is the classifier's own extension set, see thresholds.tsv
 CMT-4	commentRatioGate.ts	# value is the classifier's own extension set, see thresholds.tsv
 DEP-8	dependabotEcosystemGate.ts	# value is GitHub's fixed config path, see thresholds.tsv
+TYP-5	pythonConfigGate.ts	# values are the config file names mypy itself reads, see thresholds.tsv

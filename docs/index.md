@@ -497,7 +497,7 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | TYP-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
 | TYP-3 | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | `review`  | New type annotations in the diff                    |
-| TYP-5 | `pending` | —                                                   |
+| TYP-5 | `auto`    | `tools/ts/src/pythonConfigGate.ts`                  |
 
 ## Error handling — `errors.md`
 

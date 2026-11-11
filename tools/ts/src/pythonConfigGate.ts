@@ -27,15 +27,14 @@ function joinPath(directory: string, name: string): string {
 /**
  * PY-2, PY-3 and TYP-5: every Python project configures strict mypy and
  * ruff, the two checkers target `requires-python`, and pre-commit and CI run
- * both. Reports nothing where the repo has no Python. All three clauses stay
- * `pending` in `docs/index.md` — see `pythonConfigGate.md` for why this runs
- * advisory-only, the same rollout `schemaDriftGate.ts` and
- * `migrationClassifierGate.ts` use for DB-4 through DB-6.
+ * both. Reports nothing where the repo has no Python. A clause listed in
+ * tools/ts-promoted.tsv (TYP-5) fails a build; the others report through the
+ * same call and stay advisory until listed — see `pythonConfigGate.md`.
  */
 export class PythonConfigGate implements Gate {
   readonly id = 'python-config';
   readonly clauses = ['PY-2', 'PY-3', 'TYP-5'];
-  readonly advisory = true;
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
@@ -45,6 +44,7 @@ export class PythonConfigGate implements Gate {
     this.ratchet = ratchet;
     this.fs = fs;
     this.toolsRoot = toolsRoot;
+    this.advisory = !this.clauses.some((clause) => ratchet.isPromoted(clause));
   }
 
   run(_context: GateContext): readonly Finding[] {
@@ -108,7 +108,7 @@ export class PythonConfigGate implements Gate {
 
     if (project.pyprojectPath === undefined) {
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-3',
           file,
           1,
@@ -119,7 +119,7 @@ export class PythonConfigGate implements Gate {
 
     if (!config.hasRuffConfig) {
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-2',
           file,
           1,
@@ -129,7 +129,7 @@ export class PythonConfigGate implements Gate {
     }
     if (!config.hasMypyConfig) {
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-2',
           file,
           1,
@@ -142,7 +142,7 @@ export class PythonConfigGate implements Gate {
       // non-fatal "section already exists" warning, not an error), so
       // whatever `mypyStrict` found in the text is not actually applied.
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'TYP-5',
           file,
           1,
@@ -151,7 +151,7 @@ export class PythonConfigGate implements Gate {
       );
     } else if (!config.mypyStrict) {
       findings.push(
-        this.ratchet.findingAdvisory('TYP-5', file, 1, 'mypy is not configured in strict mode')
+        this.ratchet.findingPromotable('TYP-5', file, 1, 'mypy is not configured in strict mode')
       );
     }
 
@@ -167,7 +167,14 @@ export class PythonConfigGate implements Gate {
     if (project.pyprojectPath === undefined || config.requiresPython === undefined) {
       return project.pyprojectPath === undefined
         ? []
-        : [this.ratchet.findingAdvisory('PY-3', file, 1, 'pyproject.toml sets no requires-python')];
+        : [
+            this.ratchet.findingPromotable(
+              'PY-3',
+              file,
+              1,
+              'pyproject.toml sets no requires-python'
+            ),
+          ];
     }
     const floor = requiresPythonFloor(config.requiresPython);
     if (floor === undefined) {
@@ -181,7 +188,7 @@ export class PythonConfigGate implements Gate {
       config.ruffTargetVersion !== ruffToken
     ) {
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-3',
           file,
           1,
@@ -193,7 +200,7 @@ export class PythonConfigGate implements Gate {
       const seen =
         config.mypyPythonVersion === undefined ? 'unset' : `"${config.mypyPythonVersion}"`;
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-3',
           file,
           1,
@@ -212,7 +219,7 @@ export class PythonConfigGate implements Gate {
     const file = preCommitFile ?? DEFAULT_PRECOMMIT_FILE;
     if (content === undefined) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-2',
           this.attributionFile(firstProject) ?? file,
           1,
@@ -223,7 +230,7 @@ export class PythonConfigGate implements Gate {
     const missing = PYTHON_TOOLS.filter((tool) => !preCommitRunsTool(content, tool));
     if (missing.length > 0) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-2',
           file,
           1,
@@ -238,7 +245,7 @@ export class PythonConfigGate implements Gate {
     const workflows = this.ratchet.scopeFiles(WORKFLOW_PATTERN);
     if (workflows.length === 0) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-2',
           this.attributionFile(firstProject) ?? '.github/workflows',
           1,
@@ -254,7 +261,7 @@ export class PythonConfigGate implements Gate {
     );
     if (missing.length > 0) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'PY-2',
           workflows[0] ?? '.github/workflows',
           1,

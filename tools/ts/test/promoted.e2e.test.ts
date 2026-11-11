@@ -25,6 +25,18 @@ interface Fixture {
 }
 
 const DEPENDABOT_NPM_ONLY = 'version: 2\nupdates:\n  - package-ecosystem: "npm"\n';
+const PYPROJECT_MYPY_NOT_STRICT = [
+  '[project]',
+  'name = "svc"',
+  'requires-python = ">=3.11"',
+  '',
+  '[tool.ruff]',
+  'target-version = "py311"',
+  '',
+  '[tool.mypy]',
+  'python_version = "3.11"',
+  '',
+].join('\n');
 
 // One entry per clause on the promoted list. A clause added to the list with
 // no entry here fails the "has a fixture" test below, so a promotion cannot
@@ -43,6 +55,12 @@ const FIXTURES: Readonly<Record<string, Fixture>> = {
   'DEP-8': {
     files: { Dockerfile: 'FROM scratch\n', '.github/dependabot.yml': DEPENDABOT_NPM_ONLY },
     offender: '.github/dependabot.yml',
+    touch: '# touched\n',
+  },
+  // A mypy table that is not strict, beside a matching requires-python.
+  'TYP-5': {
+    files: { 'pyproject.toml': PYPROJECT_MYPY_NOT_STRICT, 'a.py': 'x = 1\n' },
+    offender: 'pyproject.toml',
     touch: '# touched\n',
   },
 };
