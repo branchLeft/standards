@@ -24,6 +24,7 @@ import { PythonConfigGate } from './pythonConfigGate.ts';
 import type { Ratchet } from './ratchet.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
+import { SharedLintConfigGate } from './sharedLintConfigGate.ts';
 import { WorkItemReferenceGate } from './workItemReferenceGate.ts';
 
 export function buildAdvisoryGates(
@@ -58,5 +59,6 @@ export function buildAdvisoryGates(
     new HealthcheckGate(ratchet, fs),
     new SecretsFileGate(ratchet, fs),
     new BakedConfigGate(ratchet, fs),
+    new SharedLintConfigGate(ratchet, fs),
   ];
 }
