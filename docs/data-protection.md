@@ -56,7 +56,7 @@ No personal data appears in source, commit messages, issue trackers, CI logs, or
 
 **Why:** a commit stays reachable after the branch is deleted and is disclosed on push in a public repo, so the remedy is credential rotation and notification, and a transcript or memory file is a copy in a system with its own retention, operator and jurisdiction; `CMT-2` is the narrower, linter-enforced case.
 
-**Check:** pending; the most likely of the family to become `auto`, with its ratchet behaviour left to the PR that writes the gate (a working-tree scan is remediable, a history scan is not).
+**Check:** `tools/ts/src/personalDataGate.ts` reads the working tree for email addresses and client IP addresses in log lines (TypeScript audit only, advisory); the rest of the clause (history, trackers, CI logs, tooling transcripts and memory, and personal data that is not email or IP shaped) is not mechanically checked.
 
 ## DP-8 — every service declares what personal data it holds
 

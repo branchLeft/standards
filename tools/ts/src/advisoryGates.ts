@@ -21,6 +21,7 @@ import type { Gate } from './gate.ts';
 import { HealthcheckGate } from './healthcheckGate.ts';
 import { LintCoverageGate } from './lintCoverageGate.ts';
 import { MigrationClassifierGate } from './migrationClassifierGate.ts';
+import { PersonalDataGate } from './personalDataGate.ts';
 import type { ProcessRunner } from './processRunner.ts';
 import { PythonConfigGate } from './pythonConfigGate.ts';
 import type { Ratchet } from './ratchet.ts';
@@ -62,6 +63,7 @@ export function buildAdvisoryGates(
     new HealthcheckGate(ratchet, fs),
     new SecretsFileGate(ratchet, fs),
     new BakedConfigGate(ratchet, fs),
+    new PersonalDataGate(ratchet, fs, toolsRoot),
     new SharedLintConfigGate(ratchet, fs),
     new ScannerWiringGate(ratchet, fs, toolsRoot),
     new DownloadChecksumGate(ratchet, fs, toolsRoot),
