@@ -134,7 +134,7 @@ as [`ADOPTION.md`](../ADOPTION.md) work per repo, not assumed.
 | LINT-1 | `review`  | —                                      |
 | FMT-1  | `auto`    | `@branchleft/prettier-config`          |
 | LINT-2 | `pending` | —                                      |
-| LINT-3 | `auto`    | `tools/ts/src/sharedLintConfigGate.ts` |
+| LINT-3 | `pending` | `tools/ts/src/sharedLintConfigGate.ts` |
 | LINT-4 | `pending` | —                                      |
 
 LINT-1 is `review`, not `auto`: `@branchleft/eslint-config` exists and this
