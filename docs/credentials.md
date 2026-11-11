@@ -88,4 +88,4 @@ gitleaks runs in pre-commit and in CI in every repo, and any finding fails.
 
 **Why:** a secret caught before the push is a non-event, and one caught after it is an incident.
 
-**Check:** pending; the reusable scan workflow and the gitleaks hook in the shared pre-commit template.
+**Check:** pending; the reusable scan workflow and the gitleaks hook in the shared pre-commit template. An advisory reader (`tools/ts/src/scannerWiringGate.ts`) checks that each repo wires gitleaks into pre-commit and CI.

@@ -53,6 +53,12 @@ CON-10	required_limit_keys	mem_limit,cpus,pids_limit	#provisional, a reader only
 CON-14	required_instruction	HEALTHCHECK	#provisional, a reader only until the owner moves the gate class
 CRED-10	file_suffix	_FILE	#provisional, a reader only until the owner moves the gate class
 CFG-2	deployment_value_shape	url, ip address or hostname	#provisional, a reader only until the owner moves the gate class
+SEC-7	scan_markers	grype,anchore/scan-action	#provisional, the owner sets the real scan-workflow vocabulary later
+SEC-9	hadolint_markers	hadolint	#provisional, a reader only until the owner moves the gate class
+SEC-9	kics_markers	kics,checkmarx/kics-github-action	#provisional, the owner sets the real scan-workflow vocabulary later
+SEC-10	verification_commands	sha256sum,sha512sum,sha1sum,shasum,b3sum,cosign,gpg,gpgv,minisign,slsa-verifier	#provisional, the owner sets the real verification vocabulary later
+SEC-11	agent_record_paths	.claude/projects/,.claude/memory/,.claude/agent-memory/,.claude/sessions/,MEMORY.md	#provisional, the owner sets the real agent-record path list later
+CRED-11	gitleaks_markers	gitleaks	#provisional, a reader only until the owner moves the gate class
 DP-7	scan_extensions	md,txt,ts,tsx,js,mjs,cjs,py,sh,yml,yaml,json,toml,tf,sql,csv,env,ini,conf,log,html	#provisional, a reader only until the owner moves the gate class
 DP-7	skip_basenames	pnpm-lock.yaml,package-lock.json,yarn.lock,poetry.lock,uv.lock,Cargo.lock	#provisional, a reader only until the owner moves the gate class
 DP-7	role_mailboxes	noreply,no-reply,git,security,support,abuse,postmaster,webmaster	#provisional, the owner sets the real role-mailbox vocabulary later

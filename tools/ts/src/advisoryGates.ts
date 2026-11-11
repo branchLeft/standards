@@ -4,6 +4,7 @@
 // is advisory unless its clause is in tools/ts-promoted.tsv, which the ratchet
 // carries; such a gate reports `advisory = false` and can fail the run.
 import { join } from 'node:path';
+import { AgentRecordPathGate } from './agentRecordPathGate.ts';
 import { BakedConfigGate } from './bakedConfigGate.ts';
 import { BashGate } from './bashGate.ts';
 import { CommentRatioGate } from './commentRatioGate.ts';
@@ -15,6 +16,7 @@ import { DependabotEcosystemGate } from './dependabotEcosystemGate.ts';
 import { DeployEnvironmentGate } from './deployEnvironmentGate.ts';
 import { DeployRolloutGate } from './deployRolloutGate.ts';
 import { DockerImageGate } from './dockerImageGate.ts';
+import { DownloadChecksumGate } from './downloadChecksumGate.ts';
 import { EslintGate } from './eslintGate.ts';
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Gate } from './gate.ts';
@@ -25,6 +27,7 @@ import { PersonalDataGate } from './personalDataGate.ts';
 import type { ProcessRunner } from './processRunner.ts';
 import { PythonConfigGate } from './pythonConfigGate.ts';
 import type { Ratchet } from './ratchet.ts';
+import { ScannerWiringGate } from './scannerWiringGate.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
 import { SharedLintConfigGate } from './sharedLintConfigGate.ts';
@@ -64,5 +67,8 @@ export function buildAdvisoryGates(
     new BakedConfigGate(ratchet, fs),
     new PersonalDataGate(ratchet, fs, toolsRoot),
     new SharedLintConfigGate(ratchet, fs),
+    new ScannerWiringGate(ratchet, fs, toolsRoot),
+    new DownloadChecksumGate(ratchet, fs, toolsRoot),
+    new AgentRecordPathGate(ratchet, fs, toolsRoot),
   ];
 }
