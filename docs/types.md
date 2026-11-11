@@ -8,7 +8,7 @@ TypeScript has no `any` or `unknown` and Python no `Any`, except untrusted input
 
 **Why:** an `any` switches the type checker off for everything it touches, while a value parsed at the boundary is typed everywhere after it.
 
-**Check:** ESLint `@typescript-eslint/no-explicit-any` plus an ast-grep rule that an `unknown` flows only into a `safeParse`; ruff `ANN401` and mypy `disallow_any_explicit`.
+**Check:** a reviewer reads each `any` and each `unknown` in the diff against this rule. Review-only by owner ruling of 11 Nov 2026: no standards gate enforces it.
 
 ## TYP-2 — every signature is fully typed
 
@@ -16,7 +16,7 @@ Every function and method signature states every parameter type and its return t
 
 **Why:** the signature is the contract a reader relies on, and an inferred return type changes silently whenever the body does.
 
-**Check:** ESLint `@typescript-eslint/explicit-function-return-type` and `explicit-module-boundary-types`; ruff `ANN` rules and mypy `disallow_untyped_defs`.
+**Check:** a reviewer reads each signature in the diff for a missing parameter or return type. Review-only by owner ruling of 11 Nov 2026: no standards gate enforces it.
 
 ## TYP-3 — non-trivial variables are annotated
 

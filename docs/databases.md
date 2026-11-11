@@ -24,7 +24,7 @@ TypeScript code uses Drizzle ORM, and a SQLite store uses Drizzle's `better-sqli
 
 **Why:** Drizzle is typed end to end, and `better-sqlite3` is a stable driver that keeps a store synchronous.
 
-**Check:** pending; the `database` preset in `@branchleft/eslint-config` (`no-restricted-imports` naming every other database client), enforced once a consuming repo's own lint run uses it.
+**Check:** a reviewer reads the database imports in the diff against this rule. Review-only by owner ruling of 11 Nov 2026: no standards gate enforces it. The `database` preset in `@branchleft/eslint-config` stays an advisory reader.
 
 ## DB-4 — the schema ships with the release
 
@@ -32,7 +32,7 @@ Schema changes are versioned migrations that CI/CD applies as part of the deploy
 
 **Why:** code and schema that ship separately drift apart.
 
-**Check:** pending; `tools/ts/src/schemaDriftGate.ts` runs `drizzle-kit generate` and fails if it produces a new migration (TypeScript audit only, failing closed when it cannot verify).
+**Check:** a reviewer reads the migration files in the diff against this rule. Review-only by owner ruling of 11 Nov 2026: no standards gate enforces it. `tools/ts/src/schemaDriftGate.ts` (`drizzle-kit generate`) stays an advisory reader.
 
 ## DB-5 — expand, then contract
 

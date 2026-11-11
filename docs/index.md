@@ -472,18 +472,18 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | ARCH-1 | `review`  | The diff's public signatures and file layout          |
 | ARCH-2 | `review`  | New classes and the contracts they implement          |
 | ARCH-3 | `review`  | New generic parameters, option objects and registries |
-| ARCH-4 | `pending` | `@branchleft/eslint-config` (`EslintGate`)            |
+| ARCH-4 | `review`  | A reviewer reads the class files in the diff          |
 | ARCH-5 | `review`  | New top-level functions and their grouping module     |
 | ARCH-6 | `review`  | Constructors and factories in the diff                |
-| ARCH-7 | `pending` | `@branchleft/eslint-config` (`EslintGate`)            |
+| ARCH-7 | `review`  | A reviewer reads branching functions in the diff      |
 | ARCH-8 | `review`  | New directories in the diff                           |
 
 ## Naming — `naming.md`
 
 | ID    | Gate      | Evidence                                   |
 | ----- | --------- | ------------------------------------------ |
-| NAM-1 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| NAM-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| NAM-1 | `review`  | A reviewer reads names in the diff         |
+| NAM-2 | `review`  | A reviewer reads names per language        |
 | NAM-3 | `review`  | New class names in the diff                |
 | NAM-4 | `review`  | New names in the diff                      |
 | NAM-5 | `pending` | —                                          |
@@ -493,8 +493,8 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 | ID    | Gate      | Evidence                                            |
 | ----- | --------- | --------------------------------------------------- |
-| TYP-1 | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
-| TYP-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
+| TYP-1 | `review`  | A reviewer reads any and unknown in the diff        |
+| TYP-2 | `review`  | A reviewer reads signatures in the diff             |
 | TYP-3 | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | `review`  | New type annotations in the diff                    |
 | TYP-5 | `pending` | —                                                   |
@@ -503,9 +503,9 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 | ID    | Gate      | Evidence                                   |
 | ----- | --------- | ------------------------------------------ |
-| ERR-1 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| ERR-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| ERR-3 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
+| ERR-1 | `review`  | A reviewer reads throws in the diff        |
+| ERR-2 | `review`  | A reviewer reads raising functions         |
+| ERR-3 | `review`  | A reviewer reads catch blocks in the diff  |
 | ERR-4 | `review`  | Error handling at each public boundary     |
 | ERR-5 | `pending` | —                                          |
 
@@ -589,8 +589,8 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | ---- | --------- | ------------------------------------------ |
 | DB-1 | `auto`    | `tools/check-raw-sql.sh`                   |
 | DB-2 | `review`  | Every `sql` template use in the diff       |
-| DB-3 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| DB-4 | `pending` | —                                          |
+| DB-3 | `review`  | A reviewer reads database imports          |
+| DB-4 | `review`  | A reviewer reads migration files           |
 | DB-5 | `pending` | —                                          |
 | DB-6 | `pending` | —                                          |
 | DB-7 | `pending` | —                                          |

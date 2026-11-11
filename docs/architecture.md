@@ -32,7 +32,7 @@ One class per file, except that an interface and its only implementation may sha
 
 **Why:** a file with one job is found by its name and does not sprawl as things get tacked on.
 
-**Check:** ESLint `max-classes-per-file` at 1 and an ast-grep count for Python; an exception is a `standards-allow-next-line ARCH-4 <reason>`.
+**Check:** a reviewer reads the class files in the diff against this rule; an exception is a `standards-allow-next-line ARCH-4 <reason>`. Review-only by owner ruling of 11 Nov 2026: no standards gate enforces it.
 
 ## ARCH-5 — no loose functions
 
@@ -56,7 +56,7 @@ No function exceeds the cognitive-complexity limit in the gate's configuration; 
 
 **Why:** nested branching is where readers get lost, and a good abstraction lowers it even when it adds lines.
 
-**Check:** ESLint `sonarjs/cognitive-complexity` (the limit is in `packages/eslint-config/src/architecture.ts`) and `complexipy` for Python.
+**Check:** a reviewer reads the branching functions in the diff against this rule. Review-only by owner ruling of 11 Nov 2026: no standards gate enforces it.
 
 ## ARCH-8 — one responsibility per directory
 
