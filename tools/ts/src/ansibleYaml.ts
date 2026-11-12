@@ -1,5 +1,17 @@
 import type { YamlMapEntry, YamlMapNode, YamlNode } from './composeYaml.ts';
-import { asMap, asSeq, mapGet, parseYaml, scalarValue } from './composeYaml.ts';
+import {
+  asMap,
+  asSeq,
+  bracketDelta,
+  coerceScalar,
+  findKeyColon,
+  mapGet,
+  parseYaml,
+  scalarValue,
+  splitFlowItems,
+  stripComment,
+  unquote,
+} from './composeYaml.ts';
 
 const BLOCK_SCALAR_HEADER = /^(\s*(?:-\s+)?(?:[^\s#][^#]*?:\s+)?)[|>][+-]?[0-9]?\s*(?:#.*)?$/;
 // `key: value` where the value is a plain or quoted scalar (not a flow collection, anchor, alias, tag or comment).
@@ -38,10 +50,14 @@ export function neutraliseBlockScalars(content: string): string {
   const lines = content.split('\n');
   const output: string[] = [];
   let index = 0;
+  let flowDepth = 0;
   while (index < lines.length) {
     const line = lines[index] ?? '';
     const isMarker = DOCUMENT_MARKER.test(line.trim());
-    const open = isMarker ? undefined : openScalar(lines, index);
+    // A line inside a flow collection that spans several lines is part of it, never a scalar's start.
+    const insideFlow = flowDepth > 0;
+    flowDepth = Math.max(0, flowDepth + bracketDelta(stripComment(line)));
+    const open = isMarker || insideFlow ? undefined : openScalar(lines, index);
     if (open === undefined) {
       output.push(isMarker ? '' : line);
       index += 1;
@@ -67,6 +83,11 @@ function openScalar(lines: readonly string[], index: number): OpenScalar | undef
   if (header !== null) {
     const prefix = header[1] ?? '';
     return { prefix, keyIndent: headerKeyIndent(prefix) };
+  }
+  // A line that opens a flow collection and leaves it open is a flow collection wrapped
+  // onto the lines below it, not a scalar that continues there.
+  if (bracketDelta(stripComment(line)) > 0) {
+    return undefined;
   }
   const value = SCALAR_VALUE_LINE.exec(line);
   const candidate =
@@ -123,9 +144,113 @@ function hasContinuation(lines: readonly string[], from: number, keyIndent: numb
   return false;
 }
 
+/**
+ * The key `markFlowMaps` gives a flow map that opens a line (a whole document
+ * or a list item), so the block parser reads it as the value of a one-key map
+ * that `expandFlowMaps` then removes.
+ */
+export const FLOW_MAP_SENTINEL = '__flow_map__';
+
+// A line that starts with a flow map: `{a: 1}` or `- {a: 1}`. `{{` and `{%` open a template, not a map.
+const FLOW_MAP_LINE_START = /^(\s*(?:-\s+)*)\{(?![{%#])/;
+
+/**
+ * Gives a flow map that begins a line (a whole document, or a list item) a
+ * key to be the value of, so the block parser does not take its first colon
+ * for a key. A line inside a flow collection that spans several lines is left
+ * alone. Line count is unchanged.
+ */
+export function markFlowMaps(content: string): string {
+  let depth = 0;
+  return content
+    .split('\n')
+    .map((line) => {
+      const code = stripComment(line);
+      const startsMap = depth === 0 && FLOW_MAP_LINE_START.test(code);
+      depth = Math.max(0, depth + bracketDelta(code));
+      return startsMap ? line.replace(FLOW_MAP_LINE_START, `$1${FLOW_MAP_SENTINEL}: {`) : line;
+    })
+    .join('\n');
+}
+
+function relabel(node: YamlNode, line: number): YamlNode {
+  if (node.kind === 'scalar') {
+    return { ...node, line };
+  }
+  if (node.kind === 'seq') {
+    return {
+      kind: 'seq',
+      line,
+      items: node.items.map((item) => ({ value: relabel(item.value, line), line })),
+    };
+  }
+  return {
+    kind: 'map',
+    line,
+    entries: node.entries.map((entry) => ({ ...entry, value: relabel(entry.value, line), line })),
+  };
+}
+
+function flowValue(raw: string, line: number): YamlNode {
+  const parsed = raw.startsWith('[') ? parseYaml(raw) : undefined;
+  return parsed === undefined
+    ? { kind: 'scalar', value: coerceScalar(raw), line }
+    : relabel(parsed, line);
+}
+
+// `key: value` inside a flow map; a key with no colon is a key with a null value.
+function flowEntry(item: string, line: number): YamlMapEntry {
+  const colon = findKeyColon(item);
+  const key = unquote((colon === -1 ? item : item.slice(0, colon)).trim());
+  const raw = colon === -1 ? '' : item.slice(colon + 1).trim();
+  return { key, line, value: expandFlowMaps(flowValue(raw, line)) };
+}
+
+// The map a scalar's text spells when it is a balanced `{...}` flow map; `undefined` for any other text.
+function flowMapOf(text: string, line: number): YamlMapNode | undefined {
+  const trimmed = text.trim();
+  if (
+    !trimmed.startsWith('{') ||
+    !trimmed.endsWith('}') ||
+    /^\{[{%#]/.test(trimmed) ||
+    bracketDelta(trimmed) !== 0
+  ) {
+    return undefined;
+  }
+  const entries = splitFlowItems(trimmed.slice(1, -1)).map((item) => flowEntry(item, line));
+  return { kind: 'map', entries, line };
+}
+
+/**
+ * Replaces every scalar that spells a flow map (`{a: 1, b: {c: 2}}`) with the
+ * map it spells, and removes the key `markFlowMaps` added. Each key and value
+ * carries the line the flow map began on. The parser keeps a flow map's text
+ * as a scalar; without this, every ANS reader that looks inside a map sees a
+ * valid flow-style file as missing its keys. A quoted string that is itself
+ * written as `{...}` is read as a map too: its quotes are gone by then. A
+ * template (`{{ ... }}`) is never read as a map.
+ */
+export function expandFlowMaps(node: YamlNode): YamlNode {
+  if (node.kind === 'scalar') {
+    return typeof node.value === 'string' ? (flowMapOf(node.value, node.line) ?? node) : node;
+  }
+  if (node.kind === 'seq') {
+    return {
+      ...node,
+      items: node.items.map((item) => ({ ...item, value: expandFlowMaps(item.value) })),
+    };
+  }
+  const entries = node.entries.map((entry) => ({ ...entry, value: expandFlowMaps(entry.value) }));
+  const only = entries[0];
+  return entries.length === 1 && only?.key === FLOW_MAP_SENTINEL
+    ? only.value
+    : { ...node, entries };
+}
+
 /** Parses an Ansible YAML file; `undefined` for an empty file. */
 export function parseAnsibleYaml(content: string): YamlNode | undefined {
-  return parseYaml(neutraliseBlockScalars(content));
+  const root = parseYaml(markFlowMaps(neutraliseBlockScalars(content)));
+  return root === undefined ? undefined : expandFlowMaps(root);
 }
 
 const TASK_KEYWORDS: ReadonlySet<string> = new Set([

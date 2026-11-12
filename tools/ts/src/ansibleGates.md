@@ -28,6 +28,17 @@ as a task. A reader that compares two values skips a pair where one is that
 marker. Every file is read through `readText`, which strips a byte-order mark
 and folds CRLF.
 
+The parser keeps a flow map (`driver: {name: docker}`) as the text of a scalar,
+so a reader looking for `driver.name` would find nothing in a valid file. After
+parsing, every scalar that spells a balanced `{...}` is replaced by the map it
+spells, nested maps and flow sequences included, and a flow map that opens a
+line (a whole document, or a list item) is given a throwaway key first so it is
+not read as a block key. Each key and value carries the line the flow map began
+on. Two limits: a quoted string that is itself written as `{...}` is read as a
+map, because its quotes are gone by then, and a template (`{{ ... }}`) never is.
+A reader that compares a spec default with a role default sees a map on both
+sides and skips the pair, as it skips any value that is not a scalar.
+
 ## What each clause leaves to review or to another tool
 
 The Check line of each clause names a tool or a review for the part below, and
