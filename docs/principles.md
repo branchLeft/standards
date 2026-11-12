@@ -12,7 +12,7 @@ Repositories are public by default; a private repository or package needs a writ
 
 ## PRIN-2 — merge is deploy, and it is protected
 
-Every repository that owns running infrastructure deploys it from CI on merge to its default branch, through a deployment gate whose approval is the owner's, which the owner's register may delegate to an agent as set out below, and with no other deploy step; merging is protected by rulesets and goes only through the merge route the owner's register names, and every change reaches `main` by a reviewed PR through the CI gates.
+Every repository that owns running infrastructure deploys it from CI on merge to its default branch, through a deployment gate whose approval is the owner's, which the owner's register may delegate to an agent as set out below, and with no other deploy step; merging is protected by rulesets and goes only through the merge route the owner's register names, and every change reaches `main` by a PR with a recorded review verdict, through the CI gates.
 
 **Why:** a deploy path that is not the merge path gets skipped under pressure, a merge that does not deploy leaves production drifting from `main` while looking automated, and an unprotected merge-deploys-production path makes a careless push as costly as a bad release.
 
@@ -22,7 +22,7 @@ Every repository that owns running infrastructure deploys it from CI on merge to
 
 The delegations end with the first paying tenant, when the owner rewrites the register. The owner decides that point. An agent never decides that it has been reached and never extends a delegation, and where it is unclear whether a delegation holds, it does not.
 
-**What stays with the owner.** The never-list in the register's Never section binds every delegation. No delegation covers spend (`PRIN-3`), mail, secrets, a first deploy of a stack, a plan that destroys or replaces stateful resources, the tenant-provisioning workflow, or the workflow that creates repositories. The delete guard covers only the resource types it names and no script condition reads a migration or data change, so a change of either kind waits for the owner, as do a held stack lock and a plan change the reviewed change does not explain. The four triggers of `PRIN-6` stay. The review round, the sabotage proofs and every CI gate stay required before a merge.
+**What stays with the owner.** The never-list in the register's Never section binds every delegation. No delegation covers spend (`PRIN-3`), mail, secrets, a first deploy of a stack, a plan that destroys or replaces stateful resources, the tenant-provisioning workflow, or the workflow that creates repositories. The delete guard covers only the resource types it names; a held stack lock and a plan change the reviewed change does not explain also wait for the owner. The four triggers of `PRIN-6` stay. The review round, the sabotage proofs and every CI gate stay required before a merge.
 
 ## PRIN-3 — spend is eliminated, not optimised
 
