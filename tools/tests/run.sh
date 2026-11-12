@@ -42,6 +42,10 @@ run "check-docs-site.sh"   bash "$TOOLS/check-docs-site.sh" --self-test
 # .github/workflows/standards.yml — see standards-audit.sh's ADVISORY_GATES
 # comment.
 run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
+# CODEOWNERS: the sample paths it owns and releases, red on the old file and
+# green on the real one, so a release line cannot silently un-own a rule.
+run "codeowners_ownership.py" python3 "$TOOLS/tests/codeowners_ownership.py" --self-test
+run "CODEOWNERS owns what it should" python3 "$TOOLS/tests/codeowners_ownership.py"
 
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"

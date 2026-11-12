@@ -1,19 +1,55 @@
-# This file names only the escape hatches REPO-5 defines. Where REPO-1 requires
-# code-owner review, that review gates exemptions (REPO-5, STD-001), not every
-# PR. This repo does not require it (REPO-1), so these lines request a review
-# and do not block a merge by themselves. The shared lines
-# from templates/codeowners stay last: GitHub applies the LAST matching
-# pattern, so this repo's own lines go above them, never after.
+# This file names what a change can do that no later check would catch, not
+# where a file lives. GitHub applies the LAST matching pattern, so the order
+# below is the whole mechanism: kept paths first, then lines that name no owner
+# and so release documents and the like, then paths that must stay owned
+# whatever came before, then the shared lines from templates/codeowners.
+# Those shared lines stay last (SYNC-1): this repo's own lines go above them,
+# never after. There is no catch-all line, by design.
+#
+# This repo does not require code-owner review (REPO-1), so these lines request
+# a review and do not block a merge by themselves; the merge route reads them.
+# tools/tests/codeowners_ownership.py checks a fixed table of sample paths
+# against this file, and it runs in CI through `pnpm selftest`.
 
-/tools/thresholds.tsv    @branchLeft/branchleft-admin
-/templates/rulesets/     @branchLeft/branchleft-admin
-/docs/                   @branchLeft/branchleft-admin
-# The clause docs and the TS-4 floor (FLOOR_TIER) are owned too.
-/docs/principles.md      @branchLeft/branchleft-admin
-/docs/index.md           @branchLeft/branchleft-admin
-/docs/*.md               @branchLeft/branchleft-admin
-/docs/stacks/*.md        @branchLeft/branchleft-admin
-/tools/check-tsconfig.sh @branchLeft/branchleft-admin
+# Kept: the code of every gate other repos run, the floors and exemption
+# definitions they read, and the tests of those gates (the rules themselves).
+/tools/                              @branchLeft/branchleft-admin
+# Kept: ruleset definitions, the CODEOWNERS template and the file that sets how
+# it is compared, and the workflow template.
+/templates/rulesets/                 @branchLeft/branchleft-admin
+/templates/org-rulesets/             @branchLeft/branchleft-admin
+/templates/codeowners                @branchLeft/branchleft-admin
+/templates/manifest.tsv              @branchLeft/branchleft-admin
+/templates/workflows/                @branchLeft/branchleft-admin
+# Kept: the TS-4 floor tiers, which tools/check-tsconfig.sh reads directly.
+/packages/tsconfig/*.json            @branchLeft/branchleft-admin
+
+# Released: documents, and discovery files that report and judge nothing. These
+# name no owner and come after the kept directories above so they win.
+/tools/**/*.md
+/templates/**/*.md
+/tools/clause-paths.tsv
+/packages/tsconfig/package.json
+
+# Kept again, after the releases above, so that no release line can ever
+# un-own a floor or a mode definition: the thresholds, the promoted-gate
+# register and the docs-site tiers.
+/tools/thresholds.tsv                @branchLeft/branchleft-admin
+/tools/ts-promoted.tsv               @branchLeft/branchleft-admin
+/tools/docs-site-tiers.tsv           @branchLeft/branchleft-admin
+
+# Kept at any depth: the rulebook, CODEOWNERS files, registry settings and the
+# floor files other repos name. A document extension never releases these.
+CLAUDE.md                            @branchLeft/branchleft-admin
+AUTHORISATIONS.md                    @branchLeft/branchleft-admin
+**/CODEOWNERS                        @branchLeft/branchleft-admin
+**/.npmrc                            @branchLeft/branchleft-admin
+**/floors.tsv                        @branchLeft/branchleft-admin
+# Kept: legal text.
+/LICENSE                             @branchLeft/branchleft-admin
+/LICENSE-DOCS                        @branchLeft/branchleft-admin
+
+# Shared lines from templates/codeowners. They stay last (SYNC-1).
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
