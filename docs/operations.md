@@ -44,7 +44,7 @@ After every incident and out-of-routine change an agent the owner started writes
 
 ## OPS-6 — automate rather than write a runbook
 
-A manual step that will be repeated is automated, not written up as a runbook, which is for what cannot be automated.
+A step that can be automated through CI, infrastructure as code or Ansible is automated, not written up as a runbook, and a new runbook holds only the hand work that is left, with as little manual work as possible.
 
 **Why:** a runbook is the easy answer for its writer and the hard one for whoever runs it, and the platform owner's time is the scarcest resource we have.
 

@@ -499,6 +499,7 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | TYP-3 | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | `review`  | New type annotations in the diff                    |
 | TYP-5 | `pending` | —                                                   |
+| TYP-6 | `review`  | New source files in the diff                        |
 
 ## Error handling — `errors.md`
 
