@@ -52,7 +52,7 @@ Never require a context before a real run has produced it; a required check on a
 
 ## REPO-6 — every repo's payload is committed and audited
 
-Every repo's ruleset payload is committed under `templates/rulesets/<repo>/` (enumerated with `find`, because a `*/` glob skips the `.github` repo's dot-directory), captured from the hand-configured live state rather than written from the standard, and audited, with `templates/rulesets/ghost-tenant-blog/main.json` committed ahead of a live CI gap as its `README.md` records.
+Every repo's ruleset payload is committed under `templates/rulesets/<repo>/` (enumerated with `find`, because a `*/` glob skips the `.github` repo's dot-directory), captured from the hand-configured live state rather than written from the standard, and audited.
 
 **Why:** capturing live state first means the first audit shows where a repo already differs, instead of the first apply changing it.
 
@@ -96,24 +96,14 @@ Every commit an agent writes carries a co-author trailer naming the model, and e
 
 On 25 Oct 2026 the owner ruled that, where GitHub's live settings differ from
 the committed payloads after hand edits, **the live settings win** for
-`shared-infra`, `ghost-platform` and `standards`. Their payloads under
-`templates/rulesets/<repo>/main.json` were then rewritten to the live values,
-and the audit reads them as `ok`. The two differences that matter are recorded
-in REPO-1 above: `ghost-platform` has `require_code_owner_review` true and
-`require_extra_approval_for_unattributed_changes` false; `standards` has
-`require_code_owner_review` true. `shared-infra` also records the
-`merge_queue` rule and the `Lint and test the Ansible roles` required check
-that live carries.
+`shared-infra`, `ghost-platform` and `standards`. The differences that matter are recorded in REPO-1 above.
 
-Four exclusions from that ruling, each by the owner's own decision:
+Three exclusions from that ruling, each by the owner's own decision:
 
 - `wedding-platform` is permanently outside these rules.
 - The tag bypass on `github-workflows` is the owner's own settings change; the
   payload there is left as this standard states it.
 - `ghost-tenant-blog` stays as it is.
-- The payloads above were captured from live state, not applied. The
-  apply script was not run for them; it remains the way the standard is
-  restored on any repo (see REPO-7).
 
 ## Organization-level rulesets
 

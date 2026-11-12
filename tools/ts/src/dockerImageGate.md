@@ -6,8 +6,7 @@ here is `advisory`, the same rollout `pythonConfigGate.ts` uses.
 ## CON-1: what counts as hardened
 
 `hardened_image_patterns` (`tools/thresholds.tsv`) lists base-image prefixes
-treated as Docker Hardened Images; nothing in the fleet uses one yet, so the
-default list is unverified against a real image. The only other accepted
+treated as Docker Hardened Images. The only other accepted
 base is a literal `debian:*-slim` — a third-party runtime image built on
 Debian slim (`node:*-slim`, for example) does not count, because the clause
 names Debian's own official image, not something layered on it.

@@ -25,19 +25,12 @@ force-push, linear history, signed commits, one approving review, squash-only).
 `require_code_owner_review` is `false`, matching the REPO-1 clause in
 [`docs/repo-settings.md`](../../docs/repo-settings.md) for the tenant repos.
 The payload is inert on GitHub Free today (the org rulesets endpoint returns
-403; see "Applying" below). Filed against
-[branchLeft/workspace#151](https://github.com/branchLeft/workspace/issues/151).
+403; see "Applying" below).
 
-Today `ghost-tenant-*` matches `branchLeft/ghost-tenant-blog` (public, the
-intended target) and `ghost-tenant-blog-archive` (archived, private, a
-republish leftover — not a live tenant). It does not match `ghost-platform`,
-`ghost-platform-docs` or `ghost-platform-tenant-template` — none start with
-`ghost-tenant-`. Confirmed live against `gh repo list branchLeft --limit 100`.
-
-This is the second time an `-archive` sibling has silently widened a name
-pattern in this org, so it is excluded deliberately rather than left to the
-plan-tier block to make it moot (a plan change would otherwise re-expose it,
-silently). `conditions.repository_name.exclude` is `["*-archive"]` — a
+An `-archive` sibling can silently widen a name pattern in this org, so it is
+excluded deliberately rather than left to the plan-tier block to make it moot
+(a plan change would otherwise re-expose it, silently).
+`conditions.repository_name.exclude` is `["*-archive"]` — a
 general suffix exclusion, not a literal `ghost-tenant-blog-archive`, so it
 also covers a future tenant that is later archived without this payload
 needing an edit each time. `repository_name.exclude` is confirmed against
@@ -54,54 +47,17 @@ is deliberately **not** required: it is skipped on every pull request
 reports on a PR blocks every merge permanently (`REPO-4`,
 [`docs/repo-settings.md`](../../docs/repo-settings.md)).
 
-`branchLeft/ghost-tenant-blog` — the one live tenant — cannot be used as the
-evidence source: its workflow has diverged from the current template, so what
-it reports on a PR today is not representative of what a freshly generated
-tenant would report. The template repo itself is the correct evidence source
-instead, because a freshly generated tenant copies its workflow files
-verbatim. Two recent real PRs against
-`branchLeft/ghost-platform-tenant-template` both report exactly:
-
-```text
-Deploy (pulumi up)              skipping   (never — correctly excluded)
-Committed-secret guard          pass
-Type check                      pass
-docs-lint / docs-lint           pass
-standards / Standards gates     pass
-```
-
-(PRs [#2](https://github.com/branchLeft/ghost-platform-tenant-template/pull/2)
-and
-[#4](https://github.com/branchLeft/ghost-platform-tenant-template/pull/4),
-via `gh pr checks`.)
-
-`pass` here is not full-tree enforcement. `ghost-platform-tenant-template`
+A `pass` on these contexts is not full-tree enforcement. `ghost-platform-tenant-template`
 runs both `docs-lint / docs-lint` and `standards / Standards gates` in `warn`
 mode (`.docs-lint.mode` and `.standards.mode`, both `warn`), and a required
 `warn`-mode check still fails only on findings in files the pull request
 itself touches — the pre-existing, whole-tree backlog is advisory (`REPO-4`
 rule 2, [`docs/repo-settings.md`](../../docs/repo-settings.md)). Every tenant
 generated from this template inherits that same partial coverage from day
-one, until the template's own `warn` state is cleared —
-[branchLeft/workspace#720](https://github.com/branchLeft/workspace/issues/720).
+one, until the template's own `warn` state is cleared.
 Requiring these two contexts here is real, if partial, coverage: new and
 changed files are gated in every generated tenant immediately; "four required
 checks" does not mean the tree is certified clean.
-
-**These are the right required checks for a freshly generated tenant. They
-are not yet correct for `ghost-tenant-blog` today.** Its own live workflow
-set does not emit `Committed-secret guard` or `standards / Standards gates` —
-it has diverged from the template these checks were verified against. With
-`strict_required_status_checks_policy: true`, applying this payload while
-that gap stands would make every future PR against `ghost-tenant-blog`
-permanently unmergeable (`REPO-4` rule 1). This is a real precondition on the
-handover command below, not a hypothetical: `ghost-tenant-blog`'s CI must
-converge with the template's `Committed-secret guard` and `standards /
-Standards gates` jobs first. Tracked separately, since it is blog-specific
-remediation rather than part of this payload: the repo-level ruleset in
-[branchLeft/workspace#119](https://github.com/branchLeft/workspace/issues/119)
-currently scopes to blog's _current_ (narrower) check set rather than closing
-this gap, so a further issue covers the convergence itself.
 
 ## Applying is blocked on the current plan — not a tooling gap
 
@@ -150,16 +106,11 @@ run); a re-run needs the same find-by-name-then-PUT pattern
 `ruleset-apply.sh` already uses for repo rulesets, against
 `orgs/branchLeft/rulesets` instead of `repos/branchLeft/<repo>/rulesets`.
 
-Two further preconditions, beyond the plan tier and the `ghost-tenant-blog`
-convergence above:
+One further precondition, beyond the plan tier:
 
 - **The naming convention this pattern assumes must already be enforced at
-  provisioning time.** A concurrent, not-yet-merged `branchLeft/ghost-platform`
-  change enforces `^ghost-tenant-[a-z0-9]+(-[a-z0-9]+)*$` when a tenant repo is
-  created. The two PRs have no merge-order dependency between themselves —
-  this payload is inert on the current plan regardless of provisioning-side
-  validation — but the naming-convention change must be merged and live
-  **before this handover command is ever run**, so `ghost-tenant-*` remains a
-  reliable description of every tenant repo rather than a convention a future
-  provisioning bug could silently violate.
-- `ghost-tenant-blog`'s CI convergence (above) must also be complete first.
+  provisioning time.** `branchLeft/ghost-platform` must enforce
+  `^ghost-tenant-[a-z0-9]+(-[a-z0-9]+)*$` when a tenant repo is created, and
+  that must be live **before this handover command is ever run**, so
+  `ghost-tenant-*` remains a reliable description of every tenant repo rather
+  than a convention a future provisioning bug could silently violate.

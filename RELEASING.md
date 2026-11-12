@@ -19,9 +19,6 @@ packages when one changes is trivial next to debugging a repo running
    GitHub validates the signature of the **commit a tag points at**, not the tag
    object, so a lightweight tag placed on a merge commit that GitHub's own
    web-flow key signed satisfies the rule without anyone having signed a tag.
-   A sibling repo already has two lightweight, unsigned tags in service — one of
-   them the most widely referenced tag in the fleet — and this repo's own first
-   release is a third.
 
    `publish.yml` therefore checks the tag object's own type and verification
    before it builds anything. A lightweight or unverified tag fails the release
