@@ -41,3 +41,11 @@ Type checking runs at the strictest setting each language offers (every TypeScri
 **Why:** every relaxed flag is a class of error the checker has agreed not to report.
 
 **Check:** `TS-4`'s tier raised step by step in `tools/check-tsconfig.sh`; each Python project enables mypy strict.
+
+## TYP-6 — new code is written in a strongly typed language
+
+New code is written in a language with strong static typing (Python with mypy, or TypeScript), and new plain `.js` or `.mjs` files are not added.
+
+**Why:** typed code is maintainable code, and plain JavaScript gives the checker nothing to hold a change against.
+
+**Check:** review of new source files in the diff.

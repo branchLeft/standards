@@ -6,9 +6,9 @@ Scripts and tooling are software like any other: typed, testable languages are p
 
 ### SH-1 — shell meets the same standard as other code
 
-Shell is allowed only when it carries tests to the same standard as other code (fakes for what it calls, and proof that a deliberate break turns the tests red) and passes shellcheck with no warnings.
+A new shell script is not added where Python can do the job, and shell that is added or kept carries tests to the same standard as other code (fakes for what it calls, and proof that a deliberate break turns the tests red) and passes shellcheck with no warnings.
 
-**Why:** a script that deploys or guards something is a software artefact, and shell is otherwise the least tested code in a repo.
+**Why:** a script that deploys or guards something is a software artefact, and shell is otherwise the least tested code in a repo, hard to read and hard to unit test, so Python is the default for scripts.
 
 **Check:** shellcheck in pre-commit and CI; the `COV-1` reader extended to shell through kcov.
 
@@ -22,7 +22,7 @@ A runbook may use shell for a manual task, and a runbook step an agent runs is s
 
 ### SH-3 — a typed language and its SDKs first
 
-Anything beyond basic commands is written in a typed language, Python or TypeScript, using a tool's own SDK where one exists rather than a script of subprocess calls.
+Anything beyond basic commands is written in a typed language, Python by preference or else TypeScript, using a tool's own SDK where one exists rather than a script of subprocess calls.
 
 **Why:** typed, testable code is easier to trust than shell, and wrapping a command line in subprocess calls keeps shell's weaknesses in another language.
 
