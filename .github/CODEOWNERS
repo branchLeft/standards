@@ -23,13 +23,22 @@
 /templates/workflows/                @branchLeft/branchleft-admin
 # Kept: the TS-4 floor tiers, which tools/check-tsconfig.sh reads directly.
 /packages/tsconfig/*.json            @branchLeft/branchleft-admin
+# Kept (criterion 2): what the publish job installs, builds and runs while it
+# holds the registry token. The root and every package's package.json carry the
+# build, prepare and prepublishOnly scripts and the entry point; the workspace
+# file lists the install scripts allowed to run; .pnpmfile.* can rewrite an
+# install. A dependency bump that touches package.json therefore still reaches
+# the owner; the lockfile alone does not.
+/package.json                        @branchLeft/branchleft-admin
+/packages/*/package.json             @branchLeft/branchleft-admin
+/pnpm-workspace.yaml                 @branchLeft/branchleft-admin
+**/.pnpmfile.*                       @branchLeft/branchleft-admin
 
 # Released: documents, and discovery files that report and judge nothing. These
 # name no owner and come after the kept directories above so they win.
 /tools/**/*.md
 /templates/**/*.md
 /tools/clause-paths.tsv
-/packages/tsconfig/package.json
 
 # Kept again, after the releases above, so that no release line can ever
 # un-own a floor or a mode definition: the thresholds, the promoted-gate
