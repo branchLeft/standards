@@ -8,7 +8,7 @@ Names use whole words, and an abbreviation is allowed only when it is the domain
 
 **Why:** an abbreviation saves its writer a few keystrokes and costs every reader a guess.
 
-**Check:** ESLint `unicorn/prevent-abbreviations` with an allow-list of domain words, and an ast-grep word check for Python on the same list.
+**Check:** review-only; a reviewer reads the TypeScript and Python source in the diff. No gate runs it.
 
 ## NAM-2 — each language's conventions
 
@@ -16,7 +16,7 @@ Each language's own naming and casing conventions apply, enforced by its linter.
 
 **Why:** a machine checks it, so nobody has to debate it.
 
-**Check:** ESLint `@typescript-eslint/naming-convention`; ruff's `N` rules.
+**Check:** review-only; a reviewer reads the TypeScript and Python source in the diff. No gate runs it.
 
 ## NAM-3 — a pattern is named
 
