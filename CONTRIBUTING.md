@@ -26,11 +26,12 @@ Before opening a PR:
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use && pnpm install
-pnpm lint:check && pnpm typecheck && ./tools/tests/run.sh
+pnpm build
+pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test:unit && pnpm selftest
 ```
 
-`tools/tests/run.sh` runs every self-test, the clause-index drift check, and
-shellcheck over every script here.
+`pnpm selftest` runs `tools/tests/run.sh`, which runs every self-test, the
+clause-index drift check, and shellcheck over every script here.
 
 **Run a new gate against the real repos before merging it.** The fixture matrix
 proves it does what you meant; the fleet proves you meant the right thing. The

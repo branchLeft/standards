@@ -52,8 +52,7 @@ the whole point is that there is one place to change them.
 
 **Widen `include` to `**/*.ts`.** A flat `*.ts` glob matches root-level files
 only: anything in a subdirectory is silently outside `tsc --noEmit`, with no
-error and no visible difference in output. Six repos currently have this.
-
+error and no visible difference in output.
 Verify with the gate rather than by eye:
 
 ```bash

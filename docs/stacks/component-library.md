@@ -32,7 +32,7 @@ A library has no default exports, with no framework exception (`APP-1` has one f
 
 **Why:** a default export has no canonical name, so the same component appears under three names across a codebase, and re-exporting it through a barrel is lossy.
 
-**Check:** the `library` preset in `@branchleft/eslint-config` implements it, but no library repo composes it yet ([`ADOPTION.md`](../../ADOPTION.md)).
+**Check:** the `library` preset in `@branchleft/eslint-config` implements it ([`ADOPTION.md`](../../ADOPTION.md)).
 
 ## LIB-5 — native semantics first
 

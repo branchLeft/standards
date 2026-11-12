@@ -9,7 +9,7 @@ watching. `templates/` is the source of truth and `templates/manifest.tsv` is
 the registry: target path and comparison strictness per template.
 
 Drift only. A repo that does not have the file is not reported — which repo
-needs which file is an adoption decision (`docs/adoption`), and pinning a
+needs which file is an adoption decision (`ADOPTION.md`), and pinning a
 runtime a repo never runs is worse than pinning none.
 
 ## Usage
