@@ -106,6 +106,54 @@ describe('classifyMigration — expand', () => {
     expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
   });
 
+  it('flags an added NOT NULL foreign-key column whose only DEFAULT is ON DELETE SET DEFAULT', () => {
+    const sql = assembleSql(
+      'ALTER',
+      ' TABLE a ADD COLUMN c int NOT NULL REFERENCES u(id) ON DELETE SET DEFAULT;\n'
+    );
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(1);
+  });
+
+  it('flags an added NOT NULL column whose only DEFAULT is ON UPDATE SET DEFAULT', () => {
+    const sql = assembleSql(
+      'ALTER',
+      ' TABLE a ADD COLUMN c int NOT NULL REFERENCES u(id) ON UPDATE SET DEFAULT;\n'
+    );
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(1);
+  });
+
+  it('flags a CREATE TABLE column whose only DEFAULT is ON DELETE SET DEFAULT', () => {
+    const sql = assembleSql(
+      'CREATE',
+      ' TABLE a (id text PRIMARY KEY, c int NOT NULL REFERENCES u(id) ON DELETE SET DEFAULT);\n'
+    );
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(1);
+  });
+
+  it('flags SET DEFAULT split across lines or spaced unevenly', () => {
+    const sql = assembleSql(
+      'ALTER',
+      ' TABLE a ADD COLUMN c int NOT NULL REFERENCES u(id) on  delete\n set   default;\n'
+    );
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(1);
+  });
+
+  it('does not flag a NOT NULL column with a real DEFAULT alongside ON DELETE SET DEFAULT', () => {
+    const sql = assembleSql(
+      'ALTER',
+      ' TABLE a ADD COLUMN c int NOT NULL DEFAULT 0 REFERENCES u(id) ON DELETE SET DEFAULT;\n'
+    );
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
+  });
+
+  it('does not flag a CREATE TABLE column with a real DEFAULT alongside ON UPDATE SET DEFAULT', () => {
+    const sql = assembleSql(
+      'CREATE',
+      ' TABLE a (id text PRIMARY KEY, c int NOT NULL DEFAULT 0 REFERENCES u(id) ON UPDATE SET DEFAULT);\n'
+    );
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
+  });
+
   it('does not flag a CREATE TABLE statement with no parenthesised column list', () => {
     const sql = assembleSql('CREATE', ' TABLE a;\n');
     expect(classifyMigration(sql).missingDefaults).toHaveLength(0);

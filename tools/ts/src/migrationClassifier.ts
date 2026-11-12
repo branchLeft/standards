@@ -174,10 +174,19 @@ function classifyKind(upper: string): ClassifiedStatement['kind'] {
   return 'other';
 }
 
+// A column's own `DEFAULT` clause. The `DEFAULT` in a foreign key's
+// `ON DELETE SET DEFAULT` or `ON UPDATE SET DEFAULT` action is not one: it names
+// a referential action and gives the column no value on insert, so it is
+// removed before the keyword is looked for.
+function hasColumnDefault(upper: string): boolean {
+  const withoutReferentialActions = upper.replace(/\bSET\s+DEFAULT\b/g, ' ');
+  return /\bDEFAULT\b/.test(withoutReferentialActions);
+}
+
 /** True where an `ADD COLUMN` or a `CREATE TABLE` column is `NOT NULL` with no `DEFAULT`. */
 function addsColumnMissingDefault(text: string, upper: string): boolean {
   if (/^ALTER\s+TABLE/.test(upper)) {
-    return /\bNOT\s+NULL\b/.test(upper) && !/\bDEFAULT\b/.test(upper);
+    return /\bNOT\s+NULL\b/.test(upper) && !hasColumnDefault(upper);
   }
   if (/^CREATE\s+TABLE/.test(upper)) {
     const open = text.indexOf('(');
@@ -191,7 +200,7 @@ function addsColumnMissingDefault(text: string, upper: string): boolean {
       if (/^\s*(PRIMARY\s+KEY|FOREIGN\s+KEY|CONSTRAINT|UNIQUE)\b/.test(columnUpper)) {
         return false;
       }
-      return /\bNOT\s+NULL\b/.test(columnUpper) && !/\bDEFAULT\b/.test(columnUpper);
+      return /\bNOT\s+NULL\b/.test(columnUpper) && !hasColumnDefault(columnUpper);
     });
   }
   return false;
