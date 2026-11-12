@@ -24,3 +24,11 @@ deliberate, not an edge case worth suppressing: LINT-2's text names YAML as
 code-like with no carve-out for a repo's own tooling config, and a repo that
 hand-edits those files without a formatter is exactly the drift LINT-2
 exists to catch.
+
+## Why LINT-4 cannot be promoted as it reads
+
+The CI half matches a tool's own name in a workflow `run:` step. A repo whose
+pre-commit hook runs `pnpm run lint` and whose CI runs `pnpm run lint:check`
+runs the same lint command in both, and reads as "no CI workflow runs eslint".
+LINT-4's text asks that both run the lint and format commands, and the reader
+cannot follow a package script to its tool.

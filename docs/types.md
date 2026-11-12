@@ -40,4 +40,4 @@ Type checking runs at the strictest setting each language offers (every TypeScri
 
 **Why:** every relaxed flag is a class of error the checker has agreed not to report.
 
-**Check:** `TS-4`'s tier raised step by step in `tools/check-tsconfig.sh`; each Python project enables mypy strict.
+**Check:** `TS-4`'s tier raised step by step in `tools/check-tsconfig.sh`; each Python project enables mypy strict (`tools/ts/src/pythonConfigGate.ts`, the TypeScript audit, which fails the Standards job).
