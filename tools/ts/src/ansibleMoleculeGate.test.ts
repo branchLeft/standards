@@ -43,6 +43,17 @@ describe('AnsibleMoleculeGate, ANS-15', () => {
     expect(run(scenario(MOLECULE))).toEqual([]);
   });
 
+  it('accepts a driver written as a flow-style map', () => {
+    const flow = MOLECULE.replace('driver:\n  name: docker', 'driver: {name: docker}');
+    expect(flow).not.toBe(MOLECULE);
+    expect(run(scenario(flow))).toEqual([]);
+  });
+
+  it('still flags an unmanaged driver written as a flow-style map', () => {
+    const flow = MOLECULE.replace('driver:\n  name: docker', 'driver: {name: delegated}');
+    expect(messagesFor(run(scenario(flow)), 'ANS-15').join('\n')).toContain('driver is delegated');
+  });
+
   it('flags each missing scenario file', () => {
     const findings = run({ [`${BASE}/meta/main.yml`]: 'galaxy_info: {}\n' });
     expect(messagesFor(findings, 'ANS-15')).toHaveLength(3);

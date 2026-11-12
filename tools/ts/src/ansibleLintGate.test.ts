@@ -243,6 +243,33 @@ describe('AnsibleLintGate, ANS-6', () => {
     expect(messagesFor(run({ '.yamllint': without }), 'ANS-6')).toHaveLength(2);
   });
 
+  it('accepts the same configuration written with flow-style maps', () => {
+    const flowBraces = YAMLLINT.replace(
+      '  braces:\n    min-spaces-inside: 0\n    max-spaces-inside: 1',
+      '  braces: {min-spaces-inside: 0, max-spaces-inside: 1}'
+    );
+    expect(flowBraces).not.toBe(YAMLLINT);
+    expect(messagesFor(run({ '.yamllint': flowBraces }), 'ANS-6')).toEqual([]);
+    const flowRules = [
+      'extends: default',
+      'rules: {line-length: {max: 160}, document-start: disable,',
+      '  comments: {min-spaces-from-content: 1},',
+      '  braces: {min-spaces-inside: 0, max-spaces-inside: 1},',
+      '  octal-values: {forbid-implicit-octal: true, forbid-explicit-octal: true}}',
+    ].join('\n');
+    expect(messagesFor(run({ '.yamllint': flowRules }), 'ANS-6')).toEqual([]);
+  });
+
+  it('still flags a wrong value written in a flow-style map', () => {
+    const wrong = YAMLLINT.replace(
+      '  braces:\n    min-spaces-inside: 0\n    max-spaces-inside: 1',
+      '  braces: {min-spaces-inside: 0, max-spaces-inside: 3}'
+    );
+    expect(messagesFor(run({ '.yamllint': wrong }), 'ANS-6').join('\n')).toContain(
+      'braces.max-spaces-inside'
+    );
+  });
+
   it('flags a pre-commit file and workflows that do not run yamllint', () => {
     const findings = run({
       '.pre-commit-config.yaml': 'repos: []\n',
