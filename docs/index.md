@@ -305,9 +305,12 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 | ANS-16 | `review`  | Tasks and templates in the diff that handle a secret        |
 | ANS-17 | `review`  | Workflows that run `ansible-playbook` and their environment |
 
-**No `ANS-*` clause is `auto`.** No gate script under `tools/` reads any of
-them yet, so each is binding prose carried by review, or by `ansible-lint`,
-Molecule and mypy in a repo that runs them, rather than by this repo. The
+**No `ANS-*` clause is `auto`.** Advisory readers in the TypeScript audit
+(`tools/ts/src/ansibleGates.md`) read the mechanical part of `ANS-2` to
+`ANS-9`, `ANS-11` and `ANS-15` and report at level `advisory` only, so each of
+those rows stays `pending` until the owner moves its gate class. The rest is
+binding prose carried by review, or by `ansible-lint`, Molecule and mypy in a
+repo that runs them, rather than by this repo. The
 `pending` rows are the ones such a tool is meant to check once it runs. A
 clause that a tool does not fully check says so under a `Named limit:` marker on
 the page, and the part it names is review; read the page for those, which is
