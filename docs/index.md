@@ -468,34 +468,34 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Architecture — `architecture.md`
 
-| ID     | Gate      | Evidence                                              |
-| ------ | --------- | ----------------------------------------------------- |
-| ARCH-1 | `review`  | The diff's public signatures and file layout          |
-| ARCH-2 | `review`  | New classes and the contracts they implement          |
-| ARCH-3 | `review`  | New generic parameters, option objects and registries |
-| ARCH-4 | `pending` | `@branchleft/eslint-config` (`EslintGate`)            |
-| ARCH-5 | `review`  | New top-level functions and their grouping module     |
-| ARCH-6 | `review`  | Constructors and factories in the diff                |
-| ARCH-7 | `pending` | `@branchleft/eslint-config` (`EslintGate`)            |
-| ARCH-8 | `review`  | New directories in the diff                           |
+| ID     | Gate     | Evidence                                              |
+| ------ | -------- | ----------------------------------------------------- |
+| ARCH-1 | `review` | The diff's public signatures and file layout          |
+| ARCH-2 | `review` | New classes and the contracts they implement          |
+| ARCH-3 | `review` | New generic parameters, option objects and registries |
+| ARCH-4 | `review` | TypeScript and Python source in the diff              |
+| ARCH-5 | `review` | New top-level functions and their grouping module     |
+| ARCH-6 | `review` | Constructors and factories in the diff                |
+| ARCH-7 | `review` | TypeScript and Python source in the diff              |
+| ARCH-8 | `review` | New directories in the diff                           |
 
 ## Naming — `naming.md`
 
-| ID    | Gate      | Evidence                                   |
-| ----- | --------- | ------------------------------------------ |
-| NAM-1 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| NAM-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| NAM-3 | `review`  | New class names in the diff                |
-| NAM-4 | `review`  | New names in the diff                      |
-| NAM-5 | `pending` | —                                          |
-| NAM-6 | `pending` | —                                          |
+| ID    | Gate      | Evidence                                 |
+| ----- | --------- | ---------------------------------------- |
+| NAM-1 | `review`  | TypeScript and Python source in the diff |
+| NAM-2 | `review`  | TypeScript and Python source in the diff |
+| NAM-3 | `review`  | New class names in the diff              |
+| NAM-4 | `review`  | New names in the diff                    |
+| NAM-5 | `pending` | —                                        |
+| NAM-6 | `pending` | —                                        |
 
 ## Types — `types.md`
 
 | ID    | Gate      | Evidence                                            |
 | ----- | --------- | --------------------------------------------------- |
-| TYP-1 | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
-| TYP-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`)          |
+| TYP-1 | `review`  | TypeScript and Python source in the diff            |
+| TYP-2 | `review`  | TypeScript and Python source in the diff            |
 | TYP-3 | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | `review`  | New type annotations in the diff                    |
 | TYP-5 | `pending` | —                                                   |
@@ -503,13 +503,13 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Error handling — `errors.md`
 
-| ID    | Gate      | Evidence                                   |
-| ----- | --------- | ------------------------------------------ |
-| ERR-1 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| ERR-2 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| ERR-3 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| ERR-4 | `review`  | Error handling at each public boundary     |
-| ERR-5 | `pending` | —                                          |
+| ID    | Gate      | Evidence                                 |
+| ----- | --------- | ---------------------------------------- |
+| ERR-1 | `review`  | TypeScript and Python source in the diff |
+| ERR-2 | `review`  | TypeScript and Python source in the diff |
+| ERR-3 | `review`  | TypeScript and Python source in the diff |
+| ERR-4 | `review`  | Error handling at each public boundary   |
+| ERR-5 | `pending` | —                                        |
 
 ## Logging — `logging.md`
 
@@ -587,15 +587,15 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Databases — `databases.md`
 
-| ID   | Gate      | Evidence                                   |
-| ---- | --------- | ------------------------------------------ |
-| DB-1 | `auto`    | `tools/check-raw-sql.sh`                   |
-| DB-2 | `review`  | Every `sql` template use in the diff       |
-| DB-3 | `pending` | `@branchleft/eslint-config` (`EslintGate`) |
-| DB-4 | `pending` | —                                          |
-| DB-5 | `pending` | —                                          |
-| DB-6 | `pending` | —                                          |
-| DB-7 | `pending` | —                                          |
+| ID   | Gate      | Evidence                                  |
+| ---- | --------- | ----------------------------------------- |
+| DB-1 | `auto`    | `tools/check-raw-sql.sh`                  |
+| DB-2 | `review`  | Every `sql` template use in the diff      |
+| DB-3 | `review`  | Manifests and database code in the diff   |
+| DB-4 | `review`  | Migration folders and the deploy workflow |
+| DB-5 | `pending` | —                                         |
+| DB-6 | `pending` | —                                         |
+| DB-7 | `pending` | —                                         |
 
 ## Containers — `containers.md`
 

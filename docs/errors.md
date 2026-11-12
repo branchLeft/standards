@@ -8,7 +8,7 @@ Code raises its own named error classes, never a bare built-in error or a string
 
 **Why:** a caller can only handle deliberately the errors it can tell apart.
 
-**Check:** ESLint `no-throw-literal` plus an ast-grep rule against throwing a bare `Error`; ruff `TRY002`.
+**Check:** review-only; a reviewer reads the TypeScript and Python source in the diff. No gate runs it.
 
 ## ERR-2 — every function documents what it raises
 
@@ -16,7 +16,7 @@ A function's docstring lists the errors it can raise and a unit test covers each
 
 **Why:** TypeScript and Python cannot express errors in a signature, so the docstring and its tests are the contract.
 
-**Check:** ESLint `jsdoc/require-throws`; ruff `DOC501`.
+**Check:** review-only; a reviewer reads the TypeScript and Python source in the diff. No gate runs it.
 
 ## ERR-3 — no error is buried
 
@@ -24,7 +24,7 @@ Within our own systems a caught error is handled deliberately or raised again, a
 
 **Why:** a buried error turns a loud, local failure into a quiet, distant one.
 
-**Check:** ESLint `no-empty` and `@typescript-eslint/no-floating-promises`; ruff `try-except-pass` and `blind-except`.
+**Check:** review-only; a reviewer reads the TypeScript and Python source in the diff. No gate runs it.
 
 ## ERR-4 — users never see an internal error
 
