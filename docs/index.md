@@ -158,13 +158,13 @@ the same shape of package but currently have no consumers to record.
 
 ## Code comments — `code-comments.md`
 
-| ID    | Gate      | Evidence                                                                                                                                           |
-| ----- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CMT-1 | `review`  | The diff                                                                                                                                           |
-| CMT-2 | `pending` | `docs-lint` DL009 (the letter-prefixed backlog-id shape) + `tools/ts/src/workItemReferenceGate.ts` (the `org/repo#N` shape, TypeScript audit only) |
-| CMT-3 | `auto`    | `tools/check-comment-blocks.sh`                                                                                                                    |
-| CMT-4 | `pending` | `tools/ts/src/commentRatioGate.ts` (TypeScript audit only)                                                                                         |
-| CMT-5 | `review`  | New docstrings in the diff                                                                                                                         |
+| ID    | Gate     | Evidence                                                                                                                                                                         |
+| ----- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CMT-1 | `review` | The diff                                                                                                                                                                         |
+| CMT-2 | `auto`   | `docs-lint` DL009 (the letter-prefixed backlog-id shape) + `tools/ts/src/workItemReferenceGate.ts` (the `org/repo#N` shape, TypeScript audit, listed in `tools/ts-promoted.tsv`) |
+| CMT-3 | `auto`   | `tools/check-comment-blocks.sh`                                                                                                                                                  |
+| CMT-4 | `auto`   | `tools/ts/src/commentRatioGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)                                                                                         |
+| CMT-5 | `review` | New docstrings in the diff                                                                                                                                                       |
 
 ## Testing and coverage — `testing.md`
 
@@ -221,14 +221,14 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 
 ## Dependencies — `dependencies.md`
 
-| ID    | Gate      | Encoded by |
-| ----- | --------- | ---------- |
-| DEP-3 | `pending` | —          |
-| DEP-4 | `pending` | —          |
-| DEP-5 | `pending` | —          |
-| DEP-6 | `review`  | —          |
-| DEP-7 | `review`  | —          |
-| DEP-8 | `pending` | —          |
+| ID    | Gate      | Encoded by                                |
+| ----- | --------- | ----------------------------------------- |
+| DEP-3 | `pending` | —                                         |
+| DEP-4 | `pending` | —                                         |
+| DEP-5 | `pending` | —                                         |
+| DEP-6 | `review`  | —                                         |
+| DEP-7 | `review`  | —                                         |
+| DEP-8 | `auto`    | `tools/ts/src/dependabotEcosystemGate.ts` |
 
 ## Repository settings — `repo-settings.md`
 
@@ -502,6 +502,7 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | TYP-3 | `review`  | New variables initialised from calls or expressions |
 | TYP-4 | `review`  | New type annotations in the diff                    |
 | TYP-5 | `pending` | —                                                   |
+| TYP-6 | `review`  | New source files in the diff                        |
 
 ## Error handling — `errors.md`
 

@@ -1,5 +1,3 @@
-**Bias for action.** Delivering something and failing fast leads to better progress and informed decision making. Do not agonise theoretically over the exact behaviour of a system which you can observe the behaviour of: run it in the cheapest real place (a test, a check-mode run, the live API, a pre-live host) and decide from what it does. The workspace `AUTHORISATIONS.md` and never-list still apply.
-
 # standards
 
 This repo holds branchLeft's engineering standards: prose in `docs/`, shared
@@ -23,7 +21,7 @@ internal-only shorthand.
 - **A rule needs a clause ID, and the ID never moves.** IDs survive file
   renames; filenames do not survive reorganisation.
   `tools/check-clause-index.sh` fails if a clause is defined without being
-  indexed, or indexed without being defined.
+  indexed.
 - **Every gate script carries a `--self-test`.** A matcher that silently stops
   matching reports a clean run, which is worse than reporting a failure. Prove
   the matcher still matches before trusting a pass.

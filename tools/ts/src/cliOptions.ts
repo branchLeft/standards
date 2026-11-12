@@ -8,7 +8,8 @@ export interface CliOptions {
    * runs directly. Without this, an audit run from a caller's checkout would
    * spawn every one of those scripts a second time and could fail the job on
    * a finding the direct run already decided — a decision that belongs to
-   * that direct run alone.
+   * that direct run alone. The name is historical: the TypeScript gates still
+   * run, and one whose clause is in `tools/ts-promoted.tsv` fails the run.
    */
   readonly advisoryOnly: boolean;
 }

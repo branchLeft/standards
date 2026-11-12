@@ -6,7 +6,7 @@ There are no default exports except React Router Framework Mode's route modules 
 
 **Why:** a default export has no canonical name, and a scoped override means a file that moves out of the route directory loses the exemption.
 
-**Check:** the `reactApp` preset in `@branchleft/eslint-config` implements it, but no application repo composes it yet ([`ADOPTION.md`](../../ADOPTION.md)).
+**Check:** the `reactApp` preset in `@branchleft/eslint-config` implements it ([`ADOPTION.md`](../../ADOPTION.md)).
 
 ## APP-2 — imports are absolute from the application root
 

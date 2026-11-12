@@ -50,7 +50,7 @@ weaker rule competing with them, and it would pass while either of them failed.
 That is also why `reporter` includes `json` and why `reportsDirectory` is fixed:
 so a gate reading `coverage/coverage-final.json` has an input it can rely on.
 
-**No such gate exists yet.** This package produces the artefact and stops there;
-both clauses are marked `pending` in the clause index. Setting this config does
-not put a coverage floor on your repo, and nothing today will tell you if
-coverage falls.
+**No coverage gate exists.** This package produces the artefact and stops there;
+`tools/check-coverage.sh` reads it as an advisory only, and both clauses are
+marked `pending` in the clause index. Setting this config does not put a
+coverage floor on your repo, and no gate fails if coverage falls.

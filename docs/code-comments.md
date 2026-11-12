@@ -14,7 +14,7 @@ A comment carries no ticket or story IDs, no people's names, no dated verificati
 
 **Why:** backlogs live outside every repo, so a backlog reference in shipped source dangles for every reader, external contributors included; the ID belongs in commit and PR metadata.
 
-**Check:** `docs-lint` DL009 for backlog-style IDs and `tools/ts/src/workItemReferenceGate.ts` for the `org/repo#N` shape (TypeScript audit only).
+**Check:** `docs-lint` DL009 for backlog-style IDs and `tools/ts/src/workItemReferenceGate.ts` for the `org/repo#N` shape (the TypeScript audit, which fails the Standards job).
 
 ## CMT-3 — a long comment moves to a doc
 
@@ -30,7 +30,7 @@ A file whose comment lines outnumber its code lines fails, docstrings counted as
 
 **Why:** such a file has become a design document with an implementation attached, and the prose and code drift apart.
 
-**Check:** `tools/ts/src/commentRatioGate.ts` (TypeScript audit only).
+**Check:** `tools/ts/src/commentRatioGate.ts` (the TypeScript audit, which fails the Standards job).
 
 ## CMT-5 — a docstring says what the signature can't
 
