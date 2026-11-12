@@ -13,3 +13,8 @@ CON-6 requires `cap_drop: [ALL]` (case-insensitive) and
 check that added-back capabilities (`cap_add`) each carry a reason — that's
 a review-only half of the clause a comment convention would have to encode,
 and no such convention exists yet.
+
+Both clauses fail a build: they are rows of `tools/ts-promoted.tsv` and the gate
+reports them through `findingPromotable`. A Compose service that cannot be
+hardened (a stand-in for a test, say) is exempted with `.standardsignore` or
+`standards-allow-next-line CON-5 <reason>`, never by editing the gate.

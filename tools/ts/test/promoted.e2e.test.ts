@@ -25,6 +25,31 @@ interface Fixture {
 }
 
 const DEPENDABOT_NPM_ONLY = 'version: 2\nupdates:\n  - package-ecosystem: "npm"\n';
+const DEPENDABOT_DOCKER = 'version: 2\nupdates:\n  - package-ecosystem: "docker"\n';
+
+// A pinned, hardened base: debian slim by tag and digest.
+const PINNED_BASE = `FROM debian:bookworm-slim@sha256:${'a'.repeat(64)}\n`;
+
+// One Compose service that meets every container clause, less the line a
+// fixture drops to break exactly one of them.
+function composeWithout(key: string): string {
+  return [
+    'services:',
+    '  app:',
+    `    image: app:1@sha256:${'b'.repeat(64)}`,
+    '    read_only: true',
+    '    cap_drop: [ALL]',
+    '    security_opt: [no-new-privileges:true]',
+    '    mem_limit: 64m',
+    '    cpus: 0.5',
+    '    pids_limit: 64',
+    '',
+  ]
+    .filter((line) => !line.trimStart().startsWith(`${key}:`))
+    .join('\n');
+}
+
+const DOCKER_ECOSYSTEM = { '.github/dependabot.yml': DEPENDABOT_DOCKER };
 
 // One entry per clause on the promoted list. A clause added to the list with
 // no entry here fails the "has a fixture" test below, so a promotion cannot
@@ -40,6 +65,39 @@ const FIXTURES: Readonly<Record<string, Fixture>> = {
     offender: 'a.ts',
     touch: 'export const b = 2;\n',
   },
+  'CON-3': {
+    files: {
+      Dockerfile: 'FROM debian:bookworm-slim\nUSER 1000\nHEALTHCHECK CMD true\n',
+      ...DOCKER_ECOSYSTEM,
+    },
+    offender: 'Dockerfile',
+    touch: '# touched\n',
+  },
+  'CON-4': {
+    files: { Dockerfile: `${PINNED_BASE}HEALTHCHECK CMD true\n`, ...DOCKER_ECOSYSTEM },
+    offender: 'Dockerfile',
+    touch: '# touched\n',
+  },
+  'CON-5': {
+    files: { 'compose.yml': composeWithout('read_only'), ...DOCKER_ECOSYSTEM },
+    offender: 'compose.yml',
+    touch: '# touched\n',
+  },
+  'CON-6': {
+    files: { 'compose.yml': composeWithout('cap_drop'), ...DOCKER_ECOSYSTEM },
+    offender: 'compose.yml',
+    touch: '# touched\n',
+  },
+  'CON-10': {
+    files: { 'compose.yml': composeWithout('pids_limit'), ...DOCKER_ECOSYSTEM },
+    offender: 'compose.yml',
+    touch: '# touched\n',
+  },
+  'CON-14': {
+    files: { Dockerfile: `${PINNED_BASE}USER 1000\n`, ...DOCKER_ECOSYSTEM },
+    offender: 'Dockerfile',
+    touch: '# touched\n',
+  },
   'DEP-8': {
     files: { Dockerfile: 'FROM scratch\n', '.github/dependabot.yml': DEPENDABOT_NPM_ONLY },
     offender: '.github/dependabot.yml',
@@ -47,11 +105,12 @@ const FIXTURES: Readonly<Record<string, Fixture>> = {
   },
 };
 
-// Not promoted, and breaking its own clause: a digestless image, with the
-// ecosystem listed so that DEP-8 stays quiet.
+// Not promoted, and breaking its own clause: CON-1, a base that is neither
+// hardened nor Debian slim. Pinned, non-root and healthy otherwise, with the
+// ecosystem listed so that the promoted clauses stay quiet.
 const ADVISORY_ONLY_REPO: Readonly<Record<string, string>> = {
-  Dockerfile: 'FROM node:22\n',
-  '.github/dependabot.yml': 'version: 2\nupdates:\n  - package-ecosystem: "docker"\n',
+  Dockerfile: `FROM node:22@sha256:${'a'.repeat(64)}\nUSER 1000\nHEALTHCHECK CMD true\n`,
+  ...DOCKER_ECOSYSTEM,
 };
 
 interface Run {
