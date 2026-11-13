@@ -21,6 +21,7 @@ import { EslintGate } from './eslintGate.ts';
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Gate } from './gate.ts';
 import { HealthcheckGate } from './healthcheckGate.ts';
+import { ImageScanExemptionGate } from './imageScanExemptionGate.ts';
 import { LintCoverageGate } from './lintCoverageGate.ts';
 import { MigrationClassifierGate } from './migrationClassifierGate.ts';
 import { PersonalDataGate } from './personalDataGate.ts';
@@ -70,5 +71,6 @@ export function buildAdvisoryGates(
     new ScannerWiringGate(ratchet, fs, toolsRoot),
     new DownloadChecksumGate(ratchet, fs, toolsRoot),
     new AgentRecordPathGate(ratchet, fs, toolsRoot),
+    new ImageScanExemptionGate(ratchet, fs),
   ];
 }

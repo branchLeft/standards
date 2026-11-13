@@ -36,11 +36,17 @@ A critical or high vulnerability in shipped code blocks merge and deploy, and th
 
 ## SEC-5 — an exemption expires
 
-A critical or high finding with no fix needs an exemption entry naming the finding, why it cannot be reached and a 30-day expiry, and an exemption for a critical finding needs the platform owner's approval.
+A critical or high finding in the image scan (`SEC-7`) that an update cannot clear is exempted by an entry in the repo's `.image-scan-exemptions.json`, never by a scanner flag, a config of the scanner's own or a removed check. The one file serves both cases: a finding with no fix (`kind: no-fix`) and a finding that is a false positive (`kind: false-positive`), for example a distro advisory whose stated fix is a lower version with a higher epoch. The reusable scan workflow reads the same shape for both. The file is `{ "exemptions": [ ... ] }`, and each entry has five parts:
 
-**Why:** without exemptions one unfixable upstream flaw freezes every deploy, and without an expiry an exemption becomes permanent.
+1. **The exact finding:** `vulnerability` (the advisory id), `package`, `version`, `image` and `digest` (`sha256:` and 64 hex digits), plus `severity` (`critical` or `high`). No wildcard, no tag in place of a digest, and a rebuilt image needs a new entry.
+2. **A reason with evidence:** `reason` says why the finding is safe to ship, and a `false-positive` also gives `evidence`, what shows it is false: the fixed-version comparison or the vendor's note.
+3. **A 30-day expiry:** `granted` and `expires` as `YYYY-MM-DD`, at most 30 days apart. After `expires` the scan fails on the finding again, and renewing is a new entry with fresh evidence.
+4. **An owner:** the file is covered by a CODEOWNERS line that names an owner.
+5. **Approval of a critical:** an entry with `severity: critical` records the platform owner's approval as `approval: { by, date, record }`, where `record` says where the approval is written down.
 
-**Check:** a script failing on an exemption past its expiry or missing a reason; CODEOWNERS on the exemptions file.
+**Why:** without exemptions one unfixable or mistaken upstream finding freezes every deploy, without an expiry an exemption becomes permanent, and without a fixed shape each repo invents its own ignore mechanism.
+
+**Check:** an advisory reader (`tools/ts/src/imageScanExemptionGate.ts`) refuses an entry missing any of the five parts, an entry past its expiry, and a file no CODEOWNERS owner covers; the clause stays `pending` until the gate class moves.
 
 ## SEC-6 — live images are re-scanned nightly
 

@@ -283,7 +283,7 @@ SEC-1	*	[none] a design judgement about environments, not one file type
 SEC-2	*	[none] same as SEC-1
 SEC-3	*	[none] same as SEC-1
 SEC-4	*	[none] applies to all shipped code, own logic included; the doc names no path
-SEC-5	*	[none] the exemptions file location is not yet fixed
+SEC-5	.image-scan-exemptions.json;*/.image-scan-exemptions.json	[doc] the exemptions file the clause names
 SEC-6	.github/workflows/*.yml;.github/workflows/*.yaml	[fleet] a scheduled workflow
 SEC-7	.github/workflows/*.yml;.github/workflows/*.yaml;*lock.yaml;*lock.json;*.lock	[fleet] the scan workflow and the lockfiles it reads
 SEC-8	.github/workflows/*.yml;.github/workflows/*.yaml;.pre-commit-config.yaml	[fleet] where the analysers run
