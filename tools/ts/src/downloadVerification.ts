@@ -6,7 +6,9 @@ const GH_RELEASE_DOWNLOAD = /\bgh\s+release\s+download\b/;
 const CURL_WRITES_FILE =
   /(?:^|\s)(?:-[A-Za-z]*[oO][A-Za-z]*|--output|--remote-name(?:-all)?|--remote-header-name)(?:\s|=|$)/;
 const PIPED_TO_RUNNER =
-  /\|\s*(?:sudo\s+)?(?:sh|bash|zsh|dash|tar|unzip|gunzip|zcat|bunzip2|xz|python3?|node|install|dpkg|apt(?:-get)?)\b/;
+  /\|\s*(?:sudo\s+(?:-\S+\s+)*)?(?:sh|bash|zsh|dash|tar|unzip|gunzip|zcat|bunzip2|xz|python3?|node|install|dpkg|apt(?:-get)?)\b/;
+const RUN_A_FETCH = /\b(?:eval|(?:ba|z|da)?sh(?:\s+-c)?|source)\s+["']?[$<]\(\s*curl(?:\s|$)/;
+const REDIRECT_TO_FILE = /(?:^|\s)1?>>?\s*(?!&|\/dev\/null(?:\s|$))\S/;
 const MOVABLE_URL = /\/releases\/latest\/download\//;
 const MOVABLE_GO_OR_NPM =
   /\b(?:go\s+install|npm\s+(?:i|install)|pnpm\s+(?:add|install)|yarn\s+(?:global\s+)?add)\b[^\n]*@latest\b/;
@@ -52,20 +54,35 @@ function logicalLines(body: string): readonly string[] {
     .filter((line) => line !== '');
 }
 
+/** True when the curl command on `line` has its stdout redirected to a file. */
+function curlRedirectsToFile(line: string): boolean {
+  const match = CURL.exec(line);
+  if (!match) {
+    return false;
+  }
+  // A redirect after a pipe belongs to the next command, not to curl.
+  const segment = line.slice(match.index + match[0].length).split(/\||;|&&|\)/)[0] ?? '';
+  return REDIRECT_TO_FILE.test(segment);
+}
+
 /** True when `body` fetches a file or an archive to run or unpack, as opposed to calling an API. */
 export function downloadsArtifact(body: string): boolean {
   return logicalLines(body).some((line) => {
-    if (WGET.test(line) || GH_RELEASE_DOWNLOAD.test(line)) {
+    if (WGET.test(line) || GH_RELEASE_DOWNLOAD.test(line) || RUN_A_FETCH.test(line)) {
       return true;
     }
-    return CURL.test(line) && (CURL_WRITES_FILE.test(line) || PIPED_TO_RUNNER.test(line));
+    return (
+      CURL.test(line) &&
+      (CURL_WRITES_FILE.test(line) || PIPED_TO_RUNNER.test(line) || curlRedirectsToFile(line))
+    );
   });
 }
 
 /** True when `body` pipes a download straight into a shell or an extractor, which leaves nothing to verify. */
 export function pipesDownloadIntoRunner(body: string): boolean {
   return logicalLines(body).some(
-    (line) => (WGET.test(line) || CURL.test(line)) && PIPED_TO_RUNNER.test(line)
+    (line) =>
+      RUN_A_FETCH.test(line) || ((WGET.test(line) || CURL.test(line)) && PIPED_TO_RUNNER.test(line))
   );
 }
 
