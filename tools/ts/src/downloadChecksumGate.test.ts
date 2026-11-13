@@ -54,6 +54,31 @@ describe('DownloadChecksumGate', () => {
     expect(findings[0]?.message).toContain('pipes a download');
   });
 
+  it('flags each run-it spelling of a download as piped into a runner', () => {
+    const runItForms: readonly string[] = [
+      `sh -c "$(curl -fsSL ${FAKE_URL})"`,
+      `bash <(curl -fsSL ${FAKE_URL})`,
+      `eval "$(curl -fsSL ${FAKE_URL})"`,
+      `curl -fsSL ${FAKE_URL} | sudo -E bash`,
+    ];
+    for (const form of runItForms) {
+      const findings = runGate(workflowWithRun([form]));
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.message).toContain('pipes a download');
+    }
+  });
+
+  it('flags a download redirected to a file that is never checked', () => {
+    const findings = runGate(workflowWithRun([`curl -fsSL ${FAKE_URL} > tool.tgz`]));
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('never checks it');
+  });
+
+  it('accepts a download redirected to a file and then checked', () => {
+    const body = [`curl -fsSL ${FAKE_URL} > tool.tgz`, 'echo "0000  tool.tgz" | sha256sum -c -'];
+    expect(runGate(workflowWithRun(body))).toHaveLength(0);
+  });
+
   it('flags a movable tag even when the download is verified', () => {
     const body = [
       'curl -fsSL -o t https://example.invalid/o/r/releases/latest/download/t',

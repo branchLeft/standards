@@ -47,6 +47,39 @@ describe('pipesDownloadIntoRunner', () => {
   });
 });
 
+describe('curl run, redirect and capture spellings', () => {
+  it('reads each as a download piped into a runner', () => {
+    const runItForms: readonly string[] = [
+      `sh -c "$(curl -fsSL ${FAKE_URL})"`,
+      `bash <(curl -fsSL ${FAKE_URL})`,
+      `eval "$(curl -fsSL ${FAKE_URL})"`,
+      `curl -fsSL ${FAKE_URL} | sudo -E bash`,
+    ];
+    for (const form of runItForms) {
+      expect(downloadsArtifact(form)).toBe(true);
+      expect(pipesDownloadIntoRunner(form)).toBe(true);
+    }
+  });
+
+  it('reads a redirect of curl output to a file as a download, not a pipe', () => {
+    const redirect = `curl -fsSL ${FAKE_URL} > tool.tgz`;
+    expect(downloadsArtifact(redirect)).toBe(true);
+    expect(pipesDownloadIntoRunner(redirect)).toBe(false);
+  });
+
+  it('does not read a captured or discarded curl as a download', () => {
+    const notDownloads: readonly string[] = [
+      'VERSION=$(curl -s https://example.invalid/api | jq -r .tag)',
+      'echo "$(curl -s https://example.invalid/api)"',
+      'curl -s https://example.invalid/api | jq . > out.json',
+      'curl -s https://example.invalid/health > /dev/null',
+    ];
+    for (const line of notDownloads) {
+      expect(downloadsArtifact(line)).toBe(false);
+    }
+  });
+});
+
 describe('usesMovableTag', () => {
   it('flags the latest release, @latest and a latest image tag', () => {
     expect(usesMovableTag('curl -L https://example.invalid/o/r/releases/latest/download/x')).toBe(
