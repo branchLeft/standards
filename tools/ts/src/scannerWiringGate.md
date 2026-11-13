@@ -21,6 +21,25 @@ value or a comment that only mentions the tool is never wiring. Text is
 normalised first (`workflowSteps.ts`): byte-order mark dropped, one line
 ending, comments stripped, case folded for `uses:` paths.
 
+A scanner that cannot fail the build is not wired. The reader splits a workflow
+into jobs and steps (`workflowWiring.ts`) and reads a step as not wired when:
+
+- the scanner's line ends in `|| true`, `|| :`, `|| exit 0`, `|| /bin/true`,
+  `|| echo ...` or `|| printf ...`, on the same command list (a continuation
+  line counts; another command's `|| true` does not);
+- the step, or the job holding it, sets `continue-on-error` to a literal
+  `true` (bare, quoted or `${{ true }}`);
+- the step, or the job holding it, has an `if:` that is a constant false:
+  `false`, `0`, `null`, `!true`, bare, quoted or inside `${{ }}`, or an `&&`
+  with such an operand. A job that calls a reusable workflow is read the same
+  way.
+
+A scanner run only in such places is reported as run "only where it cannot fail
+the build", not as missing, so the fix is clear. A live step anywhere in the
+repo's workflows or actions is enough; an expression that depends on the run
+(`matrix.x`, an `if:` on the event or branch) is never judged, and reads as
+live.
+
 ## What each clause asks
 
 - SEC-7: where a lockfile or Dockerfile is tracked, a workflow runs Grype, and
@@ -38,6 +57,10 @@ list reads as missing, which is the reason the lists are provisional. A bare
 `pre-commit run --all-files` with no hook id reads as wiring no particular
 scanner, because the reader cannot know which hooks the config holds. A repo
 that enables a scanner in the hosting platform's settings leaves no file to
-read. Whether a scanner fails the build on a finding, and whether SEC-8's
-analyser matches the repo's visibility, are not checked here: SEC-8 needs the
-repo's visibility from the platform and stays `pending`.
+read. Whether a scanner fails the build on a finding is read only as far as the
+shapes above: an action input that turns failure off (such as a scan action's
+`fail-build: false`), a Grype `--fail-on` threshold, `set +e` in a script, a
+pipe that hides an exit status, and a `continue-on-error` or `if:` written as a
+block scalar or flow mapping are not read. Whether SEC-8's analyser matches the
+repo's visibility is not checked either: it needs the repo's visibility from
+the platform and stays `pending`.

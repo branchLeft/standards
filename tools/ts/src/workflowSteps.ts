@@ -86,7 +86,8 @@ export function extractUsesValues(normalized: string): readonly string[] {
   return values;
 }
 
-function lastSegment(marker: string): string {
+/** The command a marker is run as: its last path segment (`anchore/scan-action` runs as `scan-action`). */
+export function markerCommand(marker: string): string {
   return marker.split('/').pop() ?? marker;
 }
 
@@ -117,20 +118,29 @@ export function runBodyInvokes(body: string, tool: string): boolean {
 }
 
 /**
- * True when `normalized` wires in any of `markers`: a step `uses:` it, or a
- * `run:` script invokes its last path segment. Case is folded, because
- * GitHub resolves action paths case-insensitively and a casing change must
- * not hide a tool.
+ * True when a step `uses:` one of `markers` (path match, case folded). Text
+ * holding several steps answers for all of them.
  */
-export function wiresInTool(normalized: string, markers: readonly string[]): boolean {
+export function usesWiresTool(normalized: string, markers: readonly string[]): boolean {
   const uses = extractUsesValues(normalized);
-  const bodies = extractRunSteps(normalized).map((step) => step.body);
   return markers.some((marker) => {
     const wanted = marker.toLowerCase();
     const usesPattern = new RegExp(`(^|/)${escapeRegExp(wanted)}($|[/\\-_.])`);
-    return (
-      uses.some((value) => usesPattern.test(value)) ||
-      bodies.some((body) => runBodyInvokes(body, lastSegment(wanted)))
-    );
+    return uses.some((value) => usesPattern.test(value));
   });
+}
+
+/**
+ * True when `normalized` mentions any of `markers` as wiring: a step `uses:`
+ * it, or a `run:` script invokes its last path segment. Case is folded,
+ * because GitHub resolves action paths case-insensitively and a casing change
+ * must not hide a tool. This does not ask whether the step can fail the
+ * build; `workflowWiring.ts` does.
+ */
+export function wiresInTool(normalized: string, markers: readonly string[]): boolean {
+  const bodies = extractRunSteps(normalized).map((step) => step.body);
+  return (
+    usesWiresTool(normalized, markers) ||
+    markers.some((marker) => bodies.some((body) => runBodyInvokes(body, markerCommand(marker))))
+  );
 }
