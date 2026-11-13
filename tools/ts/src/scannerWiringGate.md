@@ -13,11 +13,13 @@ does not exist yet, so the owner sets the real vocabulary.
 
 A tool is wired into CI when a step `uses:` a path ending in a marker, or a
 `run:` script invokes the marker as a command (at the start of a line, after
-`;`, `&&`, `|` or `sudo`, or as a `docker run` image). It is wired into
-pre-commit when a hook's `repo:`, `id:` or `entry:` names it. A step `name:`,
-an `echo`, an environment value or a comment that only mentions the tool is
-never wiring. Text is normalised first (`workflowSteps.ts`): byte-order mark
-dropped, one line ending, comments stripped, case folded for `uses:` paths.
+`;`, `&&`, `|` or `sudo`, behind leading `NAME=value` assignments, or as a
+`docker run` image). `pre-commit run <hook id>` counts as running that hook,
+with flags before or after the id. It is wired into pre-commit when a hook's
+`repo:`, `id:` or `entry:` names it. A step `name:`, an `echo`, an environment
+value or a comment that only mentions the tool is never wiring. Text is
+normalised first (`workflowSteps.ts`): byte-order mark dropped, one line
+ending, comments stripped, case folded for `uses:` paths.
 
 ## What each clause asks
 
@@ -32,7 +34,9 @@ dropped, one line ending, comments stripped, case folded for `uses:` paths.
 ## What it cannot see
 
 A scan that runs through a reusable workflow whose name is not in the marker
-list reads as missing, which is the reason the lists are provisional. A repo
+list reads as missing, which is the reason the lists are provisional. A bare
+`pre-commit run --all-files` with no hook id reads as wiring no particular
+scanner, because the reader cannot know which hooks the config holds. A repo
 that enables a scanner in the hosting platform's settings leaves no file to
 read. Whether a scanner fails the build on a finding, and whether SEC-8's
 analyser matches the repo's visibility, are not checked here: SEC-8 needs the

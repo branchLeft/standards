@@ -62,6 +62,14 @@ describe('ScannerWiringGate: CRED-11', () => {
     expect(findings).toHaveLength(0);
   });
 
+  it('accepts a hook run through pre-commit run in a workflow', () => {
+    const findings = runCred11({
+      [PRECOMMIT]: GITLEAKS_HOOK,
+      '.github/workflows/ci.yml': workflow('push', ['run: pre-commit run gitleaks --all-files']),
+    });
+    expect(findings).toHaveLength(0);
+  });
+
   it('flags a pre-commit config that only mentions gitleaks in a comment or a name', () => {
     const hook = [
       '# gitleaks soon',
@@ -119,6 +127,17 @@ describe('ScannerWiringGate: SEC-7', () => {
       '.github/workflows/ci.yml': workflow('[push, pull_request]', [
         'run: gitleaks detect',
         'uses: anchore/scan-action@v4',
+      ]),
+    });
+    expect(findings.filter((finding) => finding.clause === 'SEC-7')).toHaveLength(0);
+  });
+
+  it('accepts Grype run behind an environment assignment', () => {
+    const findings = runGate({
+      ...lockfileRepo,
+      '.github/workflows/ci.yml': workflow('[push, pull_request]', [
+        'run: gitleaks detect',
+        'run: GRYPE_DB_AUTO_UPDATE=false grype dir:.',
       ]),
     });
     expect(findings.filter((finding) => finding.clause === 'SEC-7')).toHaveLength(0);
