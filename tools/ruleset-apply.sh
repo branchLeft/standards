@@ -64,6 +64,16 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       # Read live once and feed the same bytes to the guard, so what is judged
       # is what is about to be overwritten.
       live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}")
+      # A read without admin rights omits bypass_actors rather than returning
+      # an empty list, so the guard cannot know whether a bypass exists. Stop
+      # here, loudly, whatever the flags: neither --allow-weakening nor
+      # --dry-run turns an unknown into a pass.
+      if ! printf '%s' "$live" | python3 -c 'import json, sys; sys.exit(0 if "bypass_actors" in json.load(sys.stdin) else 1)'; then
+        echo "  ERROR: cannot verify: token lacks admin read — the live ruleset ${id} on ${repo}" >&2
+        echo "  carries no bypass_actors key, so a bypass actor cannot be ruled out. Re-run" >&2
+        echo "  with a token that has admin read on the repo. No change was made." >&2
+        exit 1
+      fi
       guard_rc=0
       printf '%s' "$live" | python3 "$GUARD" "$payload" || guard_rc=$?
       if [ "$guard_rc" -eq 3 ]; then

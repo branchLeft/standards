@@ -47,6 +47,55 @@ run "check-coverage.sh"    bash "$TOOLS/check-coverage.sh" --self-test
 run "codeowners_ownership.py" python3 "$TOOLS/tests/codeowners_ownership.py" --self-test
 run "CODEOWNERS owns what it should" python3 "$TOOLS/tests/codeowners_ownership.py"
 
+# ruleset-apply.sh must stop loudly when a live read hides bypass_actors (a
+# token without admin read). A stub gh stands in for the API: the listing finds
+# the ruleset, the read returns it with or without the key, and any write is
+# recorded so the test can show none happened.
+apply_stub_gh() { # dir has_bypass_key; live is the committed payload, so only the key differs
+  local dir="$1" live
+  live="$(python3 -c '
+import json, sys
+d = json.load(open(sys.argv[1]))
+d["id"] = 1
+if sys.argv[2] != "yes":
+    del d["bypass_actors"]
+print(json.dumps(d))' "$TOOLS/../templates/rulesets/standards/main.json" "$2")" || return 1
+  printf '%s\n' "$live" > "$dir/live.json"
+  cat > "$dir/gh" <<STUB
+#!/usr/bin/env bash
+case "\$*" in
+  *"--method"*) echo "\$*" >> "$dir/writes"; echo "updated 1" ;;
+  *"/rulesets/1") cat "$dir/live.json" ;;
+  *"/rulesets") echo '[{"id": 1, "name": "Protect default branch"}]' ;;
+esac
+STUB
+  chmod +x "$dir/gh"
+}
+apply_stops_when_bypass_hidden() {
+  local d out rc=0 flags
+  d="$(mktemp -d)" || return 1
+  apply_stub_gh "$d" no
+  for flags in "" "--dry-run" "--allow-weakening"; do
+    # shellcheck disable=SC2086  # flags is one optional bare word
+    out="$(PATH="$d:$PATH" bash "$TOOLS/ruleset-apply.sh" $flags standards 2>&1)" && { echo "exit 0 with ${flags:-no flags}"; rc=1; }
+    case "$out" in *"cannot verify: token lacks admin read"*) ;; *) echo "no loud message with ${flags:-no flags}: $out"; rc=1 ;; esac
+  done
+  [ ! -e "$d/writes" ] || { echo "a write was attempted"; rc=1; }
+  rm -rf "${d:?}"
+  return "$rc"
+}
+apply_proceeds_when_bypass_visible() {
+  local d out rc=0
+  d="$(mktemp -d)" || return 1
+  apply_stub_gh "$d" yes
+  out="$(PATH="$d:$PATH" bash "$TOOLS/ruleset-apply.sh" --dry-run standards 2>&1)" || rc=1
+  case "$out" in *"cannot verify"*) echo "refused although bypass_actors was present: $out"; rc=1 ;; esac
+  rm -rf "${d:?}"
+  return "$rc"
+}
+run "ruleset-apply.sh stops when bypass_actors is hidden" apply_stops_when_bypass_hidden
+run "ruleset-apply.sh proceeds when bypass_actors is readable" apply_proceeds_when_bypass_visible
+
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
 
