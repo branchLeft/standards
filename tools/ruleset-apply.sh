@@ -50,32 +50,49 @@ for repo in "${repos[@]}"; do
     # and gh puts the error body on stdout, which is a non-empty $id that then
     # fails at the PUT and takes the whole run down with it under `set -e` —
     # including the repos later in the alphabet that had nothing wrong.
-    listing=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
+    listing_rc=0
+    listing=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || listing_rc=$?
     if grep -q "Upgrade to GitHub Pro" <<< "$listing"; then
       echo "  skipped: rulesets are unreadable on this repo (private, GitHub Free)"
       continue
     fi
+    if [ "$listing_rc" -ne 0 ]; then
+      echo "  ERROR: \`gh api repos/branchLeft/${repo}/rulesets\` failed (exit ${listing_rc}):" >&2
+      printf '    %s\n' "$listing" >&2
+      exit 1
+    fi
     id=$(printf '%s' "$listing" | python3 -c '
 import json, sys
 want = sys.argv[1]
-print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "$want_name")
+print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "$want_name") || {
+      echo "  ERROR: could not read the ruleset listing for ${repo} as JSON:" >&2
+      printf '    %s\n' "$listing" >&2
+      exit 1
+    }
 
     if [ -n "$id" ]; then
       # Read live once and feed the same bytes to the guard, so what is judged
       # is what is about to be overwritten.
-      live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}")
+      live_rc=0
+      live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}" 2>&1) || live_rc=$?
+      if [ "$live_rc" -ne 0 ]; then
+        echo "  ERROR: \`gh api repos/branchLeft/${repo}/rulesets/${id}\` failed (exit ${live_rc}):" >&2
+        printf '    %s\n' "$live" >&2
+        exit 1
+      fi
       # A read without admin rights omits bypass_actors rather than returning
       # an empty list, so the guard cannot know whether a bypass exists. Stop
       # here, loudly, whatever the flags: neither --allow-weakening nor
       # --dry-run turns an unknown into a pass.
-      if ! printf '%s' "$live" | python3 -c 'import json, sys; sys.exit(0 if "bypass_actors" in json.load(sys.stdin) else 1)'; then
+      if ! printf '%s' "$live" | python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("bypass_actors") is not None else 1)' 2>/dev/null; then
         echo "  ERROR: cannot verify: token lacks admin read — the live ruleset ${id} on ${repo}" >&2
-        echo "  carries no bypass_actors key, so a bypass actor cannot be ruled out. Re-run" >&2
+        echo "  carries no usable bypass_actors value, so a bypass actor cannot be ruled out. Re-run" >&2
         echo "  with a token that has admin read on the repo. No change was made." >&2
         exit 1
       fi
       guard_rc=0
-      printf '%s' "$live" | python3 "$GUARD" "$payload" || guard_rc=$?
+      # The findings go to stderr: they are what the operator has to read.
+      printf '%s' "$live" | python3 "$GUARD" "$payload" >&2 || guard_rc=$?
       if [ "$guard_rc" -eq 3 ]; then
         echo "  REFUSED: the guard could not classify the difference against live ${id}." >&2
         echo "  --allow-weakening does not cover this. Resolve it by hand." >&2

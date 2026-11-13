@@ -115,11 +115,11 @@ def bypass_actors(ruleset):
     """Bypass actors as a map, or None when the ruleset does not say.
 
     GitHub omits the `bypass_actors` key from a read made without admin rights
-    instead of returning an empty list, so an absent key is unknown and an
-    empty list is none. Reading the first as the second turns a hidden bypass
+    instead of returning an empty list, so an absent or null key is unknown and
+    an empty list is none. Reading the first as the second turns a hidden bypass
     into a clean pass.
     """
-    if "bypass_actors" not in ruleset:
+    if ruleset.get("bypass_actors") is None:
         return None
     return {
         (a["actor_type"], a.get("actor_id")): a.get("bypass_mode")
@@ -414,20 +414,28 @@ def self_test():
     # unclassified kind so `--allow-weakening` cannot wave it through.
     hidden = json.loads(json.dumps(base))
     del hidden["bypass_actors"]
+    nulled = json.loads(json.dumps(base))
+    nulled["bypass_actors"] = None
     unknown = "cannot verify: token lacks admin read"
     for name, payload in [
         ("live hides bypass_actors, identical payload", base),
         ("live hides bypass_actors, payload with no bypass", mutate(lambda rs: rs.__setitem__("bypass_actors", []))),
         ("live hides bypass_actors, payload without the key", hidden),
     ]:
-        found = weakenings(hidden, payload)
-        texts = [text for text, _ in found]
-        if not any(unknown in text for text in texts):
-            print(f"  FAIL {name}: expected {unknown!r} in {texts}")
-            rc = 1
-        if exit_code(found) != UNCLASSIFIED:
-            print(f"  FAIL {name}: expected exit {UNCLASSIFIED}, got {exit_code(found)}")
-            rc = 1
+        for live_name, live in [("absent", hidden), ("null", nulled)]:
+            try:
+                found = weakenings(live, payload)
+            except Exception as err:  # a crash is a failure, not a refusal
+                print(f"  FAIL {name} ({live_name}): raised {err!r}")
+                rc = 1
+                continue
+            texts = [text for text, _ in found]
+            if not any(unknown in text for text in texts):
+                print(f"  FAIL {name} ({live_name}): expected {unknown!r} in {texts}")
+                rc = 1
+            if exit_code(found) != UNCLASSIFIED:
+                print(f"  FAIL {name} ({live_name}): expected exit {UNCLASSIFIED}, got {exit_code(found)}")
+                rc = 1
     # An empty list is a real answer (admin read, no actors): it stays a pass.
     if weakenings(mutate(lambda rs: rs.__setitem__("bypass_actors", [])), base) != [
         ("bypass_actors: payload adds OrganizationAdmin (pull_request)", True)

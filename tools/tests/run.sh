@@ -35,6 +35,7 @@ run "standards-audit.sh"   bash "$TOOLS/standards-audit.sh" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
+run "ruleset_normalize.py"  python3 "$TOOLS/ruleset_normalize.py" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
 run "check-docs-site.sh"   bash "$TOOLS/check-docs-site.sh" --self-test
 # check-coverage.sh: self-tested like every other gate, but deliberately
@@ -93,7 +94,55 @@ apply_proceeds_when_bypass_visible() {
   rm -rf "${d:?}"
   return "$rc"
 }
+# The same stop for a null value, and the second half of "fail loudly": a failing
+# API call names its command on stderr and exits non-zero, and the guard's
+# findings reach stderr rather than vanishing.
+apply_stops_when_bypass_null() {
+  local d out rc=0
+  d="$(mktemp -d)" || return 1
+  apply_stub_gh "$d" yes
+  sed -i.bak 's/"bypass_actors": \[[^]]*\]/"bypass_actors": null/' "$d/live.json"
+  grep -q '"bypass_actors": null' "$d/live.json" || { echo "stub edit matched nothing"; rm -rf "${d:?}"; return 1; }
+  out="$(PATH="$d:$PATH" bash "$TOOLS/ruleset-apply.sh" --allow-weakening standards 2>&1)" && { echo "exit 0 on a null bypass_actors"; rc=1; }
+  case "$out" in *"cannot verify: token lacks admin read"*) ;; *) echo "no loud message: $out"; rc=1 ;; esac
+  [ ! -e "$d/writes" ] || { echo "a write was attempted"; rc=1; }
+  rm -rf "${d:?}"
+  return "$rc"
+}
+apply_stops_when_api_fails() { # which: listing | read
+  local d out rc=0 want
+  d="$(mktemp -d)" || return 1
+  apply_stub_gh "$d" yes
+  if [ "$1" = listing ]; then
+    want='api repos/branchLeft/standards/rulesets`'
+    sed -i.bak 's|\*"/rulesets") echo.*|*"/rulesets") echo "HTTP 502 bad gateway" >\&2; exit 1 ;;|' "$d/gh"
+  else
+    want='api repos/branchLeft/standards/rulesets/1`'
+    sed -i.bak 's|\*"/rulesets/1") cat.*|*"/rulesets/1") echo "HTTP 502 bad gateway" >\&2; exit 1 ;;|' "$d/gh"
+  fi
+  if cmp -s "$d/gh" "$d/gh.bak"; then echo "stub edit matched nothing"; rm -rf "${d:?}"; return 1; fi
+  out="$(PATH="$d:$PATH" bash "$TOOLS/ruleset-apply.sh" standards 2>&1 >/dev/null)" && { echo "exit 0 when the API call fails ($1)"; rc=1; }
+  case "$out" in *"$want"*"502"*) ;; *) echo "stderr does not name the failing command ($1): $out"; rc=1 ;; esac
+  [ ! -e "$d/writes" ] || { echo "a write was attempted"; rc=1; }
+  rm -rf "${d:?}"
+  return "$rc"
+}
+apply_findings_reach_stderr() {
+  local d out rc=0
+  d="$(mktemp -d)" || return 1
+  apply_stub_gh "$d" yes
+  sed -i.bak 's/"bypass_actors": \[[^]]*\]/"bypass_actors": []/' "$d/live.json"
+  # live carries no bypass actor and the payload adds one: a reduction to report.
+  out="$(PATH="$d:$PATH" bash "$TOOLS/ruleset-apply.sh" --dry-run standards 2>&1 >/dev/null)" && { echo "exit 0 on a reduction"; rc=1; }
+  case "$out" in *"payload adds OrganizationAdmin"*) ;; *) echo "the finding did not reach stderr: $out"; rc=1 ;; esac
+  rm -rf "${d:?}"
+  return "$rc"
+}
 run "ruleset-apply.sh stops when bypass_actors is hidden" apply_stops_when_bypass_hidden
+run "ruleset-apply.sh stops when bypass_actors is null" apply_stops_when_bypass_null
+run "ruleset-apply.sh fails loudly when the listing call fails" apply_stops_when_api_fails listing
+run "ruleset-apply.sh fails loudly when the live read fails" apply_stops_when_api_fails read
+run "ruleset-apply.sh prints guard findings to stderr" apply_findings_reach_stderr
 run "ruleset-apply.sh proceeds when bypass_actors is readable" apply_proceeds_when_bypass_visible
 
 echo "docs:"

@@ -52,7 +52,7 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
     fi
 
     drift=$(diff <(python3 "$NORMALIZE" < "$payload") \
-                 <(gh api "repos/branchLeft/${repo}/rulesets/${id}" | python3 "$NORMALIZE") || true)
+                 <(gh api "repos/branchLeft/${repo}/rulesets/${id}" | python3 "$NORMALIZE" --live) || true)
     if [ -z "$drift" ]; then
       echo "  ok: ${want_name} (${id})"
     else
