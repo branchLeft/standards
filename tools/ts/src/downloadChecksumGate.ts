@@ -1,6 +1,7 @@
 import {
   DEFAULT_VERIFICATION_COMMANDS,
   downloadsArtifact,
+  isLoopbackProbe,
   pipesDownloadIntoRunner,
   usesMovableTag,
   verifiesDownload,
@@ -21,6 +22,9 @@ function downloadProblem(body: string, verifiers: readonly string[]): string | u
   }
   if (pipesDownloadIntoRunner(body)) {
     return 'this step pipes a download straight into a shell or extractor, so nothing can verify it first';
+  }
+  if (isLoopbackProbe(body)) {
+    return undefined;
   }
   return verifiesDownload(body, verifiers)
     ? undefined

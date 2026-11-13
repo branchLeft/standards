@@ -128,6 +128,57 @@ describe('DownloadChecksumGate', () => {
     expect(runGate(action, '.github/actions/setup/action.yml')).toHaveLength(1);
   });
 
+  it('accepts a loopback health probe that writes its response to stdout', () => {
+    const probes: readonly string[] = [
+      'wget -qO- http://127.0.0.1:8080/health',
+      'wget -qO- http://localhost:8080/health',
+      'curl -fsS http://127.0.0.1:8080/health',
+      'curl -fsS http://localhost:8080/health',
+      'curl -fsS http://[::1]:8080/health',
+      'wget -q -O - http://[::1]:8080/health',
+    ];
+    for (const probe of probes) {
+      expect(runGate(workflowWithRun([probe]))).toHaveLength(0);
+    }
+  });
+
+  it('flags a loopback probe that writes a file to disk', () => {
+    const writes: readonly string[] = [
+      'curl -fsS -o health.json http://127.0.0.1:8080/health',
+      'wget http://127.0.0.1:8080/health',
+      'curl -fsS http://127.0.0.1:8080/health > health.json',
+    ];
+    for (const write of writes) {
+      expect(runGate(workflowWithRun([write]))).toHaveLength(1);
+    }
+  });
+
+  it('flags a loopback probe piped into a shell', () => {
+    const findings = runGate(workflowWithRun(['curl -fsS http://127.0.0.1:8080/setup | sh']));
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('pipes a download');
+  });
+
+  it('flags a remote download even when it is written to stdout', () => {
+    expect(runGate(workflowWithRun([`wget -qO- ${FAKE_URL}`]))).toHaveLength(1);
+  });
+
+  it('does not treat a loopback-looking host name as loopback', () => {
+    const lookalikes: readonly string[] = [
+      'wget -qO- http://127.0.0.1.example.invalid/tool',
+      'curl -fsS -o tool http://127.0.0.1@example.invalid/tool',
+      'curl -fsS -o tool http://localhost.example.invalid/tool',
+    ];
+    for (const lookalike of lookalikes) {
+      expect(runGate(workflowWithRun([lookalike]))).toHaveLength(1);
+    }
+  });
+
+  it('flags a step that mixes a loopback probe with a remote download', () => {
+    const body = ['curl -fsS http://127.0.0.1:8080/health', `wget -qO- ${FAKE_URL}`];
+    expect(runGate(workflowWithRun(body))).toHaveLength(1);
+  });
+
   it('reports nothing for a step that downloads nothing', () => {
     expect(runGate(workflowWithRun(['make build']))).toHaveLength(0);
   });
