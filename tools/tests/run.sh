@@ -245,12 +245,14 @@ bounded() { # seconds command...
   fi
 }
 
+HANG_GUARD_SECONDS=120
+
 # Runs the checker on arguments the caller chooses, with a timeout so a checker
 # that blocks on a FIFO fails the fixture instead of hanging the run.
 refused_directly() { # expected_exit expected_message args...
   local expected_exit="$1" expected_message="$2" output rc
   shift 2
-  output="$(bounded 10 bash "$TOOLS/tests/check_audit_shape.sh" "$@" 2>&1)"
+  output="$(bounded "$HANG_GUARD_SECONDS" bash "${SHAPE_CHECKER:-$TOOLS/tests/check_audit_shape.sh}" "$@" 2>&1)"
   rc=$?
   [ "$rc" -eq "$expected_exit" ] || return 1
   case "$output" in *"$expected_message"*) return 0 ;; esac
@@ -470,6 +472,13 @@ fifo_is_refused() {
   rm -f "$path" && mkfifo "$path" && refused_directly 1 "not a regular file: $path" "$path" "$REAL_AUDIT"
 }
 run "shape check: a FIFO given as the workflow is refused without blocking" fifo_is_refused
+
+slow_checker_is_refused() {
+  local wrapper="$fixture_dir/slow-check-audit-shape.sh"
+  printf '#!/usr/bin/env bash\nsleep 11\nexec bash "%s" "$@"\n' "$TOOLS/tests/check_audit_shape.sh" > "$wrapper" || return 1
+  SHAPE_CHECKER="$wrapper" refused_directly 2 'usage: check_audit_shape.sh'
+}
+run "shape check: a checker that starts 11 seconds late is still judged on its exit" slow_checker_is_refused
 
 # Wiring sabotage: each fixture is an edited copy of the real standards.yml
 # (edited_copy rejects a sed that matches nothing), so the wiring test is

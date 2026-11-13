@@ -134,6 +134,8 @@ in_declared_tooling() {
 DEFAULT_CEILING_SECONDS=120
 POLL_INTERVAL_SECONDS=0.2
 POLLS_PER_SECOND=5
+SELFTEST_STOP_BOUND_SECONDS=60
+SELFTEST_SLOW_START_SECONDS=11
 SCAN_COMPLETE_MARKER="check-raw-sql: scan-complete"
 SCAN_PID=""
 SCAN_FILE_COUNT=0
@@ -558,21 +560,26 @@ check_ceiling_value() {
   return 0
 }
 
-check_ceiling() {
-  local base="$1" small="$2" work="$1/ceiling" last_file gate_status
-  mkdir -p "$work"
-  check_ceiling_value "$small" "$work" || return 1
+check_ceiling_stop() {
+  local work="$1" small="$2" last_file gate_status
   last_file=$(cd "$small" && git ls-files | grep -E '\.(ts|tsx|js|py)$' | tail -n 1)
-  CHECK_RAW_SQL_CEILING_SECONDS=1 run_gate_standin hang "$small" 6 "$work" --mode enforce
+  CHECK_RAW_SQL_CEILING_SECONDS=1 run_gate_standin hang "$small" "$SELFTEST_STOP_BOUND_SECONDS" "$work" --mode enforce
   gate_status=$?
   kill_recorded_pids "$work/standin" "$work/sleep"
   [ "$gate_status" -eq 124 ] \
-    || { echo "FAIL: a scan past the 1 second ceiling did not make the gate exit 124 within 6 seconds (status $gate_status)"; return 1; }
+    || { echo "FAIL: a scan past the 1 second ceiling did not make the gate exit 124 within ${SELFTEST_STOP_BOUND_SECONDS} seconds (status $gate_status)"; return 1; }
   grep -q '^check-raw-sql: ceiling of 1 seconds' "$work/err" \
     || { echo "FAIL: the ceiling stop printed no 'check-raw-sql: ceiling' line giving the seconds"; return 1; }
   grep -qF "$last_file" "$work/err" \
     || { echo "FAIL: the ceiling stop did not name the file the scan had reached"; return 1; }
   return 0
+}
+
+check_ceiling() {
+  local base="$1" small="$2" work="$1/ceiling"
+  mkdir -p "$work"
+  check_ceiling_value "$small" "$work" || return 1
+  check_ceiling_stop "$work" "$small"
 }
 
 check_sigterm_body() {
@@ -588,7 +595,7 @@ check_sigterm_body() {
   gate_pid=$!
   echo "$gate_pid" > "$work/gate"
   while [ ! -f "$work/sleep" ] || [ ! -f "$work/standin" ] || [ -z "$(find "$work/tmp" -name scan-progress)" ]; do
-    [ "$polls" -lt $((10 * POLLS_PER_SECOND)) ] \
+    [ "$polls" -lt $((SELFTEST_STOP_BOUND_SECONDS * POLLS_PER_SECOND)) ] \
       || { echo "FAIL: the SIGTERM case's scan never reached its hang"; return 1; }
     sleep "$POLL_INTERVAL_SECONDS"
     polls=$((polls + 1))
@@ -596,8 +603,8 @@ check_sigterm_body() {
   kill -TERM "$gate_pid"
   polls=0
   until is_process_gone "$gate_pid" && is_process_gone "$(cat "$work/standin")" && is_process_gone "$(cat "$work/sleep")"; do
-    [ "$polls" -lt $((5 * POLLS_PER_SECOND)) ] \
-      || { echo "FAIL: 5 seconds after SIGTERM the gate, its scan or the scan's child was still running"; return 1; }
+    [ "$polls" -lt $((SELFTEST_STOP_BOUND_SECONDS * POLLS_PER_SECOND)) ] \
+      || { echo "FAIL: ${SELFTEST_STOP_BOUND_SECONDS} seconds after SIGTERM the gate, its scan or the scan's child was still running"; return 1; }
     sleep "$POLL_INTERVAL_SECONDS"
     polls=$((polls + 1))
   done
@@ -619,6 +626,15 @@ check_sigterm() {
   return "$status"
 }
 
+check_slow_start() {
+  local base="$1" small="$2" work="$1/slow-start" wrapper="$1/slow-start/slow-gate.sh"
+  mkdir -p "$work"
+  printf '#!/usr/bin/env bash\nsleep %s\nexec bash "%s" "$@"\n' "$SELFTEST_SLOW_START_SECONDS" "$CHECK_SCRIPT" > "$wrapper"
+  chmod +x "$wrapper"
+  CHECK_SCRIPT="$wrapper" check_ceiling_stop "$work" "$small" || return 1
+  CHECK_SCRIPT="$wrapper" check_sigterm "$work" "$small"
+}
+
 run_scan_self_tests() {
   local base="$1/scan-cases"
   # Git exports GIT_INDEX_FILE and GIT_DIR to a hook. These cases run the gate and
@@ -638,6 +654,7 @@ run_scan_self_tests() {
   check_scan_fails_closed "$base" "$base/small" || return 1
   check_ceiling "$base" "$base/small" || return 1
   check_sigterm "$base" "$base/small" || return 1
+  check_slow_start "$base" "$base/small" || return 1
   return 0
 }
 
