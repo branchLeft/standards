@@ -71,6 +71,23 @@ describe('classifyCommentLines — python', () => {
   });
 });
 
+describe('classifyCommentLines — python, a string closed by a comma or paren', () => {
+  it.each([
+    { opener: '"""', closer: '""",' },
+    { opener: '"""', closer: '""")' },
+    { opener: "'''", closer: "'''," },
+    { opener: "'''", closer: "''')" },
+  ])('closes a string opened with $opener and closed with $closer', ({ opener, closer }) => {
+    const lines = [opener, 'fixture text', closer, 'x = 1', 'y = 2'];
+    expect(classifyCommentLines(lines, 'pyhash')).toEqual([true, true, true, false, false]);
+  });
+
+  it('keeps a string open when its closer is followed by other code', () => {
+    const lines = ['"""', 'text', '""" + suffix', 'x = 1'];
+    expect(classifyCommentLines(lines, 'pyhash')).toEqual([true, true, true, true]);
+  });
+});
+
 describe('classifyCommentLines — shell', () => {
   it('excludes a line-1 shebang and flags # lines after it', () => {
     const lines = ['#!/usr/bin/env bash', '# narrative', 'echo hi'];

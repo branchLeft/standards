@@ -72,7 +72,8 @@ function classifyHashStyle(lines: readonly string[], pyish: boolean): boolean[] 
     } else if (inDocument) {
       isComment = true;
       const at = text.indexOf(documentDelimiter);
-      if (at >= 0 && trim(text.slice(at + 3)) === '') inDocument = false;
+      // A comma or paren after the closer still closes it: the string was a call argument.
+      if (at >= 0 && /^(?:[,)].*)?$/.test(trim(text.slice(at + 3)))) inDocument = false;
     } else if (text.startsWith('#')) {
       isComment = true;
     } else if (pyish && (text.startsWith(DOUBLE_QUOTE_DOC) || text.startsWith(SINGLE_QUOTE_DOC))) {
