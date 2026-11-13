@@ -63,11 +63,11 @@ STUB
 
   check "healthy live passes" 0 "$list" 0 "$good" "" 0 "dry run: would update 7"
   check "listing 403 fails loudly" 1 'HTTP 403: Resource not accessible' 0 "$good" "" nonzero \
-    "gh api repos/branchLeft/demo/rulesets failed"
+    'gh api repos/branchLeft/demo/rulesets` failed'
   check "unparseable listing fails loudly" 0 'not json' 0 "$good" "" nonzero \
     "could not read the ruleset listing for demo"
   check "failed live read fails loudly" 0 "$list" 1 'HTTP 404' "" nonzero \
-    "gh api repos/branchLeft/demo/rulesets/7 failed"
+    'gh api repos/branchLeft/demo/rulesets/7` failed'
   check "hidden bypass list is refused, naming the scope" 0 "$list" 0 "$hidden" "" nonzero \
     "Administration: read"
   check "hidden bypass list ends in a REFUSED line" 0 "$list" 0 "$hidden" "" nonzero \
@@ -156,7 +156,7 @@ for repo in "${repos[@]}"; do
       continue
     fi
     if [ "$listing_rc" -ne 0 ]; then
-      echo "  FAILED: gh api repos/branchLeft/${repo}/rulesets failed (exit ${listing_rc}):" >&2
+      echo "  FAILED: \`gh api repos/branchLeft/${repo}/rulesets\` failed (exit ${listing_rc}):" >&2
       printf '%s\n' "$listing" | sed 's/^/    /' >&2
       exit 1
     fi
@@ -177,7 +177,7 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       live_rc=0
       live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}" 2>&1) || live_rc=$?
       if [ "$live_rc" -ne 0 ]; then
-        echo "  FAILED: gh api repos/branchLeft/${repo}/rulesets/${id} failed (exit ${live_rc}):" >&2
+        echo "  FAILED: \`gh api repos/branchLeft/${repo}/rulesets/${id}\` failed (exit ${live_rc}):" >&2
         printf '%s\n' "$live" | sed 's/^/    /' >&2
         exit 1
       fi

@@ -26,11 +26,20 @@ POST. Use it to exercise this script: there is otherwise no way to see what
 the guard makes of a payload except by performing the write, and a run that
 reaches the guard's override path performs a real one.
 
+## Stops that no flag covers
+
+A live read made without admin rights omits `bypass_actors` (or returns null, or
+anything that is not a list). That is unknown, not none: the guard reports
+`cannot verify: token lacks admin read` as a finding it could not classify (exit
+3), and the script refuses with no write. Neither `--dry-run` nor
+`--allow-weakening` changes this; re-run with a token that has Administration:
+read on the repo. `ruleset-audit.sh` shows the same condition as drift on the
+`bypass_actors` line rather than comparing it as an empty list.
+
 Every failure is loud and on stderr. A listing or live read that fails, or a
-listing that is not a JSON list, stops the run with the failing `gh api` call
-named and the response shown; the guard's findings are printed there too, so a
-refusal always says why. A live ruleset read with the bypass list hidden (a token
-without Administration: read on the repo) is refused as unclassified; run with a
-token that can see it. The override applies only when the guard exits exactly 1;
-any other non-zero status, including a crash or a usage error, is refused like
-exit 3. `--self-test` exercises these paths against a stubbed `gh`.
+listing that is not a JSON list, stops the run with exit 1, the failing
+`gh api` call named and the response shown; the guard's findings are printed
+there too, so a refusal always says why, and a captured stderr holds everything
+the operator has to act on. The override applies only when the guard exits
+exactly 1; any other non-zero status, including a crash or a usage error, is
+refused like exit 3. `--self-test` exercises these paths against a stubbed `gh`.
