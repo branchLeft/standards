@@ -28,15 +28,18 @@ reaches the guard's override path performs a real one.
 
 ## Stops that no flag covers
 
-A live read made without admin rights omits `bypass_actors` (or returns null).
-That is unknown, not none, so the script stops before the guard runs, prints
-`cannot verify: token lacks admin read` to stderr and exits 1, with no write.
-Neither `--dry-run` nor `--allow-weakening` changes this; re-run with a token
-that has admin read on the repo. The guard reports the same condition as a
-finding it could not classify (exit 3), and `ruleset-audit.sh` shows it as
-drift on the `bypass_actors` line rather than comparing it as an empty list.
+A live read made without admin rights omits `bypass_actors` (or returns null, or
+anything that is not a list). That is unknown, not none: the guard reports
+`cannot verify: token lacks admin read` as a finding it could not classify (exit
+3), and the script refuses with no write. Neither `--dry-run` nor
+`--allow-weakening` changes this; re-run with a token that has Administration:
+read on the repo. `ruleset-audit.sh` shows the same condition as drift on the
+`bypass_actors` line rather than comparing it as an empty list.
 
-A failing `gh api` call (the listing or the live read), or a listing that is not
-JSON, also stops the run with exit 1. The error names the failing command and
-carries gh's own output. The guard's findings go to stderr, so a captured
-stderr holds everything the operator has to act on.
+Every failure is loud and on stderr. A listing or live read that fails, or a
+listing that is not a JSON list, stops the run with exit 1, the failing
+`gh api` call named and the response shown; the guard's findings are printed
+there too, so a refusal always says why, and a captured stderr holds everything
+the operator has to act on. The override applies only when the guard exits
+exactly 1; any other non-zero status, including a crash or a usage error, is
+refused like exit 3. `--self-test` exercises these paths against a stubbed `gh`.

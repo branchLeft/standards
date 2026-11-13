@@ -109,6 +109,12 @@ def compare_value(live, payload, path, findings):
 
 
 UNKNOWN_BYPASS = "cannot verify: token lacks admin read"
+HIDDEN_BYPASS = (
+    f"{UNKNOWN_BYPASS}: live ruleset has no readable `bypass_actors` list; GitHub "
+    "omits it unless the token has Administration: read on the repository (admin "
+    "on the repo), so the live bypass list is unknown, not empty — re-read with a "
+    "token that has it"
+)
 
 
 def bypass_actors(ruleset):
@@ -161,13 +167,15 @@ def weakenings(live, payload):
     for rtype in sorted(set(live_rules) & set(payload_rules)):
         compare_value(live_rules[rtype], payload_rules[rtype], f"rules.{rtype}", findings)
 
-    live_bypass, payload_bypass = bypass_actors(live), bypass_actors(payload)
-    if live_bypass is None:
-        unclassified(
-            findings,
-            f"bypass_actors: {UNKNOWN_BYPASS} (the live read carries no bypass_actors key)",
-        )
+    # Absent is not empty: a token without admin on the repo gets the ruleset
+    # back with the key stripped. Comparing against "none" would refuse a
+    # payload for adding an actor live already has, and would wave through one
+    # that escalates an actor the token could not see.
+    if not isinstance(live.get("bypass_actors"), list):
+        unclassified(findings, HIDDEN_BYPASS)
         return findings
+
+    live_bypass, payload_bypass = bypass_actors(live), bypass_actors(payload)
     # A committed payload may omit the key to mean no bypass actor.
     payload_bypass = payload_bypass or {}
     for actor, mode in sorted(payload_bypass.items(), key=str):
@@ -393,7 +401,77 @@ def self_test():
         ),
     ]
 
+    def hidden(fn=None):
+        live = json.loads(json.dumps(base))
+        del live["bypass_actors"]
+        if fn:
+            fn(live)
+        return live
+
+    # (case, live, payload, expected text, exit code). The default is the
+    # stripped live read a non-admin token gets, and it must never read as none.
+    hidden_cases = [
+        (
+            "live hides bypass_actors, payload re-states the actor",
+            hidden(),
+            base,
+            [HIDDEN_BYPASS],
+            3,
+        ),
+        (
+            "live hides bypass_actors, payload carries none",
+            hidden(),
+            mutate(lambda rs: rs.__setitem__("bypass_actors", [])),
+            ["Administration: read"],
+            3,
+        ),
+        (
+            "live hides bypass_actors, payload escalates",
+            hidden(),
+            mutate(lambda rs: rs["bypass_actors"][0].__setitem__("bypass_mode", "always")),
+            ["live bypass list is unknown"],
+            3,
+        ),
+        (
+            "live bypass_actors is null",
+            hidden(lambda rs: rs.__setitem__("bypass_actors", None)),
+            base,
+            ["unknown, not empty"],
+            3,
+        ),
+        (
+            "live hides bypass_actors and a real reduction is also present",
+            hidden(),
+            mutate(lambda rs: drop_rule(rs, "deletion")),
+            ["payload drops the whole `deletion` rule", "unknown, not empty"],
+            3,
+        ),
+    ]
+
     rc = 0
+    good_text = json.dumps(base)
+    for name, live_text, want_code in [
+        ("judge: identical documents", good_text, 0),
+        ("judge: live is not JSON", "not json", 3),
+        ("judge: live is deeply nested JSON (RecursionError)", "[" * 200000, 3),
+        ("judge: live is JSON of the wrong shape", "[1, 2]", 3),
+    ]:
+        _, code = judge(good_text, live_text)
+        if code != want_code:
+            print(f"  FAIL {name}: expected exit {want_code}, got {code}")
+            rc = 1
+
+    for name, live, payload, expected, want_code in hidden_cases:
+        found = weakenings(live, payload)
+        texts = [text for text, _ in found]
+        for want in expected:
+            if not any(want in text for text in texts):
+                print(f"  FAIL {name}: expected {want!r} in {texts}")
+                rc = 1
+        if exit_code(found) != want_code:
+            print(f"  FAIL {name}: expected exit {want_code}, got {exit_code(found)}")
+            rc = 1
+
     for name, payload, expected, want_code in cases:
         found = weakenings(base, payload)
         texts = [text for text, _ in found]
@@ -447,6 +525,24 @@ def self_test():
     return rc
 
 
+def judge(payload_text, live_text):
+    """Compare two ruleset documents; return (printable lines, exit code).
+
+    Any failure here, however it arises (bad JSON, a missing key, a parser
+    stack overflow), is a finding the guard could not classify and exits 3. An
+    uncaught crash exits 1, which `--allow-weakening` is allowed to accept.
+    """
+    try:
+        findings = weakenings(json.loads(live_text), json.loads(payload_text))
+    except Exception as err:  # noqa: BLE001 - fail closed on anything at all
+        return [f"    [unclassified] could not read or compare the rulesets: {type(err).__name__}"], UNCLASSIFIED
+    lines = [
+        f"    {text}" if classified else f"    [unclassified] {text}"
+        for text, classified in findings
+    ]
+    return lines, exit_code(findings)
+
+
 def main(argv):
     if len(argv) == 2 and argv[1] == "--self-test":
         return self_test()
@@ -454,12 +550,16 @@ def main(argv):
         print(__doc__.strip().splitlines()[-1], file=sys.stderr)
         return 2
 
-    payload = json.load(open(argv[1]))
-    live = json.load(sys.stdin)
-    findings = weakenings(live, payload)
-    for text, classified in findings:
-        print(f"    {text}" if classified else f"    [unclassified] {text}")
-    return exit_code(findings)
+    try:
+        with open(argv[1]) as fh:
+            payload_text = fh.read()
+    except OSError as err:
+        print(f"    [unclassified] could not read the payload: {err!r}")
+        return UNCLASSIFIED
+    lines, code = judge(payload_text, sys.stdin.read())
+    for line in lines:
+        print(line)
+    return code
 
 
 if __name__ == "__main__":
