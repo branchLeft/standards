@@ -76,6 +76,29 @@ STUB
     "--allow-weakening" nonzero "REFUSED"
   check "unreadable live JSON is unclassified, not a reduction" 0 "$list" 0 'not json' \
     "--allow-weakening" nonzero "[unclassified]"
+  # Deeply nested JSON blows the parser's stack. A crash must read as
+  # unclassified, never as the reduction --allow-weakening may accept.
+  local deep
+  deep="$(python3 -c 'print("[" * 200000)')"
+  check "deeply nested live JSON is refused under --allow-weakening" 0 "$list" 0 "$deep" \
+    "--allow-weakening" nonzero "REFUSED"
+  check "deeply nested live JSON is refused without the override too" 0 "$list" 0 "$deep" \
+    "" nonzero "REFUSED"
+
+  # Any guard status other than 0 (clean) or 1 (a reduction the operator may
+  # accept) is not a decision: a usage error, a kill, a crash.
+  local real_guard="$tmp/tools/ruleset_guard.py.real" status
+  cp "$tmp/tools/ruleset_guard.py" "$real_guard"
+  for status in 2 4 137; do
+    printf '#!/usr/bin/env python3\nimport sys\nsys.exit(%s)\n' "$status" > "$tmp/tools/ruleset_guard.py"
+    check "guard exit ${status} is refused under --allow-weakening" 0 "$list" 0 "$good" \
+      "--allow-weakening" nonzero "REFUSED"
+  done
+  printf '#!/usr/bin/env python3\nimport sys\nsys.exit(1)\n' > "$tmp/tools/ruleset_guard.py"
+  check "guard exit 1 still applies a deliberate reduction under --allow-weakening" 0 "$list" 0 "$good" \
+    "--allow-weakening" 0 "applying the reduction above anyway"
+  cp "$real_guard" "$tmp/tools/ruleset_guard.py"
+
   check "private repo on Free is skipped, not failed" 1 'Upgrade to GitHub Pro' 0 "$good" "" 0 "skipped"
 
   rm -rf "$tmp"
@@ -160,11 +183,15 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       fi
       guard_rc=0
       printf '%s' "$live" | python3 "$GUARD" "$payload" >&2 || guard_rc=$?
-      if [ "$guard_rc" -eq 3 ]; then
-        echo "  REFUSED: the guard could not classify the difference against live ${id}." >&2
+      # Only 0 (clean) and 1 (a reduction the operator can see) are decisions.
+      # 3 is a finding the guard could not classify; any other status is a
+      # crash, a usage error or a kill. None of those is something an override
+      # about a visible reduction may wave through.
+      if [ "$guard_rc" -ne 0 ] && [ "$guard_rc" -ne 1 ]; then
+        echo "  REFUSED: the guard could not classify the difference against live ${id} (exit ${guard_rc})." >&2
         echo "  --allow-weakening does not cover this. Resolve it by hand." >&2
         exit 1
-      elif [ "$guard_rc" -ne 0 ]; then
+      elif [ "$guard_rc" -eq 1 ]; then
         if [ "$allow_weakening" = true ]; then
           echo "  --allow-weakening given for ${repo}: applying the reduction above anyway"
         else

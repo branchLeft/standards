@@ -22,6 +22,16 @@ the guard could not classify. 3 is deliberately not the same as 1: an
 override expresses intent about a reduction the operator can see, and a
 finding the guard could not read is not one anybody has seen.
 
+A live ruleset with no `bypass_actors` list is structure the guard could not
+classify, never an empty one. GitHub strips the key from the response unless the
+token has Administration: read on the repository, so absence means the bypass
+list is hidden. Reading it as none would refuse a payload for adding an actor
+live already carries, and would pass one that escalates an actor the token could
+not see. The finding names the missing scope and exits 3, which
+`--allow-weakening` cannot override. Any failure while reading or comparing the
+two files, including a parser stack overflow on deeply nested JSON, also exits 3
+rather than the traceback's 1.
+
 ## Usage
 
 `ruleset_guard.py PAYLOAD.json < live.json` or `ruleset_guard.py --self-test`.

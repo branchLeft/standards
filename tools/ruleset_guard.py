@@ -436,6 +436,18 @@ def self_test():
     ]
 
     rc = 0
+    good_text = json.dumps(base)
+    for name, live_text, want_code in [
+        ("judge: identical documents", good_text, 0),
+        ("judge: live is not JSON", "not json", 3),
+        ("judge: live is deeply nested JSON (RecursionError)", "[" * 200000, 3),
+        ("judge: live is JSON of the wrong shape", "[1, 2]", 3),
+    ]:
+        _, code = judge(good_text, live_text)
+        if code != want_code:
+            print(f"  FAIL {name}: expected exit {want_code}, got {code}")
+            rc = 1
+
     for name, live, payload, expected, want_code in hidden_cases:
         found = weakenings(live, payload)
         texts = [text for text, _ in found]
@@ -465,6 +477,24 @@ def self_test():
     return rc
 
 
+def judge(payload_text, live_text):
+    """Compare two ruleset documents; return (printable lines, exit code).
+
+    Any failure here, however it arises (bad JSON, a missing key, a parser
+    stack overflow), is a finding the guard could not classify and exits 3. An
+    uncaught crash exits 1, which `--allow-weakening` is allowed to accept.
+    """
+    try:
+        findings = weakenings(json.loads(live_text), json.loads(payload_text))
+    except Exception as err:  # noqa: BLE001 - fail closed on anything at all
+        return [f"    [unclassified] could not read or compare the rulesets: {type(err).__name__}"], UNCLASSIFIED
+    lines = [
+        f"    {text}" if classified else f"    [unclassified] {text}"
+        for text, classified in findings
+    ]
+    return lines, exit_code(findings)
+
+
 def main(argv):
     if len(argv) == 2 and argv[1] == "--self-test":
         return self_test()
@@ -472,18 +502,16 @@ def main(argv):
         print(__doc__.strip().splitlines()[-1], file=sys.stderr)
         return 2
 
-    # A crash is a finding the guard could not classify, not a reduction: an
-    # uncaught traceback exits 1, which `--allow-weakening` is allowed to accept.
     try:
-        payload = json.load(open(argv[1]))
-        live = json.load(sys.stdin)
-        findings = weakenings(live, payload)
-    except (OSError, ValueError, KeyError, TypeError, AttributeError) as err:
-        print(f"    [unclassified] could not read or compare the rulesets: {err!r}")
+        with open(argv[1]) as fh:
+            payload_text = fh.read()
+    except OSError as err:
+        print(f"    [unclassified] could not read the payload: {err!r}")
         return UNCLASSIFIED
-    for text, classified in findings:
-        print(f"    {text}" if classified else f"    [unclassified] {text}")
-    return exit_code(findings)
+    lines, code = judge(payload_text, sys.stdin.read())
+    for line in lines:
+        print(line)
+    return code
 
 
 if __name__ == "__main__":

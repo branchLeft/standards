@@ -25,3 +25,12 @@ expresses intent about a reduction someone can see.
 POST. Use it to exercise this script: there is otherwise no way to see what
 the guard makes of a payload except by performing the write, and a run that
 reaches the guard's override path performs a real one.
+
+Every failure is loud and on stderr. A listing or live read that fails, or a
+listing that is not a JSON list, stops the run with the failing `gh api` call
+named and the response shown; the guard's findings are printed there too, so a
+refusal always says why. A live ruleset read with the bypass list hidden (a token
+without Administration: read on the repo) is refused as unclassified; run with a
+token that can see it. The override applies only when the guard exits exactly 1;
+any other non-zero status, including a crash or a usage error, is refused like
+exit 3. `--self-test` exercises these paths against a stubbed `gh`.
