@@ -8,9 +8,108 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RULESETS="$HERE/../templates/rulesets"
 GUARD="$HERE/ruleset_guard.py"
 
+# Runs a copy of this script against a stubbed API client, so the failure paths
+# that need a failing API (a 403 listing, a failed live read, a live ruleset
+# with the bypass list stripped) can be seen without touching a repo.
+stubbed_apply_self_test() {
+  local tmp rc=0 out err code
+  tmp="$(mktemp -d)" || return 1
+  mkdir -p "$tmp/tools" "$tmp/bin" "$tmp/stub" "$tmp/templates/rulesets/demo"
+  cp "${BASH_SOURCE[0]}" "$tmp/tools/ruleset-apply.sh"
+  cp "$GUARD" "$tmp/tools/ruleset_guard.py"
+  cat > "$tmp/templates/rulesets/demo/main.json" <<'JSON'
+{"name":"demo","target":"branch","enforcement":"active",
+ "conditions":{"ref_name":{"include":["~DEFAULT_BRANCH"],"exclude":[]}},
+ "rules":[{"type":"deletion"}],
+ "bypass_actors":[{"actor_type":"OrganizationAdmin","actor_id":null,"bypass_mode":"pull_request"}]}
+JSON
+  cat > "$tmp/bin/gh" <<'STUB'
+#!/usr/bin/env bash
+if [ "$2" = "--method" ]; then : > "$STUB_DIR/wrote"; echo "updated 7"; exit 0; fi
+case "$2" in
+  */rulesets/*) cat "$STUB_DIR/live.out"; exit "$(cat "$STUB_DIR/live.rc")" ;;
+  */rulesets) cat "$STUB_DIR/listing.out"; exit "$(cat "$STUB_DIR/listing.rc")" ;;
+esac
+exit 99
+STUB
+  chmod +x "$tmp/bin/gh"
+  local list='[{"id":7,"name":"demo"}]'
+  local good='{"id":7,"name":"demo","target":"branch","enforcement":"active","conditions":{"ref_name":{"include":["~DEFAULT_BRANCH"],"exclude":[]}},"rules":[{"type":"deletion"}],"bypass_actors":[{"actor_type":"OrganizationAdmin","actor_id":null,"bypass_mode":"pull_request"}]}'
+  local hidden='{"id":7,"name":"demo","target":"branch","enforcement":"active","conditions":{"ref_name":{"include":["~DEFAULT_BRANCH"],"exclude":[]}},"rules":[{"type":"deletion"}],"current_user_can_bypass":"never"}'
+
+  # check NAME LISTING_RC LISTING LIVE_RC LIVE FLAGS WANT TEXT: WANT is 0 or
+  # "nonzero"; TEXT must appear in stdout or stderr; a dry run must never write.
+  check() {
+    local name="$1" lrc="$2" lbody="$3" vrc="$4" vbody="$5" flags="$6" want="$7" text="$8"
+    printf '%s' "$lrc" > "$tmp/stub/listing.rc"; printf '%s' "$lbody" > "$tmp/stub/listing.out"
+    printf '%s' "$vrc" > "$tmp/stub/live.rc"; printf '%s' "$vbody" > "$tmp/stub/live.out"
+    rm -f "$tmp/stub/wrote"
+    code=0
+    # shellcheck disable=SC2086
+    out=$(STUB_DIR="$tmp/stub" PATH="$tmp/bin:$PATH" bash "$tmp/tools/ruleset-apply.sh" --dry-run $flags demo 2>"$tmp/err") || code=$?
+    err=$(cat "$tmp/err")
+    if [ "$want" = 0 ] && [ "$code" -ne 0 ]; then
+      echo "  FAIL $name: expected exit 0, got $code: $err"; rc=1
+    elif [ "$want" != 0 ] && [ "$code" -eq 0 ]; then
+      echo "  FAIL $name: expected a non-zero exit, got 0"; rc=1
+    fi
+    if ! grep -qF -- "$text" <<< "$out$err"; then
+      echo "  FAIL $name: expected '$text' in: $out$err"; rc=1
+    fi
+    if [ -e "$tmp/stub/wrote" ]; then
+      echo "  FAIL $name: wrote to a ruleset in a dry run"; rc=1
+    fi
+  }
+
+  check "healthy live passes" 0 "$list" 0 "$good" "" 0 "dry run: would update 7"
+  check "listing 403 fails loudly" 1 'HTTP 403: Resource not accessible' 0 "$good" "" nonzero \
+    'gh api repos/branchLeft/demo/rulesets` failed'
+  check "unparseable listing fails loudly" 0 'not json' 0 "$good" "" nonzero \
+    "could not read the ruleset listing for demo"
+  check "failed live read fails loudly" 0 "$list" 1 'HTTP 404' "" nonzero \
+    'gh api repos/branchLeft/demo/rulesets/7` failed'
+  check "hidden bypass list is refused, naming the scope" 0 "$list" 0 "$hidden" "" nonzero \
+    "Administration: read"
+  check "hidden bypass list ends in a REFUSED line" 0 "$list" 0 "$hidden" "" nonzero \
+    "REFUSED"
+  check "--allow-weakening cannot wave a hidden bypass list through" 0 "$list" 0 "$hidden" \
+    "--allow-weakening" nonzero "REFUSED"
+  check "unreadable live JSON is unclassified, not a reduction" 0 "$list" 0 'not json' \
+    "--allow-weakening" nonzero "[unclassified]"
+  # Deeply nested JSON blows the parser's stack. A crash must read as
+  # unclassified, never as the reduction --allow-weakening may accept.
+  local deep
+  deep="$(python3 -c 'print("[" * 200000)')"
+  check "deeply nested live JSON is refused under --allow-weakening" 0 "$list" 0 "$deep" \
+    "--allow-weakening" nonzero "REFUSED"
+  check "deeply nested live JSON is refused without the override too" 0 "$list" 0 "$deep" \
+    "" nonzero "REFUSED"
+
+  # Any guard status other than 0 (clean) or 1 (a reduction the operator may
+  # accept) is not a decision: a usage error, a kill, a crash.
+  local real_guard="$tmp/tools/ruleset_guard.py.real" status
+  cp "$tmp/tools/ruleset_guard.py" "$real_guard"
+  for status in 2 4 137; do
+    printf '#!/usr/bin/env python3\nimport sys\nsys.exit(%s)\n' "$status" > "$tmp/tools/ruleset_guard.py"
+    check "guard exit ${status} is refused under --allow-weakening" 0 "$list" 0 "$good" \
+      "--allow-weakening" nonzero "REFUSED"
+  done
+  printf '#!/usr/bin/env python3\nimport sys\nsys.exit(1)\n' > "$tmp/tools/ruleset_guard.py"
+  check "guard exit 1 still applies a deliberate reduction under --allow-weakening" 0 "$list" 0 "$good" \
+    "--allow-weakening" 0 "applying the reduction above anyway"
+  cp "$real_guard" "$tmp/tools/ruleset_guard.py"
+
+  check "private repo on Free is skipped, not failed" 1 'Upgrade to GitHub Pro' 0 "$good" "" 0 "skipped"
+
+  rm -rf "$tmp"
+  return $rc
+}
+
 if [ "${1:-}" = "--self-test" ]; then
-  python3 "$GUARD" --self-test
-  exit $?
+  python3 "$GUARD" --self-test || exit 1
+  stubbed_apply_self_test || exit 1
+  echo "ruleset-apply.sh: self-test passed"
+  exit 0
 fi
 
 allow_weakening=false
@@ -57,18 +156,20 @@ for repo in "${repos[@]}"; do
       continue
     fi
     if [ "$listing_rc" -ne 0 ]; then
-      echo "  ERROR: \`gh api repos/branchLeft/${repo}/rulesets\` failed (exit ${listing_rc}):" >&2
-      printf '    %s\n' "$listing" >&2
+      echo "  FAILED: \`gh api repos/branchLeft/${repo}/rulesets\` failed (exit ${listing_rc}):" >&2
+      printf '%s\n' "$listing" | sed 's/^/    /' >&2
       exit 1
     fi
+    id_rc=0
     id=$(printf '%s' "$listing" | python3 -c '
 import json, sys
 want = sys.argv[1]
-print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "$want_name") || {
-      echo "  ERROR: could not read the ruleset listing for ${repo} as JSON:" >&2
-      printf '    %s\n' "$listing" >&2
+print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "$want_name" 2>/dev/null) || id_rc=$?
+    if [ "$id_rc" -ne 0 ]; then
+      echo "  FAILED: could not read the ruleset listing for ${repo} as a JSON list of rulesets:" >&2
+      printf '%s\n' "$listing" | sed 's/^/    /' >&2
       exit 1
-    }
+    fi
 
     if [ -n "$id" ]; then
       # Read live once and feed the same bytes to the guard, so what is judged
@@ -76,28 +177,21 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       live_rc=0
       live=$(gh api "repos/branchLeft/${repo}/rulesets/${id}" 2>&1) || live_rc=$?
       if [ "$live_rc" -ne 0 ]; then
-        echo "  ERROR: \`gh api repos/branchLeft/${repo}/rulesets/${id}\` failed (exit ${live_rc}):" >&2
-        printf '    %s\n' "$live" >&2
-        exit 1
-      fi
-      # A read without admin rights omits bypass_actors rather than returning
-      # an empty list, so the guard cannot know whether a bypass exists. Stop
-      # here, loudly, whatever the flags: neither --allow-weakening nor
-      # --dry-run turns an unknown into a pass.
-      if ! printf '%s' "$live" | python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("bypass_actors") is not None else 1)' 2>/dev/null; then
-        echo "  ERROR: cannot verify: token lacks admin read — the live ruleset ${id} on ${repo}" >&2
-        echo "  carries no usable bypass_actors value, so a bypass actor cannot be ruled out. Re-run" >&2
-        echo "  with a token that has admin read on the repo. No change was made." >&2
+        echo "  FAILED: \`gh api repos/branchLeft/${repo}/rulesets/${id}\` failed (exit ${live_rc}):" >&2
+        printf '%s\n' "$live" | sed 's/^/    /' >&2
         exit 1
       fi
       guard_rc=0
-      # The findings go to stderr: they are what the operator has to read.
       printf '%s' "$live" | python3 "$GUARD" "$payload" >&2 || guard_rc=$?
-      if [ "$guard_rc" -eq 3 ]; then
-        echo "  REFUSED: the guard could not classify the difference against live ${id}." >&2
+      # Only 0 (clean) and 1 (a reduction the operator can see) are decisions.
+      # 3 is a finding the guard could not classify; any other status is a
+      # crash, a usage error or a kill. None of those is something an override
+      # about a visible reduction may wave through.
+      if [ "$guard_rc" -ne 0 ] && [ "$guard_rc" -ne 1 ]; then
+        echo "  REFUSED: the guard could not classify the difference against live ${id} (exit ${guard_rc})." >&2
         echo "  --allow-weakening does not cover this. Resolve it by hand." >&2
         exit 1
-      elif [ "$guard_rc" -ne 0 ]; then
+      elif [ "$guard_rc" -eq 1 ]; then
         if [ "$allow_weakening" = true ]; then
           echo "  --allow-weakening given for ${repo}: applying the reduction above anyway"
         else
