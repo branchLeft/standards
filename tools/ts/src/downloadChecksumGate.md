@@ -26,6 +26,18 @@ A `curl` whose output is only read (an API call piped to `jq`) is not a
 download. Verification is deliberately per step: a later step cannot vouch for
 a file an earlier step already ran.
 
+## What it exempts
+
+A loopback health or access probe: a `wget` or `curl` step whose every URL
+has host `127.0.0.1`, `localhost` or `[::1]`, and whose response goes to stdout
+(`wget -qO-`, `curl -fsS URL`) rather than to a file. Nothing is left on disk to
+run, so it is not a tool download. The exemption is per step and all or nothing:
+one remote URL, one file written, or one pipe into a shell or extractor in the
+same step and the step is flagged again. A probe that writes `-o`, `--output`,
+`> file`, or a plain `wget` (which saves a file) is still flagged. A host that
+only looks like loopback (`127.0.0.1.example.invalid`, `127.0.0.1@example.invalid`)
+is not loopback: the host is read with a URL parser.
+
 ## What counts as verification
 
 A hash tool (`sha256sum`, `shasum`, ...) with `-c` or `--check`; or a
@@ -42,4 +54,6 @@ and a download in a Windows shell are not seen. A download assembled in a
 variable, or written into a script file that a step then runs, is not seen
 either. A digest compared by hand with a shell test instead of `-c` reads as
 unverified. The clause is about scanners, but the check cannot tell a scanner
-from any other tool a workflow fetches, so it flags every tool download.
+from any other tool a workflow fetches, so it flags every tool download that is
+not a loopback probe. A probe that writes to a file it never runs (`-o /dev/null`)
+is flagged too, because the check does not special-case `/dev/null`.
