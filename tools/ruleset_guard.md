@@ -22,6 +22,12 @@ the guard could not classify. 3 is deliberately not the same as 1: an
 override expresses intent about a reduction the operator can see, and a
 finding the guard could not read is not one anybody has seen.
 
+A live read made without admin rights omits `bypass_actors` entirely instead of
+returning an empty list. The guard reads the missing key as unknown, reports
+`cannot verify: token lacks admin read` as a finding it could not classify (exit
+3), and `ruleset-apply.sh` stops on the same condition before the guard runs,
+in dry runs and under `--allow-weakening` too. An empty list is still none.
+
 ## Usage
 
 `ruleset_guard.py PAYLOAD.json < live.json` or `ruleset_guard.py --self-test`.

@@ -108,7 +108,19 @@ def compare_value(live, payload, path, findings):
         )
 
 
+UNKNOWN_BYPASS = "cannot verify: token lacks admin read"
+
+
 def bypass_actors(ruleset):
+    """Bypass actors as a map, or None when the ruleset does not say.
+
+    GitHub omits the `bypass_actors` key from a read made without admin rights
+    instead of returning an empty list, so an absent or null key is unknown and
+    an empty list is none. Reading the first as the second turns a hidden bypass
+    into a clean pass.
+    """
+    if ruleset.get("bypass_actors") is None:
+        return None
     return {
         (a["actor_type"], a.get("actor_id")): a.get("bypass_mode")
         for a in ruleset.get("bypass_actors", [])
@@ -150,6 +162,14 @@ def weakenings(live, payload):
         compare_value(live_rules[rtype], payload_rules[rtype], f"rules.{rtype}", findings)
 
     live_bypass, payload_bypass = bypass_actors(live), bypass_actors(payload)
+    if live_bypass is None:
+        unclassified(
+            findings,
+            f"bypass_actors: {UNKNOWN_BYPASS} (the live read carries no bypass_actors key)",
+        )
+        return findings
+    # A committed payload may omit the key to mean no bypass actor.
+    payload_bypass = payload_bypass or {}
     for actor, mode in sorted(payload_bypass.items(), key=str):
         if actor not in live_bypass:
             reduction(findings, f"bypass_actors: payload adds {actor[0]} ({mode})")
@@ -387,6 +407,41 @@ def self_test():
         if exit_code(found) != want_code:
             print(f"  FAIL {name}: expected exit {want_code}, got {exit_code(found)}")
             rc = 1
+
+    # A live read from a token without admin rights omits `bypass_actors`
+    # altogether rather than returning an empty list. That is unknown, not
+    # none: it must never pass, whatever the payload says, and it must be the
+    # unclassified kind so `--allow-weakening` cannot wave it through.
+    hidden = json.loads(json.dumps(base))
+    del hidden["bypass_actors"]
+    nulled = json.loads(json.dumps(base))
+    nulled["bypass_actors"] = None
+    unknown = "cannot verify: token lacks admin read"
+    for name, payload in [
+        ("live hides bypass_actors, identical payload", base),
+        ("live hides bypass_actors, payload with no bypass", mutate(lambda rs: rs.__setitem__("bypass_actors", []))),
+        ("live hides bypass_actors, payload without the key", hidden),
+    ]:
+        for live_name, live in [("absent", hidden), ("null", nulled)]:
+            try:
+                found = weakenings(live, payload)
+            except Exception as err:  # a crash is a failure, not a refusal
+                print(f"  FAIL {name} ({live_name}): raised {err!r}")
+                rc = 1
+                continue
+            texts = [text for text, _ in found]
+            if not any(unknown in text for text in texts):
+                print(f"  FAIL {name} ({live_name}): expected {unknown!r} in {texts}")
+                rc = 1
+            if exit_code(found) != UNCLASSIFIED:
+                print(f"  FAIL {name} ({live_name}): expected exit {UNCLASSIFIED}, got {exit_code(found)}")
+                rc = 1
+    # An empty list is a real answer (admin read, no actors): it stays a pass.
+    if weakenings(mutate(lambda rs: rs.__setitem__("bypass_actors", [])), base) != [
+        ("bypass_actors: payload adds OrganizationAdmin (pull_request)", True)
+    ]:
+        print("  FAIL live with an empty bypass_actors list must still be read as none")
+        rc = 1
     if rc == 0:
         print("ruleset_guard.py: self-test passed")
     return rc
