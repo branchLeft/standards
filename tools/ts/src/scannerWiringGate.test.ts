@@ -239,3 +239,199 @@ describe('ScannerWiringGate: SEC-9', () => {
     expect(findings.filter((finding) => finding.clause === 'SEC-9')).toHaveLength(0);
   });
 });
+
+// A workflow whose jobs are written out in full, for shapes `workflow()` cannot
+// express: a key on the step beside `run:`, or a key on the job itself.
+function workflowOfJobs(jobs: readonly string[]): string {
+  return ['on: [push, pull_request]', 'jobs:', ...jobs].join('\n');
+}
+
+function singleStepJob(jobKeys: readonly string[], stepLines: readonly string[]): string {
+  return [
+    '  scan:',
+    ...jobKeys.map((key) => `    ${key}`),
+    '    steps:',
+    ...stepLines.map((line, index) => (index === 0 ? `      - ${line}` : `        ${line}`)),
+  ].join('\n');
+}
+
+const CANNOT_FAIL = 'cannot fail the build';
+
+describe('ScannerWiringGate: a scanner that cannot fail the build is not wired', () => {
+  const lockfileRepo = { [PRECOMMIT]: GITLEAKS_HOOK, 'package-lock.json': '{}' };
+  const dockerRepo = {
+    [PRECOMMIT]: `${GITLEAKS_HOOK}\n${HADOLINT_HOOK}`,
+    Dockerfile: 'FROM scratch',
+  };
+
+  function sec7(workflowText: string): readonly Finding[] {
+    return runGate({ ...lockfileRepo, '.github/workflows/ci.yml': workflowText }).filter(
+      (finding) => finding.clause === 'SEC-7'
+    );
+  }
+
+  function cred11(workflowText: string): readonly Finding[] {
+    return runCred11({ [PRECOMMIT]: GITLEAKS_HOOK, '.github/workflows/ci.yml': workflowText });
+  }
+
+  function grypeStep(jobKeys: readonly string[], stepLines: readonly string[]): readonly Finding[] {
+    return sec7(workflowOfJobs([singleStepJob(jobKeys, stepLines)]));
+  }
+
+  it.each([
+    ['|| true', 'run: grype dir:. || true'],
+    ['|| true behind a cd', 'run: cd app && grype dir:. || true'],
+    ['|| :', 'run: grype dir:. || :'],
+    ['|| exit 0', 'run: grype dir:. --fail-on high || exit 0'],
+    ['|| echo', 'run: grype dir:. || echo scan failed'],
+    ['|| true in a subshell', 'run: (grype dir:. || true)'],
+  ])('reads Grype under %s as not wired', (_label, run) => {
+    const findings = grypeStep([], [run]);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain(CANNOT_FAIL);
+  });
+
+  it('reads a block script whose only Grype line ends in || true as not wired', () => {
+    const run = ['run: |', '  set -eu', '  grype dir:. \\', '    --scope all || true'];
+    expect(grypeStep([], run)).toHaveLength(1);
+  });
+
+  it('reads a command continued onto a || true line as not wired', () => {
+    expect(grypeStep([], ['run: |', '  grype dir:. \\', '    || true'])).toHaveLength(1);
+    expect(grypeStep([], ['run: |', '  grype dir:. ||', '    true'])).toHaveLength(1);
+  });
+
+  it('reads Grype as wired when one line is masked and another is not', () => {
+    expect(grypeStep([], ['run: |', '  grype dir:. || true', '  grype image:app'])).toHaveLength(0);
+  });
+
+  it('reads Grype as wired when || true belongs to a different command', () => {
+    expect(grypeStep([], ['run: true || grype dir:.'])).toHaveLength(0);
+    expect(grypeStep([], ['run: mkdir -p out || true; grype dir:.'])).toHaveLength(0);
+  });
+
+  it('reads Grype as wired when the fallback is itself a failure', () => {
+    expect(grypeStep([], ['run: grype dir:. || exit 1'])).toHaveLength(0);
+  });
+
+  it.each([
+    ['a step with continue-on-error: true', [], ['run: grype dir:.', 'continue-on-error: true']],
+    [
+      'a uses: step with continue-on-error: true',
+      [],
+      ['uses: anchore/scan-action@v4', 'continue-on-error: true'],
+    ],
+    ['a quoted continue-on-error', [], ['run: grype dir:.', "continue-on-error: 'true'"]],
+    ['a continue-on-error expression', [], ['run: grype dir:.', 'continue-on-error: ${{ true }}']],
+    ['a job with continue-on-error: true', ['continue-on-error: true'], ['run: grype dir:.']],
+    ['a job under if: false', ['if: false'], ['run: grype dir:.']],
+    ['a job under if: ${{ false }}', ['if: ${{ false }}'], ['run: grype dir:.']],
+    ['a step under if: false', [], ['run: grype dir:.', 'if: false']],
+    ['a step under a quoted false', [], ['run: grype dir:.', "if: 'false'"]],
+    ['a step under if: false && always()', [], ['run: grype dir:.', 'if: false && always()']],
+    ['a step under if: ${{ !true }}', [], ['run: grype dir:.', 'if: ${{ !true }}']],
+  ])('reads Grype in %s as not wired', (_label, jobKeys, stepLines) => {
+    const findings = grypeStep(jobKeys, stepLines);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain(CANNOT_FAIL);
+  });
+
+  it.each([
+    ['continue-on-error: false', [], ['run: grype dir:.', 'continue-on-error: false']],
+    ['an if on an event', ["if: github.event_name == 'push'"], ['run: grype dir:.']],
+    ['a step if on always()', [], ['run: grype dir:.', 'if: always()']],
+    ['an if: true', ['if: true'], ['run: grype dir:.']],
+    ['a matrix expression', [], ['run: grype dir:.', 'continue-on-error: ${{ matrix.x }}']],
+  ])('reads Grype under %s as wired', (_label, jobKeys, stepLines) => {
+    expect(grypeStep(jobKeys, stepLines)).toHaveLength(0);
+  });
+
+  it('does not read a key written inside a run script as a key of the step', () => {
+    const run = [
+      'run: |',
+      '  grype dir:.',
+      '  echo "if: false"',
+      '  echo "continue-on-error: true"',
+    ];
+    expect(grypeStep([], run)).toHaveLength(0);
+  });
+
+  it('does not read a key of a with: block as a key of the step', () => {
+    const stepLines = ['uses: anchore/scan-action@v4', 'with:', '  continue-on-error: true'];
+    expect(grypeStep([], stepLines)).toHaveLength(0);
+  });
+
+  it('reads Grype as wired when a second job runs it for real', () => {
+    const quiet = singleStepJob(['continue-on-error: true'], ['run: grype dir:.']);
+    const real = singleStepJob([], ['run: grype dir:.']).replace('  scan:', '  gate:');
+    expect(sec7(workflowOfJobs([quiet, real]))).toHaveLength(0);
+  });
+
+  it('does not let a job that is off disable the Grype step of another job', () => {
+    const off = singleStepJob(['if: false'], ['run: echo skipped']);
+    const real = singleStepJob([], ['run: grype dir:.']).replace('  scan:', '  gate:');
+    expect(sec7(workflowOfJobs([off, real]))).toHaveLength(0);
+  });
+
+  it('reads a reusable-workflow job under if: false as not wired', () => {
+    const job = [
+      '  scan:',
+      '    if: false',
+      '    uses: example/shared/.github/workflows/grype.yml@v1',
+    ].join('\n');
+    expect(sec7(workflowOfJobs([job]))).toHaveLength(1);
+  });
+
+  it('reads a reusable-workflow job that is live as wired', () => {
+    const job = ['  scan:', '    uses: example/shared/.github/workflows/grype.yml@v1'].join('\n');
+    expect(sec7(workflowOfJobs([job]))).toHaveLength(0);
+  });
+
+  it('reads a composite action step under continue-on-error as not wired', () => {
+    const action = [
+      'name: scan',
+      'runs:',
+      '  using: composite',
+      '  steps:',
+      '    - run: grype dir:.',
+      '      shell: bash',
+      '      continue-on-error: true',
+    ].join('\n');
+    const findings = runGate({
+      ...lockfileRepo,
+      '.github/actions/scan/action.yml': action,
+      '.github/workflows/ci.yml': workflow('push', ['run: gitleaks detect']),
+    }).filter((finding) => finding.clause === 'SEC-7');
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain(CANNOT_FAIL);
+  });
+
+  it('keeps the original message when the scanner is absent altogether', () => {
+    const findings = grypeStep([], ['run: echo hello']);
+    expect(findings[0]?.message).toContain('no workflow runs Grype');
+  });
+
+  it('applies the same reading to gitleaks in CI', () => {
+    const quiet = cred11(
+      workflowOfJobs([singleStepJob([], ['run: gitleaks detect --no-git || true'])])
+    );
+    expect(quiet).toHaveLength(1);
+    expect(quiet[0]?.message).toContain(CANNOT_FAIL);
+    const real = cred11(workflowOfJobs([singleStepJob([], ['run: gitleaks detect --no-git'])]));
+    expect(real).toHaveLength(0);
+  });
+
+  it('applies the same reading to hadolint and KICS in CI', () => {
+    const ci = workflowOfJobs([
+      singleStepJob(
+        ['continue-on-error: true'],
+        ['run: hadolint Dockerfile', 'uses: checkmarx/kics-github-action@v2']
+      ),
+    ]);
+    const findings = runGate({ ...dockerRepo, '.github/workflows/ci.yml': ci }).filter(
+      (finding) => finding.clause === 'SEC-9'
+    );
+    expect(findings).toHaveLength(2);
+    expect(findings.every((finding) => finding.message.includes(CANNOT_FAIL))).toBe(true);
+  });
+});
