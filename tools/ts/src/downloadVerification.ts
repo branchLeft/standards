@@ -12,6 +12,9 @@ const REDIRECT_TO_FILE = /(?:^|\s)1?>>?\s*(?!&|\/dev\/null(?:\s|$))\S/;
 const MOVABLE_URL = /\/releases\/latest\/download\//;
 const MOVABLE_GO_OR_NPM =
   /\b(?:go\s+install|npm\s+(?:i|install)|pnpm\s+(?:add|install)|yarn\s+(?:global\s+)?add)\b[^\n]*@latest\b/;
+const WGET_TO_STDOUT = /(?:^|\s)(?:-[A-Za-z]*O\s*-|--output-document(?:=|\s+)-)(?=\s|$)/;
+const URL_TOKEN = /https?:\/\/[^\s'"()<>;|&`]+/g;
+const LOOPBACK_HOSTS: ReadonlySet<string> = new Set(['127.0.0.1', 'localhost', '[::1]']);
 const MOVABLE_IMAGE = /\bdocker\s+(?:run|pull)\b[^\n]*\s\S+:latest(?:\s|$)/;
 
 // A hash tool verifies only when told to compare (`-c` or `--check`); run
@@ -65,17 +68,59 @@ function curlRedirectsToFile(line: string): boolean {
   return REDIRECT_TO_FILE.test(segment);
 }
 
+/** True when one logical line fetches a file or an archive to run or unpack, as opposed to calling an API. */
+function isDownloadLine(line: string): boolean {
+  if (WGET.test(line) || GH_RELEASE_DOWNLOAD.test(line) || RUN_A_FETCH.test(line)) {
+    return true;
+  }
+  return (
+    CURL.test(line) &&
+    (CURL_WRITES_FILE.test(line) || PIPED_TO_RUNNER.test(line) || curlRedirectsToFile(line))
+  );
+}
+
 /** True when `body` fetches a file or an archive to run or unpack, as opposed to calling an API. */
 export function downloadsArtifact(body: string): boolean {
-  return logicalLines(body).some((line) => {
-    if (WGET.test(line) || GH_RELEASE_DOWNLOAD.test(line) || RUN_A_FETCH.test(line)) {
-      return true;
-    }
-    return (
-      CURL.test(line) &&
-      (CURL_WRITES_FILE.test(line) || PIPED_TO_RUNNER.test(line) || curlRedirectsToFile(line))
-    );
-  });
+  return logicalLines(body).some(isDownloadLine);
+}
+
+/** True when a wget or curl line writes what it fetches to a file on disk. */
+function writesFile(line: string): boolean {
+  if (WGET.test(line)) {
+    return !WGET_TO_STDOUT.test(line) || REDIRECT_TO_FILE.test(line);
+  }
+  return CURL_WRITES_FILE.test(line) || curlRedirectsToFile(line);
+}
+
+function isLoopbackUrl(text: string): boolean {
+  try {
+    return LOOPBACK_HOSTS.has(new URL(text).hostname);
+  } catch {
+    return false;
+  }
+}
+
+/** True when a single download line only fetches from loopback and writes its response to stdout. */
+function isStdoutLoopbackProbe(line: string): boolean {
+  if (!(WGET.test(line) || CURL.test(line))) {
+    return false;
+  }
+  if (RUN_A_FETCH.test(line) || PIPED_TO_RUNNER.test(line) || writesFile(line)) {
+    return false;
+  }
+  const urls = line.match(URL_TOKEN) ?? [];
+  return urls.length > 0 && urls.every(isLoopbackUrl);
+}
+
+/**
+ * True when every download in `body` is a health or access probe: it fetches
+ * only from loopback (127.0.0.1, localhost, [::1]) and writes the response to
+ * stdout, with no file left on disk to run. A probe piped into a shell is not
+ * one, and a single remote download in the same step makes the whole step not one.
+ */
+export function isLoopbackProbe(body: string): boolean {
+  const downloads = logicalLines(body).filter(isDownloadLine);
+  return downloads.length > 0 && downloads.every(isStdoutLoopbackProbe);
 }
 
 /** True when `body` pipes a download straight into a shell or an extractor, which leaves nothing to verify. */
