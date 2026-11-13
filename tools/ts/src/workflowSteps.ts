@@ -94,17 +94,26 @@ function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const COMMAND_START = '(^|[;&|(]\\s*|\\bsudo\\s+|\\bxargs\\s+)';
+const LEADING_ASSIGNMENTS = '(?:[a-z_][a-z0-9_]*=\\S*\\s+)*';
+
 /**
  * True when a `run:` script runs `tool` as a command: at the start of a
- * line, after a shell separator or `sudo`, or as the image of a `docker run`.
- * A tool name inside an `echo`, a filename or an unrelated word never counts.
+ * line, after a shell separator, `sudo` or leading `NAME=value` assignments,
+ * as the image of a `docker run`, or as the hook of `pre-commit run <id>`
+ * (flags before or after the id). A tool name inside an `echo`, a filename
+ * or an unrelated word never counts.
  */
 export function runBodyInvokes(body: string, tool: string): boolean {
   const name = escapeRegExp(tool.toLowerCase());
-  const command = new RegExp(`(^|[;&|(]\\s*|\\bsudo\\s+|\\bxargs\\s+)(\\S*/)?${name}(\\s|$)`, 'm');
+  const command = new RegExp(`${COMMAND_START}${LEADING_ASSIGNMENTS}(\\S*/)?${name}(\\s|$)`, 'm');
+  const preCommit = new RegExp(
+    `${COMMAND_START}${LEADING_ASSIGNMENTS}pre-commit\\s+run\\s+(?:-\\S+\\s+)*${name}(\\s|$)`,
+    'm'
+  );
   const container = new RegExp(`\\bdocker\\s+run\\b[^\\n]*\\s\\S*${name}(:|\\s|$)`, 'm');
   const lowered = body.toLowerCase();
-  return command.test(lowered) || container.test(lowered);
+  return command.test(lowered) || preCommit.test(lowered) || container.test(lowered);
 }
 
 /**

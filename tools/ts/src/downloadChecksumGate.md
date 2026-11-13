@@ -12,10 +12,13 @@ share. Moving it to `auto` is the owner's gate-class decision.
 
 A `run:` step in a workflow or composite action that:
 
-- downloads a file (`wget`, `gh release download`, or `curl` writing a file or
-  piping into a shell or extractor) and never verifies it in the same step;
+- downloads a file (`wget`, `gh release download`, or `curl` writing a file,
+  redirected to one with `curl URL > file`, or piped into a shell or extractor)
+  and never verifies it in the same step;
 - pipes a download straight into a shell or extractor, which leaves nothing to
-  verify first, so a verification elsewhere in the step does not excuse it;
+  verify first, so a verification elsewhere in the step does not excuse it. This
+  includes a shell run of a curl substitution (`sh -c "$(curl URL)"`,
+  `bash <(curl URL)`, `eval "$(curl URL)"`) and `curl URL | sudo -E bash`;
 - fetches a tool by a movable tag: a `releases/latest/download` URL, `@latest`
   on `go install` or a package install, or an image tagged `latest`.
 
@@ -35,7 +38,8 @@ tool needs is fixed in `downloadVerification.ts`.
 ## What it cannot see
 
 A download in a script file a step calls, a `run:` written as a flow mapping,
-and a download in a Windows shell are not seen. A digest compared by hand with
-a shell test instead of `-c` reads as unverified. The clause is about
-scanners, but the check cannot tell a scanner from any other tool a workflow
-fetches, so it flags every tool download.
+and a download in a Windows shell are not seen. A download assembled in a
+variable, or written into a script file that a step then runs, is not seen
+either. A digest compared by hand with a shell test instead of `-c` reads as
+unverified. The clause is about scanners, but the check cannot tell a scanner
+from any other tool a workflow fetches, so it flags every tool download.
