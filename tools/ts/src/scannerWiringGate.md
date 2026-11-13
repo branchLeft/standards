@@ -17,8 +17,9 @@ A tool is wired into CI when a step `uses:` a path ending in a marker, or a
 `docker run` image). `pre-commit run <hook id>` counts as running that hook,
 with flags before or after the id. It is wired into pre-commit when a hook's
 `repo:`, `id:` or `entry:` names it. A step `name:`, an `echo`, an environment
-value or a comment that only mentions the tool is never wiring. Text is normalised first (`workflowSteps.ts`): byte-order mark
-dropped, one line ending, comments stripped, case folded for `uses:` paths.
+value or a comment that only mentions the tool is never wiring. Text is
+normalised first (`workflowSteps.ts`): byte-order mark dropped, one line
+ending, comments stripped, case folded for `uses:` paths.
 
 ## What each clause asks
 
