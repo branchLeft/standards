@@ -4,8 +4,9 @@ import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
 import type { Ratchet } from './ratchet.ts';
 import { readThresholdSetting, splitThresholdList } from './thresholdSettings.ts';
-import { normalizeWorkflowText, wiresInTool } from './workflowSteps.ts';
+import { normalizeWorkflowText } from './workflowSteps.ts';
 import { runsOnEvent, workflowTriggers } from './workflowTriggers.ts';
+import { bestWiring, toolWiring, type ToolWiring } from './workflowWiring.ts';
 
 const PRECOMMIT_FILE = '.pre-commit-config.yaml';
 const WORKFLOW_PATTERN = /^\.github\/workflows\/[^/]+\.ya?ml$/;
@@ -24,6 +25,9 @@ interface CiFile {
   readonly text: string;
   readonly isWorkflow: boolean;
 }
+
+const CANNOT_FAIL =
+  'only where it cannot fail the build (`|| true`, `continue-on-error: true` or `if: false`)';
 
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -44,6 +48,15 @@ function preCommitWiresIn(normalized: string, markers: readonly string[]): boole
     );
     return values.some((value) => pattern.test(value));
   });
+}
+
+function ciWiring(ci: readonly CiFile[], markers: readonly string[]): ToolWiring {
+  return bestWiring(ci.map((entry) => toolWiring(entry.text, markers)));
+}
+
+// What is wrong with a scanner that is not wired: never run, or run only where it cannot fail.
+function missingPhrase(reading: ToolWiring, tool: string): string {
+  return reading === 'neutralised' ? `${tool} is run ${CANNOT_FAIL}` : `no workflow runs ${tool}`;
 }
 
 /**
@@ -108,14 +121,16 @@ export class ScannerWiringGate implements Gate {
       return [];
     }
     const markers = this.markers('SEC-7', 'scan_markers', DEFAULT_SCAN_MARKERS);
-    const carriers = ci.filter((entry) => wiresInTool(entry.text, markers));
+    const states = ci.map((entry) => ({ entry, state: toolWiring(entry.text, markers) }));
+    const carriers = states.filter(({ state }) => state === 'wired').map(({ entry }) => entry);
     if (carriers.length === 0) {
+      const reading = bestWiring(states.map(({ state }) => state));
       return [
         this.ratchet.findingAdvisory(
           'SEC-7',
           subject,
           1,
-          'this repo tracks a lockfile or Dockerfile but no workflow runs Grype'
+          `this repo tracks a lockfile or Dockerfile but ${missingPhrase(reading, 'Grype')}`
         ),
       ];
     }
@@ -159,13 +174,14 @@ export class ScannerWiringGate implements Gate {
     const kicsSubject =
       dockerfile ?? this.firstTracked(COMPOSE_FILE_PATTERN) ?? this.firstTracked(WORKFLOW_PATTERN);
     const kicsMarkers = this.markers('SEC-9', 'kics_markers', DEFAULT_KICS_MARKERS);
-    if (kicsSubject !== undefined && !ci.some((entry) => wiresInTool(entry.text, kicsMarkers))) {
+    const kicsReading = ciWiring(ci, kicsMarkers);
+    if (kicsSubject !== undefined && kicsReading !== 'wired') {
       findings.push(
         this.ratchet.findingAdvisory(
           'SEC-9',
           kicsSubject,
           1,
-          'this repo tracks Dockerfiles, Compose files or workflows but no workflow runs KICS'
+          `this repo tracks Dockerfiles, Compose files or workflows but ${missingPhrase(kicsReading, 'KICS')}`
         )
       );
     }
@@ -185,13 +201,14 @@ export class ScannerWiringGate implements Gate {
         )
       );
     }
-    if (!ci.some((entry) => wiresInTool(entry.text, markers))) {
+    const reading = ciWiring(ci, markers);
+    if (reading !== 'wired') {
       findings.push(
         this.ratchet.findingAdvisory(
           'SEC-9',
           dockerfile,
           1,
-          'Dockerfiles are tracked but no workflow runs hadolint'
+          `Dockerfiles are tracked but ${missingPhrase(reading, 'hadolint')}`
         )
       );
     }
@@ -215,9 +232,15 @@ export class ScannerWiringGate implements Gate {
         )
       );
     }
-    if (!ci.some((entry) => wiresInTool(entry.text, markers))) {
+    const reading = ciWiring(ci, markers);
+    if (reading !== 'wired') {
       findings.push(
-        this.ratchet.findingAdvisory('CRED-11', PRECOMMIT_FILE, 1, 'no workflow runs gitleaks')
+        this.ratchet.findingAdvisory(
+          'CRED-11',
+          PRECOMMIT_FILE,
+          1,
+          missingPhrase(reading, 'gitleaks')
+        )
       );
     }
     return findings;
