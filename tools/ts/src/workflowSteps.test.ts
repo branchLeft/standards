@@ -56,6 +56,21 @@ describe('runBodyInvokes', () => {
     expect(runBodyInvokes('docker run --rm zricethezav/gitleaks:v8 detect', 'gitleaks')).toBe(true);
   });
 
+  it('matches a command run behind environment assignments', () => {
+    expect(runBodyInvokes('GRYPE_DB_AUTO_UPDATE=false grype dir:.', 'grype')).toBe(true);
+    expect(runBodyInvokes('cd x && A=1 B="2" grype dir:.', 'grype')).toBe(true);
+    expect(runBodyInvokes('echo A=1 grype', 'grype')).toBe(false);
+  });
+
+  it('matches a hook run through pre-commit run, with flags on either side', () => {
+    expect(runBodyInvokes('pre-commit run gitleaks', 'gitleaks')).toBe(true);
+    expect(runBodyInvokes('pre-commit run gitleaks --all-files', 'gitleaks')).toBe(true);
+    expect(runBodyInvokes('pre-commit run --all-files gitleaks', 'gitleaks')).toBe(true);
+    expect(runBodyInvokes('pre-commit run hadolint', 'gitleaks')).toBe(false);
+    expect(runBodyInvokes('pre-commit run notgitleaks', 'gitleaks')).toBe(false);
+    expect(runBodyInvokes('echo pre-commit run gitleaks', 'gitleaks')).toBe(false);
+  });
+
   it('does not match the name inside an echo or a longer word', () => {
     expect(runBodyInvokes('echo gitleaks is great', 'gitleaks')).toBe(false);
     expect(runBodyInvokes('notgitleaks detect', 'gitleaks')).toBe(false);
