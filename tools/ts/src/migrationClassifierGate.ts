@@ -56,25 +56,28 @@ export class MigrationClassifierGate implements Gate {
     }
     const result = classifyMigration(content);
 
+    const findings: Finding[] = [];
     if (result.classification === 'mixed') {
       const line = result.mixedStatements[0]?.startLine ?? 1;
-      return [
+      findings.push(
         this.ratchet.findingAdvisory(
           'DB-6',
           file,
           line,
           'migration mixes an expand statement with a contract statement — split it into one migration per direction'
-        ),
-      ];
+        )
+      );
     }
-
-    return result.missingDefaults.map((statement) =>
-      this.ratchet.findingAdvisory(
-        'DB-5',
-        file,
-        statement.startLine,
-        'added NOT NULL column carries no DEFAULT — the previous release would fail against it'
-      )
-    );
+    for (const statement of result.missingDefaults) {
+      findings.push(
+        this.ratchet.findingAdvisory(
+          'DB-5',
+          file,
+          statement.startLine,
+          'added NOT NULL column carries no DEFAULT — the previous release would fail against it'
+        )
+      );
+    }
+    return findings;
   }
 }

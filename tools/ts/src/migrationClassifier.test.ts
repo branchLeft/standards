@@ -58,6 +58,55 @@ describe('splitStatementsWithLines', () => {
   });
 });
 
+describe('splitStatementsWithLines — quoted text', () => {
+  it('does not split on a semicolon inside a single-quoted string', () => {
+    const sql = assembleSql('ALTER', " TABLE a ADD b text DEFAULT 'one; two';\n");
+    const statements = splitStatementsWithLines(sql);
+    expect(statements).toHaveLength(1);
+    expect(statements[0]?.text).toBe(
+      assembleSql('ALTER', " TABLE a ADD b text DEFAULT 'one; two'")
+    );
+  });
+
+  it('reads a doubled quote as part of the string, not its end', () => {
+    const sql = assembleSql('UPDATE', " a SET b = 'it''s; fine';\n");
+    expect(splitStatementsWithLines(sql)).toHaveLength(1);
+  });
+
+  it('does not split on a semicolon inside a quoted identifier', () => {
+    const sql = assembleSql('CREATE', ' TABLE "a;b" (id text);\n');
+    expect(splitStatementsWithLines(sql)).toHaveLength(1);
+  });
+
+  it('does not split on a semicolon inside a dollar-quoted body', () => {
+    const sql =
+      assembleSql('CREATE', ' FUNCTION f() RETURNS int LANGUAGE sql AS $body$\n') +
+      assembleSql('SELECT', ' 1;\n') +
+      assembleSql('SELECT', ' 2;\n$body$;\n') +
+      assembleSql('CREATE', ' TABLE a (id text);\n');
+    const statements = splitStatementsWithLines(sql);
+    expect(statements).toHaveLength(2);
+    expect(statements[1]?.startLine).toBe(5);
+  });
+
+  it('does not read a comment opener inside a string as a comment', () => {
+    const sql = assembleSql('ALTER', " TABLE a ADD b text DEFAULT '--x /* y';\n");
+    expect(splitStatementsWithLines(sql)[0]?.text).toContain("'--x /* y'");
+  });
+
+  it('counts the lines a multi-line string spans', () => {
+    const sql =
+      assembleSql('UPDATE', " a SET b = 'one\ntwo';\n") +
+      assembleSql('CREATE', ' TABLE c (id text);\n');
+    expect(splitStatementsWithLines(sql)[1]?.startLine).toBe(3);
+  });
+
+  it('classifies a migration whose string holds a semicolon as expand', () => {
+    const sql = assembleSql('ALTER', " TABLE a ADD COLUMN b text DEFAULT 'one; two';\n");
+    expect(classifyMigration(sql).classification).toBe('expand');
+  });
+});
+
 describe('classifyMigration — expand', () => {
   it('classifies CREATE TABLE and CREATE INDEX as expand', () => {
     const sql =
@@ -83,32 +132,109 @@ describe('classifyMigration — expand', () => {
     expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
   });
 
-  it('flags a NOT NULL column with no DEFAULT inside CREATE TABLE', () => {
-    const sql = assembleSql('CREATE', ' TABLE a (id text PRIMARY KEY, name text NOT NULL);\n');
+  it('does not flag NOT NULL columns with no DEFAULT inside CREATE TABLE', () => {
+    // DB-5 allows new tables: a table that did not exist cannot break the
+    // previous release, whatever its column constraints are.
+    const sql = assembleSql(
+      'CREATE',
+      ' TABLE a (id text PRIMARY KEY NOT NULL, name text NOT NULL, note text NOT NULL);\n'
+    );
+    const result = classifyMigration(sql);
+    expect(result.classification).toBe('expand');
+    expect(result.missingDefaults).toHaveLength(0);
+  });
+});
+
+describe('classifyMigration — ALTER TABLE ADD without the COLUMN keyword', () => {
+  it('classifies drizzle-kit SQLite output (ADD <column>) as expand', () => {
+    const sql = assembleSql('ALTER', ' TABLE `t` ADD `c` text;\n');
+    const result = classifyMigration(sql);
+    expect(result.classification).toBe('expand');
+    expect(result.missingDefaults).toHaveLength(0);
+  });
+
+  it('classifies a schema-qualified ADD <column> as expand', () => {
+    const sql = assembleSql('ALTER', ' TABLE "portal"."t" ADD "c" text;\n');
+    expect(classifyMigration(sql).classification).toBe('expand');
+  });
+
+  it('flags a NOT NULL ADD <column> with no DEFAULT', () => {
+    const sql = assembleSql('ALTER', ' TABLE `t` ADD `c` text NOT NULL;\n');
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(1);
+  });
+
+  it('does not flag a NOT NULL ADD <column> that has a DEFAULT', () => {
+    const sql = assembleSql('ALTER', " TABLE `t` ADD `c` text NOT NULL DEFAULT 'x';\n");
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
+  });
+
+  it('judges each action of a comma-separated ALTER TABLE on its own', () => {
+    const sql = assembleSql('ALTER', ' TABLE t ADD a text DEFAULT 1, ADD b text NOT NULL;\n');
+    expect(classifyMigration(sql).missingDefaults).toHaveLength(1);
+  });
+
+  it('treats an ALTER TABLE that adds and drops in one statement as mixed', () => {
+    const sql = assembleSql('ALTER', ' TABLE t ADD a text, DROP COLUMN b;\n');
+    expect(classifyMigration(sql).classification).toBe('mixed');
+  });
+});
+
+describe('classifyMigration — an added NOT NULL column is DB-5, not DB-6', () => {
+  it('classifies an added NOT NULL column beside ADD CONSTRAINT as expand with one missing default', () => {
+    const sql =
+      assembleSql('ALTER', ' TABLE "s"."t" ADD COLUMN "kind" text NOT NULL;\n') +
+      assembleSql('ALTER', ' TABLE "s"."t" ADD CONSTRAINT "k" CHECK ("kind" IN (\'A\'));\n');
     const result = classifyMigration(sql);
     expect(result.classification).toBe('expand');
     expect(result.missingDefaults).toHaveLength(1);
   });
 
-  it('does not flag a CREATE TABLE column with a DEFAULT', () => {
-    const sql = assembleSql(
-      'CREATE',
-      " TABLE a (id text PRIMARY KEY, name text NOT NULL DEFAULT 'x');\n"
-    );
-    expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
+  it('keeps the missing default when the same migration is also mixed', () => {
+    const sql =
+      assembleSql('ALTER', ' TABLE a ADD COLUMN name text NOT NULL;\n') +
+      assembleSql('DROP', ' TABLE b;\n');
+    const result = classifyMigration(sql);
+    expect(result.classification).toBe('mixed');
+    expect(result.missingDefaults).toHaveLength(1);
+  });
+});
+
+describe('classifyMigration — Postgres statements', () => {
+  it.each([
+    ['CREATE', ' SCHEMA "portal";\n'],
+    ['CREATE', ' POLICY "p" ON "s"."t" AS PERMISSIVE FOR ALL TO "r" USING (true);\n'],
+    ['ALTER', ' TABLE "s"."t" ENABLE ROW LEVEL SECURITY;\n'],
+    ['ALTER', ' TABLE "s"."t" ADD CONSTRAINT "c" FOREIGN KEY ("a") REFERENCES "s"."u"("a");\n'],
+    ['ALTER', ' TABLE "s"."t" ADD CONSTRAINT "c" CHECK ("a" > 0);\n'],
+    ['ALTER', ' TABLE "s"."t" ADD PRIMARY KEY ("a");\n'],
+    ['ALTER', ' TABLE IF EXISTS ONLY "s"."t" ADD COLUMN IF NOT EXISTS "a" text;\n'],
+    ['CREATE', ' FUNCTION public.f() RETURNS int LANGUAGE sql AS $$ SELECT 1; $$;\n'],
+  ])('classifies %s%s as expand', (keyword, rest) => {
+    const result = classifyMigration(assembleSql(keyword, rest));
+    expect(result.classification).toBe('expand');
+    expect(result.missingDefaults).toHaveLength(0);
   });
 
-  it('does not flag a table-level PRIMARY KEY constraint as a missing-default column', () => {
-    const sql = assembleSql(
-      'CREATE',
-      " TABLE a (id text, name text NOT NULL DEFAULT 'x', PRIMARY KEY (id));\n"
-    );
-    expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
+  it.each([
+    ['DROP', ' SCHEMA "portal";\n'],
+    ['DROP', ' POLICY "p" ON "s"."t";\n'],
+    ['DROP', ' FUNCTION public.f();\n'],
+    ['ALTER', ' TABLE "s"."t" DROP CONSTRAINT "c";\n'],
+    ['ALTER', ' TABLE "s"."t" DROP "a";\n'],
+  ])('classifies %s%s as contract', (keyword, rest) => {
+    expect(classifyMigration(assembleSql(keyword, rest)).classification).toBe('contract');
   });
 
-  it('does not flag a CREATE TABLE statement with no parenthesised column list', () => {
-    const sql = assembleSql('CREATE', ' TABLE a;\n');
-    expect(classifyMigration(sql).missingDefaults).toHaveLength(0);
+  it('still classifies a drop and an add of a constraint in one migration as mixed', () => {
+    const sql =
+      assembleSql('ALTER', ' TABLE "s"."t" DROP CONSTRAINT "c";\n') +
+      assembleSql('ALTER', ' TABLE "s"."t" ADD CONSTRAINT "c" CHECK ("a" > 0);\n');
+    expect(classifyMigration(sql).classification).toBe('mixed');
+  });
+
+  it('still classifies a statement it does not know as mixed', () => {
+    const sql = assembleSql('ALTER', ' TABLE "s"."t" DISABLE ROW LEVEL SECURITY;\n');
+    expect(classifyMigration(sql).classification).toBe('mixed');
   });
 });
 
