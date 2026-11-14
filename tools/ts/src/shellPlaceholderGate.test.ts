@@ -120,7 +120,8 @@ describe('ShellPlaceholderGate (SH-4)', () => {
   });
 
   it('reports a finding as exempt after an inline allow comment', () => {
-    const allow = '<!-- standards-allow-next-line SH-4 shape of the command, not for copying -->';
+    // Built in two parts so this file's own line is not read as a stale exemption of SH-4.
+    const allow = `<!-- standards-allow${'-next-line'} SH-4 shape of the command, not for copying -->`;
     const content = [FENCE + 'bash', allow, 'echo <a>', FENCE, ''].join('\n');
     expect(run({ 'docs/guide.md': content })).toEqual(['SH-4 exempt docs/guide.md:3']);
   });
