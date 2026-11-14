@@ -38,6 +38,7 @@ import { ScannerWiringGate } from './scannerWiringGate.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
 import { SharedLintConfigGate } from './sharedLintConfigGate.ts';
+import { ShellPlaceholderGate } from './shellPlaceholderGate.ts';
 import { WorkItemReferenceGate } from './workItemReferenceGate.ts';
 
 export function buildAdvisoryGates(
@@ -84,5 +85,6 @@ export function buildAdvisoryGates(
     new AnsibleMoleculeGate(ratchet, fs, toolsRoot),
     new AnsibleToolchainGate(ratchet, fs, toolsRoot),
     new AnsibleLintGate(ratchet, fs, toolsRoot),
+    new ShellPlaceholderGate(ratchet, fs),
   ];
 }
