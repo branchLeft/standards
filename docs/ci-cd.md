@@ -92,9 +92,9 @@ Every fleet caller's reusable-workflow tag equals the latest published tag, with
 
 ## CI-12 — every deploy job runs in a protected environment
 
-Every deploy job runs in a protected deployment environment that only the default branch may use and that waits for the platform owner's approval (today `production`; staging environments may be added).
+Every deploy job runs in a protected deployment environment that only the default branch may use and that waits for the approval `PRIN-2` names (today `production`; staging environments may be added).
 
-**Why:** a deploy job outside such an environment ships on merge with no approval click, bypassing the only human gate.
+**Why:** a deploy job outside such an environment ships on merge with no approval click, bypassing the only approval gate.
 
 **Check:** pending; `tools/check-workflows.sh` extended so a job using deploy credentials must declare an `environment`.
 
