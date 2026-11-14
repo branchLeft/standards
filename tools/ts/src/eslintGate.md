@@ -6,8 +6,21 @@ turned a rule firing into a finding in this audit's own format. This gate
 closes that gap: it runs the consuming repo's own ESLint and maps each
 `ruleId` in the JSON output onto the clause it evidences.
 
-All ten clauses stay `pending` in `docs/index.md`. This gate is advisory
-evidence for the eventual `auto` decision, not the decision itself.
+The clauses stay `pending` in `docs/index.md` unless `tools/ts-promoted.tsv`
+lists them. This gate is advisory evidence for the eventual `auto` decision,
+not the decision itself.
+
+## Why NAM-1, NAM-2, TYP-1 and TYP-2 are not on the promoted list
+
+These four each name a Python half in their `Check:` line
+(ruff `N` and `ANN`, mypy, an ast-grep word check) that this gate does not
+read. The TypeScript half runs the consuming repo's own ESLint, which the
+Standards workflow does not install, so a repo with an ESLint config gets the
+fail-closed "could not run ESLint" finding on every clause, and a repo that
+does not configure the rule gets no finding at all. Promoting the clauses would
+turn the first into a failing build for a repo that broke nothing and leave the
+second passing. They wait for a consumer that installs and runs the shared
+config in the Standards job.
 
 ## Command choice
 

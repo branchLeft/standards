@@ -67,7 +67,17 @@ describe('buildAdvisoryGates', () => {
   it('builds advisory gates plus exactly the promoted list', () => {
     const promoted = new Set(promotedClauses);
     const enforcing = buildGates(promoted).filter((gate) => !gate.advisory);
-    expect(enforcing.flatMap((gate) => gate.clauses).sort()).toEqual([...promoted].sort());
+    // A gate may carry a clause that is not promoted beside one that is; that
+    // sibling stays advisory because the gate reports through findingPromotable.
+    expect(enforcing.every((gate) => gate.clauses.some((clause) => promoted.has(clause)))).toBe(
+      true
+    );
+    expect(
+      enforcing
+        .flatMap((gate) => gate.clauses)
+        .filter((clause) => promoted.has(clause))
+        .sort()
+    ).toEqual([...promoted].sort());
     expect(unwiredClauses(enforcing, promotedClauses)).toEqual([]);
   });
 

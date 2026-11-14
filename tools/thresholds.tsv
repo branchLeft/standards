@@ -34,7 +34,7 @@ TYP-2	eslint_rule	@typescript-eslint/explicit-function-return-type,@typescript-e
 PY-2	ruff_config_filenames	ruff.toml,.ruff.toml	#provisional, a reader only until the owner moves the gate class
 PY-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 PY-3	pyproject_filename	pyproject.toml	#provisional, a reader only until the owner moves the gate class
-TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	#provisional, a reader only until the owner moves the gate class
+TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	# config file names mypy itself reads; promoted in ts-promoted.tsv
 CI-12	deploy_secret_substrings	DEPLOY,PULUMI,HCLOUD,SSH_KEY	#provisional, the owner sets the real deploy-secret vocabulary later
 CI-15	allowed_issue_repo	branchLeft/workspace	#provisional, a reader only until the owner moves the gate class
 OPS-2	deploy_job_name_substrings	deploy	#provisional, the owner sets the real deploy-job vocabulary later
