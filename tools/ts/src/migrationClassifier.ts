@@ -260,12 +260,21 @@ function classifyKind(upper: string): ClassifiedStatement['kind'] {
   return isNeutralStatement(upper) ? 'neutral' : 'other';
 }
 
+// A column's own `DEFAULT` clause. The `DEFAULT` in a foreign key's
+// `ON DELETE SET DEFAULT` or `ON UPDATE SET DEFAULT` action is not one: it names
+// a referential action and gives the column no value on insert, so it is
+// removed before the keyword is looked for.
+function hasColumnDefault(upper: string): boolean {
+  const withoutReferentialActions = upper.replace(/\bSET\s+DEFAULT\b/g, ' ');
+  return /\bDEFAULT\b/.test(withoutReferentialActions);
+}
+
 function isAddColumnWithoutDefault(action: string): boolean {
   return (
     ADD_COLUMN.test(action) &&
     !ADD_CONSTRAINT.test(action) &&
     /\bNOT\s+NULL\b/.test(action) &&
-    !/\bDEFAULT\b/.test(action)
+    !hasColumnDefault(action)
   );
 }
 
