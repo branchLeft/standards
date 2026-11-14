@@ -214,6 +214,7 @@ COV-1 until a gate exists to say so.
 | CI-12 | `pending` | —                             |
 | CI-13 | `review`  | —                             |
 | CI-14 | `pending` | —                             |
+| CI-15 | `pending` | —                             |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state. CI-11 runs the same way, for the same reason — see

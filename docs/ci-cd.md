@@ -113,3 +113,11 @@ Every test suite and quality gate runs in CI and blocks merge, with two sanction
 **Why:** a gate that cannot fail is only a report.
 
 **Check:** pending; the ruleset audit (`CI-6`) extended so every job in a repo's test and standards workflows is a required check.
+
+## CI-15 — a workflow opens issues only in the workspace repo
+
+A workflow never holds `issues: write` and never runs a step that opens an issue (`gh issue create`, a REST `POST` to `.../issues`, `issues.create`, an issue-creating action) aimed at any repository but `branchLeft/workspace`; a failure surfaces as the workflow's own red status, or as an issue in that repo through a credential scoped to it.
+
+**Why:** all issues live in the workspace repo, and an issue filed anywhere else is not seen by the tracking that runs the work, so it is lost; a workflow's own token can write issues only to its own repository, so `issues: write` is a hole by construction.
+
+**Check:** pending; `tools/ts/src/issueTargetGate.ts` reports it as advisory, and `tools/issue-target-allowlist.tsv` names the workflows not yet repointed. Limits: `tools/ts/src/issueTargetGate.md`.

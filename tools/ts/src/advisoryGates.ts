@@ -27,6 +27,7 @@ import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Gate } from './gate.ts';
 import { HealthcheckGate } from './healthcheckGate.ts';
 import { ImageScanExemptionGate } from './imageScanExemptionGate.ts';
+import { IssueTargetGate } from './issueTargetGate.ts';
 import { LintCoverageGate } from './lintCoverageGate.ts';
 import { MigrationClassifierGate } from './migrationClassifierGate.ts';
 import { PersonalDataGate } from './personalDataGate.ts';
@@ -60,6 +61,7 @@ export function buildAdvisoryGates(
     new WorkItemReferenceGate(ratchet, fs, toolsRoot),
     new EslintGate(ratchet, fs, processRunner),
     new DeployEnvironmentGate(ratchet, fs, toolsRoot),
+    new IssueTargetGate(ratchet, fs, toolsRoot, process.env['GITHUB_REPOSITORY']),
     new DeployRolloutGate(ratchet, fs, toolsRoot),
     new DependabotEcosystemGate(ratchet, fs, toolsRoot),
     new CommitSigningGate(ratchet, fs, toolsRoot),
