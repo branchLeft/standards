@@ -145,6 +145,13 @@ run "ruleset-apply.sh fails loudly when the live read fails" apply_stops_when_ap
 run "ruleset-apply.sh prints guard findings to stderr" apply_findings_reach_stderr
 run "ruleset-apply.sh proceeds when bypass_actors is readable" apply_proceeds_when_bypass_visible
 
+# The publish workflow signs what it publishes and holds exactly the two extra
+# permissions for it. The self-test is the sabotage: it must see the real
+# workflow green and each of fourteen broken copies red.
+echo "publish attestation:"
+run "publish.yml attests every tarball it publishes" python3 -I "$TOOLS/tests/check_publish_attests.py"
+run "check_publish_attests.py self-test (sabotage red, real green)" python3 -I "$TOOLS/tests/check_publish_attests.py" --self-test
+
 echo "docs:"
 run "clause index agrees"  bash "$TOOLS/check-clause-index.sh"
 
