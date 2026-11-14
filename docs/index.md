@@ -496,14 +496,14 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Types — `types.md`
 
-| ID    | Gate      | Evidence                                            |
-| ----- | --------- | --------------------------------------------------- |
-| TYP-1 | `review`  | TypeScript and Python source in the diff            |
-| TYP-2 | `review`  | TypeScript and Python source in the diff            |
-| TYP-3 | `review`  | New variables initialised from calls or expressions |
-| TYP-4 | `review`  | New type annotations in the diff                    |
-| TYP-5 | `auto`    | `tools/ts/src/pythonConfigGate.ts`                  |
-| TYP-6 | `review`  | New source files in the diff                        |
+| ID    | Gate     | Evidence                                            |
+| ----- | -------- | --------------------------------------------------- |
+| TYP-1 | `review` | TypeScript and Python source in the diff            |
+| TYP-2 | `review` | TypeScript and Python source in the diff            |
+| TYP-3 | `review` | New variables initialised from calls or expressions |
+| TYP-4 | `review` | New type annotations in the diff                    |
+| TYP-5 | `auto`   | `tools/ts/src/pythonConfigGate.ts`                  |
+| TYP-6 | `review` | New source files in the diff                        |
 
 ## Error handling — `errors.md`
 
