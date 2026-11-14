@@ -5,11 +5,16 @@ export interface ClassifiedStatement {
   readonly text: string;
   readonly startLine: number;
   readonly kind: 'add' | 'drop-or-rename' | 'neutral' | 'other';
+  /** True where the statement adds a column that is `NOT NULL` with no `DEFAULT`. */
+  readonly missingDefault: boolean;
 }
 
 export interface MigrationClassificationResult {
   readonly classification: MigrationClassification;
-  /** Add statements whose NOT NULL column carries no DEFAULT — a DB-5 finding each. */
+  /**
+   * Statements that add a `NOT NULL` column with no `DEFAULT` — a DB-5 finding each.
+   * Reported whatever the classification: a mixed migration can breach both clauses.
+   */
   readonly missingDefaults: readonly ClassifiedStatement[];
   /** The statements that made the migration MIXED — empty unless mixed. */
   readonly mixedStatements: readonly ClassifiedStatement[];
@@ -20,104 +25,150 @@ interface RawStatement {
   readonly startLine: number;
 }
 
-interface CleanedLine {
-  readonly text: string;
-  readonly inBlockComment: boolean;
+const DOLLAR_QUOTE_TAG = /\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$/y;
+
+function isWordChar(char: string | undefined): boolean {
+  return char !== undefined && /\w/.test(char);
 }
 
-// A block comment already open on entry: consumes up to its close, or the
-// whole line if it doesn't close here.
-function continueBlockComment(line: string): CleanedLine {
-  const end = line.indexOf('*/');
-  return end === -1
-    ? { text: '', inBlockComment: true }
-    : { text: line.slice(end + 2), inBlockComment: false };
+function closeOfQuote(text: string, closer: string, from: number): number {
+  const close = text.indexOf(closer, from);
+  return close === -1 ? text.length : close + closer.length;
 }
 
-// Every `/* */` span opened and closed within one line, repeated until none remain.
-function stripBlockComments(line: string): CleanedLine {
-  let text = line;
-  for (;;) {
-    const start = text.indexOf('/*');
-    if (start === -1) {
-      return { text, inBlockComment: false };
-    }
-    const end = text.indexOf('*/', start + 2);
-    if (end === -1) {
-      return { text: text.slice(0, start), inBlockComment: true };
-    }
-    text = text.slice(0, start) + text.slice(end + 2);
+// Where the quoted span opening at `index` ends (exclusive), or undefined when
+// none opens there. A span is a string, a quoted identifier or a Postgres
+// dollar-quoted body; a doubled quote is read as one span ending and the next
+// opening, which keeps `''` inside a string whole. An unclosed span runs to the end.
+function quotedSpanEnd(text: string, index: number): number | undefined {
+  const char = text.charAt(index);
+  if (char === "'" || char === '"' || char === '`') {
+    return closeOfQuote(text, char, index + 1);
   }
-}
-
-// `--` to end of line, the `--> statement-breakpoint` marker included.
-function stripLineComment(line: string): string {
-  const dashIndex = line.indexOf('--');
-  return dashIndex === -1 ? line : line.slice(0, dashIndex);
-}
-
-function cleanLine(line: string, inBlockComment: boolean): CleanedLine {
-  const opened = inBlockComment
-    ? continueBlockComment(line)
-    : { text: line, inBlockComment: false };
-  if (opened.inBlockComment) {
-    return opened;
+  if (char !== '$' || isWordChar(text[index - 1])) {
+    return undefined;
   }
-  const closed = stripBlockComments(opened.text);
-  return { text: stripLineComment(closed.text), inBlockComment: closed.inBlockComment };
+  DOLLAR_QUOTE_TAG.lastIndex = index;
+  const tag = DOLLAR_QUOTE_TAG.exec(text)?.[0];
+  return tag === undefined ? undefined : closeOfQuote(text, tag, index + tag.length);
 }
 
-// Accumulates cleaned lines into `;`-terminated statements, each carrying the
-// line it started on. A separate object rather than closures over the loop in
-// `splitStatementsWithLines`, so that function stays a single, simple pass.
-class StatementAccumulator {
+// The same text with the inside of every quoted span blanked, so a keyword or
+// a bracket inside a string never reads as SQL. Offsets are unchanged.
+function maskQuoted(text: string): string {
+  let masked = '';
+  let index = 0;
+  while (index < text.length) {
+    const end = quotedSpanEnd(text, index);
+    if (end === undefined) {
+      masked += text.charAt(index);
+      index += 1;
+    } else {
+      masked +=
+        text.charAt(index) + ' '.repeat(Math.max(0, end - index - 2)) + text.charAt(end - 1);
+      index = end;
+    }
+  }
+  return masked;
+}
+
+function countNewlines(text: string): number {
+  return text.split('\n').length - 1;
+}
+
+// Walks the source once, dropping comments, ending a statement at each `;`
+// outside a quoted span, and recording the line each statement started on.
+// Lines inside a statement are joined by one space, as when a statement is
+// written on one line.
+class StatementScanner {
+  private readonly source: string;
   private readonly statements: RawStatement[] = [];
   private buffer = '';
   private startLine = 0;
+  private line = 1;
+  private index = 0;
+  private atLineStart = true;
 
-  addLine(text: string, lineNumber: number): void {
-    if (text === '') {
+  constructor(source: string) {
+    this.source = source;
+  }
+
+  scan(): readonly RawStatement[] {
+    while (this.index < this.source.length) {
+      this.step();
+    }
+    this.flush();
+    return this.statements;
+  }
+
+  private step(): void {
+    const pair = this.source.slice(this.index, this.index + 2);
+    if (pair === '--') {
+      this.skipLineComment();
       return;
     }
+    if (pair === '/*') {
+      this.skipBlockComment();
+      return;
+    }
+    const quoteEnd = quotedSpanEnd(this.source, this.index);
+    if (quoteEnd !== undefined) {
+      this.append(this.source.slice(this.index, quoteEnd));
+      this.index = quoteEnd;
+      return;
+    }
+    this.takeChar(this.source.charAt(this.index));
+    this.index += 1;
+  }
+
+  private takeChar(char: string): void {
+    if (char === ';') {
+      this.flush();
+    } else if (char === '\n') {
+      this.line += 1;
+      this.buffer = this.buffer.trimEnd();
+      this.buffer = this.buffer === '' ? '' : `${this.buffer} `;
+      this.atLineStart = true;
+    } else if (/\s/.test(char) && (this.buffer === '' || this.atLineStart)) {
+      return;
+    } else {
+      this.append(char);
+    }
+  }
+
+  private append(text: string): void {
     if (this.buffer === '') {
-      this.startLine = lineNumber;
+      this.startLine = this.line;
     }
-    this.buffer = this.buffer === '' ? text : `${this.buffer} ${text}`;
-    this.flushCompleteStatements(lineNumber);
+    this.buffer += text;
+    this.line += countNewlines(text);
+    this.atLineStart = false;
   }
 
-  private flushCompleteStatements(lineNumber: number): void {
-    let semicolon = this.buffer.indexOf(';');
-    while (semicolon !== -1) {
-      const statementText = this.buffer.slice(0, semicolon).trim();
-      if (statementText !== '') {
-        this.statements.push({ text: statementText, startLine: this.startLine });
-      }
-      this.buffer = this.buffer.slice(semicolon + 1).trim();
-      this.startLine = lineNumber;
-      semicolon = this.buffer.indexOf(';');
-    }
+  private skipLineComment(): void {
+    const end = this.source.indexOf('\n', this.index);
+    this.index = end === -1 ? this.source.length : end;
   }
 
-  finish(): readonly RawStatement[] {
-    if (this.buffer.trim() !== '') {
-      this.statements.push({ text: this.buffer.trim(), startLine: this.startLine });
+  private skipBlockComment(): void {
+    const close = this.source.indexOf('*/', this.index + 2);
+    const stop = close === -1 ? this.source.length : close + 2;
+    this.line += countNewlines(this.source.slice(this.index, stop));
+    this.index = stop;
+  }
+
+  private flush(): void {
+    const text = this.buffer.trim();
+    if (text !== '') {
+      this.statements.push({ text, startLine: this.startLine });
     }
-    return this.statements;
+    this.buffer = '';
   }
 }
 
 /** Strips comments and breakpoints, then splits on `;` into statements with their start line. */
 export function splitStatementsWithLines(source: string): readonly RawStatement[] {
-  const accumulator = new StatementAccumulator();
-  let inBlockComment = false;
-  const lines = source.split('\n');
-  for (let index = 0; index < lines.length; index += 1) {
-    const cleaned = cleanLine(lines[index] ?? '', inBlockComment);
-    inBlockComment = cleaned.inBlockComment;
-    accumulator.addLine(cleaned.text.trim(), index + 1);
-  }
-  return accumulator.finish();
+  return new StatementScanner(source).scan();
 }
 
 /** Splits `body` on commas that are not inside parentheses. */
@@ -155,89 +206,115 @@ function isNeutralStatement(upper: string): boolean {
   );
 }
 
-function classifyKind(upper: string): ClassifiedStatement['kind'] {
-  if (/^CREATE\s+(TABLE|(UNIQUE\s+)?INDEX)\b/.test(upper)) {
-    return 'add';
+// One identifier: double-quoted (Postgres), backtick-quoted (SQLite) or bare.
+const IDENTIFIER = '(?:"[^"]*"|`[^`]*`|\\w+)';
+const ALTER_TABLE_PREFIX = new RegExp(
+  `^ALTER\\s+TABLE\\s+(?:IF\\s+EXISTS\\s+)?(?:ONLY\\s+)?${IDENTIFIER}(?:\\s*\\.\\s*${IDENTIFIER})*\\s+`
+);
+const ADD_CONSTRAINT = /^ADD\s+(?:CONSTRAINT|PRIMARY\s+KEY|FOREIGN\s+KEY|UNIQUE|CHECK|EXCLUDE)\b/;
+// `ADD`, with or without the `COLUMN` keyword: drizzle-kit writes
+// `ALTER TABLE t ADD c text` for SQLite.
+const ADD_COLUMN = /^ADD\s+(?:COLUMN\s+)?(?:IF\s+NOT\s+EXISTS\s+)?\S/;
+const ENABLE_ROW_SECURITY = /^(?:ENABLE|FORCE)\s+ROW\s+LEVEL\s+SECURITY\b/;
+const CREATE_ADDS = /^CREATE\s+(?:TABLE|SCHEMA|POLICY|FUNCTION|(?:UNIQUE\s+)?INDEX)\b/;
+const DROPS = /^DROP\s+(?:TABLE|INDEX|SCHEMA|POLICY|FUNCTION)\b/;
+const DROP_OR_RENAME_ACTION = /^(?:DROP|RENAME)\b/;
+
+type ActionKind = 'add' | 'drop-or-rename' | 'other';
+
+/** The comma-separated actions of an `ALTER TABLE`, or undefined for any other statement. */
+function alterTableActions(upper: string): readonly string[] | undefined {
+  const prefix = ALTER_TABLE_PREFIX.exec(upper);
+  if (prefix === null) {
+    return undefined;
   }
-  if (/^ALTER\s+TABLE\b.*\bADD\s+COLUMN\b/.test(upper)) {
-    return 'add';
-  }
-  if (/^DROP\s+(TABLE|INDEX)\b/.test(upper)) {
-    return 'drop-or-rename';
-  }
-  if (/^ALTER\s+TABLE\b.*\b(DROP\s+COLUMN|RENAME)\b/.test(upper)) {
-    return 'drop-or-rename';
-  }
-  if (isNeutralStatement(upper)) {
-    return 'neutral';
-  }
-  return 'other';
+  return splitTopLevelCommas(upper.slice(prefix[0].length)).map((action) => action.trim());
 }
 
-/** True where an `ADD COLUMN` or a `CREATE TABLE` column is `NOT NULL` with no `DEFAULT`. */
-function addsColumnMissingDefault(text: string, upper: string): boolean {
-  if (/^ALTER\s+TABLE/.test(upper)) {
-    return /\bNOT\s+NULL\b/.test(upper) && !/\bDEFAULT\b/.test(upper);
+function actionKind(action: string): ActionKind {
+  if (ADD_CONSTRAINT.test(action) || ADD_COLUMN.test(action) || ENABLE_ROW_SECURITY.test(action)) {
+    return 'add';
   }
-  if (/^CREATE\s+TABLE/.test(upper)) {
-    const open = text.indexOf('(');
-    const close = text.lastIndexOf(')');
-    if (open === -1 || close === -1 || close <= open) {
-      return false;
-    }
-    const columns = splitTopLevelCommas(text.slice(open + 1, close));
-    return columns.some((column) => {
-      const columnUpper = column.toUpperCase();
-      if (/^\s*(PRIMARY\s+KEY|FOREIGN\s+KEY|CONSTRAINT|UNIQUE)\b/.test(columnUpper)) {
-        return false;
-      }
-      return /\bNOT\s+NULL\b/.test(columnUpper) && !/\bDEFAULT\b/.test(columnUpper);
-    });
+  return DROP_OR_RENAME_ACTION.test(action) ? 'drop-or-rename' : 'other';
+}
+
+// An `ALTER TABLE` is one kind when all its actions are; a statement that adds
+// and drops at once, or holds an action this reader does not know, is `other`.
+function alterTableKind(actions: readonly string[]): ActionKind {
+  const kinds = new Set(actions.map(actionKind));
+  const only = kinds.size === 1 ? [...kinds][0] : undefined;
+  return only ?? 'other';
+}
+
+function classifyKind(upper: string): ClassifiedStatement['kind'] {
+  const actions = alterTableActions(upper);
+  if (actions !== undefined) {
+    return alterTableKind(actions);
   }
-  return false;
+  if (CREATE_ADDS.test(upper)) {
+    return 'add';
+  }
+  if (DROPS.test(upper)) {
+    return 'drop-or-rename';
+  }
+  return isNeutralStatement(upper) ? 'neutral' : 'other';
+}
+
+function isAddColumnWithoutDefault(action: string): boolean {
+  return (
+    ADD_COLUMN.test(action) &&
+    !ADD_CONSTRAINT.test(action) &&
+    /\bNOT\s+NULL\b/.test(action) &&
+    !/\bDEFAULT\b/.test(action)
+  );
+}
+
+// DB-5 allows new tables, so only an `ALTER TABLE` that adds a column to a
+// table that already exists can break the previous release this way.
+function addsColumnMissingDefault(upper: string): boolean {
+  return alterTableActions(upper)?.some(isAddColumnWithoutDefault) ?? false;
 }
 
 /** Classifies every statement in `sql`, case-insensitively, comments and breakpoints stripped. */
 export function classifyStatements(sql: string): readonly ClassifiedStatement[] {
-  return splitStatementsWithLines(sql).map(({ text, startLine }) => ({
-    text,
-    startLine,
-    kind: classifyKind(text.toUpperCase()),
-  }));
+  return splitStatementsWithLines(sql).map(({ text, startLine }) => {
+    const upper = maskQuoted(text).toUpperCase();
+    return {
+      text,
+      startLine,
+      kind: classifyKind(upper),
+      missingDefault: addsColumnMissingDefault(upper),
+    };
+  });
 }
 
 // EXPAND: every non-neutral statement only adds. CONTRACT: only drops or
 // renames. An unrecognised statement, or a mix of the two, is MIXED — a
-// table-rebuild still qualifies, see `migrationClassifier.md`. Within an
-// EXPAND migration, an added `NOT NULL` column with no `DEFAULT` is reported.
+// table-rebuild still qualifies, see `migrationClassifier.md`. A column added
+// `NOT NULL` with no `DEFAULT` is reported whatever the classification.
 export function classifyMigration(sql: string): MigrationClassificationResult {
   const statements = classifyStatements(sql);
   if (statements.length === 0) {
     return { classification: 'empty', missingDefaults: [], mixedStatements: [] };
   }
+  const missingDefaults = statements.filter((statement) => statement.missingDefault);
 
   const other = statements.find((statement) => statement.kind === 'other');
   if (other) {
-    return { classification: 'mixed', missingDefaults: [], mixedStatements: [other] };
+    return { classification: 'mixed', missingDefaults, mixedStatements: [other] };
   }
 
   const structural = statements.filter((statement) => statement.kind !== 'neutral');
   if (structural.length === 0) {
-    return { classification: 'expand', missingDefaults: [], mixedStatements: [] };
+    return { classification: 'expand', missingDefaults, mixedStatements: [] };
   }
 
   const firstKind = (structural[0] as ClassifiedStatement).kind;
   const conflicting = structural.find((statement) => statement.kind !== firstKind);
   if (conflicting) {
-    return { classification: 'mixed', missingDefaults: [], mixedStatements: [conflicting] };
+    return { classification: 'mixed', missingDefaults, mixedStatements: [conflicting] };
   }
 
-  if (firstKind === 'add') {
-    const missingDefaults = structural.filter((statement) =>
-      addsColumnMissingDefault(statement.text, statement.text.toUpperCase())
-    );
-    return { classification: 'expand', missingDefaults, mixedStatements: [] };
-  }
-
-  return { classification: 'contract', missingDefaults: [], mixedStatements: [] };
+  const classification = firstKind === 'add' ? 'expand' : 'contract';
+  return { classification, missingDefaults, mixedStatements: [] };
 }
