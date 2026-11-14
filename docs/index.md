@@ -603,23 +603,23 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Containers — `containers.md`
 
-| ID     | Gate      | Evidence                                |
-| ------ | --------- | --------------------------------------- |
-| CON-1  | `pending` | —                                       |
-| CON-2  | `review`  | New third-party images in Compose files |
-| CON-3  | `pending` | —                                       |
-| CON-4  | `pending` | —                                       |
-| CON-5  | `pending` | —                                       |
-| CON-6  | `pending` | —                                       |
-| CON-7  | `pending` | —                                       |
-| CON-8  | `pending` | —                                       |
-| CON-9  | `pending` | —                                       |
-| CON-10 | `pending` | —                                       |
-| CON-11 | `pending` | —                                       |
-| CON-12 | `pending` | —                                       |
-| CON-13 | `review`  | Dockerfile entrypoints                  |
-| CON-14 | `pending` | —                                       |
-| CON-15 | `pending` | —                                       |
+| ID     | Gate      | Evidence                                                                                    |
+| ------ | --------- | ------------------------------------------------------------------------------------------- |
+| CON-1  | `pending` | —                                                                                           |
+| CON-2  | `review`  | New third-party images in Compose files                                                     |
+| CON-3  | `auto`    | `tools/ts/src/dockerImageGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)     |
+| CON-4  | `auto`    | `tools/ts/src/dockerImageGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)     |
+| CON-5  | `auto`    | `tools/ts/src/composeRuntimeGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)  |
+| CON-6  | `auto`    | `tools/ts/src/composeRuntimeGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)  |
+| CON-7  | `pending` | —                                                                                           |
+| CON-8  | `pending` | —                                                                                           |
+| CON-9  | `pending` | —                                                                                           |
+| CON-10 | `auto`    | `tools/ts/src/composeResourceGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`) |
+| CON-11 | `pending` | —                                                                                           |
+| CON-12 | `pending` | —                                                                                           |
+| CON-13 | `review`  | Dockerfile entrypoints                                                                      |
+| CON-14 | `auto`    | `tools/ts/src/healthcheckGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)     |
+| CON-15 | `pending` | —                                                                                           |
 
 ## Shell — `shell-and-python.md`
 

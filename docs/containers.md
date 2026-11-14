@@ -1,6 +1,6 @@
 # Containers
 
-Our own images are minimal, hardened and pinned; third-party applications run as upstream ships them; every container is locked down at runtime and reaches only what it declares. `CON-3` to `CON-10` are planned for one typed policy checker in this repo, backed by hadolint and KICS (`SEC-9`).
+Our own images are minimal, hardened and pinned; third-party applications run as upstream ships them; every container is locked down at runtime and reaches only what it declares. `CON-3` to `CON-10` are checked by the typed policy checker in this repo, backed by hadolint and KICS (`SEC-9`). `CON-3`, `CON-4`, `CON-5`, `CON-6` and `CON-10` fail the Standards job; `CON-7`, `CON-8` and `CON-9` are still advisory readers, because the front-door service name and the egress-list shape are not yet settled.
 
 ## CON-1 — hardened base images
 
@@ -24,7 +24,7 @@ Every image reference, in Dockerfiles and Compose files alike, is `name:tag@sha2
 
 **Why:** a registry owner can move a tag but not a digest, and the tag stays so humans can read it.
 
-**Check:** the policy checker; Dependabot keeps the digests current ([`DEP-8`](dependencies.md)).
+**Check:** `tools/ts/src/dockerImageGate.ts` (the TypeScript audit, which fails the Standards job) reads every Dockerfile `FROM` and Compose `image:` for the `name:tag@sha256:digest` shape, skipping `scratch`, an earlier build stage and a reference built from a variable; Dependabot keeps the digests current ([`DEP-8`](dependencies.md)).
 
 ## CON-4 — non-root
 
@@ -32,7 +32,7 @@ Images run as a numeric, non-root user, and any exception is listed with its rea
 
 **Why:** escaping a container as root is escaping onto the host.
 
-**Check:** the policy checker; hadolint `DL3002`.
+**Check:** `tools/ts/src/dockerImageGate.ts` (the TypeScript audit, which fails the Standards job): the final stage's last `USER`, including one inherited from the stage it builds on, is a numeric uid that is not 0, and an exception is a `standards-allow-next-line CON-4 <reason>` or a `.standardsignore` row; hadolint `DL3002`.
 
 ## CON-5 — read-only root filesystem
 
@@ -40,7 +40,7 @@ Containers run with a read-only root filesystem, and anything writable is a name
 
 **Why:** an attacker cannot drop tools into the container or change the app.
 
-**Check:** the policy checker, on Compose `read_only`.
+**Check:** `tools/ts/src/composeRuntimeGate.ts` (the TypeScript audit, which fails the Standards job), on Compose `read_only: true` for every service.
 
 ## CON-6 — no extra privileges
 
@@ -48,7 +48,7 @@ Every Linux capability is dropped and only named ones added back, each with a re
 
 **Why:** capabilities are slices of root's power, and most services need none.
 
-**Check:** the policy checker; KICS.
+**Check:** `tools/ts/src/composeRuntimeGate.ts` (the TypeScript audit, which fails the Standards job): `cap_drop: [ALL]`, `no-new-privileges:true`, no `privileged: true` and no `docker.sock` mount on every service; the reason for each `cap_add` is read in review; KICS.
 
 ## CON-7 — one front door
 
@@ -80,7 +80,7 @@ Every service has memory, CPU and process-count limits set from its observed beh
 
 **Why:** a runaway container cannot starve its neighbours, and a limit that throttles normal load is an outage of our own making.
 
-**Check:** the policy checker requires all three limits; review of the values against observed metrics.
+**Check:** `tools/ts/src/composeResourceGate.ts` (the TypeScript audit, which fails the Standards job) requires all three limits on every service (`mem_limit` or `deploy.resources.limits.memory`, `cpus` or `deploy.resources.limits.cpus`, and `pids_limit`); review of the values against observed metrics.
 
 ## CON-11 — a software bill of materials for every image
 
@@ -112,7 +112,7 @@ Every image has a health check, and CI boots it with the real configuration shap
 
 **Why:** a staging environment costs money we choose not to spend, and this gives much of the same guarantee.
 
-**Check:** the policy checker requires `HEALTHCHECK`; a CI smoke-test job per image.
+**Check:** `tools/ts/src/healthcheckGate.ts` (the TypeScript audit, which fails the Standards job) requires a `HEALTHCHECK` on each Dockerfile's final stage, counting one inherited from the stage it builds on and not `HEALTHCHECK NONE`; a CI smoke-test job per image.
 
 ## CON-15 — what was scanned is what runs
 

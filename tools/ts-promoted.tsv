@@ -8,4 +8,10 @@
 # missing from the index or from the end-to-end test, fails the unit tests.
 CMT-2	workItemReferenceGate.ts	# value is the classifier's own extension set, see thresholds.tsv
 CMT-4	commentRatioGate.ts	# value is the classifier's own extension set, see thresholds.tsv
+CON-3	dockerImageGate.ts	# value is the clause's own name:tag@sha256 shape, see thresholds.tsv
+CON-4	dockerImageGate.ts	# value is the clause's own numeric non-root user, see thresholds.tsv
+CON-5	composeRuntimeGate.ts	# value is the Compose key the clause names, see thresholds.tsv
+CON-6	composeRuntimeGate.ts	# value is the clause's own cap_drop ALL, see thresholds.tsv
+CON-10	composeResourceGate.ts	# values are the clause's three limits, see thresholds.tsv
+CON-14	healthcheckGate.ts	# value is the Dockerfile instruction the clause names, see thresholds.tsv
 DEP-8	dependabotEcosystemGate.ts	# value is GitHub's fixed config path, see thresholds.tsv
