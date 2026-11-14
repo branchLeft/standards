@@ -50,5 +50,5 @@ PR. See [`docs/ratchet.md`](docs/ratchet.md).
 ## Pre-1.0
 
 Breaking changes are expected while the clause families are still being
-authored. Once `docs/index.md` has no pending families, the version goes to
+authored. Once `docs/index.md` has no pending families (the families in its `## Pending — blocked on authorship` table, not clauses merely gated `pending`), the version goes to
 1.0.0 and a clause removal or a floor raise becomes a minor bump with a note.
