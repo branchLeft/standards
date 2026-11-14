@@ -43,6 +43,31 @@ describe('AnsibleRoleGate, ANS-7', () => {
     expect(messagesFor(findings, 'ANS-7')).toEqual([]);
   });
 
+  it('accepts a spec and defaults written as flow-style maps', () => {
+    const spec = [
+      'argument_specs:',
+      '  main: {short_description: Web, options: {',
+      '    web_port: {type: int, description: Port., default: 80},',
+      '    web_token: {type: str, description: A token., required: true},',
+      '    web_networks: {type: list, elements: str, description: Networks., default: []}}}',
+    ].join('\n');
+    const findings = run({
+      [SPEC]: spec,
+      [DEFAULTS]: '{web_port: 80, web_networks: []}\n',
+      [MAIN]: '[]',
+    });
+    expect(messagesFor(findings, 'ANS-7')).toEqual([]);
+  });
+
+  it('still flags an option missing its type in a flow-style spec', () => {
+    const spec = [
+      'argument_specs:',
+      '  main: {options: {web_port: {description: Port., default: 80}}}',
+    ].join('\n');
+    const findings = run({ [SPEC]: spec, [DEFAULTS]: 'web_port: 80\n', [MAIN]: '[]' });
+    expect(messagesFor(findings, 'ANS-7').join('\n')).toContain('it has no type');
+  });
+
   it('flags a role with no spec', () => {
     const findings = run({ [MAIN]: '[]' });
     expect(messagesFor(findings, 'ANS-7')).toHaveLength(1);
