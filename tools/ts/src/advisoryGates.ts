@@ -5,6 +5,11 @@
 // carries; such a gate reports `advisory = false` and can fail the run.
 import { join } from 'node:path';
 import { AgentRecordPathGate } from './agentRecordPathGate.ts';
+import { AnsibleLintGate } from './ansibleLintGate.ts';
+import { AnsibleMoleculeGate } from './ansibleMoleculeGate.ts';
+import { AnsibleRoleGate } from './ansibleRoleGate.ts';
+import { AnsibleTaskGate } from './ansibleTaskGate.ts';
+import { AnsibleToolchainGate } from './ansibleToolchainGate.ts';
 import { BakedConfigGate } from './bakedConfigGate.ts';
 import { BashGate } from './bashGate.ts';
 import { CommentRatioGate } from './commentRatioGate.ts';
@@ -72,5 +77,10 @@ export function buildAdvisoryGates(
     new DownloadChecksumGate(ratchet, fs, toolsRoot),
     new AgentRecordPathGate(ratchet, fs, toolsRoot),
     new ImageScanExemptionGate(ratchet, fs),
+    new AnsibleTaskGate(ratchet, fs, toolsRoot),
+    new AnsibleRoleGate(ratchet, fs, toolsRoot),
+    new AnsibleMoleculeGate(ratchet, fs, toolsRoot),
+    new AnsibleToolchainGate(ratchet, fs, toolsRoot),
+    new AnsibleLintGate(ratchet, fs, toolsRoot),
   ];
 }
