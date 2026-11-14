@@ -34,25 +34,37 @@ TYP-2	eslint_rule	@typescript-eslint/explicit-function-return-type,@typescript-e
 PY-2	ruff_config_filenames	ruff.toml,.ruff.toml	#provisional, a reader only until the owner moves the gate class
 PY-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 PY-3	pyproject_filename	pyproject.toml	#provisional, a reader only until the owner moves the gate class
-TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	#provisional, a reader only until the owner moves the gate class
+TYP-5	mypy_config_filenames	mypy.ini,setup.cfg	# config file names mypy itself reads; promoted in ts-promoted.tsv
 CI-12	deploy_secret_substrings	DEPLOY,PULUMI,HCLOUD,SSH_KEY	#provisional, the owner sets the real deploy-secret vocabulary later
+CI-15	allowed_issue_repo	branchLeft/workspace	#provisional, a reader only until the owner moves the gate class
 OPS-2	deploy_job_name_substrings	deploy	#provisional, the owner sets the real deploy-job vocabulary later
 DEP-8	dependabot_config_file	.github/dependabot.yml	# the path GitHub itself reads Dependabot's config from; promoted in ts-promoted.tsv
 REPO-8	disable_signing_patterns	commit.gpgsign=false,commit.gpgsign false,--no-gpg-sign	#provisional, the owner extends the pattern list later
 LINT-2	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 LINT-4	precommit_config_file	.pre-commit-config.yaml	#provisional, a reader only until the owner moves the gate class
 CON-1	hardened_image_patterns	docker/dhi-,dockerhardenedimages/	#provisional, a reader only until the owner moves the gate class
-CON-3	digest_pattern	name:tag@sha256:64-hex-digest	#provisional, a reader only until the owner moves the gate class
-CON-4	numeric_user_pattern	uid or uid:gid, digits only, not 0	#provisional, a reader only until the owner moves the gate class
-CON-5	required_setting	read_only: true	#provisional, a reader only until the owner moves the gate class
-CON-6	required_cap_drop	ALL	#provisional, a reader only until the owner moves the gate class
+CON-3	digest_pattern	name:tag@sha256:64-hex-digest	# the clause's own shape, name:tag@sha256 and 64 hex digits; promoted in ts-promoted.tsv
+CON-4	numeric_user_pattern	uid or uid:gid, digits only, not 0	# the clause's own words, a numeric non-root user; promoted in ts-promoted.tsv
+CON-5	required_setting	read_only: true	# the Compose key the clause names; promoted in ts-promoted.tsv
+CON-6	required_cap_drop	ALL	# the clause's own words, every capability dropped; promoted in ts-promoted.tsv
 CON-7	edge_service_names	edge	#provisional, a reader only until the owner moves the gate class
 CON-8	internal_network_key	internal	#provisional, a reader only until the owner moves the gate class
 CON-9	egress_key	x-egress	#provisional, a reader only until the owner moves the gate class
-CON-10	required_limit_keys	mem_limit,cpus,pids_limit	#provisional, a reader only until the owner moves the gate class
-CON-14	required_instruction	HEALTHCHECK	#provisional, a reader only until the owner moves the gate class
+CON-10	required_limit_keys	mem_limit,cpus,pids_limit	# the clause's three limits (memory, CPU, process count), as Compose spells them; promoted in ts-promoted.tsv
+CON-14	required_instruction	HEALTHCHECK	# the Dockerfile instruction the clause names; promoted in ts-promoted.tsv
 CRED-10	file_suffix	_FILE	#provisional, a reader only until the owner moves the gate class
 CFG-2	deployment_value_shape	url, ip address or hostname	#provisional, a reader only until the owner moves the gate class
+ANS-2	module_required_blocks	DOCUMENTATION,EXAMPLES,RETURN	#provisional, a reader only until the owner moves the gate class
+ANS-3	forbidden_modules	shell,raw,script	#provisional, a reader only until the owner moves the gate class
+ANS-4	pinned_requirements	ansible-core|ansible,ansible-lint,molecule,molecule-plugins,mypy,ruff	#provisional, a reader only until the owner moves the gate class
+ANS-5	forbidden_config_keys	skip_list,exclude_paths,mock_modules,mock_roles,kinds	#provisional, a reader only until the owner moves the gate class
+ANS-5	ignore_files	.ansible-lint-ignore,.config/ansible-lint-ignore.txt	#provisional, a reader only until the owner moves the gate class
+ANS-6	config_file	.yamllint	#provisional, a reader only until the owner moves the gate class
+ANS-7	spec_file	meta/argument_specs.yml	#provisional, a reader only until the owner moves the gate class
+ANS-8	forbidden_keyword	collections	#provisional, a reader only until the owner moves the gate class
+ANS-9	command_argument_key	argv	#provisional, a reader only until the owner moves the gate class
+ANS-11	required_test_step	idempotence	#provisional, a reader only until the owner moves the gate class
+ANS-15	allowed_drivers	docker,podman	#provisional, a reader only until the owner moves the gate class
 SEC-7	scan_markers	grype,anchore/scan-action	#provisional, the owner sets the real scan-workflow vocabulary later
 SEC-9	hadolint_markers	hadolint	#provisional, a reader only until the owner moves the gate class
 SEC-9	kics_markers	kics,checkmarx/kics-github-action	#provisional, the owner sets the real scan-workflow vocabulary later

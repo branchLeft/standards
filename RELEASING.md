@@ -27,6 +27,11 @@ packages when one changes is trivial next to debugging a repo running
 4. `publish.yml` fires on `v*.*.*` and publishes all four to GitHub Packages.
    Never `npm publish` locally.
 
+   The workflow packs each package once, signs that tarball with a GitHub
+   artifact attestation (SLSA build provenance), proves the attestation, and
+   only then publishes the same file. All four are attested before any is
+   published. A package that cannot be attested stops the release.
+
 ## Gates are versioned by the tag, not by semver
 
 Consumers pin the reusable workflow at an exact tag (`@v0.4.0`), never `@main`.
@@ -50,5 +55,5 @@ PR. See [`docs/ratchet.md`](docs/ratchet.md).
 ## Pre-1.0
 
 Breaking changes are expected while the clause families are still being
-authored. Once `docs/index.md` has no pending families, the version goes to
+authored. Once `docs/index.md` has no pending families (the families in its `## Pending — blocked on authorship` table, not clauses merely gated `pending`), the version goes to
 1.0.0 and a clause removal or a floor raise becomes a minor bump with a note.

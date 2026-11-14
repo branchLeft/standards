@@ -56,8 +56,11 @@ error and no visible difference in output.
 Verify with the gate rather than by eye:
 
 ```bash
-<standards>/tools/check-tsconfig.sh --mode enforce
+read -r STANDARDS_DIR; export STANDARDS_DIR
+"$STANDARDS_DIR"/tools/check-tsconfig.sh --mode enforce
 ```
+
+Enter the path of your standards checkout at the prompt.
 
 ## 3. Prettier
 

@@ -1,6 +1,6 @@
 # Repository settings
 
-Repo settings are code: committed as payloads under `templates/rulesets/<repo>/<name>.json`, applied by `tools/ruleset-apply.sh` (privileged, the platform owner's to run) and checked by `tools/ruleset-audit.sh`, so drift is a diff rather than a discovery.
+Repo settings are code: committed as payloads under `templates/rulesets/<repo>/<name>.json`, applied by `tools/ruleset-apply.sh` (privileged: repo and ruleset settings are never delegated under `PRIN-2`, so the owner runs it) and checked by `tools/ruleset-audit.sh`, so drift is a diff rather than a discovery.
 
 ## REPO-1 — the default-branch ruleset shape
 
@@ -86,7 +86,7 @@ Every public repo has GitHub secret scanning and push protection switched on.
 
 ## REPO-10 — agent work says so
 
-Every commit an agent writes carries a co-author trailer naming the model, and every pull request an agent raises says it was generated.
+Every commit an agent writes carries a co-author trailer naming the model, and every pull request an agent raises says it was generated. The rule is kept: the owner's rewrite of the agent rules on 12 Nov 2026 left it in force.
 
 **Why:** people reading the history are owed an accurate account of who wrote what.
 

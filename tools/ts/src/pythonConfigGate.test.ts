@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { Finding } from './finding.ts';
 import { FakeFileSystem } from './test-support/fakeFileSystem.ts';
 import { FakeGitClient } from './test-support/fakeGitClient.ts';
 import { PythonConfigGate } from './pythonConfigGate.ts';
@@ -293,5 +294,83 @@ describe('PythonConfigGate', () => {
     const findings = buildGate(fs, allFiles).run({ root: ROOT, mode: 'enforce' });
     const ruffFinding = findings.find((finding) => finding.message.includes('no ruff'));
     expect(ruffFinding?.level).toBe('exempt');
+  });
+});
+
+describe('PythonConfigGate promotion (TYP-5 listed, PY-2 and PY-3 not)', () => {
+  const PROMOTED = new Set(['TYP-5']);
+  // Loose scripts: no pyproject.toml, so PY-3 and PY-2 both fire on scripts/a.py.
+  const LOOSE_FILES = ['scripts/a.py', '.pre-commit-config.yaml', '.github/workflows/ci.yml'];
+  // A mypy table that is not strict: TYP-5 fires on pyproject.toml.
+  const LAX_PYPROJECT = CLEAN_PYPROJECT.replace('strict = true\n', '');
+  const LAX_FILES = [
+    'pyproject.toml',
+    'src/app.py',
+    '.pre-commit-config.yaml',
+    '.github/workflows/ci.yml',
+  ];
+
+  function build(
+    files: readonly string[],
+    pyproject: string | undefined,
+    mode: 'warn' | 'enforce',
+    promoted: ReadonlySet<string>,
+    changed: readonly string[]
+  ): { gate: PythonConfigGate; findings: () => readonly Finding[] } {
+    const fs = new FakeFileSystem();
+    if (pyproject !== undefined) {
+      fs.set(ROOT, 'pyproject.toml', pyproject);
+    }
+    fs.set(ROOT, '.pre-commit-config.yaml', CLEAN_PRECOMMIT);
+    fs.set(ROOT, '.github/workflows/ci.yml', CLEAN_WORKFLOW);
+    const git = new FakeGitClient({
+      root: ROOT,
+      files,
+      mergeBases: { 'origin/main..HEAD': 'base' },
+      diffs: { 'base...HEAD': changed, HEAD: [] },
+    });
+    const ratchet = Ratchet.init(git, fs, ROOT, { mode, promoted });
+    const gate = new PythonConfigGate(ratchet, fs, TOOLS_ROOT);
+    return { gate, findings: () => gate.run({ root: ROOT, mode }) };
+  }
+
+  function levelsOf(findings: readonly Finding[], clause: string): readonly string[] {
+    return findings.filter((finding) => finding.clause === clause).map((f) => f.level);
+  }
+
+  it('keeps PY-2 and PY-3 advisory in both modes while TYP-5 is promoted', () => {
+    const enforce = build(LOOSE_FILES, undefined, 'enforce', PROMOTED, ['scripts/a.py']);
+    const warn = build(LOOSE_FILES, undefined, 'warn', PROMOTED, ['scripts/a.py']);
+    for (const { findings } of [enforce, warn]) {
+      expect(levelsOf(findings(), 'PY-3')).toEqual(['advisory']);
+      expect(levelsOf(findings(), 'PY-2')).toEqual(['advisory', 'advisory']);
+    }
+  });
+
+  it('fails TYP-5 in enforce mode', () => {
+    const { gate, findings } = build(LAX_FILES, LAX_PYPROJECT, 'enforce', PROMOTED, []);
+    expect(gate.advisory).toBe(false);
+    expect(levelsOf(findings(), 'TYP-5')).toEqual(['error']);
+  });
+
+  it('fails TYP-5 in warn mode only when pyproject.toml changed', () => {
+    const changed = build(LAX_FILES, LAX_PYPROJECT, 'warn', PROMOTED, ['pyproject.toml']);
+    const untouched = build(LAX_FILES, LAX_PYPROJECT, 'warn', PROMOTED, ['README.md']);
+    expect(levelsOf(changed.findings(), 'TYP-5')).toEqual(['error']);
+    expect(levelsOf(untouched.findings(), 'TYP-5')).toEqual(['warning']);
+  });
+
+  it('reports nothing for a strict, version-matched project even when promoted', () => {
+    const { findings } = build(LAX_FILES, CLEAN_PYPROJECT, 'enforce', PROMOTED, []);
+    expect(findings()).toEqual([]);
+  });
+
+  it('is advisory for every clause while nothing is promoted', () => {
+    const loose = build(LOOSE_FILES, undefined, 'enforce', new Set(), ['scripts/a.py']);
+    const lax = build(LAX_FILES, LAX_PYPROJECT, 'enforce', new Set(), ['pyproject.toml']);
+    expect(loose.gate.advisory).toBe(true);
+    expect(lax.gate.advisory).toBe(true);
+    expect(levelsOf(loose.findings(), 'PY-3')).toEqual(['advisory']);
+    expect(levelsOf(lax.findings(), 'TYP-5')).toEqual(['advisory']);
   });
 });

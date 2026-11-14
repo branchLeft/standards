@@ -1,0 +1,8 @@
+# Workflows CI-15 does not report yet: each still opens issues outside the
+# workspace repo and is waiting to be repointed. path<TAB>reason
+#
+# A row without a reason is ignored, so its workflow is still reported. Delete
+# a row when its workflow is repointed or its issue step is removed; a row never
+# outlives the work it waits on.
+.github/workflows/ansible-drift-check.yml	opens a drift issue in its own repository; the reusable alert job and its caller are repointed together
+.github/workflows/ansible.yml	the daily-issue job opens a red-run issue in its own repository; repoint it or remove the step
