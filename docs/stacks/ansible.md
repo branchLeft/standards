@@ -28,7 +28,7 @@ A role's tasks and handlers contain no `ansible.builtin.shell`, `ansible.builtin
 
 ## ANS-4 — the toolchain is pinned
 
-ansible-core, ansible-lint, Molecule and its driver plugin, mypy and ruff are pinned to exact versions in one committed requirements file under `ansible/`, every collection a role uses is pinned to an exact version in `ansible/requirements.yml` and vendored so a clean checkout installs the pinned set with no network beyond the pins, the pre-commit ansible-lint hook's `rev` equals the requirements-file version, and a bump is a deliberate PR changing the pin and, for a collection, the vendored copy together, with the collection pins reviewed whenever `ansible-core` changes.
+ansible-core, ansible-lint, Molecule and its driver plugin, mypy and ruff are pinned to exact versions in one committed requirements file under `ansible/`, every collection a role uses is pinned to an exact version in `ansible/requirements.yml` and vendored so a clean checkout installs the pinned set with no network beyond the pins, the `rev` of every pre-commit hook that runs one of those tools (ansible-lint, mypy and ruff) equals the requirements-file version, and a bump is a deliberate PR changing the pin and, for a collection, the vendored copy together, with the collection pins reviewed whenever `ansible-core` changes.
 
 **Why:** Ansible's behaviour moves between core releases so an unpinned install makes a green run unrepeatable (the reason `CI-1` pins actions), and a vendored collection cannot change or disappear between two runs of one commit.
 
@@ -44,11 +44,11 @@ ansible-core, ansible-lint, Molecule and its driver plugin, mypy and ruff are pi
 
 ## ANS-6 — yamllint covers every YAML file under `ansible/`
 
-`.yamllint` extends `default` and keeps `comments.min-spaces-from-content` at 1, `braces.min-spaces-inside` at 0, `braces.max-spaces-inside` at 1 and both `octal-values.forbid-implicit-octal` and `forbid-explicit-octal` true (the five settings ansible-lint's `yaml` rule requires), sets `line-length.max` to 160 and disables `document-start` as ansible-lint's own default does, and runs in pre-commit and CI as its own step over every YAML file under `ansible/`.
+`.yamllint` extends `default` and keeps `comments.min-spaces-from-content` at 1, `comments-indentation` false, `braces.min-spaces-inside` at 0, `braces.max-spaces-inside` at 1 and both `octal-values.forbid-implicit-octal` and `forbid-explicit-octal` true (the six settings ansible-lint's `yaml` rule requires), sets `line-length.max` to 160 and disables `document-start` as ansible-lint's own default does, and runs in pre-commit and CI as its own step over every YAML file under `ansible/`.
 
 **Why:** unformatted YAML turns a one-line change into a whole-file diff and hides what changed from a reviewer, and a file ansible-lint does not treat as Ansible content is still covered.
 
-**Check:** a CI step running yamllint with the committed `.yamllint`, and a check that the file keeps the five settings and the two values.
+**Check:** a CI step running yamllint with the committed `.yamllint`, and a check that the file keeps the six settings and the two values.
 
 ## ANS-7 — every role declares its interface in `meta/argument_specs.yml`
 
@@ -235,9 +235,9 @@ enable_list:
   - no-log-password
 ```
 
-This is `.yamllint` at the repository root, with the five settings ansible-lint's
+This is `.yamllint` at the repository root, with the six settings ansible-lint's
 `yaml` rule requires, the two values ansible-lint's own default configuration
-sets, and nothing that loosens the five (`ANS-6`).
+sets, and nothing that loosens the six (`ANS-6`).
 
 ```yaml
 extends: default
@@ -247,6 +247,7 @@ rules:
   document-start: disable
   comments:
     min-spaces-from-content: 1
+  comments-indentation: false
   braces:
     min-spaces-inside: 0
     max-spaces-inside: 1
@@ -267,8 +268,12 @@ target host provides (`PY-3`).
 name = "example-service-ansible"
 requires-python = ">=3.11"
 
+[tool.ruff]
+target-version = "py311"
+
 [tool.mypy]
 strict = true
+python_version = "3.11"
 
 [[tool.mypy.overrides]]
 module = ["ansible.*"]
