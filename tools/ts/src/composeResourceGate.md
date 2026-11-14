@@ -12,3 +12,9 @@ key regardless of which shape the other two use).
 It checks presence only, not whether the values make sense — "set from
 observed behaviour at rest and under load" is a review judgement this
 checker can't make from the file alone.
+
+CON-10 fails a build: it is a row of `tools/ts-promoted.tsv` and the gate
+reports it through `findingPromotable`. Only the presence half of the Check is
+read here; the values against observed metrics stay a review. `cpu_shares` is a
+relative weight, not a limit, so a service that sets only that is missing its
+CPU limit.

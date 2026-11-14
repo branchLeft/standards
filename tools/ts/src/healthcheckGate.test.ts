@@ -41,4 +41,36 @@ describe('HealthcheckGate', () => {
     const findings = gate.run({ root: ROOT, mode: 'enforce' });
     expect(findings[0]?.clause).toBe('CON-14');
   });
+
+  it('counts a HEALTHCHECK inherited from the stage the final stage builds on', () => {
+    const fs = new FakeFileSystem();
+    fs.set(
+      ROOT,
+      'Dockerfile',
+      [
+        'FROM debian:bookworm-slim AS base',
+        'HEALTHCHECK CMD true',
+        'FROM base AS final',
+        'USER 1000',
+      ].join('\n')
+    );
+    const gate = new HealthcheckGate(buildRatchet(fs, ['Dockerfile']), fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
+  it('does not count HEALTHCHECK NONE, even over an inherited check', () => {
+    const fs = new FakeFileSystem();
+    fs.set(
+      ROOT,
+      'Dockerfile',
+      [
+        'FROM debian:bookworm-slim AS base',
+        'HEALTHCHECK CMD true',
+        'FROM base AS final',
+        'HEALTHCHECK NONE',
+      ].join('\n')
+    );
+    const gate = new HealthcheckGate(buildRatchet(fs, ['Dockerfile']), fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })[0]?.clause).toBe('CON-14');
+  });
 });

@@ -23,13 +23,13 @@ function hasScalar(service: ComposeService, ...path: readonly string[]): boolean
  * (pids) limit — either the legacy `mem_limit`/`cpus`/`pids_limit` keys the
  * Compose CLI still honours outside Swarm, or `deploy.resources.limits`
  * for memory and CPU alongside `pids_limit` (Compose has no
- * `deploy.resources.limits.pids`). Stays `pending` — see
- * composeResourceGate.md.
+ * `deploy.resources.limits.pids`). Fails a build because CON-10 is listed in
+ * tools/ts-promoted.tsv — see composeResourceGate.md.
  */
 export class ComposeResourceGate implements Gate {
   readonly id = 'compose-resources';
   readonly clauses = ['CON-10'];
-  readonly advisory = true;
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
@@ -37,6 +37,7 @@ export class ComposeResourceGate implements Gate {
   constructor(ratchet: Ratchet, fs: FileSystemPort) {
     this.ratchet = ratchet;
     this.fs = fs;
+    this.advisory = !ratchet.isPromoted('CON-10');
   }
 
   run(_context: GateContext): readonly Finding[] {
@@ -72,7 +73,7 @@ export class ComposeResourceGate implements Gate {
       return [];
     }
     return [
-      this.ratchet.findingAdvisory(
+      this.ratchet.findingPromotable(
         'CON-10',
         file,
         service.line,

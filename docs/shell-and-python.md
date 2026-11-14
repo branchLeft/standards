@@ -34,7 +34,7 @@ A fenced shell block meant to be copied and pasted verbatim never contains an un
 
 **Why:** a placeholder pasted by mistake runs with a wrong value and a secret typed into a command line lands in shell history, neither of which happens in prose.
 
-**Check:** a docs-lint rule for placeholder-shaped tokens inside fenced shell blocks meant to be copied, not in prose, templates or legal documents.
+**Check:** `tools/ts/src/shellPlaceholderGate.ts` reads placeholder-shaped tokens (`<name>`, `[ALL_CAPS]`, `YOUR_VALUE_HERE`, `REPLACE_ME`, `{{ name }}`) inside fenced shell blocks of markdown documents, not in prose, templates or legal documents. It is advisory and the clause stays `pending`: the reader cannot tell a block meant to be copied from one that illustrates a command's shape, so it does not fail a build until a sweep shows how many findings are real.
 
 ## Python
 

@@ -7,8 +7,12 @@ export interface ComposeService {
   readonly node: YamlMapNode;
 }
 
-/** `name:tag@sha256:64hex` — CON-3's exact shape. */
-export const DIGEST_PINNED_PATTERN = /^[^\s@]+@sha256:[0-9a-f]{64}$/;
+/**
+ * `name:tag@sha256:64hex` — CON-3's exact shape. The tag is the last `:`
+ * segment before the `@` and holds no `/`, so a registry port
+ * (`host:5000/name@sha256:…`) is not mistaken for one.
+ */
+export const DIGEST_PINNED_PATTERN = /^[^\s@]+:[^\s@:/]+@sha256:[0-9a-f]{64}$/;
 
 /**
  * A Compose file, whether named `compose.yml`, `docker-compose.yml`, or the

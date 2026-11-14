@@ -113,3 +113,23 @@ export function finalStage(stages: readonly DockerStage[]): DockerStage | undefi
 export function isStageReference(reference: string, stages: readonly DockerStage[]): boolean {
   return stages.some((stage) => stage.name === reference);
 }
+
+/**
+ * What a stage runs with: the instructions of the earlier stage it builds
+ * `FROM`, then its own. `USER` and `HEALTHCHECK` are inherited that way, so a
+ * final `FROM build` stage with neither of its own still has the build stage's.
+ */
+export function effectiveInstructions(
+  stage: DockerStage,
+  stages: readonly DockerStage[]
+): readonly DockerInstruction[] {
+  const index = stages.indexOf(stage);
+  const base = stage.baseImage.toLowerCase();
+  const parent = stages
+    .slice(0, Math.max(index, 0))
+    .reverse()
+    .find((earlier) => earlier.name?.toLowerCase() === base);
+  return parent === undefined
+    ? stage.instructions
+    : [...effectiveInstructions(parent, stages), ...stage.instructions];
+}

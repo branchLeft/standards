@@ -214,6 +214,7 @@ COV-1 until a gate exists to say so.
 | CI-12 | `pending` | —                             |
 | CI-13 | `review`  | —                             |
 | CI-14 | `pending` | —                             |
+| CI-15 | `pending` | —                             |
 
 CI-6 runs in the audit rather than in-repo CI because it needs `gh api` to read
 live ruleset state. CI-11 runs the same way, for the same reason — see
@@ -305,9 +306,12 @@ salt-injected-at-deploy pattern a stack still on the passphrase provider needs.
 | ANS-16 | `review`  | Tasks and templates in the diff that handle a secret        |
 | ANS-17 | `review`  | Workflows that run `ansible-playbook` and their environment |
 
-**No `ANS-*` clause is `auto`.** No gate script under `tools/` reads any of
-them yet, so each is binding prose carried by review, or by `ansible-lint`,
-Molecule and mypy in a repo that runs them, rather than by this repo. The
+**No `ANS-*` clause is `auto`.** Advisory readers in the TypeScript audit
+(`tools/ts/src/ansibleGates.md`) read the mechanical part of `ANS-2` to
+`ANS-9`, `ANS-11` and `ANS-15` and report at level `advisory` only, so each of
+those rows stays `pending` until the owner moves its gate class. The rest is
+binding prose carried by review, or by `ansible-lint`, Molecule and mypy in a
+repo that runs them, rather than by this repo. The
 `pending` rows are the ones such a tool is meant to check once it runs. A
 clause that a tool does not fully check says so under a `Named limit:` marker on
 the page, and the part it names is review; read the page for those, which is
@@ -492,14 +496,14 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Types — `types.md`
 
-| ID    | Gate      | Evidence                                            |
-| ----- | --------- | --------------------------------------------------- |
-| TYP-1 | `review`  | TypeScript and Python source in the diff            |
-| TYP-2 | `review`  | TypeScript and Python source in the diff            |
-| TYP-3 | `review`  | New variables initialised from calls or expressions |
-| TYP-4 | `review`  | New type annotations in the diff                    |
-| TYP-5 | `pending` | —                                                   |
-| TYP-6 | `review`  | New source files in the diff                        |
+| ID    | Gate     | Evidence                                            |
+| ----- | -------- | --------------------------------------------------- |
+| TYP-1 | `review` | TypeScript and Python source in the diff            |
+| TYP-2 | `review` | TypeScript and Python source in the diff            |
+| TYP-3 | `review` | New variables initialised from calls or expressions |
+| TYP-4 | `review` | New type annotations in the diff                    |
+| TYP-5 | `auto`   | `tools/ts/src/pythonConfigGate.ts`                  |
+| TYP-6 | `review` | New source files in the diff                        |
 
 ## Error handling — `errors.md`
 
@@ -599,23 +603,23 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 
 ## Containers — `containers.md`
 
-| ID     | Gate      | Evidence                                |
-| ------ | --------- | --------------------------------------- |
-| CON-1  | `pending` | —                                       |
-| CON-2  | `review`  | New third-party images in Compose files |
-| CON-3  | `pending` | —                                       |
-| CON-4  | `pending` | —                                       |
-| CON-5  | `pending` | —                                       |
-| CON-6  | `pending` | —                                       |
-| CON-7  | `pending` | —                                       |
-| CON-8  | `pending` | —                                       |
-| CON-9  | `pending` | —                                       |
-| CON-10 | `pending` | —                                       |
-| CON-11 | `pending` | —                                       |
-| CON-12 | `pending` | —                                       |
-| CON-13 | `review`  | Dockerfile entrypoints                  |
-| CON-14 | `pending` | —                                       |
-| CON-15 | `pending` | —                                       |
+| ID     | Gate      | Evidence                                                                                    |
+| ------ | --------- | ------------------------------------------------------------------------------------------- |
+| CON-1  | `pending` | —                                                                                           |
+| CON-2  | `review`  | New third-party images in Compose files                                                     |
+| CON-3  | `auto`    | `tools/ts/src/dockerImageGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)     |
+| CON-4  | `auto`    | `tools/ts/src/dockerImageGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)     |
+| CON-5  | `auto`    | `tools/ts/src/composeRuntimeGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)  |
+| CON-6  | `auto`    | `tools/ts/src/composeRuntimeGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)  |
+| CON-7  | `pending` | —                                                                                           |
+| CON-8  | `pending` | —                                                                                           |
+| CON-9  | `pending` | —                                                                                           |
+| CON-10 | `auto`    | `tools/ts/src/composeResourceGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`) |
+| CON-11 | `pending` | —                                                                                           |
+| CON-12 | `pending` | —                                                                                           |
+| CON-13 | `review`  | Dockerfile entrypoints                                                                      |
+| CON-14 | `auto`    | `tools/ts/src/healthcheckGate.ts` (TypeScript audit, listed in `tools/ts-promoted.tsv`)     |
+| CON-15 | `pending` | —                                                                                           |
 
 ## Shell — `shell-and-python.md`
 
@@ -624,7 +628,7 @@ is `warn`: the gate runs in every consumer and can only warn. It moves to
 | SH-1 | `pending` | —                                        |
 | SH-2 | `review`  | Shell in runbooks versus shell elsewhere |
 | SH-3 | `review`  | New scripts in the diff                  |
-| SH-4 | `pending` | —                                        |
+| SH-4 | `pending` | `tools/ts/src/shellPlaceholderGate.ts`   |
 
 ## Python — `shell-and-python.md`
 

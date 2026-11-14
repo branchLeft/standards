@@ -23,3 +23,10 @@ Earlier stages in a multi-stage build never ship; only `finalStage()`'s
 instructions describe the running container. CON-3's digest check is the
 exception — every stage's `FROM` is checked, since even a build-only stage
 still pulls from a registry each time CI runs.
+
+## Inheritance between stages
+
+`effectiveInstructions(stage, stages)` returns the instructions of the earlier
+stage a stage builds `FROM`, then its own. `USER` and `HEALTHCHECK` carry over
+that way in Docker, so CON-4 and CON-14 read the chain, not just the last
+stage's own lines.

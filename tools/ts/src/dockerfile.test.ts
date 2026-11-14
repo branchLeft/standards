@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { finalStage, isStageReference, parseDockerfile } from './dockerfile.ts';
+import {
+  effectiveInstructions,
+  finalStage,
+  isStageReference,
+  parseDockerfile,
+} from './dockerfile.ts';
 
 describe('parseDockerfile', () => {
   it('parses a single-stage Dockerfile', () => {
@@ -85,5 +90,45 @@ describe('parseDockerfile', () => {
     expect(stages[0]?.instructions).toHaveLength(1);
     expect(stages[0]?.instructions[0]?.keyword).toBe('RUN');
     expect(stages[0]?.instructions[0]?.args).toBe('apt-get update && apt-get install -y curl');
+  });
+});
+
+describe('effectiveInstructions', () => {
+  it("is the stage's own instructions when it builds on a registry image", () => {
+    const stages = parseDockerfile(['FROM debian:bookworm-slim', 'USER 1000'].join('\n'));
+    const stage = finalStage(stages);
+    expect(
+      stage && effectiveInstructions(stage, stages).map((instruction) => instruction.keyword)
+    ).toEqual(['USER']);
+  });
+
+  it('puts the inherited stage first, through a chain of stages', () => {
+    const stages = parseDockerfile(
+      [
+        'FROM debian:bookworm-slim AS a',
+        'USER 1',
+        'FROM a AS b',
+        'USER 2',
+        'FROM b',
+        'HEALTHCHECK CMD true',
+      ].join('\n')
+    );
+    const stage = finalStage(stages);
+    const lines =
+      stage &&
+      effectiveInstructions(stage, stages).map(
+        (instruction) => `${instruction.keyword} ${instruction.args}`
+      );
+    expect(lines).toEqual(['USER 1', 'USER 2', 'HEALTHCHECK CMD true']);
+  });
+
+  it('matches a stage name case-insensitively and ignores a later stage of the same name', () => {
+    const stages = parseDockerfile(
+      ['FROM debian AS Base', 'USER 1', 'FROM base', 'FROM debian AS base', 'USER 3'].join('\n')
+    );
+    const third = stages[1];
+    expect(
+      third && effectiveInstructions(third, stages).map((instruction) => instruction.args)
+    ).toEqual(['1']);
   });
 });

@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { buildAdvisoryGates } from './advisoryGates.ts';
-import { DockerImageGate } from './dockerImageGate.ts';
+import { HardenedBaseGate } from './hardenedBaseGate.ts';
 import type { Gate } from './gate.ts';
 import { NodeFileSystem } from './fileSystemPort.ts';
 import { readPromotedRows } from './promotedClauses.ts';
@@ -54,7 +54,9 @@ const promotedClauses = promotedRows.map((row) => row.clause);
 
 describe('buildAdvisoryGates', () => {
   it('wires every provisional threshold clause to an advisory gate', () => {
-    expect(provisionalClauses).toEqual(expect.arrayContaining(['CON-1', 'COV-1', 'CI-12']));
+    expect(provisionalClauses).toEqual(
+      expect.arrayContaining(['CON-1', 'COV-1', 'CI-12', 'CI-15'])
+    );
     expect(unwiredClauses(buildGates(), provisionalClauses)).toEqual([]);
   });
 
@@ -65,13 +67,23 @@ describe('buildAdvisoryGates', () => {
   it('builds advisory gates plus exactly the promoted list', () => {
     const promoted = new Set(promotedClauses);
     const enforcing = buildGates(promoted).filter((gate) => !gate.advisory);
-    expect(enforcing.flatMap((gate) => gate.clauses).sort()).toEqual([...promoted].sort());
+    // A gate may carry a clause that is not promoted beside one that is; that
+    // sibling stays advisory because the gate reports through findingPromotable.
+    expect(enforcing.every((gate) => gate.clauses.some((clause) => promoted.has(clause)))).toBe(
+      true
+    );
+    expect(
+      enforcing
+        .flatMap((gate) => gate.clauses)
+        .filter((clause) => promoted.has(clause))
+        .sort()
+    ).toEqual([...promoted].sort());
     expect(unwiredClauses(enforcing, promotedClauses)).toEqual([]);
   });
 
   it('reports the clauses of a removed gate, so the check cannot pass vacuously', () => {
-    const withoutDocker = buildGates().filter((gate) => !(gate instanceof DockerImageGate));
-    expect(unwiredClauses(withoutDocker, provisionalClauses)).toEqual(['CON-1', 'CON-3', 'CON-4']);
+    const withoutHardened = buildGates().filter((gate) => !(gate instanceof HardenedBaseGate));
+    expect(unwiredClauses(withoutHardened, provisionalClauses)).toEqual(['CON-1']);
   });
 });
 

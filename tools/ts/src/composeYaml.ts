@@ -40,7 +40,7 @@ interface Line {
   readonly number: number;
 }
 
-function stripComment(raw: string): string {
+export function stripComment(raw: string): string {
   let inSingle = false;
   let inDouble = false;
   for (let index = 0; index < raw.length; index += 1) {
@@ -59,7 +59,7 @@ function stripComment(raw: string): string {
   return raw;
 }
 
-function bracketDelta(text: string): number {
+export function bracketDelta(text: string): number {
   let depth = 0;
   let inSingle = false;
   let inDouble = false;
@@ -107,7 +107,7 @@ function preprocess(content: string): readonly Line[] {
   return lines;
 }
 
-function unquote(text: string): string {
+export function unquote(text: string): string {
   if (text.length >= 2) {
     const first = text[0];
     const last = text[text.length - 1];
@@ -118,7 +118,7 @@ function unquote(text: string): string {
   return text;
 }
 
-function coerceScalar(raw: string): YamlScalar {
+export function coerceScalar(raw: string): YamlScalar {
   const trimmed = raw.trim();
   if (trimmed === '' || trimmed === '~' || trimmed === 'null') {
     return null;
@@ -135,7 +135,7 @@ function coerceScalar(raw: string): YamlScalar {
   return unquote(trimmed);
 }
 
-function splitFlowItems(inner: string): readonly string[] {
+export function splitFlowItems(inner: string): readonly string[] {
   const items: string[] = [];
   let depth = 0;
   let inSingle = false;
@@ -185,7 +185,7 @@ function parseScalarOrFlow(rest: string, line: number): YamlNode {
   return { kind: 'scalar', value: coerceScalar(trimmed), line };
 }
 
-function findKeyColon(content: string): number {
+export function findKeyColon(content: string): number {
   let inSingle = false;
   let inDouble = false;
   for (let index = 0; index < content.length; index += 1) {

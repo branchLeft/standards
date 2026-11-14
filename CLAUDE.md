@@ -11,7 +11,8 @@ internal-only shorthand.
 ## Hard rules
 
 - **Never write an audit finding or a work-item ID into this repo.** Findings
-  are filed as issues in a private tracker, never committed here, and an ID
+  are filed as issues in the private `branchLeft/workspace` tracker, never
+  committed here, and an ID
   belongs in commit and PR metadata, never in committed content. Committing a
   finding would publish an unfixed gap. `docs/` may describe a _pattern_; it
   must never cite a repo's current gap as the example.

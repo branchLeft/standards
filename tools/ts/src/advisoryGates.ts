@@ -5,6 +5,11 @@
 // carries; such a gate reports `advisory = false` and can fail the run.
 import { join } from 'node:path';
 import { AgentRecordPathGate } from './agentRecordPathGate.ts';
+import { AnsibleLintGate } from './ansibleLintGate.ts';
+import { AnsibleMoleculeGate } from './ansibleMoleculeGate.ts';
+import { AnsibleRoleGate } from './ansibleRoleGate.ts';
+import { AnsibleTaskGate } from './ansibleTaskGate.ts';
+import { AnsibleToolchainGate } from './ansibleToolchainGate.ts';
 import { BakedConfigGate } from './bakedConfigGate.ts';
 import { BashGate } from './bashGate.ts';
 import { CommentRatioGate } from './commentRatioGate.ts';
@@ -20,8 +25,10 @@ import { DownloadChecksumGate } from './downloadChecksumGate.ts';
 import { EslintGate } from './eslintGate.ts';
 import type { FileSystemPort } from './fileSystemPort.ts';
 import type { Gate } from './gate.ts';
+import { HardenedBaseGate } from './hardenedBaseGate.ts';
 import { HealthcheckGate } from './healthcheckGate.ts';
 import { ImageScanExemptionGate } from './imageScanExemptionGate.ts';
+import { IssueTargetGate } from './issueTargetGate.ts';
 import { LintCoverageGate } from './lintCoverageGate.ts';
 import { MigrationClassifierGate } from './migrationClassifierGate.ts';
 import { PersonalDataGate } from './personalDataGate.ts';
@@ -32,6 +39,7 @@ import { ScannerWiringGate } from './scannerWiringGate.ts';
 import { SchemaDriftGate } from './schemaDriftGate.ts';
 import { SecretsFileGate } from './secretsFileGate.ts';
 import { SharedLintConfigGate } from './sharedLintConfigGate.ts';
+import { ShellPlaceholderGate } from './shellPlaceholderGate.ts';
 import { WorkItemReferenceGate } from './workItemReferenceGate.ts';
 
 export function buildAdvisoryGates(
@@ -55,11 +63,13 @@ export function buildAdvisoryGates(
     new WorkItemReferenceGate(ratchet, fs, toolsRoot),
     new EslintGate(ratchet, fs, processRunner),
     new DeployEnvironmentGate(ratchet, fs, toolsRoot),
+    new IssueTargetGate(ratchet, fs, toolsRoot, process.env['GITHUB_REPOSITORY']),
     new DeployRolloutGate(ratchet, fs, toolsRoot),
     new DependabotEcosystemGate(ratchet, fs, toolsRoot),
     new CommitSigningGate(ratchet, fs, toolsRoot),
     new LintCoverageGate(ratchet, fs, toolsRoot),
-    new DockerImageGate(ratchet, fs, toolsRoot),
+    new DockerImageGate(ratchet, fs),
+    new HardenedBaseGate(ratchet, fs, toolsRoot),
     new ComposeRuntimeGate(ratchet, fs),
     new ComposeNetworkGate(ratchet, fs, toolsRoot),
     new ComposeResourceGate(ratchet, fs),
@@ -72,5 +82,11 @@ export function buildAdvisoryGates(
     new DownloadChecksumGate(ratchet, fs, toolsRoot),
     new AgentRecordPathGate(ratchet, fs, toolsRoot),
     new ImageScanExemptionGate(ratchet, fs),
+    new AnsibleTaskGate(ratchet, fs, toolsRoot),
+    new AnsibleRoleGate(ratchet, fs, toolsRoot),
+    new AnsibleMoleculeGate(ratchet, fs, toolsRoot),
+    new AnsibleToolchainGate(ratchet, fs, toolsRoot),
+    new AnsibleLintGate(ratchet, fs, toolsRoot),
+    new ShellPlaceholderGate(ratchet, fs),
   ];
 }

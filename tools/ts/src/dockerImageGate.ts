@@ -4,54 +4,37 @@ import type { Gate, GateContext } from './gate.ts';
 import { asMap, mapGet, scalarValue } from './composeYaml.ts';
 import { parseYaml } from './composeYaml.ts';
 import { COMPOSE_FILE_PATTERN, DIGEST_PINNED_PATTERN, listServices } from './composeModel.ts';
-import { finalStage, isStageReference, parseDockerfile } from './dockerfile.ts';
+import {
+  effectiveInstructions,
+  finalStage,
+  isStageReference,
+  parseDockerfile,
+} from './dockerfile.ts';
 import type { DockerStage } from './dockerfile.ts';
 import type { Ratchet } from './ratchet.ts';
-import { readThresholdSetting, splitThresholdList } from './thresholdSettings.ts';
 
 const DOCKERFILE_PATTERN = /(^|\/)Dockerfile(\.[^/]+)?$/;
-const DEFAULT_HARDENED_PATTERNS: readonly string[] = ['docker/dhi-', 'dockerhardenedimages/'];
 const NUMERIC_USER_PATTERN = /^([1-9]\d*)(:\d+)?$/;
-const VARIABLE_PATTERN = /\$[{(]/;
-
-function isHardened(image: string, patterns: readonly string[]): boolean {
-  return patterns.some((pattern) => image.startsWith(pattern));
-}
-
-function isDebianSlimFallback(image: string): boolean {
-  const [repo, tag = ''] = image.split(/[:@]/);
-  return repo === 'debian' && tag.includes('slim');
-}
-
-function repoOnly(reference: string): string {
-  return reference.split('@')[0] ?? reference;
-}
+const VARIABLE_PATTERN = /\$/;
 
 /**
- * CON-1, CON-3 and CON-4: a Dockerfile's shipped stage builds on a hardened
- * or Debian-slim base, every non-stage image reference (Dockerfile `FROM`
- * and Compose `image:`) is pinned by tag and digest, and the shipped stage
- * runs as a numeric non-root user. All three stay `pending` — see
- * dockerImageGate.md.
+ * CON-3 and CON-4: every non-stage image reference (Dockerfile `FROM` and
+ * Compose `image:`) is pinned by tag and digest, and the shipped stage runs
+ * as a numeric non-root user. Both fail a build because they are listed in
+ * tools/ts-promoted.tsv — see dockerImageGate.md.
  */
 export class DockerImageGate implements Gate {
   readonly id = 'docker-image';
-  readonly clauses = ['CON-1', 'CON-3', 'CON-4'];
-  readonly advisory = true;
+  readonly clauses = ['CON-3', 'CON-4'];
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
-  private readonly toolsRoot: string;
 
-  constructor(ratchet: Ratchet, fs: FileSystemPort, toolsRoot: string) {
+  constructor(ratchet: Ratchet, fs: FileSystemPort) {
     this.ratchet = ratchet;
     this.fs = fs;
-    this.toolsRoot = toolsRoot;
-  }
-
-  private hardenedPatterns(): readonly string[] {
-    const raw = readThresholdSetting(this.fs, this.toolsRoot, 'CON-1', 'hardened_image_patterns');
-    return raw === undefined ? DEFAULT_HARDENED_PATTERNS : splitThresholdList(raw);
+    this.advisory = !this.clauses.every((clause) => ratchet.isPromoted(clause));
   }
 
   run(_context: GateContext): readonly Finding[] {
@@ -75,8 +58,7 @@ export class DockerImageGate implements Gate {
     findings.push(...this.checkDigests(file, stages));
     const shipped = finalStage(stages);
     if (shipped !== undefined) {
-      findings.push(...this.checkHardenedBase(file, shipped));
-      findings.push(...this.checkNonRootUser(file, shipped));
+      findings.push(...this.checkNonRootUser(file, stages, shipped));
     }
     return findings;
   }
@@ -90,7 +72,7 @@ export class DockerImageGate implements Gate {
       }
       if (!DIGEST_PINNED_PATTERN.test(image)) {
         findings.push(
-          this.ratchet.findingAdvisory(
+          this.ratchet.findingPromotable(
             'CON-3',
             file,
             stage.fromLine,
@@ -102,29 +84,18 @@ export class DockerImageGate implements Gate {
     return findings;
   }
 
-  private checkHardenedBase(file: string, shipped: DockerStage): readonly Finding[] {
-    const repo = repoOnly(shipped.baseImage);
-    if (isHardened(repo, this.hardenedPatterns()) || isDebianSlimFallback(repo)) {
-      return [];
-    }
-    return [
-      this.ratchet.findingAdvisory(
-        'CON-1',
-        file,
-        shipped.fromLine,
-        `final stage base "${shipped.baseImage}" is neither a Docker Hardened Image nor Debian's official -slim fallback`
-      ),
-    ];
-  }
-
-  private checkNonRootUser(file: string, shipped: DockerStage): readonly Finding[] {
-    const userInstructions = shipped.instructions.filter(
+  private checkNonRootUser(
+    file: string,
+    stages: readonly DockerStage[],
+    shipped: DockerStage
+  ): readonly Finding[] {
+    const userInstructions = effectiveInstructions(shipped, stages).filter(
       (instruction) => instruction.keyword === 'USER'
     );
     const last = userInstructions[userInstructions.length - 1];
     if (last === undefined) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'CON-4',
           file,
           shipped.fromLine,
@@ -134,7 +105,7 @@ export class DockerImageGate implements Gate {
     }
     if (!NUMERIC_USER_PATTERN.test(last.args)) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'CON-4',
           file,
           last.line,
@@ -160,7 +131,7 @@ export class DockerImageGate implements Gate {
       }
       if (!DIGEST_PINNED_PATTERN.test(image)) {
         findings.push(
-          this.ratchet.findingAdvisory(
+          this.ratchet.findingPromotable(
             'CON-3',
             file,
             entry?.line ?? service.line,

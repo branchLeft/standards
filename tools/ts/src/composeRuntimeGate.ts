@@ -13,12 +13,13 @@ const NO_NEW_PRIVILEGES = 'no-new-privileges:true';
  * CON-5 and CON-6: every service runs a read-only root filesystem, drops
  * every Linux capability (adding back only named ones), sets
  * `no-new-privileges`, and never runs `privileged` or mounts the Docker
- * socket. Both stay `pending` — see composeRuntimeGate.md.
+ * socket. Both fail a build because they are listed in
+ * tools/ts-promoted.tsv — see composeRuntimeGate.md.
  */
 export class ComposeRuntimeGate implements Gate {
   readonly id = 'compose-runtime';
   readonly clauses = ['CON-5', 'CON-6'];
-  readonly advisory = true;
+  readonly advisory: boolean;
 
   private readonly ratchet: Ratchet;
   private readonly fs: FileSystemPort;
@@ -26,6 +27,7 @@ export class ComposeRuntimeGate implements Gate {
   constructor(ratchet: Ratchet, fs: FileSystemPort) {
     this.ratchet = ratchet;
     this.fs = fs;
+    this.advisory = !this.clauses.every((clause) => ratchet.isPromoted(clause));
   }
 
   run(_context: GateContext): readonly Finding[] {
@@ -51,7 +53,7 @@ export class ComposeRuntimeGate implements Gate {
       return [];
     }
     return [
-      this.ratchet.findingAdvisory(
+      this.ratchet.findingPromotable(
         'CON-5',
         file,
         entry?.line ?? service.line,
@@ -65,7 +67,7 @@ export class ComposeRuntimeGate implements Gate {
     const dropped = scalarList(dropEntry?.value).map((item) => item.value.toUpperCase());
     if (!dropped.includes('ALL')) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'CON-6',
           file,
           dropEntry?.line ?? service.line,
@@ -78,7 +80,7 @@ export class ComposeRuntimeGate implements Gate {
     );
     if (!securityOpt.some((option) => option.toLowerCase() === NO_NEW_PRIVILEGES)) {
       return [
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'CON-6',
           file,
           service.line,
@@ -94,7 +96,7 @@ export class ComposeRuntimeGate implements Gate {
     const privilegedEntry = mapGet(service.node, 'privileged');
     if (scalarValue(privilegedEntry?.value) === true) {
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'CON-6',
           file,
           privilegedEntry?.line ?? service.line,
@@ -106,7 +108,7 @@ export class ComposeRuntimeGate implements Gate {
     const socketMount = volumes.find((volume) => DOCKER_SOCKET_PATTERN.test(volume.value));
     if (socketMount !== undefined) {
       findings.push(
-        this.ratchet.findingAdvisory(
+        this.ratchet.findingPromotable(
           'CON-6',
           file,
           socketMount.line,

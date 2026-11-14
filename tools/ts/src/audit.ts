@@ -18,7 +18,8 @@ import type { ClauseCoverage } from './clauseCoverage.ts';
  * `standards-audit.sh`'s `COVERED`. Kept in sync with that file by hand,
  * except the clauses whose gate is native TypeScript with no bash
  * equivalent, so only this runner covers them: CMT-2, CMT-4, DB-4, DB-5,
- * DB-6, PY-2, PY-3, TYP-5, CI-12, OPS-2, DEP-8, REPO-8, LINT-2, LINT-3, LINT-4, and
+ * DB-6, PY-2, PY-3, TYP-5, CI-12, CI-15, OPS-2, DEP-8, REPO-8, LINT-2, LINT-3, LINT-4,
+ * the ten ANS clauses the Ansible gates read (ANS-2 to ANS-9, ANS-11, ANS-15), SH-4, and
  * EslintGate's ten (ARCH-4, ARCH-7, ERR-1, ERR-2, ERR-3, NAM-1, NAM-2, TYP-1,
  * TYP-2, DB-3) — an intentional difference, not drift.
  */
@@ -45,6 +46,12 @@ export const COVERED_CLAUSES: ReadonlySet<string> = new Set([
   'CMT-2',
   'CMT-3',
   'CMT-4',
+  'CON-3',
+  'CON-4',
+  'CON-5',
+  'CON-6',
+  'CON-10',
+  'CON-14',
   'COV-1',
   'DB-1',
   'ARCH-4',
@@ -64,12 +71,24 @@ export const COVERED_CLAUSES: ReadonlySet<string> = new Set([
   'PY-3',
   'TYP-5',
   'CI-12',
+  'CI-15',
   'OPS-2',
   'DEP-8',
   'REPO-8',
   'LINT-2',
   'LINT-3',
   'LINT-4',
+  'ANS-2',
+  'ANS-3',
+  'ANS-4',
+  'ANS-5',
+  'ANS-6',
+  'ANS-7',
+  'ANS-8',
+  'ANS-9',
+  'ANS-11',
+  'ANS-15',
+  'SH-4',
 ]);
 
 /**
