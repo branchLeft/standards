@@ -31,7 +31,21 @@
           { "context": "test" },
           { "context": "actionlint" },
           { "context": "standards / Standards gates" },
-          { "context": "docs-lint / docs-lint" }
+          { "context": "docs-lint / docs-lint" },
+          { "context": "reference (ubuntu-24.04, g++)" },
+          { "context": "reference (ubuntu-24.04, clang++)" },
+          { "context": "reference (ubuntu-24.04-arm, g++)" },
+          { "context": "reference (ubuntu-24.04-arm, clang++)" },
+          { "context": "engine (node 22, ubuntu-24.04)" },
+          { "context": "engine (node 24, ubuntu-24.04)" },
+          { "context": "engine (node 24, ubuntu-24.04-arm)" },
+          { "context": "engine (node 26, ubuntu-24.04-arm)" },
+          { "context": "engine (bun latest, ubuntu-24.04)" },
+          { "context": "engine (bun latest, ubuntu-24.04-arm)" },
+          { "context": "engine (deno v2.x, ubuntu-24.04)" },
+          { "context": "engine (deno v2.x, ubuntu-24.04-arm)" },
+          { "context": "browsers (ubuntu-24.04)" },
+          { "context": "browsers (ubuntu-24.04-arm)" }
         ]
       }
     }
