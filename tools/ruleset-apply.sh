@@ -66,6 +66,10 @@ STUB
     'gh api repos/branchLeft/demo/rulesets` failed'
   check "unparseable listing fails loudly" 0 'not json' 0 "$good" "" nonzero \
     "could not read the ruleset listing for demo"
+  local deep_list
+  deep_list="$(python3 -c 'print("[" * 200000)')"
+  check "a listing nested past the recursion limit fails loudly" 0 "$deep_list" 0 "$good" "" nonzero \
+    "could not read the ruleset listing for demo"
   check "failed live read fails loudly" 0 "$list" 1 'HTTP 404' "" nonzero \
     'gh api repos/branchLeft/demo/rulesets/7` failed'
   check "hidden bypass list is refused, naming the scope" 0 "$list" 0 "$hidden" "" nonzero \
