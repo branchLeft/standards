@@ -705,7 +705,9 @@ gate_fixture_passes() {
   local pattern="$1" out
   [ -x "$TOOLS/../node_modules/.bin/vitest" ] \
     || { echo "vitest is not installed: run pnpm install"; return 1; }
-  out=$(cd "$TOOLS/.." && ./node_modules/.bin/vitest --run "${GATE_TEST_FILES[@]}" -t "$pattern" 2>&1) \
+  # FORCE_COLOR=0: CI forces colour, and escape codes inside "Tests  N passed"
+  # would stop the summary line from matching.
+  out=$(cd "$TOOLS/.." && FORCE_COLOR=0 NO_COLOR=1 ./node_modules/.bin/vitest --run "${GATE_TEST_FILES[@]}" -t "$pattern" 2>&1) \
     || { printf '%s\n' "$out"; return 1; }
   grep -qE 'Tests +[0-9]+ passed' <<< "$out" \
     || { echo "no fixture matched: $pattern"; printf '%s\n' "$out"; return 1; }
