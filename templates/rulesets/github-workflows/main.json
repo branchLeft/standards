@@ -46,6 +46,9 @@
         "required_status_checks": [
           {
             "context": "docs-lint"
+          },
+          {
+            "context": "standards / Standards gates"
           }
         ]
       }
