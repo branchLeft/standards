@@ -230,6 +230,7 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 | DEP-6 | `review`  | —                                         |
 | DEP-7 | `review`  | —                                         |
 | DEP-8 | `auto`    | `tools/ts/src/dependabotEcosystemGate.ts` |
+| DEP-9 | `auto`    | `tools/check-shield-licence.py` |
 
 ## Repository settings — `repo-settings.md`
 
