@@ -134,6 +134,24 @@ describe('AnsibleTaskGate, ANS-8', () => {
     expect(messagesFor(findings, 'ANS-8')).toEqual([]);
   });
 
+  it('does not read the collections key of a role Galaxy requirements file as the keyword', () => {
+    const findings = run({
+      'ansible/roles/web/meta/requirements.yml':
+        'collections:\n  - name: a.b\n    version: 1.0.0\n',
+      'ansible/roles/web/molecule/default/requirements.yml':
+        'collections:\n  - name: a.b\n    version: 1.0.0\n',
+    });
+    expect(messagesFor(findings, 'ANS-8')).toEqual([]);
+  });
+
+  it('still flags the collections keyword in a molecule playbook', () => {
+    const findings = run({
+      'ansible/roles/web/molecule/default/converge.yml':
+        '- hosts: all\n  collections:\n    - a.b\n  roles: []\n',
+    });
+    expect(messagesFor(findings, 'ANS-8')).toHaveLength(1);
+  });
+
   it('flags a lookup named without its collection, in a task file and a template', () => {
     const findings = run({
       [TASKS]:
