@@ -47,17 +47,15 @@ is deliberately **not** required: it is skipped on every pull request
 reports on a PR blocks every merge permanently (`REPO-4`,
 [`docs/repo-settings.md`](../../docs/repo-settings.md)).
 
-A `pass` on these contexts is not full-tree enforcement. `ghost-platform-tenant-template`
-runs both `docs-lint / docs-lint` and `standards / Standards gates` in `warn`
-mode (`.docs-lint.mode` and `.standards.mode`, both `warn`), and a required
-`warn`-mode check still fails only on findings in files the pull request
-itself touches — the pre-existing, whole-tree backlog is advisory (`REPO-4`
-rule 2, [`docs/repo-settings.md`](../../docs/repo-settings.md)). Every tenant
-generated from this template inherits that same partial coverage from day
-one, until the template's own `warn` state is cleared.
-Requiring these two contexts here is real, if partial, coverage: new and
-changed files are gated in every generated tenant immediately; "four required
-checks" does not mean the tree is certified clean.
+A `pass` on these contexts certifies the whole tree, not only the files a pull
+request touches. `ghost-platform-tenant-template` runs both `docs-lint / docs-lint`
+and `standards / Standards gates` in `enforce` mode: neither `.docs-lint.mode` nor
+`.standards.mode` exists on its `main`, and an absent mode file means `enforce`.
+An enforce-mode check fails on any finding anywhere in the tree, so the four
+required checks certify the whole tree at the commit they ran on. Every tenant
+generated from this template inherits that whole-tree enforcement from day one,
+because the `warn` state that gated only diff-touched files has been cleared
+(`REPO-4`, [`docs/repo-settings.md`](../../docs/repo-settings.md)).
 
 ## Applying is blocked on the current plan — not a tooling gap
 
