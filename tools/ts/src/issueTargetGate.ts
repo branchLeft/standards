@@ -16,14 +16,30 @@ const WRITE_ALL = /(?:^|[\s{,])["']?permissions["']?\s*:\s*["']?write-all["']?(?
 const GH_ISSUE_CREATE = /\bgh\s+(?:(?:-R|--repo)[ =]\S+\s+)?issue\s+create\b/;
 const GH_API = /\bgh\s+api\b/;
 const GH_API_ISSUES_PATH = /repos\/([^/\s"']+\/[^/\s"']+)\/issues(?=[\s"']|$)/;
-const GH_API_WRITE = /(?:-X|--method)[ =]+POST\b|(?:-f|-F|--field|--raw-field)[ =]+["']?title=/;
+const GH_API_METHOD = /(?:^|\s)(?:-X|--method)(?:\s+|=)["']?([A-Za-z]+)/;
+const GH_API_BODY = /(?:^|\s)(?:-[fF]|--field|--raw-field|--input)(?=[\s=]|["']|$)/;
 const REPO_FLAG = /(?:--repo|-R)[ =]+["']?([^\s"']+)/;
 const SCRIPT_CREATE = /\b(?:createIssue|issues\.create)\b/;
 const ISSUE_ACTION =
   /^\s*-?\s*uses:\s*\S*(?:create-issue|create-an-issue|issue-bot|issue-from-file)\S*@/i;
 
+// Rows are keyed `repo/path`, lower-cased: a path alone would exempt a same-named file in every repo.
 interface Allowlist {
-  readonly paths: ReadonlySet<string>;
+  readonly keys: ReadonlySet<string>;
+}
+
+function allowKey(repo: string, path: string): string {
+  return `${repo.trim().toLowerCase()}\t${path.trim()}`;
+}
+
+// `gh api` sends a POST when it is told to, and also when it is given any body field or `--input`,
+// unless the method is named as something else. The issue endpoint then opens an issue whatever fields ride along.
+function ghApiWrites(command: string): boolean {
+  const method = GH_API_METHOD.exec(command)?.[1];
+  if (method !== undefined) {
+    return method.toUpperCase() === 'POST';
+  }
+  return GH_API_BODY.test(command);
 }
 
 // A byte-order mark or CRLF must not hide a line from a pattern anchored on its start.
@@ -83,7 +99,7 @@ function ghHit(lines: readonly string[], index: number): { repo: string | undefi
   if (GH_API.test(line)) {
     const command = commandFrom(lines, index);
     const path = GH_API_ISSUES_PATH.exec(command)?.[1];
-    if (path !== undefined && GH_API_WRITE.test(command)) {
+    if (path !== undefined && ghApiWrites(command)) {
       return { repo: path };
     }
   }
@@ -112,20 +128,26 @@ export class IssueTargetGate implements Gate {
     return raw === undefined || raw.trim() === '' ? DEFAULT_TARGET : raw.trim();
   }
 
-  // A row with no reason is not an allowance: an exemption nobody explained is how a gate is turned off.
+  // A row with no repository, path or reason is not an allowance: an exemption nobody explained,
+  // or one that names no repository, is how a gate is turned off.
   private allowlist(): Allowlist {
     const content = this.fs.readFile(this.toolsRoot, ALLOWLIST_FILE) ?? '';
-    const paths = new Set<string>();
+    const keys = new Set<string>();
     for (const line of normalise(content).split('\n')) {
       if (line.trim() === '' || line.trimStart().startsWith('#')) {
         continue;
       }
-      const [path = '', reason = ''] = line.split('\t');
-      if (path.trim() !== '' && reason.trim() !== '') {
-        paths.add(path.trim());
+      const [repo = '', path = '', reason = ''] = line.split('\t');
+      if (repo.trim() !== '' && path.trim() !== '' && reason.trim() !== '') {
+        keys.add(allowKey(repo, path));
       }
     }
-    return { paths };
+    return { keys };
+  }
+
+  // Without a known repository nothing can match a row, so the file is reported.
+  private isAllowed(allowed: Allowlist, file: string): boolean {
+    return this.ownRepo !== undefined && allowed.keys.has(allowKey(this.ownRepo, file));
   }
 
   private scanLines(lines: readonly string[], target: string): readonly Hit[] {
@@ -170,7 +192,7 @@ export class IssueTargetGate implements Gate {
     const findings: Finding[] = [];
     for (const file of this.ratchet.scopeFiles(WORKFLOW_PATTERN)) {
       const content = this.fs.readFile(this.ratchet.root, file);
-      if (content === undefined || allowed.paths.has(file)) {
+      if (content === undefined || this.isAllowed(allowed, file)) {
         continue;
       }
       const lines = stripYamlComments(normalise(content)).split('\n');
