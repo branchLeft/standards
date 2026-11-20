@@ -30,13 +30,15 @@
 # see the PR description for the full list of what could not be grounded
 # in a doc or a script.
 
-## Principles — principles.md (all six `pending`, all repo-level decisions)
+## Principles — principles.md (all eight `pending`, all repo-level decisions)
 PRIN-1	*	[none] a public-vs-private choice made once, at repo creation — not tied to any file in a diff
 PRIN-2	*	[none] a repo-level deploy/merge-protection posture — not tied to any file in a diff
 PRIN-3	*	[none] a spend decision — not tied to any file in a diff
 PRIN-4	*	[none] a supplier-choice decision — not tied to any file in a diff
 PRIN-5	*	[none] a repo-scope decision — not tied to any file in a diff
 PRIN-6	*	[none] an agent-authorisation decision — not tied to any file in a diff
+PRIN-7	*	[none] a maintainability decision — not tied to any file in a diff
+PRIN-8	*	[none] a defensibility decision — not tied to any file in a diff
 
 ## Meta — index.md "Meta"
 STD-000	*	[gate] standards-audit.sh audit_exemptions(): a malformed `standards-allow-next-line` token, found via an unfiltered grep_tracked over every git-tracked file — no ratchet_scope_files pattern, so scope is genuinely every tracked file
