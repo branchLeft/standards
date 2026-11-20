@@ -90,13 +90,13 @@ Running a role against a host it has already configured reports zero changed tas
 
 **Check:** the role's Molecule run in CI (`ANS-15`) fails when the idempotence step reports a change, and that failure blocks merge only when the role's container test is on the repository's blocking list (`ANS-15`).
 
-## ANS-12 — no role imports another role
+## ANS-12 — a role imports another only as a capability role
 
-No role imports another role.
+A role may include another role only when the included role is a capability role. A capability role configures no service and owns no host state of its own: it writes only the paths its caller passes in as inputs, and restarts or reloads nothing. It declares every input in `meta/argument_specs.yml`, is called with `include_role` with every input given explicitly, and names in its README the roles that call it. `import_role` and a `meta/main.yml` `dependencies` entry are never used for composition, and a role's tasks never `include_tasks` or `import_tasks` a file outside their own role. Any other composition is in a playbook.
 
-**Why:** shared logic belongs in a playbook or a collection, and a role that applies another hides from its playbook what gets applied.
+**Why:** shared logic has one home, and a role that applies another hides from its playbook what gets applied. A capability role owns no service, so the call still shows everything it changes.
 
-**Check:** a check in the repository that owns the roles (`ansible/checks/test_role_composition_gate.py` in `shared-infra`) fails an `include_role`, an `import_role` or a `meta/main.yml` `dependencies` entry in a role; without such a check this is review.
+**Check:** `ansible/checks/check_role_imports.py` in `shared-infra` fails an `include_role` or `import_role`, a `dependencies` entry and a file include that leaves the role. It does not yet allow a capability role, so the exception is not enforced by a check until that gate is changed. Review only: that the included role is a capability role, that every input is given, that its README names its callers, and that it owns no state of its own.
 
 ## ANS-13 — where roles and playbooks live
 
