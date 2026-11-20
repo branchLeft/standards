@@ -28,9 +28,16 @@ function findReference(text: string): string | undefined {
 // The comment that trails code on a line (`x = 1; // see org/repo#N`). The
 // classifier only reads whole-line comments, so this is the one place a
 // trailing one is found. A `#` that is `$#` in shell is not a comment start.
+// A marker inside a string literal (`'// see ...'`) is not a comment: only a
+// marker preceded by an even number of quote characters counts.
 function trailingComment(line: string, style: CommentStyle): string | undefined {
-  const at = style === 'c' ? line.indexOf('//') : line.search(/(?<!\$)#/);
-  return at < 0 ? undefined : line.slice(at);
+  const marker = style === 'c' ? /\/\// : /(?<!\$)#/;
+  const pattern = new RegExp(marker.source, 'g');
+  for (let match = pattern.exec(line); match !== null; match = pattern.exec(line)) {
+    const quotes = (line.slice(0, match.index).match(/['"`]/g) ?? []).length;
+    if (quotes % 2 === 0) return line.slice(match.index);
+  }
+  return undefined;
 }
 
 // CMT-2's cross-repo shape (`org/repo#N`) in a source comment. TypeScript-only;
