@@ -183,6 +183,11 @@ export class AnsibleToolchainGate implements Gate {
   private readRequirements(tracked: readonly string[]): readonly Requirement[] {
     const found: Requirement[] = [];
     for (const file of tracked.filter((path) => REQUIREMENTS_TEXT.test(path))) {
+      // An input file beside its hashed lock is read through the lock: its loose
+      // ranges are the input the lock was compiled from, not what gets installed.
+      if (file.endsWith('.in') && tracked.includes(`${file.slice(0, -'.in'.length)}.txt`)) {
+        continue;
+      }
       for (const [index, raw] of (readText(this.fs, this.ratchet.root, file) ?? '')
         .split('\n')
         .entries()) {
