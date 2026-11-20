@@ -1,5 +1,10 @@
 import type { FileSystemPort } from './fileSystemPort.ts';
-import { classifyCommentLines, commentScanPattern, commentStyleFor } from './commentClassifier.ts';
+import {
+  classifyCommentLines,
+  commentScanPattern,
+  commentStyleFor,
+  type CommentStyle,
+} from './commentClassifier.ts';
 import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
 import type { Ratchet } from './ratchet.ts';
@@ -18,6 +23,14 @@ function blank(text: string, pattern: RegExp): string {
 
 function findReference(text: string): string | undefined {
   return REFERENCE.exec(blank(blank(text, URL_SPAN), VERSION_PIN))?.[0];
+}
+
+// The comment that trails code on a line (`x = 1; // see org/repo#N`). The
+// classifier only reads whole-line comments, so this is the one place a
+// trailing one is found. A `#` that is `$#` in shell is not a comment start.
+function trailingComment(line: string, style: CommentStyle): string | undefined {
+  const at = style === 'c' ? line.indexOf('//') : line.search(/(?<!\$)#/);
+  return at < 0 ? undefined : line.slice(at);
 }
 
 // CMT-2's cross-repo shape (`org/repo#N`) in a source comment. TypeScript-only;
@@ -48,8 +61,9 @@ export class WorkItemReferenceGate implements Gate {
       const lines = this.fs.readLines(this.ratchet.root, file);
       const flags = classifyCommentLines(lines, style);
       lines.forEach((line, index) => {
-        if (!flags[index]) return;
-        const hit = findReference(line);
+        const scanned = flags[index] ? line : trailingComment(line, style);
+        if (scanned === undefined) return;
+        const hit = findReference(scanned);
         if (hit !== undefined) findings.push(this.referenceFinding(file, index + 1, hit));
       });
     }
