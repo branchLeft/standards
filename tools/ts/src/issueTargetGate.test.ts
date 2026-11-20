@@ -181,6 +181,30 @@ describe('IssueTargetGate: issue-opening steps', () => {
     expect(run(content)).toEqual([`CI-15:${WORKFLOW}:5`]);
   });
 
+  it('reports a REST POST that carries only a body field', () => {
+    const content = workflow('- run: gh api repos/branchLeft/shared-infra/issues -f body=text');
+    expect(run(content)).toEqual([`CI-15:${WORKFLOW}:5`]);
+  });
+
+  it('reports a REST POST that carries only --input', () => {
+    const content = workflow(
+      '- run: gh api repos/branchLeft/shared-infra/issues --input issue.json'
+    );
+    expect(run(content)).toEqual([`CI-15:${WORKFLOW}:5`]);
+  });
+
+  it('reports a REST POST named by method with no field at all', () => {
+    const content = workflow('- run: gh api --method=POST repos/branchLeft/shared-infra/issues');
+    expect(run(content)).toEqual([`CI-15:${WORKFLOW}:5`]);
+  });
+
+  it('passes a REST GET that sends query fields, which opens nothing', () => {
+    const content = workflow(
+      '- run: gh api -X GET repos/branchLeft/shared-infra/issues -f state=open'
+    );
+    expect(run(content)).toEqual([]);
+  });
+
   it('passes a REST POST to the workspace repo', () => {
     const content = workflow('- run: gh api -X POST repos/branchLeft/workspace/issues -f title=t');
     expect(run(content)).toEqual([]);
@@ -228,24 +252,47 @@ describe('IssueTargetGate: issue-opening steps', () => {
 describe('IssueTargetGate: the allowlist', () => {
   const content = permissions('issues: write');
   const reported = [`CI-15:${WORKFLOW}:2`];
+  const OWN = 'branchLeft/shared-infra';
+  const row = `${OWN}\t${WORKFLOW}\trepoint pending\n`;
 
-  it('skips a workflow the allowlist names with a reason', () => {
-    expect(run(content, { allowlist: `${WORKFLOW}\trepoint pending\n` })).toEqual([]);
+  it('skips a workflow the allowlist names with a repo and a reason', () => {
+    expect(run(content, { allowlist: row, own: OWN })).toEqual([]);
+  });
+
+  it('reports a same-named workflow in another repository', () => {
+    expect(run(content, { allowlist: row, own: 'branchLeft/website' })).toEqual(reported);
+  });
+
+  it('reports every workflow when the repository is not known', () => {
+    expect(run(content, { allowlist: row })).toEqual(reported);
+  });
+
+  it('matches the repository without regard to case', () => {
+    expect(run(content, { allowlist: row, own: 'BRANCHLEFT/Shared-Infra' })).toEqual([]);
+  });
+
+  it('keeps reporting a row that names no repository', () => {
+    expect(run(content, { allowlist: `${WORKFLOW}\trepoint pending\n`, own: OWN })).toEqual(
+      reported
+    );
   });
 
   it('keeps reporting a workflow whose row has no reason', () => {
-    expect(run(content, { allowlist: `${WORKFLOW}\n${WORKFLOW}\t   \n` })).toEqual(reported);
+    const allowlist = `${OWN}\t${WORKFLOW}\n${OWN}\t${WORKFLOW}\t   \n`;
+    expect(run(content, { allowlist, own: OWN })).toEqual(reported);
   });
 
   it('keeps reporting a workflow the allowlist does not name', () => {
-    expect(run(content, { allowlist: `.github/workflows/other.yml\tpending\n` })).toEqual(reported);
+    const allowlist = `${OWN}\t.github/workflows/other.yml\tpending\n`;
+    expect(run(content, { allowlist, own: OWN })).toEqual(reported);
   });
 
   it('ignores a commented-out row', () => {
-    expect(run(content, { allowlist: `# ${WORKFLOW}\trepoint pending\n` })).toEqual(reported);
+    expect(run(content, { allowlist: `# ${row}`, own: OWN })).toEqual(reported);
   });
 
   it('reads the allowlist after a byte-order mark and CRLF', () => {
-    expect(run(content, { allowlist: `${BOM}${WORKFLOW}\trepoint pending\r\n` })).toEqual([]);
+    const allowlist = `${BOM}${OWN}\t${WORKFLOW}\trepoint pending\r\n`;
+    expect(run(content, { allowlist, own: OWN })).toEqual([]);
   });
 });
