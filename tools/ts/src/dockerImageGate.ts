@@ -15,7 +15,8 @@ import type { Ratchet } from './ratchet.ts';
 
 const DOCKERFILE_PATTERN = /(^|\/)Dockerfile(\.[^/]+)?$/;
 const NUMERIC_USER_PATTERN = /^([1-9]\d*)(:\d+)?$/;
-const VARIABLE_PATTERN = /\$/;
+// A reference that is only a variable, such as ${IMAGE}, is resolved at deploy or build time.
+const VARIABLE_ONLY_PATTERN = /^\$\{?[A-Za-z_][A-Za-z0-9_]*\}?$/;
 
 /**
  * CON-3 and CON-4: every non-stage image reference (Dockerfile `FROM` and
@@ -67,7 +68,11 @@ export class DockerImageGate implements Gate {
     const findings: Finding[] = [];
     for (const stage of stages) {
       const image = stage.baseImage;
-      if (image === 'scratch' || isStageReference(image, stages) || VARIABLE_PATTERN.test(image)) {
+      if (
+        image === 'scratch' ||
+        isStageReference(image, stages) ||
+        VARIABLE_ONLY_PATTERN.test(image)
+      ) {
         continue;
       }
       if (!DIGEST_PINNED_PATTERN.test(image)) {
@@ -126,7 +131,7 @@ export class DockerImageGate implements Gate {
     for (const service of listServices(root)) {
       const entry = mapGet(service.node, 'image');
       const image = scalarValue(entry?.value);
-      if (typeof image !== 'string' || VARIABLE_PATTERN.test(image) || asMap(entry?.value)) {
+      if (typeof image !== 'string' || VARIABLE_ONLY_PATTERN.test(image) || asMap(entry?.value)) {
         continue;
       }
       if (!DIGEST_PINNED_PATTERN.test(image)) {

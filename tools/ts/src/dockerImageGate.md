@@ -11,11 +11,13 @@ Checked against `DockerImageGate.checkDigests` (Dockerfile `FROM`, every
 stage) and `checkComposeImages` (Compose `image:`). The shape is
 `name:tag@sha256:64-hex`; a digest with no tag fails, because the clause keeps
 the tag for humans to read. Skipped: `scratch`, a `FROM` naming an earlier
-build stage (`isStageReference`), and any value containing a `$` — a Compose
-`image: ${IMAGE}` is usually pinned by digest at deploy time by tooling outside
-the repo, and an `ARG`-built `FROM` resolves only at build time, which this
-checker can't see statically. That is a gap, not a pass: such a reference is
-unread.
+build stage (`isStageReference`), and a value that is only a variable such as `${IMAGE}` — a
+Compose `image: ${IMAGE}` is usually pinned by digest at deploy time by tooling
+outside the repo, and an `ARG`-built `FROM` resolves only at build time, which
+this checker can't see statically. That is a gap, not a pass: such a reference
+is unread. A variable inside the name or the tag, such as `caddy:${V}-alpine`,
+is checked like any other reference: it passes only with a literal
+`@sha256:` digest after it.
 
 ## CON-4: numeric means numeric
 
