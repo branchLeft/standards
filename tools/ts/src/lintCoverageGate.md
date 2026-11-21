@@ -25,6 +25,12 @@ code-like with no carve-out for a repo's own tooling config, and a repo that
 hand-edits those files without a formatter is exactly the drift LINT-2
 exists to catch.
 
+A tracked source type the table has no entry for (Go, Rust, Terraform and a
+few others, listed in `UNCHECKED_SOURCE_TYPES`) is reported as one LINT-2
+finding per type, on its first file, rather than skipped: a repo in one of
+those languages would otherwise report nothing at all and read as clean.
+Adding a real rule to the table retires the matching entry.
+
 ## Why LINT-4 cannot be promoted as it reads
 
 The CI half matches a tool's own name in a workflow `run:` step. A repo whose

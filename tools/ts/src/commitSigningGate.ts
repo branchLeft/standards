@@ -9,7 +9,31 @@ const DEFAULT_PATTERNS: readonly string[] = [
   'commit.gpgsign false',
   '--no-gpg-sign',
 ];
-const SCOPE_PATTERN = /\.(sh|py|md)$|^\.github\/workflows\/.*\.ya?ml$/;
+const SCOPE_PATTERN = /\.(sh|py|md)$|^\.github\/workflows\/.*\.ya?ml$|(^|\/)\.?gitconfig$/;
+
+// Ways to switch signing off that a fixed literal cannot name: they apply
+// whatever the configured list says. The environment form sets the key on one
+// line and the value on the next, so the key line alone is the signal; the
+// ini and `git config` forms cover a `.gitconfig` edited in place or through
+// `--file`; the `sed` form rewrites or deletes the setting.
+const OFF_VALUE = String.raw`\b(?:false|no|off|0)\b`;
+const NOT_SED_SEGMENT = String.raw`[^/\n]*`;
+const STRUCTURAL_PATTERNS: readonly RegExp[] = [
+  /\bGIT_CONFIG_KEY_\d+\b[^\n]*\bcommit\.gpgsign\b/i,
+  // Not after a `/`: in `s/gpgsign = false/gpgsign = true/` the first segment
+  // is what is replaced, not what is written.
+  new RegExp(String.raw`(?<!/)\bgpgsign\s*=\s*["']?${OFF_VALUE}`, 'i'),
+  new RegExp(String.raw`\bgit\s+config\b[^\n]*\bcommit\.gpgsign\s+["']?${OFF_VALUE}`, 'i'),
+  // `s/old/new/` writing an off value to gpgsign, or `/gpgsign/d` deleting it.
+  new RegExp(
+    String.raw`\bsed\b[^\n]*(?:\bs/${NOT_SED_SEGMENT}/${NOT_SED_SEGMENT}gpgsign${NOT_SED_SEGMENT}${OFF_VALUE}|/${NOT_SED_SEGMENT}gpgsign${NOT_SED_SEGMENT}/d\b)`,
+    'i'
+  ),
+  new RegExp(
+    String.raw`\bsed\b[^\n]*\bs/${NOT_SED_SEGMENT}gpgsign${NOT_SED_SEGMENT}/${NOT_SED_SEGMENT}${OFF_VALUE}`,
+    'i'
+  ),
+];
 
 function toRegExp(literal: string): RegExp {
   return new RegExp(literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
@@ -35,7 +59,7 @@ export class CommitSigningGate implements Gate {
   private patterns(): readonly RegExp[] {
     const raw = readThresholdSetting(this.fs, this.toolsRoot, 'REPO-8', 'disable_signing_patterns');
     const literals = raw === undefined ? DEFAULT_PATTERNS : splitThresholdList(raw);
-    return literals.map(toRegExp);
+    return [...literals.map(toRegExp), ...STRUCTURAL_PATTERNS];
   }
 
   run(_context: GateContext): readonly Finding[] {
