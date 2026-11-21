@@ -1,5 +1,10 @@
 import type { FileSystemPort } from './fileSystemPort.ts';
-import { classifyCommentLines, commentScanPattern, commentStyleFor } from './commentClassifier.ts';
+import {
+  classifyCommentLines,
+  commentScanPattern,
+  commentStyleFor,
+  type CommentStyle,
+} from './commentClassifier.ts';
 import type { Finding } from './finding.ts';
 import type { Gate, GateContext } from './gate.ts';
 import type { Ratchet } from './ratchet.ts';
@@ -18,6 +23,21 @@ function blank(text: string, pattern: RegExp): string {
 
 function findReference(text: string): string | undefined {
   return REFERENCE.exec(blank(blank(text, URL_SPAN), VERSION_PIN))?.[0];
+}
+
+// The comment that trails code on a line (`x = 1; // see org/repo#N`). The
+// classifier only reads whole-line comments, so this is the one place a
+// trailing one is found. A `#` that is `$#` in shell is not a comment start.
+// A marker inside a string literal (`'// see ...'`) is not a comment: only a
+// marker preceded by an even number of quote characters counts.
+function trailingComment(line: string, style: CommentStyle): string | undefined {
+  const marker = style === 'c' ? /\/\// : /(?<!\$)#/;
+  const pattern = new RegExp(marker.source, 'g');
+  for (let match = pattern.exec(line); match !== null; match = pattern.exec(line)) {
+    const quotes = (line.slice(0, match.index).match(/['"`]/g) ?? []).length;
+    if (quotes % 2 === 0) return line.slice(match.index);
+  }
+  return undefined;
 }
 
 // CMT-2's cross-repo shape (`org/repo#N`) in a source comment. TypeScript-only;
@@ -48,8 +68,9 @@ export class WorkItemReferenceGate implements Gate {
       const lines = this.fs.readLines(this.ratchet.root, file);
       const flags = classifyCommentLines(lines, style);
       lines.forEach((line, index) => {
-        if (!flags[index]) return;
-        const hit = findReference(line);
+        const scanned = flags[index] ? line : trailingComment(line, style);
+        if (scanned === undefined) return;
+        const hit = findReference(scanned);
         if (hit !== undefined) findings.push(this.referenceFinding(file, index + 1, hit));
       });
     }

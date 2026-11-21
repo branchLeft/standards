@@ -105,6 +105,49 @@ describe('WorkItemReferenceGate', () => {
     expect(findings[0]?.message).toContain('example-org/example-repo#9');
   });
 
+  it('reports an org-qualified private tracker reference on a line of its own', () => {
+    const fs = new FakeFileSystem();
+    fs.set(
+      ROOT,
+      'qualified.ts',
+      '// tracked in example-org/example-workspace#3850\nexport const q = 1;\n'
+    );
+    const gate = buildGate(['qualified.ts'], fs);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('example-org/example-workspace#3850');
+  });
+
+  it('reports an org-qualified reference in a trailing comment after code', () => {
+    const fs = new FakeFileSystem();
+    fs.set(
+      ROOT,
+      'trail.ts',
+      'export const t = 1; // tracked in example-org/example-workspace#3850\n'
+    );
+    const gate = buildGate(['trail.ts'], fs);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.line).toBe(1);
+    expect(findings[0]?.message).toContain('example-org/example-workspace#3850');
+  });
+
+  it('reports an org-qualified reference in a trailing hash comment in shell', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'trail.sh', 'echo hi # example-org/example-workspace#3850\n');
+    const gate = buildGate(['trail.sh'], fs);
+    const findings = gate.run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toContain('example-org/example-workspace#3850');
+  });
+
+  it('does not flag a URL in code with no reference', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'codeurl.ts', 'export const u = "https://example.com/a/b#12";\n');
+    const gate = buildGate(['codeurl.ts'], fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
+
   it('ignores a file whose extension the classifier has no style for', () => {
     const fs = new FakeFileSystem();
     fs.set(ROOT, 'a.yml', '# see example-org/example-repo#1\n');

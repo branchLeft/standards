@@ -49,3 +49,11 @@ Dependabot tracks every package ecosystem a repo uses, including the image diges
 **Why:** a pinned digest freezes old vulnerabilities along with working code unless something moves it forward.
 
 **Check:** `tools/ts/src/dependabotEcosystemGate.ts` (the TypeScript audit, which fails the Standards job): `.github/dependabot.yml` lists every ecosystem the repo's files use, including `docker` for both Dockerfiles and Compose files.
+
+## DEP-9 — no copyleft code in a PolyForm Shield repo
+
+A repo licensed under PolyForm Shield links, bundles and installs no GPL, AGPL or SSPL code; LGPL and MPL code is accepted when used unmodified as a library. A GPL or AGPL program run as a separate process or container is accepted, since it is aggregation rather than a combined work. A modification to an AGPL service run for users is published under AGPL.
+
+**Why:** a GPL, AGPL or SSPL library built into a Shield-licensed codebase would oblige the combined work to be released under that licence, which contradicts the Shield licence it was published under. Lockfile licence metadata also drifts without anything noticing, and `npm ci` does not check it.
+
+**Check:** `tools/check-shield-licence.py` reads each `package.json`, `package-lock.json` and `pnpm-lock.yaml`, and any installed `node_modules`, and fails on a GPL, AGPL or SSPL licence, a missing licence field, a `SEE LICENSE IN <path>` whose file does not exist, or a lockfile root entry that disagrees with its `package.json`. Its `--self-test` proves each failure mode still goes red.

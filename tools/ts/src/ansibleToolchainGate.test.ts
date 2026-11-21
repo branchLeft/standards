@@ -89,6 +89,23 @@ describe('AnsibleToolchainGate, ANS-4', () => {
     expect(messagesFor(findings, 'ANS-4')).toHaveLength(3);
   });
 
+  it('does not flag an unpinned requirements.in beside its hashed requirements.txt lock', () => {
+    const findings = run({
+      'ansible/requirements.txt': REQUIREMENTS,
+      'ansible/requirements.in': 'ansible-core\nruff>=0.17\n',
+      '.pre-commit-config.yaml': PRE_COMMIT,
+      'ansible/requirements.yml': 'collections: []\n',
+    });
+    expect(messagesFor(findings, 'ANS-4')).toEqual([]);
+  });
+
+  it('still flags an unpinned requirements.in that has no lock beside it', () => {
+    const findings = run({
+      'ansible/requirements.in': 'ruff>=0.17\n',
+    });
+    expect(messagesFor(findings, 'ANS-4').join('\n')).toContain('ruff is not pinned');
+  });
+
   it('reads nothing in a repository with no ansible directory', () => {
     expect(findingsOf(build, { 'src/a.ts': 'x' })).toEqual([]);
   });
@@ -133,6 +150,38 @@ describe('AnsibleToolchainGate, ANS-2', () => {
     expect(
       messagesFor(run({ ...MODULE, 'ansible/pyproject.toml': wide }), 'ANS-2').join('\n')
     ).toContain('yaml');
+  });
+
+  it('flags a stray module named in a multi-line override array', () => {
+    const multi = [
+      '[project]',
+      'requires-python = ">=3.12"',
+      '[[tool.mypy.overrides]]',
+      'module = [',
+      '    "ansible.*",',
+      '    "yaml",',
+      ']',
+      'ignore_missing_imports = true',
+      '',
+    ].join('\n');
+    expect(
+      messagesFor(run({ ...MODULE, 'ansible/pyproject.toml': multi }), 'ANS-2').join('\n')
+    ).toContain('yaml');
+  });
+
+  it('accepts a multi-line override array that names only ansible.* modules', () => {
+    const multi = [
+      '[project]',
+      'requires-python = ">=3.12"',
+      '[[tool.mypy.overrides]]',
+      'module = [',
+      '    "ansible.builtin",',
+      '    "ansible.*",',
+      ']',
+      'ignore_missing_imports = true',
+      '',
+    ].join('\n');
+    expect(messagesFor(run({ ...MODULE, 'ansible/pyproject.toml': multi }), 'ANS-2')).toEqual([]);
   });
 
   it('does not require a pyproject when ansible/ holds no Python', () => {

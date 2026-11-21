@@ -49,6 +49,22 @@ function isExact(requirement: Requirement): boolean {
   );
 }
 
+// The quoted module names on one line of a `module = [...]` array.
+const quotedNames = (text: string): string[] =>
+  [...text.matchAll(/["']([^"']+)["']/g)].map((match) => match[1] ?? '');
+
+// A `module = [` array that runs over several lines is moved onto its first line, so the
+// line scan reads it whole. The newlines are kept after it, so later line numbers hold.
+const joinModuleArrays = (text: string): string =>
+  text.replace(/^(\s*module\s*=\s*\[)([^\]]*)\]/gm, (_match, head: string, body: string) => {
+    const joined = body
+      .split('\n')
+      .map((part) => part.replace(/\s#.*$/, ''))
+      .join(' ');
+    const breaks = (body.match(/\n/g) ?? []).length;
+    return `${head}${joined}]${'\n'.repeat(breaks)}`;
+  });
+
 /**
  * ANS-2's `requires-python` and mypy-override checks, and ANS-4: the
  * toolchain and collections pinned to exact versions, and the pre-commit
@@ -144,7 +160,7 @@ export class AnsibleToolchainGate implements Gate {
         );
       }
     };
-    for (const [index, raw] of text.split('\n').entries()) {
+    for (const [index, raw] of joinModuleArrays(text).split('\n').entries()) {
       const line = raw.replace(/\s#.*$/, '').trim();
       const section = /^\[{1,2}\s*([^\]]+?)\s*\]{1,2}$/.exec(line);
       if (section !== null) {
@@ -171,7 +187,7 @@ export class AnsibleToolchainGate implements Gate {
           overrideIgnores = true;
         }
       } else if (heading === 'tool.mypy.overrides' && /^module\s*=/.test(line)) {
-        overrideModules = [...line.matchAll(/["']([^"']+)["']/g)].map((match) => match[1] ?? '');
+        overrideModules = quotedNames(line);
       }
     }
     if (heading === 'tool.mypy.overrides') {
@@ -183,6 +199,11 @@ export class AnsibleToolchainGate implements Gate {
   private readRequirements(tracked: readonly string[]): readonly Requirement[] {
     const found: Requirement[] = [];
     for (const file of tracked.filter((path) => REQUIREMENTS_TEXT.test(path))) {
+      // An input file beside its hashed lock is read through the lock: its loose
+      // ranges are the input the lock was compiled from, not what gets installed.
+      if (file.endsWith('.in') && tracked.includes(`${file.slice(0, -'.in'.length)}.txt`)) {
+        continue;
+      }
       for (const [index, raw] of (readText(this.fs, this.ratchet.root, file) ?? '')
         .split('\n')
         .entries()) {

@@ -55,3 +55,19 @@ Automated agents and pipelines hold engineering autonomy only, granted from an e
 **Why:** an agent that infers permission from context eventually infers it wrong on the one action that cannot be undone, and the triggers cannot be grant-listed away because no engineering-scoped grant was meant to cover them.
 
 **Check:** review; the registry names the line that authorises an action, and the four triggers are not in it.
+
+## PRIN-7 — a human could take over
+
+Code an agent has touched is code a human principal engineer could own. In the owner's words: "if no agent ever touched the code again, an human principal engineer could take over".
+
+**Why:** an agent's output that only the agent can maintain is a lock-in on the agent itself, and it leaves no one who can judge the next change.
+
+**Check:** review; the verdict line says whether a principal engineer new to the code could take it over with no agent in the loop.
+
+## PRIN-8 — the whiteboard defense
+
+Any customer-facing system an agent has shipped must be explainable on request. In the owner's words: "The \"whiteboard defense:\" I should be able to pull you aside at any moment and ask you to explain any customer-facing system you've shipped. You should be able to clearly explain how it works and defend the decisions you made. This is my benchmark for responsible AI usage."
+
+**Why:** a shipped decision nobody can defend is a decision nobody made, and the owner's benchmark is the test that catches it.
+
+**Check:** review; the verdict line says whether the author could defend each decision in the change.

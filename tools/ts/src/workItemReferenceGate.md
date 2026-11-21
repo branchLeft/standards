@@ -18,6 +18,15 @@ Same extensions `commentClassifier.ts` knows: `.ts/.tsx/.js/.mjs/.cjs/.py/.sh`,
 overridable via the `CMT-2 scan_extensions` threshold row. A reference inside
 `.yml`/`.tf` is DL009's alone to catch.
 
+## Scanned: a trailing comment after code
+
+The shared classifier reads whole-line comments only, so `x = 1; // see org/repo#N`
+or `echo hi # org/repo#N` was never scanned. `workItemReferenceGate.ts` now also
+scans the text from the first `//` (C-style) or `#` (not `$#` in shell) on a code
+line. A URL in that tail is blanked by the same rule as above, so
+`"https://example.com/a/b#12"` in code is still not flagged. The classifier itself
+is unchanged: CMT-3 and CMT-4 count lines through it and must not move.
+
 ## Excepted: a URL's own path or fragment
 
 A domain-and-path (`example.com/foo/bar#123`) or a full URL

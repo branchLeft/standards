@@ -36,8 +36,10 @@ run "ruleset_code_owner.py" python3 "$TOOLS/ruleset_code_owner.py" --self-test
 run "check-clause-index.sh" bash "$TOOLS/check-clause-index.sh" --self-test
 run "clauses-in-scope.sh"  bash "$TOOLS/clauses-in-scope.sh" --self-test
 run "ruleset-apply.sh"     bash "$TOOLS/ruleset-apply.sh" --self-test
+run "ruleset-audit.sh"     bash "$TOOLS/ruleset-audit.sh" --self-test
 run "ruleset_normalize.py"  python3 "$TOOLS/ruleset_normalize.py" --self-test
 run "check-caller-drift.sh" bash "$TOOLS/check-caller-drift.sh" --self-test
+run "check-shield-licence.py" python3 "$TOOLS/check-shield-licence.py" --self-test
 run "check-docs-site.sh"   bash "$TOOLS/check-docs-site.sh" --self-test
 # check-coverage.sh: self-tested like every other gate, but deliberately
 # absent from GATES in standards-audit.sh and from

@@ -52,8 +52,10 @@ promise and is not checked.
 | PRIN-4 | `pending` | —          |
 | PRIN-5 | `pending` | —          |
 | PRIN-6 | `pending` | —          |
+| PRIN-7 | `pending` | —          |
+| PRIN-8 | `pending` | —          |
 
-**All six are `pending`.** They are binding prose, not yet mechanically
+**All eight are `pending`.** They are binding prose, not yet mechanically
 checked — no artefact under `tools/`, `packages/` or `templates/` reads any
 of them. When one is implemented, move its row to `auto`. See
 [`principles.md`](principles.md) for the reasoning behind each, including
@@ -230,6 +232,7 @@ live ruleset state. CI-11 runs the same way, for the same reason — see
 | DEP-6 | `review`  | —                                         |
 | DEP-7 | `review`  | —                                         |
 | DEP-8 | `auto`    | `tools/ts/src/dependabotEcosystemGate.ts` |
+| DEP-9 | `auto`    | `tools/check-shield-licence.py`           |
 
 ## Repository settings — `repo-settings.md`
 

@@ -195,4 +195,42 @@ describe('DockerImageGate', () => {
     const gate = new DockerImageGate(buildRatchet(fs, ['compose.yml']), fs);
     expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
   });
+
+  it('flags a Dockerfile tag built from a variable when no digest follows', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'Dockerfile', ['FROM caddy:${V}-alpine', 'USER 1000'].join('\n'));
+    const gate = new DockerImageGate(buildRatchet(fs, ['Dockerfile']), fs);
+    const finding = gate.run({ root: ROOT, mode: 'enforce' }).find((f) => f.clause === 'CON-3');
+    expect(finding?.message).toContain('caddy:${V}-alpine');
+  });
+
+  it('accepts a variable tag that is followed by a literal digest', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'Dockerfile', ['FROM caddy:${V}-alpine@' + DIGEST, 'USER 1000'].join('\n'));
+    const gate = new DockerImageGate(buildRatchet(fs, ['Dockerfile']), fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' }).filter((f) => f.clause === 'CON-3')).toEqual(
+      []
+    );
+  });
+
+  it('skips a Dockerfile base that is only a variable', () => {
+    const fs = new FakeFileSystem();
+    fs.set(ROOT, 'Dockerfile', ['FROM ${BASE}', 'USER 1000'].join('\n'));
+    const gate = new DockerImageGate(buildRatchet(fs, ['Dockerfile']), fs);
+    expect(gate.run({ root: ROOT, mode: 'enforce' }).filter((f) => f.clause === 'CON-3')).toEqual(
+      []
+    );
+  });
+
+  it('flags a Compose image whose tag is a variable with no digest', () => {
+    const fs = new FakeFileSystem();
+    fs.set(
+      ROOT,
+      'compose.yml',
+      ['services:', '  web:', '    image: ghost:${GHOST_VERSION}'].join('\n')
+    );
+    const gate = new DockerImageGate(buildRatchet(fs, ['compose.yml']), fs);
+    const finding = gate.run({ root: ROOT, mode: 'enforce' }).find((f) => f.clause === 'CON-3');
+    expect(finding?.message).toContain('ghost:${GHOST_VERSION}');
+  });
 });

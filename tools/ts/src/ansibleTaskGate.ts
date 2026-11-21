@@ -10,6 +10,8 @@ import type { Ratchet } from './ratchet.ts';
 
 const TASK_FILE = /^ansible\/roles\/[^/]+\/(?:tasks|handlers)\/.+\.ya?ml$/;
 const KEYWORD_FILE = /^ansible\/(?:roles\/[^/]+\/(?:meta|molecule)\/.+|playbooks\/.+)\.ya?ml$/;
+// A Galaxy requirements file names its collections under `collections:`, which is not the keyword.
+const GALAXY_REQUIREMENTS = /(?:^|\/)requirements\.ya?ml$/;
 const LOOKUP_FILE = /^ansible\/roles\/[^/]+\/(?:tasks|handlers|templates|vars|defaults|meta)\/.+$/;
 const PLUGIN_CALL = /\b(?:lookup|query|q)\(\s*(['"])([^'"]+)\1/g;
 const SHELL_PROGRAMS: ReadonlySet<string> = new Set(['sh', 'bash', 'dash', 'zsh', 'ksh']);
@@ -49,7 +51,9 @@ export class AnsibleTaskGate implements Gate {
     for (const file of tracked.filter((path) => TASK_FILE.test(path))) {
       findings.push(...this.checkTaskFile(file));
     }
-    for (const file of tracked.filter((path) => KEYWORD_FILE.test(path))) {
+    for (const file of tracked.filter(
+      (path) => KEYWORD_FILE.test(path) && !GALAXY_REQUIREMENTS.test(path)
+    )) {
       findings.push(...this.checkKeywordFile(file));
     }
     for (const file of tracked.filter((path) => LOOKUP_FILE.test(path))) {

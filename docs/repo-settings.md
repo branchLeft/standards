@@ -10,11 +10,11 @@ The default branch allows no deletion and no force-push, requires linear history
 
 **Check:** `templates/rulesets/` payloads and `tools/ruleset-audit.sh`, which reads `.rules[] | select(.type == "pull_request") | .parameters.require_code_owner_review` live and committed and fails a public repo that differs from its row or sits outside the rows. The comparison is `tools/ruleset_code_owner.py`, which parses the rows below; the audit runs it on each committed payload and each live default-branch ruleset, and a private repo in the NOT AUDITED row is reported and not judged.
 
-| `require_code_owner_review` | Repos                                                                                                                                                                                 |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `true`                      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`, `ghost-platform`, `standards` (live, per the owner's ruling of 25 Oct 2026; see below). |
-| `false`                     | `ghost-platform-tenant-template`, `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`.                                            |
-| NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS).   |
+| `require_code_owner_review` | Repos                                                                                                                                                                                                                   |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `true`                      | `components`, `website`, `github-workflows`, `shared-infra`, `speckify`, `pdq-ts`, `.github`, `ghost-platform`, `standards` (live, per the owner's ruling of 25 Oct 2026; see below), `ghost-platform-tenant-template`. |
+| `false`                     | `ghost-tenant-blog` and the tenant repos generated from the template, `content-safety`, `control-plane`.                                                                                                                |
+| NOT AUDITED                 | Private repos, including `ghost-platform-docs`: the rulesets endpoint returns 403 on this plan, so no live value can be read and a payload value carries no force (ACCEPTED-RISKS).                                     |
 
 The owner's recorded reason for `false` on the tenant repos, verbatim: "contributing still requires org members, which is only me and my agents today."
 
@@ -56,7 +56,7 @@ Every repo's ruleset payload is committed under `templates/rulesets/<repo>/` (en
 
 **Why:** capturing live state first means the first audit shows where a repo already differs, instead of the first apply changing it.
 
-**Check:** `tools/ruleset-audit.sh` reports each payload `ok`, `MISSING` or `DRIFT` with a diff, exits non-zero on either and reports a 403 repo as blocked.
+**Check:** `tools/ruleset-audit.sh` reports each payload `ok`, `MISSING` or `DRIFT` with a diff, exits 1 on either, reports a 403 repo as blocked, and reports a repo whose ruleset listing cannot be read as a list of rulesets (not JSON, or nested past the parser's limit) as an `ERROR` for that repo only, goes on to the repos after it and exits 2.
 
 The audit runs weekly and on demand from `.github/workflows/repo-settings-audit.yml`. That workflow is read-only: it never runs `ruleset-apply.sh`. It reads the secret `RULESET_AUDIT_TOKEN`, because the default workflow token cannot read other repos' rulesets, and it fails visibly when the secret is absent. `tools/tests/run.sh` fails if the audit script, the apply script or the workflow is removed, or if the workflow stops running the audit. `tools/tests/check_audit_shape.sh`, called from `run.sh`, also refuses a workflow that could write or go quiet: a `gh api` call that is not a plain read (a non-GET method or any request body), widened permissions, triggers beyond `schedule` and `workflow_dispatch`, a missing or weakened token guard, `continue-on-error`, or an `if:` condition on the token guard step, the audit step or their job. `run.sh` proves each refusal with a generated fixture.
 

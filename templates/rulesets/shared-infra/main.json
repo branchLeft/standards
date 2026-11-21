@@ -39,7 +39,8 @@
           { "context": "Audit (Pulumi secrets + state backends)" },
           { "context": "Validate (monitoring stack config)" },
           { "context": "docs-lint / docs-lint" },
-          { "context": "Lint and test the Ansible roles" }
+          { "context": "Lint and test the Ansible roles" },
+          { "context": "standards / Standards gates" }
         ]
       }
     },
