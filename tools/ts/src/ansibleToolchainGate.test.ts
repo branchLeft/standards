@@ -152,6 +152,38 @@ describe('AnsibleToolchainGate, ANS-2', () => {
     ).toContain('yaml');
   });
 
+  it('flags a stray module named in a multi-line override array', () => {
+    const multi = [
+      '[project]',
+      'requires-python = ">=3.12"',
+      '[[tool.mypy.overrides]]',
+      'module = [',
+      '    "ansible.*",',
+      '    "yaml",',
+      ']',
+      'ignore_missing_imports = true',
+      '',
+    ].join('\n');
+    expect(
+      messagesFor(run({ ...MODULE, 'ansible/pyproject.toml': multi }), 'ANS-2').join('\n')
+    ).toContain('yaml');
+  });
+
+  it('accepts a multi-line override array that names only ansible.* modules', () => {
+    const multi = [
+      '[project]',
+      'requires-python = ">=3.12"',
+      '[[tool.mypy.overrides]]',
+      'module = [',
+      '    "ansible.builtin",',
+      '    "ansible.*",',
+      ']',
+      'ignore_missing_imports = true',
+      '',
+    ].join('\n');
+    expect(messagesFor(run({ ...MODULE, 'ansible/pyproject.toml': multi }), 'ANS-2')).toEqual([]);
+  });
+
   it('does not require a pyproject when ansible/ holds no Python', () => {
     expect(messagesFor(run({}), 'ANS-2')).toEqual([]);
   });
