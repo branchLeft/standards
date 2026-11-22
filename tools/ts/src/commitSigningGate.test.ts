@@ -48,4 +48,36 @@ describe('CommitSigningGate', () => {
     });
     expect(findings).toHaveLength(1);
   });
+
+  it.each([
+    ['GIT_CONFIG_KEY_0=commit.gpgsign'],
+    ['      GIT_CONFIG_KEY_1: commit.gpgsign'],
+    ['git config --file .gitconfig commit.gpgsign no'],
+    ['git config --file "$HOME/.gitconfig" commit.gpgsign off'],
+    ["sed -i 's/gpgsign = true/gpgsign = false/' ~/.gitconfig"],
+    ["sed -i '/gpgsign/d' .gitconfig"],
+    ["printf '[commit]\\n  gpgsign = false\\n' >> .gitconfig"],
+  ])('reports REPO-8 for the env-config and gitconfig form: %s', (line) => {
+    const findings = buildGate('setup.sh', `${line}\n`).run({ root: ROOT, mode: 'enforce' });
+    expect(findings).toHaveLength(1);
+  });
+
+  it('reports REPO-8 for gpgsign = false in a tracked gitconfig file', () => {
+    const findings = buildGate('.gitconfig', '[commit]\n\tgpgsign = false\n').run({
+      root: ROOT,
+      mode: 'enforce',
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.line).toBe(2);
+  });
+
+  it('does not report the env-config and gitconfig forms that keep signing on', () => {
+    const content = [
+      'git config --file .gitconfig commit.gpgsign true',
+      "sed -i 's/gpgsign = false/gpgsign = true/' ~/.gitconfig",
+      '[commit]',
+      '  gpgsign = true',
+    ].join('\n');
+    expect(buildGate('setup.sh', content).run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
+  });
 });

@@ -784,6 +784,28 @@ run "code owner: a table row for true with no field fails" co_expect fail "DISAG
 run "code owner: a live ruleset that cannot be read fails" co_expect fail "code owner (live): ERROR" live-unreadable
 run "code owner: the committed estate reads clean against the real table" co_estate
 
+# The OPS-2, REPO-8 and LINT-2/4 gates are TypeScript, so their fixtures are
+# vitest cases in tools/ts/src. Each case below runs only the tests whose name
+# matches the pattern and requires at least one to pass, so a renamed or
+# deleted fixture reads as a failure rather than as a clean run.
+echo "gate heuristics:"
+GATE_TEST_FILES=(tools/ts/src/deployRolloutGate.test.ts tools/ts/src/commitSigningGate.test.ts tools/ts/src/lintCoverageGate.test.ts)
+gate_fixture_passes() {
+  local pattern="$1" out
+  [ -x "$TOOLS/../node_modules/.bin/vitest" ] \
+    || { echo "vitest is not installed: run pnpm install"; return 1; }
+  # FORCE_COLOR=0: CI forces colour, and escape codes inside "Tests  N passed"
+  # would stop the summary line from matching.
+  out=$(cd "$TOOLS/.." && FORCE_COLOR=0 NO_COLOR=1 ./node_modules/.bin/vitest --run "${GATE_TEST_FILES[@]}" -t "$pattern" 2>&1) \
+    || { printf '%s\n' "$out"; return 1; }
+  grep -qE 'Tests +[0-9]+ passed' <<< "$out" \
+    || { echo "no fixture matched: $pattern"; printf '%s\n' "$out"; return 1; }
+}
+run "OPS-2: a read-only plan job is not a deploy job" gate_fixture_passes 'read-only plan job'
+run "OPS-2: a step carrying only the health-check name is refused" gate_fixture_passes 'placebo step|empty block body|only echoes'
+run "REPO-8: env-config and gitconfig edits that disable signing are reported" gate_fixture_passes 'env-config and gitconfig|tracked gitconfig file'
+run "LINT-2: an unknown tracked source type is reported, not skipped" gate_fixture_passes 'unknown tracked source type'
+
 echo "shell hygiene:"
 if command -v shellcheck >/dev/null 2>&1; then
   while IFS= read -r f; do
