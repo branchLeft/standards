@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Report drift between the committed ruleset payloads and each repo's live state.
 # Private repos on GitHub Free return 403 for the rulesets endpoint — that's
-# reported as blocked, not as drift. Exits 1 on missing or drifted and 2 when a
-# repo's listing could not be read as a JSON list of rulesets (a 403 body, text
-# that is not JSON, or JSON nested past the parser's recursion limit); that
-# repo reports an ERROR and the audit goes on to the repos after it.
+# reported as blocked, not as drift. Exits 1 on missing or drifted, and on a
+# require_code_owner_review (REPO-1) that disagrees with the table in
+# docs/repo-settings.md or is set by a repo outside it. Exits 2 when a repo's
+# listing could not be read as a JSON list of rulesets (a 403 body, text that is
+# not JSON, or JSON nested past the parser's recursion limit); that repo reports
+# an ERROR and the audit goes on to the repos after it.
 # Usage: ruleset-audit.sh [repo ...] | --self-test
 #
 # This is where REPO-1, REPO-2, REPO-3 and REPO-6 are decided, and where CI-6
@@ -14,8 +16,10 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RULESETS="$HERE/../templates/rulesets"
+RULESETS="${RULESET_AUDIT_PAYLOADS:-$HERE/../templates/rulesets}"
+DOC="${RULESET_AUDIT_DOC:-$HERE/../docs/repo-settings.md}"
 NORMALIZE="$HERE/ruleset_normalize.py"
+CODE_OWNER="$HERE/ruleset_code_owner.py"
 
 # Runs a copy of this script against a stubbed API client: a listing that cannot
 # be read must be an ERROR for its repo, never a traceback that ends the audit
@@ -26,6 +30,8 @@ stubbed_audit_self_test() {
   mkdir -p "$tmp/tools" "$tmp/bin" "$tmp/stub"
   cp "${BASH_SOURCE[0]}" "$tmp/tools/ruleset-audit.sh"
   cp "$NORMALIZE" "$tmp/tools/ruleset_normalize.py"
+  cp "$CODE_OWNER" "$tmp/tools/ruleset_code_owner.py"
+  mkdir -p "$tmp/docs" && cp "$DOC" "$tmp/docs/repo-settings.md"
   for d in bad ok; do
     mkdir -p "$tmp/templates/rulesets/$d"
     cat > "$tmp/templates/rulesets/$d/main.json" <<'JSON'
@@ -104,11 +110,41 @@ fi
 status=0
 unreadable=0
 
+# REPO-1: judge one require_code_owner_review value (committed or live) against
+# the table in $DOC. A disagreement, or a field set outside the table, fails the
+# run; a repo whose row says NOT AUDITED is reported and not judged.
+code_owner_check() { # committed|live repo value
+  local out rc=0
+  out=$(python3 "$CODE_OWNER" judge --doc "$DOC" --repo "$2" --value "$3") || rc=$?
+  printf '  code owner (%s): %s\n' "$1" "$out"
+  [ "$rc" -eq 0 ] || status=1
+  return 0
+}
+
+# Reads the field from a ruleset body on stdin and judges it. A body that cannot
+# be read fails the run; a ruleset without a pull_request rule (a tag ruleset)
+# has no field to judge.
+code_owner_of() { # committed|live repo (body on stdin)
+  local value rc=0
+  value=$(python3 "$CODE_OWNER" field) || rc=$?
+  if [ "$rc" -ne 0 ]; then
+    printf '  code owner (%s): %s\n' "$1" "$value"
+    status=1
+    return 0
+  fi
+  [ "$value" = no-pr-rule ] || code_owner_check "$1" "$2" "$value"
+  return 0
+}
+
 for repo in "${repos[@]}"; do
   echo "== ${repo} =="
   live=$(gh api "repos/branchLeft/${repo}/rulesets" 2>&1) || true
   if grep -q "Upgrade to GitHub Pro" <<< "$live"; then
     echo "  live: blocked (GitHub Free) — payloads not applied"
+    for payload in "$RULESETS/${repo}"/*.json; do
+      [ -e "$payload" ] || continue
+      code_owner_of committed "$repo" < "$payload"
+    done
     continue
   fi
 
@@ -138,8 +174,13 @@ print(next((r["id"] for r in json.load(sys.stdin) if r["name"] == want), ""))' "
       continue
     fi
 
+    code_owner_of committed "$repo" < "$payload"
+
+    live_one=$(gh api "repos/branchLeft/${repo}/rulesets/${id}") || true
+    printf '%s\n' "$live_one" | code_owner_of live "$repo"
+
     drift=$(diff <(python3 "$NORMALIZE" < "$payload") \
-                 <(gh api "repos/branchLeft/${repo}/rulesets/${id}" | python3 "$NORMALIZE" --live) || true)
+                 <(printf '%s\n' "$live_one" | python3 "$NORMALIZE" --live) || true)
     if [ -z "$drift" ]; then
       echo "  ok: ${want_name} (${id})"
     else
