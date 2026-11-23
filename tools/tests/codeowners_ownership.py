@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Prove what .github/CODEOWNERS owns, path by path.
 
-Usage: codeowners_ownership.py [--codeowners PATH] [--tree-ref REF] [--count]
+Usage: codeowners_ownership.py [--repo standards|github-workflows|website]
+                               [--codeowners PATH] [--tree-ref REF] [--count]
                                [--self-test]
 
 GitHub applies the LAST matching pattern, and a pattern with no owner leaves a
@@ -26,7 +27,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REAL_CODEOWNERS = ROOT / ".github" / "CODEOWNERS"
-OLD_CODEOWNERS = ROOT / "tools" / "tests" / "fixtures" / "codeowners-before.txt"
+FIXTURES = ROOT / "tools" / "tests" / "fixtures"
+OLD_CODEOWNERS = FIXTURES / "codeowners-before.txt"
 SHARED_TEMPLATE = ROOT / "templates" / "codeowners"
 PROMOTED_REGISTER = ROOT / "tools" / "ts-promoted.tsv"
 OWNER_TEAM = "@branchLeft/branchleft-admin"
@@ -218,10 +220,138 @@ RED_ON_OLD = frozenset(
 )
 
 
-def check_samples(rules: list[Rule]) -> list[str]:
+# The other two repos that proved their CODEOWNERS with their own matcher. Their
+# sample tables are kept verbatim, one per repo, so each repo's assertions are
+# still made, against that repo's own file, by this one matcher (`--repo`).
+GITHUB_WORKFLOWS_SAMPLES: tuple[Sample, ...] = (
+    Sample(".github/workflows/docs-lint.yml", True, "criterion 3"),
+    Sample("sub/.github/workflows/a.yml", True, "criterion 3"),
+    Sample(".github/actions/spend-gate/spend-gate.py", True, "criterion 3"),
+    Sample("sub/.github/actions/a/b.py", True, "criterion 3"),
+    Sample(".github/dependabot.yml", True, "criterion 3"),
+    Sample("x/CODEOWNERS", True, "criterion 1"),
+    Sample("x/codeowners", True, "criterion 1"),
+    Sample("x/CodeOwners", True, "criterion 1"),
+    Sample("x/ruleset.json", True, "criterion 1"),
+    Sample("x/Ruleset.json", True, "criterion 1"),
+    Sample("x/RULESET.json", True, "criterion 1"),
+    Sample("x/branch-protection.json", True, "criterion 1"),
+    Sample("x/Branch-Protection.json", True, "criterion 1"),
+    Sample("x/BRANCH-PROTECTION.md", True, "criterion 1"),
+    Sample("x/branch_protection.tf", True, "criterion 1"),
+    Sample("x/Branch_Protection.tf", True, "criterion 1"),
+    Sample("x/BRANCH_PROTECTION.md", True, "criterion 1"),
+    Sample("x/branchprotection.json", True, "criterion 1"),
+    Sample("x/BranchProtection.json", True, "criterion 1"),
+    Sample("x/BRANCHPROTECTION.json", True, "criterion 1"),
+    Sample("tools/docs-lint.test.sh", True, "criterion 1, test of a required gate"),
+    Sample("tools/docs-lint-workflow.test.sh", True, "criterion 1, test of a required gate"),
+    Sample("tools/docs-lint.sh", True, "criterion 1"),
+    Sample("tools/sabotage.py", True, "criterion 1"),
+    Sample("tools/resolve-pinned-ref.sh", True, "criterion 1"),
+    Sample("tools/test_ansible_gated_apply.py", True, "criterion 1, test of a gate"),
+    Sample("tools/test_codeowners.py", True, "criterion 1, test of the rules"),
+    Sample("tools/test_codeowners.md", True, "criterion 1"),
+    Sample("tools/floors.tsv", True, "criterion 1"),
+    Sample(".pre-commit-hooks.yaml", True, "criterion 1"),
+    Sample(".opv-lintignore", True, "criterion 1"),
+    Sample(".docs-lintignore", True, "criterion 1"),
+    Sample(".standards.mode", True, "criterion 1"),
+    Sample(".standardsignore", True, "criterion 1"),
+    Sample(".standards-db-tooling", True, "criterion 1"),
+    Sample("keys/allowed_signers", True, "criterion 2"),
+    Sample("ansible/trust/host.txt", True, "criterion 2"),
+    Sample(".npmrc", True, "criterion 2"),
+    Sample("Pulumi.prod.yaml", True, "criterion 2"),
+    Sample("ansible/library/x.py", True, "criterion 2"),
+    Sample("ansible/roles/r/module_utils/x.py", True, "criterion 2"),
+    Sample("ansible/filter_plugins/x.py", True, "criterion 2"),
+    Sample("etc/sudoers", True, "criterion 2"),
+    Sample("etc/sudoers.d/x", True, "criterion 2"),
+    Sample("home/.ssh/authorized_keys", True, "criterion 2"),
+    Sample("mail/x.ts", True, "criterion 4"),
+    Sample("LICENSE", True, "criterion 8"),
+    Sample("tools/docs-lint-rules.md", False, "released gate prose"),
+    Sample("tools/opv-lint-rules.md", False, "released gate prose"),
+    Sample("tools/resolve-pinned-ref.md", False, "released gate prose"),
+    Sample("README.md", False, "unowned prose"),
+    Sample("RUNBOOK.md", False, "unowned prose"),
+    Sample(".editorconfig", False, "unowned file"),
+    Sample(".gitignore", False, "unowned file"),
+    Sample("scripts/run.sh", False, "dropped name-only line"),
+    Sample("x/deploy-notes.md", False, "dropped name-only line"),
+    Sample("x/approval.py", False, "dropped name-only line"),
+    Sample("x/guard.py", False, "dropped name-only line"),
+)
+WEBSITE_SAMPLES: tuple[Sample, ...] = (
+    Sample(".github/CODEOWNERS", True, "1: the rules themselves"),
+    Sample("CLAUDE.md", True, "1: agent guidance"),
+    Sample(".claude/.gitignore", True, "1: agent guidance directory"),
+    Sample("tools/floors.tsv", True, "1: floor file"),
+    Sample("vitest.config.ts", True, "1: coverage thresholds CI reads"),
+    Sample("package.json", True, "1 and 2: scripts CI calls, lifecycle scripts run with the token"),
+    Sample("pnpm-workspace.yaml", True, "2: allowBuilds, the install-script allow list"),
+    Sample(".npmrc", True, "2: registry auth"),
+    Sample("Dockerfile", True, "2: image build mounts the registry token"),
+    Sample("deploy/compose.yml", True, "2: SMTP credential wiring"),
+    Sample("app/lib/sendContactEmail.server.ts", True, "2 and 4: reads the SMTP credentials"),
+    Sample(".github/workflows/ci.yml", True, "3: workflows that reach secrets"),
+    Sample(".standards.mode", True, "1: exemption and floor file"),
+    Sample("public/robots.txt", True, "5: public files"),
+    Sample("app/routes/privacy.tsx", True, "8: legal text"),
+    Sample("LICENSE", True, "8: legal text"),
+    Sample("app/lib/codeowners-ownership.test.ts", True, "1: the test of this file"),
+    Sample("pnpm-lock.yaml", False, "lockfile"),
+    Sample("README.md", False, "document"),
+    Sample("deploy/RUNBOOK-app1-website.md", False, "document inside a once-owned directory"),
+    Sample("app/lib/dockerfile-pins.test.ts", False, "test of a released file"),
+    Sample("tests/home.spec.ts", False, "end-to-end test"),
+    Sample("app/styles/theme.css", False, "styles"),
+    Sample("app/lib/security-headers.ts", False, "no criterion names it"),
+    Sample("vite.config.ts", False, "runs only in steps that hold no secret"),
+    Sample(".nvmrc", False, "version pin"),
+    Sample("tests/approval-flow.spec.ts", False, "name only: approv"),
+    Sample("app/lib/guard-notes.ts", False, "name only: guard"),
+    Sample("scripts/format.py", False, "name only: scripts directory"),
+)
+
+STANDARDS_RELEASED: frozenset[str] = frozenset(
+    {"/tools/**/*.md", "/templates/**/*.md", "/tools/clause-paths.tsv"}
+)
+GITHUB_WORKFLOWS_RELEASED: frozenset[str] = frozenset(
+    {"/tools/docs-lint-rules.md", "/tools/opv-lint-rules.md", "/tools/resolve-pinned-ref.md"}
+)
+
+
+@dataclass(frozen=True)
+class RepoProof:
+    """One repo's selection: its sample table, its owner-less lines, and a copy
+    of its CODEOWNERS that the self-test sabotages (the real file for standards)."""
+
+    name: str
+    samples: tuple[Sample, ...]
+    released_lines: frozenset[str]
+    fixture: Path
+
+
+REPOS: dict[str, RepoProof] = {
+    "standards": RepoProof("standards", SAMPLES, STANDARDS_RELEASED, REAL_CODEOWNERS),
+    "github-workflows": RepoProof(
+        "github-workflows",
+        GITHUB_WORKFLOWS_SAMPLES,
+        GITHUB_WORKFLOWS_RELEASED,
+        FIXTURES / "codeowners-github-workflows.txt",
+    ),
+    "website": RepoProof(
+        "website", WEBSITE_SAMPLES, frozenset(), FIXTURES / "codeowners-website.txt"
+    ),
+}
+
+
+def check_samples(rules: list[Rule], samples: tuple[Sample, ...] = SAMPLES) -> list[str]:
     """One line per sample whose answer is not the expected one."""
     problems: list[str] = []
-    for sample in SAMPLES:
+    for sample in samples:
         got = is_owned(rules, sample.path)
         if got != sample.owned:
             want = "owned" if sample.owned else "unowned"
@@ -233,8 +363,9 @@ def content_lines(text: str) -> list[str]:
     return [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
 
 
-def check_structure(rules: list[Rule], text: str) -> list[str]:
+def check_structure(rules: list[Rule], text: str, repo: RepoProof | None = None) -> list[str]:
     """Rules that hold whatever the sample table says."""
+    repo = repo or REPOS["standards"]
     problems: list[str] = []
     for rule in rules:
         if rule.pattern in CATCH_ALLS:
@@ -242,10 +373,20 @@ def check_structure(rules: list[Rule], text: str) -> list[str]:
         for owner in rule.owners:
             if owner != OWNER_TEAM:
                 problems.append(f"'{rule.pattern}' names owner {owner}, not {OWNER_TEAM}")
+    # Owner-less lines release a path; only the repo's named release lines may do so.
+    released = {rule.pattern for rule in rules if not rule.owners}
+    if released != set(repo.released_lines):
+        problems.append(
+            f"owner-less lines are {sorted(released)}, expected {sorted(repo.released_lines)}"
+        )
+    if re.search(r"#\d+", text):
+        problems.append("a work-item reference (#<digits>) appears in the file")
     shared = content_lines(SHARED_TEMPLATE.read_text(encoding="utf-8"))
     own = content_lines(text)
     if own[-len(shared) :] != shared:
         problems.append("templates/codeowners lines are not the file's final lines, in order")
+    if repo.name != "standards":
+        return problems
     # A promoted gate, and its test, must be owned: promoting one more clause
     # must not add a judge that nobody reviews.
     for raw in PROMOTED_REGISTER.read_text(encoding="utf-8").splitlines():
@@ -259,13 +400,39 @@ def check_structure(rules: list[Rule], text: str) -> list[str]:
     return problems
 
 
-def run_checks(codeowners: Path) -> list[str]:
-    text = codeowners.read_text(encoding="utf-8")
+def problems_in_text(text: str, repo: RepoProof | None = None) -> list[str]:
+    repo = repo or REPOS["standards"]
     try:
         rules = parse(text)
     except UnsupportedSyntax as err:
         return [str(err)]
-    return check_samples(rules) + check_structure(rules, text)
+    return check_samples(rules, repo.samples) + check_structure(rules, text, repo)
+
+
+def run_checks(codeowners: Path, repo: RepoProof | None = None) -> list[str]:
+    return problems_in_text(codeowners.read_text(encoding="utf-8"), repo)
+
+
+def repo_self_test(repo: RepoProof) -> list[str]:
+    """The repo's copy is green; shadowing any kept sample path with a released
+    line is red on that path's own assertion; a catch-all is red."""
+    failures = [f"{repo.name} green: {p}" for p in run_checks(repo.fixture, repo)]
+    lines = repo.fixture.read_text(encoding="utf-8").splitlines()
+    tail = len(content_lines(SHARED_TEMPLATE.read_text(encoding="utf-8")))
+    start = len(lines) - tail
+    for sample in repo.samples:
+        if not sample.owned:
+            continue
+        # Appended last, so it is the last match: the path goes unowned whichever
+        # line owned it before, including the shared lines that own .github/.
+        shadowed = "\n".join([*lines, f"/{sample.path}"]) + "\n"
+        found = problems_in_text(shadowed, repo)
+        if not any(p.startswith(f"{sample.path}:") for p in found):
+            failures.append(f"{repo.name} sabotage stayed green: {sample.path} shadowed")
+    catch_all = "\n".join([*lines[:start], f"*  {OWNER_TEAM}", *lines[start:]]) + "\n"
+    if not problems_in_text(catch_all, repo):
+        failures.append(f"{repo.name} sabotage stayed green: a catch-all")
+    return failures
 
 
 def tree_files(ref: str) -> list[str]:
@@ -374,6 +541,10 @@ def self_test() -> int:
     if not any("catch-all" in p for p in check_structure(parse(catch_all), catch_all)):
         failures.append("sabotage: a catch-all was not caught")
 
+    # Every repo's table: its copy is green, and no kept sample can be shadowed.
+    for repo in REPOS.values():
+        failures.extend(repo_self_test(repo))
+
     for line in failures:
         print(f"FAIL: {line}")
     if failures:
@@ -384,7 +555,8 @@ def self_test() -> int:
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="Prove what CODEOWNERS owns.")
-    parser.add_argument("--codeowners", type=Path, default=REAL_CODEOWNERS)
+    parser.add_argument("--repo", choices=sorted(REPOS), default="standards")
+    parser.add_argument("--codeowners", type=Path, default=None)
     parser.add_argument("--tree-ref", default="origin/main")
     parser.add_argument("--count", action="store_true")
     parser.add_argument("--self-test", action="store_true")
@@ -392,15 +564,19 @@ def main(argv: list[str]) -> int:
 
     if args.self_test:
         return self_test()
+    repo = REPOS[args.repo]
+    codeowners = args.codeowners or (REAL_CODEOWNERS if args.repo == "standards" else None)
+    if codeowners is None:
+        parser.error(f"--codeowners is required for --repo {args.repo}")
     if args.count:
-        count(args.codeowners, args.tree_ref)
+        count(codeowners, args.tree_ref)
         return 0
-    problems = run_checks(args.codeowners)
+    problems = run_checks(codeowners, repo)
     for problem in problems:
         print(f"FAIL: {problem}")
     if problems:
         return 1
-    print(f"codeowners_ownership.py: {len(SAMPLES)} sample paths and the structural rules hold")
+    print(f"codeowners_ownership.py [{repo.name}]: {len(repo.samples)} sample paths and the structural rules hold")
     return 0
 
 
