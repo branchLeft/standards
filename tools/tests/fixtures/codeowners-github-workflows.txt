@@ -1,0 +1,74 @@
+# Code owners for the files that can change who may merge, what a merge or a
+# deploy checks, or who can reach a secret. The owner approves those. Every
+# other file is unowned, so a pull request touching only those merges on the
+# reviewer App's approval. There is deliberately no catch-all line.
+#
+# GitHub applies the LAST matching line, so a line with no owner releases a
+# path an earlier line owned. The released files sit after the owned groups and
+# before the five shared lines. Those five come from the standards template and
+# stay last, byte for byte, so the standards sync check passes.
+#
+# Matching is case-sensitive and has no character classes, so each name form
+# below is spelled in lower-case, Capitalised and UPPER-case.
+
+# Workflows and actions: they run with the repository's secrets and decide
+# pass or fail on every pull request.
+**/.github/workflows/                          @branchLeft/branchleft-admin
+**/.github/actions/                            @branchLeft/branchleft-admin
+
+# CODEOWNERS and ruleset or branch-protection files: they say who must approve.
+**/CODEOWNERS                                  @branchLeft/branchleft-admin
+**/codeowners                                  @branchLeft/branchleft-admin
+**/CodeOwners                                  @branchLeft/branchleft-admin
+**/*ruleset*                                   @branchLeft/branchleft-admin
+**/*Ruleset*                                   @branchLeft/branchleft-admin
+**/*RULESET*                                   @branchLeft/branchleft-admin
+**/*branch-protection*                         @branchLeft/branchleft-admin
+**/*Branch-Protection*                         @branchLeft/branchleft-admin
+**/*BRANCH-PROTECTION*                         @branchLeft/branchleft-admin
+**/*branch_protection*                         @branchLeft/branchleft-admin
+**/*Branch_Protection*                         @branchLeft/branchleft-admin
+**/*BRANCH_PROTECTION*                         @branchLeft/branchleft-admin
+**/*branchprotection*                          @branchLeft/branchleft-admin
+**/*BranchProtection*                          @branchLeft/branchleft-admin
+**/*BRANCHPROTECTION*                          @branchLeft/branchleft-admin
+
+# The gate code and its tests: the lint tools every repo's CI
+# calls, the apply-gate tests, the hook registry that runs them, and the
+# ignore files that switch checks off.
+/tools/                                        @branchLeft/branchleft-admin
+/.pre-commit-hooks.yaml                        @branchLeft/branchleft-admin
+/.opv-lint*                                    @branchLeft/branchleft-admin
+/tools/floors.tsv                              @branchLeft/branchleft-admin
+
+# Keys, trust and access. Nothing here exists in this repo today; the lines
+# keep these files the owner's if they ever appear.
+**/allowed_signers                             @branchLeft/branchleft-admin
+/ansible/trust/                                @branchLeft/branchleft-admin
+**/.npmrc                                      @branchLeft/branchleft-admin
+**/Pulumi.*.yaml                               @branchLeft/branchleft-admin
+**/library/                                    @branchLeft/branchleft-admin
+**/*_plugins/                                  @branchLeft/branchleft-admin
+**/module_utils/                               @branchLeft/branchleft-admin
+**/*sudoers*                                   @branchLeft/branchleft-admin
+**/*sudoers*/                                  @branchLeft/branchleft-admin
+**/authorized_keys*                            @branchLeft/branchleft-admin
+
+# Mail. Nothing here exists in this repo today.
+/mail/                                         @branchLeft/branchleft-admin
+
+# The owner's own words: the licence text.
+/LICENSE                                       @branchLeft/branchleft-admin
+
+# Released: prose that explains a kept gate and that no job reads as input.
+# These lines name no owner and must stay after every owned line above.
+/tools/docs-lint-rules.md
+/tools/opv-lint-rules.md
+/tools/resolve-pinned-ref.md
+
+# The shared set from the standards template. Keep these lines last.
+/.standardsignore        @branchLeft/branchleft-admin
+/.standards.mode         @branchLeft/branchleft-admin
+/.docs-lint*             @branchLeft/branchleft-admin
+/.standards-db-tooling   @branchLeft/branchleft-admin
+/.github/                @branchLeft/branchleft-admin
