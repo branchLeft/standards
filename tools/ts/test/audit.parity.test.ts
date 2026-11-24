@@ -13,7 +13,7 @@ import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { NodeProcessRunner } from '../src/processRunner.ts';
 import { ALLOW_TOKEN, Ratchet } from '../src/ratchet.ts';
-import { ScratchRepo } from '../src/test-support/scratchRepo.ts';
+import { ScratchRepository } from '../src/test-support/scratchRepository.ts';
 
 const TOOLS_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const GATE_NAMES = [
@@ -112,85 +112,88 @@ jobs:
 `;
 
 describe('Audit parity — standards-audit.sh --self-test, ported', () => {
-  let repo: ScratchRepo | undefined;
+  let repository: ScratchRepository | undefined;
 
   afterEach(() => {
-    repo?.destroy();
-    repo = undefined;
+    repository?.destroy();
+    repository = undefined;
   });
 
   it('reports a live CI-1 failure, a stale exemption and a vanished-path exemption', () => {
-    repo = ScratchRepo.create();
-    repo.write('.github/workflows/bad.yml', BAD_WORKFLOW);
-    repo.write('.github/workflows/exempt.yml', UNPINNED_EXEMPT_WORKFLOW);
-    repo.write(
+    repository = ScratchRepository.create();
+    repository.write('.github/workflows/bad.yml', BAD_WORKFLOW);
+    repository.write('.github/workflows/exempt.yml', UNPINNED_EXEMPT_WORKFLOW);
+    repository.write(
       '.standardsignore',
       '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\ngone/*\tCI-1\t# path deleted long ago\n'
     );
-    repo.commit('init');
+    repository.commit('init');
 
-    const human = buildTsAudit(repo.root).run(false);
+    const human = buildTsAudit(repository.root).run(false);
     expect(human.output).toMatch(/CI-1\s+fail/);
     expect(human.output).toContain('STD-002');
     expect(human.output).toContain('live — suppressing');
     expect(human.output).toContain('STALE — matches no tracked file');
     expect(human.success).toBe(false);
 
-    const json = buildTsAudit(repo.root).run(true);
+    const json = buildTsAudit(repository.root).run(true);
     expect(json.output.split('\n').every((line) => line === '' || /^\{.*\}$/.test(line))).toBe(
       true
     );
     expect(json.output).toContain('"clause":"CI-1"');
 
-    assertParity(repo.root);
+    assertParity(repository.root);
   }, 120000);
 
   it('flags an exemption over a now-clean file as stale', () => {
-    repo = ScratchRepo.create();
-    repo.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
-    repo.write('.standardsignore', '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n');
-    repo.commit('init');
+    repository = ScratchRepository.create();
+    repository.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
+    repository.write(
+      '.standardsignore',
+      '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n'
+    );
+    repository.commit('init');
 
-    const human = buildTsAudit(repo.root).run(false);
+    const human = buildTsAudit(repository.root).run(false);
     expect(human.output).toContain('STALE — 1 files, no finding to suppress');
 
-    assertParity(repo.root);
+    assertParity(repository.root);
   }, 120000);
 
   it('reports STD-000 for a bare allow, and ignores a quoted mention of the token', () => {
-    repo = ScratchRepo.create();
-    repo.write(
+    repository = ScratchRepository.create();
+    repository.write(
       '.github/workflows/allow.yml',
       `name: Doc\n# ${ALLOW_TOKEN}\n# write it as \`${ALLOW_TOKEN} <CLAUSE-ID> <reason>\`\non:\n  pull_request:\n`
     );
-    repo.commit('init');
+    repository.commit('init');
 
-    const human = buildTsAudit(repo.root).run(false);
+    const human = buildTsAudit(repository.root).run(false);
     expect(human.output).toContain('STD-000');
     expect(human.output.match(/MALFORMED/g)).toHaveLength(1);
 
-    assertParity(repo.root);
+    assertParity(repository.root);
   }, 120000);
 
   it('lets STD-002 be suppressed by its own exemption, and passes cleanly', () => {
-    repo = ScratchRepo.create();
-    repo.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
-    repo.write(
+    repository = ScratchRepository.create();
+    repository.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
+    repository.write(
       '.standardsignore',
       '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n.standardsignore\tSTD-002\t# reviewed, keeping the licence\n'
     );
-    repo.commit('init');
+    repository.commit('init');
 
-    const ts = buildTsAudit(repo.root);
+    const ts = buildTsAudit(repository.root);
     expect(ts.run(false).success).toBe(true);
 
-    assertParity(repo.root);
+    assertParity(repository.root);
   }, 120000);
 
   it('aggregates a non-failing gate finding without failing the build, and reports clause coverage', () => {
-    repo = ScratchRepo.create();
-    repo.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
-    repo.write(
+    repository = ScratchRepository.create();
+    repository.write('.github/workflows/exempt.yml', PINNED_EXEMPT_WORKFLOW);
+    repository.write(
       '.standardsignore',
       '.github/workflows/exempt.yml\tCI-1\t# vendored upstream\n.standardsignore\tSTD-002\t# reviewed, keeping the licence\n'
     );
@@ -206,13 +209,13 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
       { length: 6 },
       (_, index) => `export const pad${index} = ${index};`
     ).join('\n');
-    repo.write(
+    repository.write(
       'long.ts',
       `export function f() {\n  /**\n${narrativeLines}\n   */\n  return 1;\n}\n${padLines}\n`
     );
-    repo.commit('init');
+    repository.commit('init');
 
-    const json = buildTsAudit(repo.root).run(true);
+    const json = buildTsAudit(repository.root).run(true);
     expect(json.output).toMatch(/"clause":"CMT-3".*"file":"long\.ts".*"level":"warning"/);
     expect(json.output).toMatch(/"clause":"COV-1".*"level":"info"/);
 
@@ -245,10 +248,10 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
       '"measured_clauses":["ANS-11","ANS-15","ANS-2","ANS-3","ANS-4","ANS-5","ANS-6","ANS-7","ANS-8","ANS-9","ARCH-4","ARCH-7","CFG-2","CI-12","CI-15","CMT-2","CMT-3","CMT-4","CON-1","CON-10","CON-14","CON-3","CON-4","CON-5","CON-6","CON-7","CON-8","CON-9","COV-1","CRED-10","CRED-11","DB-1","DB-3","DB-4","DB-5","DB-6","DEP-8","DP-7","ERR-1","ERR-2","ERR-3","LINT-2","LINT-4","NAM-1","NAM-2","OPS-2","PY-2","PY-3","REPO-8","SEC-10","SEC-11","SEC-7","SEC-9","TYP-1","TYP-2","TYP-5"]'
     );
 
-    const ts = buildTsAudit(repo.root);
+    const ts = buildTsAudit(repository.root);
     expect(ts.run(false).success).toBe(true);
 
-    const human = buildTsAudit(repo.root).run(false);
+    const human = buildTsAudit(repository.root).run(false);
     expect(human.output).toMatch(
       new RegExp(
         `standards: enforced=${expectedEnforced} measured-not-enforced=${expectedMeasured} not-checked=${expectedNotChecked}`
@@ -258,26 +261,29 @@ describe('Audit parity — standards-audit.sh --self-test, ported', () => {
     expect(human.output).toMatch(/^ {2}COV-1 +info/m);
     expect(human.output).toMatch(/^ {2}1 +long\.ts {2}CMT-3$/m);
 
-    assertParity(repo.root);
+    assertParity(repository.root);
   }, 120000);
 
   it('renders the database tooling section — live, stale and refused rows', () => {
-    repo = ScratchRepo.create();
-    repo.write('ops/db-tooling/backup.ts', 'export const backupPath = 1;\n');
-    repo.write('.standards-db-tooling', 'ops/db-tooling/backup.ts\nno-such-dir/nested/*\n*\n');
-    repo.commit('init');
+    repository = ScratchRepository.create();
+    repository.write('ops/db-tooling/backup.ts', 'export const backupPath = 1;\n');
+    repository.write(
+      '.standards-db-tooling',
+      'ops/db-tooling/backup.ts\nno-such-dir/nested/*\n*\n'
+    );
+    repository.commit('init');
 
-    const human = buildTsAudit(repo.root).run(false);
+    const human = buildTsAudit(repository.root).run(false);
     expect(human.output).toContain("live — declaring 1 file(s) out of DB-1's scope");
     expect(human.output).toContain('STALE — matches no tracked file');
     expect(human.output).toContain('REFUSED — a wildcard with no literal path segment before it');
 
-    const json = buildTsAudit(repo.root).run(true);
+    const json = buildTsAudit(repository.root).run(true);
     expect(json.output).toContain('"clause":"STD-002"');
     expect(
       json.output.split('\n').filter((line) => line.includes('.standards-db-tooling')).length
     ).toBe(2);
 
-    assertParity(repo.root);
+    assertParity(repository.root);
   }, 120000);
 });

@@ -13,8 +13,8 @@ function isHardened(image: string, patterns: readonly string[]): boolean {
 }
 
 function isDebianSlimFallback(image: string): boolean {
-  const [repo, tag = ''] = image.split(/[:@]/);
-  return repo === 'debian' && tag.includes('slim');
+  const [repository, tag = ''] = image.split(/[:@]/);
+  return repository === 'debian' && tag.includes('slim');
 }
 
 /**
@@ -50,8 +50,8 @@ export class HardenedBaseGate implements Gate {
       if (shipped === undefined) {
         continue;
       }
-      const repo = shipped.baseImage.split('@')[0] ?? shipped.baseImage;
-      if (isHardened(repo, this.hardenedPatterns()) || isDebianSlimFallback(repo)) {
+      const repository = shipped.baseImage.split('@')[0] ?? shipped.baseImage;
+      if (isHardened(repository, this.hardenedPatterns()) || isDebianSlimFallback(repository)) {
         continue;
       }
       findings.push(

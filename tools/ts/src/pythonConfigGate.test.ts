@@ -32,7 +32,7 @@ function buildGate(fs: FakeFileSystem, files: readonly string[]): PythonConfigGa
   return new PythonConfigGate(ratchet, fs, TOOLS_ROOT);
 }
 
-function cleanRepo(): { fs: FakeFileSystem; files: readonly string[] } {
+function cleanRepository(): { fs: FakeFileSystem; files: readonly string[] } {
   const fs = new FakeFileSystem();
   fs.set(ROOT, 'pyproject.toml', CLEAN_PYPROJECT);
   fs.set(ROOT, 'src/app.py', 'print("hi")\n');
@@ -52,13 +52,13 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports nothing for a fully configured project', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     const gate = buildGate(fs, files);
     expect(gate.run({ root: ROOT, mode: 'enforce' })).toHaveLength(0);
   });
 
   it('reports PY-2 for a project with no ruff configuration', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -71,7 +71,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports PY-2 for a project with no mypy configuration', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -84,7 +84,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports TYP-5 when mypy is configured but not in strict mode', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -97,7 +97,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports TYP-5 for a standalone mypy.ini with two [mypy] sections, not "not strict"', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -119,7 +119,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports nothing for a standalone mypy.ini with python_version appended in the same section', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -136,7 +136,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports PY-3 when ruff target-version disagrees with requires-python', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -152,7 +152,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports PY-3 when mypy python_version is missing', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -168,7 +168,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports PY-3 when pyproject.toml has no requires-python', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -184,7 +184,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports nothing further about versions when requires-python has no parseable version', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',
@@ -207,7 +207,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports PY-2 once when pre-commit does not run ruff or mypy', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       '.pre-commit-config.yaml',
@@ -235,7 +235,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('reports PY-2 when no CI workflow runs ruff or mypy', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       '.github/workflows/ci.yml',
@@ -266,7 +266,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('respects a custom ruff_config_filenames threshold setting', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(ROOT, 'pyproject.toml', '[project]\nname = "svc"\nrequires-python = ">=3.11"\n');
     fs.set(ROOT, 'custom-ruff.toml', 'line-length = 100\n');
     fs.set(
@@ -283,7 +283,7 @@ describe('PythonConfigGate', () => {
   });
 
   it('honours an exemption on a PY-2 finding', () => {
-    const { fs, files } = cleanRepo();
+    const { fs, files } = cleanRepository();
     fs.set(
       ROOT,
       'pyproject.toml',

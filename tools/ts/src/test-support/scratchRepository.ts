@@ -8,20 +8,20 @@ import { tmpdir } from 'node:os';
  * {@link NodeGitClient}/{@link NodeFileSystem} or run bash gates as
  * subprocesses, neither of which a fake can stand in for.
  */
-export class ScratchRepo {
+export class ScratchRepository {
   readonly root: string;
 
   private constructor(root: string) {
     this.root = root;
   }
 
-  static create(): ScratchRepo {
+  static create(): ScratchRepository {
     const root = mkdtempSync(join(tmpdir(), 'standards-ts-'));
     execFileSync('git', ['init', '-q', '-b', 'main', '.'], { cwd: root });
     execFileSync('git', ['config', 'user.email', 't@t'], { cwd: root });
     execFileSync('git', ['config', 'user.name', 't'], { cwd: root });
     execFileSync('git', ['config', 'core.hooksPath', '/dev/null'], { cwd: root });
-    return new ScratchRepo(root);
+    return new ScratchRepository(root);
   }
 
   write(relativePath: string, content: string): void {

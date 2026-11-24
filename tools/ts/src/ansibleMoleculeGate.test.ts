@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Finding } from './finding.ts';
 import { AnsibleMoleculeGate } from './ansibleMoleculeGate.ts';
-import type { AnsibleTestRepo } from './test-support/ansibleRepo.ts';
-import { findingsOf, messagesFor } from './test-support/ansibleRepo.ts';
+import type { AnsibleTestRepository } from './test-support/ansibleRepository.ts';
+import { findingsOf, messagesFor } from './test-support/ansibleRepository.ts';
 
-const build = (repo: AnsibleTestRepo): AnsibleMoleculeGate =>
-  new AnsibleMoleculeGate(repo.ratchet, repo.fs, '/tools');
+const build = (repository: AnsibleTestRepository): AnsibleMoleculeGate =>
+  new AnsibleMoleculeGate(repository.ratchet, repository.fs, '/tools');
 
 const BASE = 'ansible/roles/web';
 const DIGEST = 'a'.repeat(64);
