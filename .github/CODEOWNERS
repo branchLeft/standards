@@ -17,10 +17,11 @@
 # publish a release (ci.yml carries the self-test and the dogfood job;
 # publish.yml checks the tag's signature before it publishes). The reusable gate
 # and the docs-lint caller come from the shared lines. repo-settings-audit.yml
-# and the Dependabot settings are released: nothing requires them, and
-# tools/tests/run.sh fails if the audit stops running.
+# reads a repository secret, so it stays owned. The Dependabot settings are
+# released: nothing requires them.
 /.github/workflows/ci.yml            @branchLeft/branchleft-admin
 /.github/workflows/publish.yml       @branchLeft/branchleft-admin
+/.github/workflows/repo-settings-audit.yml  @branchLeft/branchleft-admin
 # The code of every gate other repos run, the floors and
 # exemption definitions they read, and the tests of those gates.
 /tools/                              @branchLeft/branchleft-admin

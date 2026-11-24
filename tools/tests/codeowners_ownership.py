@@ -185,7 +185,7 @@ SAMPLES: tuple[Sample, ...] = (
     Sample(".github/workflows/standards.yml", True, "3 required check, shared line"),
     Sample(".github/workflows/docs-lint.yml", True, "3 required check, shared line"),
     Sample("templates/workflows/standards.yml", True, "3 workflow template"),
-    Sample(".github/workflows/repo-settings-audit.yml", False, "released: read-only audit, not required"),
+    Sample(".github/workflows/repo-settings-audit.yml", True, "3 reads a repository secret"),
     Sample(".github/dependabot.yml", False, "released: update settings"),
     Sample(".github/actions/x/action.yml", False, "released: no action here is a gate"),
     # criterion 8: the owner's words
@@ -218,7 +218,6 @@ SAMPLES: tuple[Sample, ...] = (
 # cannot pass the self-test.
 RED_ON_OLD = frozenset(
     {
-        ".github/workflows/repo-settings-audit.yml",
         ".github/dependabot.yml",
         ".github/actions/x/action.yml",
         ".npmrc",
@@ -414,6 +413,54 @@ def content_lines(text: str) -> list[str]:
     return [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
 
 
+def hold_reasons(text: str, is_action: bool) -> list[str]:
+    """Why a workflow or action file stays owned, read from its own text.
+
+    A file stays owned when it names a secret other than GITHUB_TOKEN, carries
+    an environment, grants any write permission, has no explicit permissions
+    block, or declares secrets on workflow_call.
+    """
+    out: list[str] = []
+    if (
+        re.search(r"(?<![\w-])secrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]", text)
+        or re.search(r"(?<![\w-])secrets\[", text)
+        or re.search(r"secrets:\s*inherit", text)
+    ):
+        out.append("secrets")
+    if re.search(r"^\s+environment:", text, re.M):
+        out.append("environment")
+    if re.search(r"^\s+[a-z-]+:\s*write\s*(#.*)?$", text, re.M) or re.search(
+        r"permissions:\s*write-all", text
+    ):
+        out.append("write permission")
+    if re.search(r"workflow_call:", text) and re.search(r"^\s{4}secrets:\s*$", text, re.M):
+        out.append("workflow_call secrets")
+    if not is_action and not re.search(r"^permissions:", text, re.M):
+        start = re.search(r"^jobs:\s*$", text, re.M)
+        body = text[start.end() :] if start else ""
+        pattern = r"^  (?=[A-Za-z0-9_.-]+:\s*(?:#.*)?$)"
+        jobs = re.split(pattern, body, flags=re.M)[1:]
+        if not jobs or any(not re.search(r"^    permissions:", job, re.M) for job in jobs):
+            out.append("no permissions block")
+    return out
+
+
+def workflow_problems(rules: list[Rule], root: Path = ROOT) -> list[str]:
+    """One line per workflow or action of this repo that matches the hold rule
+    and is not owned, so a new workflow cannot be released by accident."""
+    files = sorted(
+        [*(root / ".github" / "workflows").glob("*.y*ml")]
+        + [*(root / ".github" / "actions").glob("*/action.y*ml")]
+    )
+    problems: list[str] = []
+    for file in files:
+        rel = file.relative_to(root).as_posix()
+        reasons = hold_reasons(file.read_text(encoding="utf-8"), "/actions/" in rel)
+        if reasons and not is_owned(rules, rel):
+            problems.append(f"{rel} matches the hold rule ({', '.join(reasons)}) but is not owned")
+    return problems
+
+
 def check_structure(rules: list[Rule], text: str, repo: RepoProof | None = None) -> list[str]:
     """Rules that hold whatever the sample table says."""
     repo = repo or REPOS["standards"]
@@ -439,6 +486,7 @@ def check_structure(rules: list[Rule], text: str, repo: RepoProof | None = None)
         problems.append("templates/codeowners lines are not the file's final lines, in order")
     if repo.name != "standards":
         return problems
+    problems.extend(workflow_problems(rules))
     # A promoted gate, and its test, must be owned: promoting one more clause
     # must not add a judge that nobody reviews.
     for raw in PROMOTED_REGISTER.read_text(encoding="utf-8").splitlines():
@@ -590,6 +638,26 @@ def self_test() -> int:
     catch_all = real_text.replace("/tools/ ", "* ", 1)
     if not any("catch-all" in p for p in check_structure(parse(catch_all), catch_all)):
         failures.append("sabotage: a catch-all was not caught")
+
+    # The hold rule reads every workflow of this repo: the real file is green, and
+    # dropping the line that owns a matching workflow is red on that workflow.
+    if workflow_problems(parse(real_text)):
+        failures.append("green: a workflow that matches the hold rule is not owned")
+    audit_line = ["/.github/workflows/repo-settings-audit.yml"]
+    audit_dropped = "\n".join(ln for ln in real_text.splitlines() if ln.split()[:1] != audit_line)
+    if not any("repo-settings-audit.yml" in p for p in workflow_problems(parse(audit_dropped))):
+        failures.append("sabotage: releasing repo-settings-audit.yml was not caught")
+    reads = {
+        "a secret": ("env:\n  T: ${{ secrets.TOKEN }}\n", "secrets"),
+        "an environment": ("jobs:\n  a:\n    environment: prod\n", "environment"),
+        "a write": ("permissions:\n  contents: write\n", "write permission"),
+        "no block": ("on: push\njobs:\n  a:\n    runs-on: x\n", "no permissions block"),
+    }
+    for name, (snippet, reason) in reads.items():
+        if reason not in hold_reasons(snippet, False):
+            failures.append(f"hold rule: {name} was not read")
+    if hold_reasons("env:\n  T: ${{ secrets.GITHUB_TOKEN }}\npermissions: {}\n", False):
+        failures.append("hold rule: GITHUB_TOKEN alone must not match")
 
     # The shared template must not own a whole .github directory again.
     template_text = SHARED_TEMPLATE.read_text(encoding="utf-8")
