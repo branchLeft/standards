@@ -44,9 +44,9 @@ Never require a context before a real run has produced it; a required check on a
 
 ## REPO-5 — CODEOWNERS covers the escape hatches
 
-`CODEOWNERS` covers `.standardsignore`, `.standards.mode`, `.docs-lint*`, `.standards-db-tooling` and `.github/`.
+`CODEOWNERS` covers `.standardsignore`, `.standards.mode`, `.docs-lint*`, `.standards-db-tooling`, `.github/CODEOWNERS` and the two workflow callers every repo runs as a required check, `.github/workflows/standards.yml` and `.github/workflows/docs-lint.yml`. It does not own `.github/` as a whole: a workflow is the owner's only when it enforces a required check or gates a deploy, and a repo names its own such workflows, and the local actions they call, above the shared lines.
 
-**Why:** an exemption or a scope declaration is a review decision, and if the files that grant one are not owned a PR can widen one quietly.
+**Why:** an exemption or a scope declaration is a review decision, and if the files that grant one are not owned a PR can widen one quietly. A workflow that enforces a required check or gates a deploy is the same kind of file: weakening it lets a merge or a deploy through. Owning every workflow, action and Dependabot setting as well sends the owner changes that guard nothing.
 
 **Check:** `SYNC-1` holds the shared lines to `templates/codeowners`.
 

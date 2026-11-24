@@ -1,9 +1,17 @@
 # Target: .github/CODEOWNERS
 #
-# The shared set is the escape hatches, not the whole tree. Keep these lines
-# last — GitHub applies the LAST matching pattern, so a repo's own go above.
+# The shared set is the escape hatches and the two workflows every repo runs as
+# a required check, not the whole tree. Keep these lines last — GitHub applies
+# the LAST matching pattern, so a repo's own go above.
+#
+# There is no /.github/ line. The owner reviews a workflow only when it enforces
+# a required check or gates a deploy, so a repo names its own such workflows
+# (and the local actions they call) above these lines; Dependabot settings, issue
+# and pull request templates and every other workflow are agent-reviewed.
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
 /.standards-db-tooling   @branchLeft/branchleft-admin
-/.github/                @branchLeft/branchleft-admin
+/.github/CODEOWNERS      @branchLeft/branchleft-admin
+/.github/workflows/standards.yml  @branchLeft/branchleft-admin
+/.github/workflows/docs-lint.yml  @branchLeft/branchleft-admin

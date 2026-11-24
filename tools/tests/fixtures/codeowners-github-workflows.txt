@@ -1,19 +1,34 @@
-# Code owners for the files that can change who may merge, what a merge or a
-# deploy checks, or who can reach a secret. The owner approves those. Every
-# other file is unowned, so a pull request touching only those merges on the
-# reviewer App's approval. There is deliberately no catch-all line.
+# The owner is a required reviewer only for two things:
+#   (a) guardrails: anything that, if silently weakened, would stop an agent
+#       guardrail or a required check protecting us. That is the workflows and
+#       actions that enforce checks or gate deploys, this file, ruleset and
+#       branch-protection files, the gate tools and their tests, the floors
+#       and ignore files that set gate levels, and the trust anchors that
+#       decide who may sign a release.
+#   (b) human-facing docs: the README and the licence text.
+# Everything else is released: it merges on the reviewer App's approval and
+# green CI. There is deliberately no catch-all line.
 #
 # GitHub applies the LAST matching line, so a line with no owner releases a
 # path an earlier line owned. The released files sit after the owned groups and
-# before the five shared lines. Those five come from the standards template and
+# before the seven shared lines. Those seven come from the standards template and
 # stay last, byte for byte, so the standards sync check passes.
 #
 # Matching is case-sensitive and has no character classes, so each name form
 # below is spelled in lower-case, Capitalised and UPPER-case.
 
-# Workflows and actions: they run with the repository's secrets and decide
-# pass or fail on every pull request.
-**/.github/workflows/                          @branchLeft/branchleft-admin
+# Workflows and actions that enforce a check or gate a deploy. docs-lint-self.yml
+# emits the one required check here ("docs-lint"); the reusable workflows are
+# what the other repos' required checks and gated applies call (docs lint, opv
+# lint, image scan, the gated apply and the gated step); every action is gate code.
+# standards.yml and docs-lint.yml come from the shared lines at the end. The
+# self-test workflows, the drift check, the nightly rescan, the scan report and
+# Dependabot settings are released: nothing requires them and none gates a deploy.
+/.github/workflows/docs-lint-self.yml          @branchLeft/branchleft-admin
+/.github/workflows/opv-lint.yml                @branchLeft/branchleft-admin
+/.github/workflows/image-scan.yml              @branchLeft/branchleft-admin
+/.github/workflows/ansible-gated-apply.yml     @branchLeft/branchleft-admin
+/.github/workflows/ansible-gated-step.yml      @branchLeft/branchleft-admin
 **/.github/actions/                            @branchLeft/branchleft-admin
 
 # CODEOWNERS and ruleset or branch-protection files: they say who must approve.
@@ -41,23 +56,13 @@
 /.opv-lint*                                    @branchLeft/branchleft-admin
 /tools/floors.tsv                              @branchLeft/branchleft-admin
 
-# Keys, trust and access. Nothing here exists in this repo today; the lines
-# keep these files the owner's if they ever appear.
+# Trust anchors: the signer list that decides which release tags are trusted,
+# and the trust directory the host-key checks read.
 **/allowed_signers                             @branchLeft/branchleft-admin
 /ansible/trust/                                @branchLeft/branchleft-admin
-**/.npmrc                                      @branchLeft/branchleft-admin
-**/Pulumi.*.yaml                               @branchLeft/branchleft-admin
-**/library/                                    @branchLeft/branchleft-admin
-**/*_plugins/                                  @branchLeft/branchleft-admin
-**/module_utils/                               @branchLeft/branchleft-admin
-**/*sudoers*                                   @branchLeft/branchleft-admin
-**/*sudoers*/                                  @branchLeft/branchleft-admin
-**/authorized_keys*                            @branchLeft/branchleft-admin
 
-# Mail. Nothing here exists in this repo today.
-/mail/                                         @branchLeft/branchleft-admin
-
-# The owner's own words: the licence text.
+# Human-facing docs and the owner's own words: the README and the licence text.
+/README.md                                     @branchLeft/branchleft-admin
 /LICENSE                                       @branchLeft/branchleft-admin
 
 # Released: prose that explains a kept gate and that no job reads as input.
@@ -71,4 +76,6 @@
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
 /.standards-db-tooling   @branchLeft/branchleft-admin
-/.github/                @branchLeft/branchleft-admin
+/.github/CODEOWNERS      @branchLeft/branchleft-admin
+/.github/workflows/standards.yml  @branchLeft/branchleft-admin
+/.github/workflows/docs-lint.yml  @branchLeft/branchleft-admin
