@@ -31,7 +31,7 @@
   "dependencies": {
     "@eslint/js": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "65.4.7",
+    "eslint-plugin-jsdoc": "65.5.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-unicorn": "80.0.0",
