@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Finding } from './finding.ts';
 import { AnsibleTaskGate } from './ansibleTaskGate.ts';
-import type { AnsibleTestRepo } from './test-support/ansibleRepo.ts';
-import { findingsOf, messagesFor } from './test-support/ansibleRepo.ts';
+import type { AnsibleTestRepository } from './test-support/ansibleRepository.ts';
+import { findingsOf, messagesFor } from './test-support/ansibleRepository.ts';
 
-const build = (repo: AnsibleTestRepo): AnsibleTaskGate =>
-  new AnsibleTaskGate(repo.ratchet, repo.fs, '/tools');
+const build = (repository: AnsibleTestRepository): AnsibleTaskGate =>
+  new AnsibleTaskGate(repository.ratchet, repository.fs, '/tools');
 
 const TASKS = 'ansible/roles/web/tasks/main.yml';
 

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Finding } from './finding.ts';
 import { AnsibleToolchainGate } from './ansibleToolchainGate.ts';
-import type { AnsibleTestRepo } from './test-support/ansibleRepo.ts';
-import { findingsOf, messagesFor } from './test-support/ansibleRepo.ts';
+import type { AnsibleTestRepository } from './test-support/ansibleRepository.ts';
+import { findingsOf, messagesFor } from './test-support/ansibleRepository.ts';
 
-const build = (repo: AnsibleTestRepo): AnsibleToolchainGate =>
-  new AnsibleToolchainGate(repo.ratchet, repo.fs, '/tools');
+const build = (repository: AnsibleTestRepository): AnsibleToolchainGate =>
+  new AnsibleToolchainGate(repository.ratchet, repository.fs, '/tools');
 
 const REQUIREMENTS = [
   '# compiled',

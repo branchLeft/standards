@@ -106,14 +106,14 @@ describe('ScannerWiringGate: CRED-11', () => {
 });
 
 describe('ScannerWiringGate: SEC-7', () => {
-  const lockfileRepo = {
+  const lockfileRepository = {
     [PRECOMMIT]: GITLEAKS_HOOK,
     'package-lock.json': '{}',
   };
 
   it('flags a lockfile with no Grype anywhere', () => {
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': workflow('push', ['run: gitleaks detect']),
     });
     const sec7 = findings.filter((finding) => finding.clause === 'SEC-7');
@@ -123,7 +123,7 @@ describe('ScannerWiringGate: SEC-7', () => {
 
   it('accepts Grype on pull requests and pushes', () => {
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': workflow('[push, pull_request]', [
         'run: gitleaks detect',
         'uses: anchore/scan-action@v4',
@@ -134,7 +134,7 @@ describe('ScannerWiringGate: SEC-7', () => {
 
   it('accepts Grype run behind an environment assignment', () => {
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': workflow('[push, pull_request]', [
         'run: gitleaks detect',
         'run: GRYPE_DB_AUTO_UPDATE=false grype dir:.',
@@ -145,7 +145,7 @@ describe('ScannerWiringGate: SEC-7', () => {
 
   it('flags Grype that never runs on pull requests', () => {
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': workflow('push', ['run: gitleaks detect', 'run: grype dir:.']),
     });
     const sec7 = findings.filter((finding) => finding.clause === 'SEC-7');
@@ -155,7 +155,7 @@ describe('ScannerWiringGate: SEC-7', () => {
 
   it('counts a reusable workflow as running on any event', () => {
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': workflow('workflow_call', [
         'run: gitleaks detect',
         'run: grype dir:.',
@@ -177,7 +177,7 @@ describe('ScannerWiringGate: SEC-7', () => {
   it('reads the triggers of a workflow that starts with a byte-order mark and CRLF endings', () => {
     const text = `${BYTE_ORDER_MARK}${workflow('[push, pull_request]', ['run: grype dir:.'])}`;
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': text.replace(/\n/g, '\r\n'),
     });
     expect(findings.filter((finding) => finding.clause === 'SEC-7')).toHaveLength(0);
@@ -185,7 +185,7 @@ describe('ScannerWiringGate: SEC-7', () => {
 
   it('finds Grype by a differently cased uses path', () => {
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/workflows/ci.yml': workflow('[push, pull_request]', [
         'run: gitleaks detect',
         'uses: Anchore/Scan-Action@v4',
@@ -196,7 +196,7 @@ describe('ScannerWiringGate: SEC-7', () => {
 });
 
 describe('ScannerWiringGate: SEC-9', () => {
-  const dockerRepo = {
+  const dockerRepository = {
     [PRECOMMIT]: `${GITLEAKS_HOOK}\n${HADOLINT_HOOK}`,
     Dockerfile: 'FROM scratch',
   };
@@ -208,7 +208,7 @@ describe('ScannerWiringGate: SEC-9', () => {
   ]);
 
   it('accepts hadolint in pre-commit and CI plus KICS in CI', () => {
-    const findings = runGate({ ...dockerRepo, '.github/workflows/ci.yml': fullCi });
+    const findings = runGate({ ...dockerRepository, '.github/workflows/ci.yml': fullCi });
     expect(findings.filter((finding) => finding.clause === 'SEC-9')).toHaveLength(0);
   });
 
@@ -258,14 +258,14 @@ function singleStepJob(jobKeys: readonly string[], stepLines: readonly string[])
 const CANNOT_FAIL = 'cannot fail the build';
 
 describe('ScannerWiringGate: a scanner that cannot fail the build is not wired', () => {
-  const lockfileRepo = { [PRECOMMIT]: GITLEAKS_HOOK, 'package-lock.json': '{}' };
-  const dockerRepo = {
+  const lockfileRepository = { [PRECOMMIT]: GITLEAKS_HOOK, 'package-lock.json': '{}' };
+  const dockerRepository = {
     [PRECOMMIT]: `${GITLEAKS_HOOK}\n${HADOLINT_HOOK}`,
     Dockerfile: 'FROM scratch',
   };
 
   function sec7(workflowText: string): readonly Finding[] {
-    return runGate({ ...lockfileRepo, '.github/workflows/ci.yml': workflowText }).filter(
+    return runGate({ ...lockfileRepository, '.github/workflows/ci.yml': workflowText }).filter(
       (finding) => finding.clause === 'SEC-7'
     );
   }
@@ -398,7 +398,7 @@ describe('ScannerWiringGate: a scanner that cannot fail the build is not wired',
       '      continue-on-error: true',
     ].join('\n');
     const findings = runGate({
-      ...lockfileRepo,
+      ...lockfileRepository,
       '.github/actions/scan/action.yml': action,
       '.github/workflows/ci.yml': workflow('push', ['run: gitleaks detect']),
     }).filter((finding) => finding.clause === 'SEC-7');
@@ -428,7 +428,7 @@ describe('ScannerWiringGate: a scanner that cannot fail the build is not wired',
         ['run: hadolint Dockerfile', 'uses: checkmarx/kics-github-action@v2']
       ),
     ]);
-    const findings = runGate({ ...dockerRepo, '.github/workflows/ci.yml': ci }).filter(
+    const findings = runGate({ ...dockerRepository, '.github/workflows/ci.yml': ci }).filter(
       (finding) => finding.clause === 'SEC-9'
     );
     expect(findings).toHaveLength(2);

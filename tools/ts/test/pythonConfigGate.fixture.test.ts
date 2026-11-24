@@ -8,13 +8,13 @@ import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { NodeGitClient } from '../src/gitClient.ts';
 import { PythonConfigGate } from '../src/pythonConfigGate.ts';
 import { Ratchet } from '../src/ratchet.ts';
-import { ScratchRepo } from '../src/test-support/scratchRepo.ts';
+import { ScratchRepository } from '../src/test-support/scratchRepository.ts';
 
-let repo: ScratchRepo | undefined;
+let repository: ScratchRepository | undefined;
 
 afterEach(() => {
-  repo?.destroy();
-  repo = undefined;
+  repository?.destroy();
+  repository = undefined;
 });
 
 function buildGate(root: string): PythonConfigGate {
@@ -26,27 +26,30 @@ function buildGate(root: string): PythonConfigGate {
 
 describe('PythonConfigGate — provisioning-folder fixture', () => {
   it('flags every unconfigured script once, and pre-commit and CI once each', () => {
-    repo = ScratchRepo.create();
-    repo.write(
+    repository = ScratchRepository.create();
+    repository.write(
       'db/provision/dump_tenant.py',
       'def dump_tenant(tenant_id: str) -> None:\n    raise NotImplementedError\n'
     );
-    repo.write(
+    repository.write(
       'db/provision/test_dump_tenant.py',
       'from dump_tenant import dump_tenant\n\n\ndef test_dump_tenant_raises() -> None:\n    pass\n'
     );
-    repo.write(
+    repository.write(
       'db/provision/naming.py',
       'def backup_name(tenant_id: str) -> str:\n    return f"{tenant_id}-backup"\n'
     );
-    repo.write(
+    repository.write(
       '.pre-commit-config.yaml',
       'repos:\n  - repo: local\n    hooks:\n      - id: prettier\n'
     );
-    repo.write('.github/workflows/ci.yml', 'jobs:\n  test:\n    steps:\n      - run: npm test\n');
-    repo.commit('add a provisioning folder');
+    repository.write(
+      '.github/workflows/ci.yml',
+      'jobs:\n  test:\n    steps:\n      - run: npm test\n'
+    );
+    repository.commit('add a provisioning folder');
 
-    const findings = buildGate(repo.root).run({ root: repo.root, mode: 'enforce' });
+    const findings = buildGate(repository.root).run({ root: repository.root, mode: 'enforce' });
     const clauses = findings.map((finding) => finding.clause).sort();
 
     // One PY-3 and two PY-2 findings for the one project db/provision groups
@@ -63,9 +66,9 @@ describe('PythonConfigGate — provisioning-folder fixture', () => {
   });
 
   it('reports nothing once the fixture adopts the shared ruff and mypy templates', () => {
-    repo = ScratchRepo.create();
-    repo.write('db/provision/dump_tenant.py', 'def dump_tenant() -> None:\n    pass\n');
-    repo.write(
+    repository = ScratchRepository.create();
+    repository.write('db/provision/dump_tenant.py', 'def dump_tenant() -> None:\n    pass\n');
+    repository.write(
       'db/provision/pyproject.toml',
       [
         '[project]',
@@ -81,17 +84,17 @@ describe('PythonConfigGate — provisioning-folder fixture', () => {
         '',
       ].join('\n')
     );
-    repo.write(
+    repository.write(
       '.pre-commit-config.yaml',
       'repos:\n  - repo: local\n    hooks:\n      - id: ruff\n      - id: mypy\n'
     );
-    repo.write(
+    repository.write(
       '.github/workflows/ci.yml',
       'jobs:\n  lint:\n    steps:\n      - run: ruff check .\n      - run: mypy .\n'
     );
-    repo.commit('adopt the shared configuration');
+    repository.commit('adopt the shared configuration');
 
-    const findings = buildGate(repo.root).run({ root: repo.root, mode: 'enforce' });
+    const findings = buildGate(repository.root).run({ root: repository.root, mode: 'enforce' });
     expect(findings).toHaveLength(0);
   });
 });

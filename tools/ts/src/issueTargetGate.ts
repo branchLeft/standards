@@ -28,8 +28,8 @@ interface Allowlist {
   readonly keys: ReadonlySet<string>;
 }
 
-function allowKey(repo: string, path: string): string {
-  return `${repo.trim().toLowerCase()}\t${path.trim()}`;
+function allowKey(repository: string, path: string): string {
+  return `${repository.trim().toLowerCase()}\t${path.trim()}`;
 }
 
 // `gh api` sends a POST when it is told to, and also when it is given any body field or `--input`,
@@ -48,7 +48,7 @@ function normalise(content: string): string {
   return withoutMark.replace(/\r\n?/g, '\n');
 }
 
-function sameRepo(a: string, b: string): boolean {
+function sameRepository(a: string, b: string): boolean {
   return a.toLowerCase() === b.toLowerCase();
 }
 
@@ -74,10 +74,10 @@ function windowNamesTarget(window: string, target: string): boolean {
   if (window.toLowerCase().includes(target.toLowerCase())) {
     return true;
   }
-  const [owner = '', repo = ''] = target.split('/');
+  const [owner = '', repository = ''] = target.split('/');
   const pair = (key: string, value: string): RegExp =>
     new RegExp(`\\b${key}\\s*:\\s*["']${value}["']`, 'i');
-  return pair('owner', owner).test(window) && pair('repo', repo).test(window);
+  return pair('owner', owner).test(window) && pair('repo', repository).test(window);
 }
 
 interface Hit {
@@ -86,7 +86,7 @@ interface Hit {
 }
 
 // The repository a gh command names, or undefined when it names none (and so targets the workflow's own).
-function namedRepo(command: string, pattern: RegExp): string | undefined {
+function namedRepository(command: string, pattern: RegExp): string | undefined {
   return pattern.exec(command)?.[1];
 }
 
@@ -94,7 +94,7 @@ function namedRepo(command: string, pattern: RegExp): string | undefined {
 function ghHit(lines: readonly string[], index: number): { repo: string | undefined } | undefined {
   const line = lines[index] ?? '';
   if (GH_ISSUE_CREATE.test(line)) {
-    return { repo: namedRepo(commandFrom(lines, index), REPO_FLAG) };
+    return { repo: namedRepository(commandFrom(lines, index), REPO_FLAG) };
   }
   if (GH_API.test(line)) {
     const command = commandFrom(lines, index);
@@ -116,11 +116,11 @@ export class IssueTargetGate implements Gate {
   private readonly toolsRoot: string;
   private readonly ownRepo: string | undefined;
 
-  constructor(ratchet: Ratchet, fs: FileSystemPort, toolsRoot: string, ownRepo?: string) {
+  constructor(ratchet: Ratchet, fs: FileSystemPort, toolsRoot: string, ownRepository?: string) {
     this.ratchet = ratchet;
     this.fs = fs;
     this.toolsRoot = toolsRoot;
-    this.ownRepo = ownRepo;
+    this.ownRepo = ownRepository;
   }
 
   private target(): string {
@@ -137,9 +137,9 @@ export class IssueTargetGate implements Gate {
       if (line.trim() === '' || line.trimStart().startsWith('#')) {
         continue;
       }
-      const [repo = '', path = '', reason = ''] = line.split('\t');
-      if (repo.trim() !== '' && path.trim() !== '' && reason.trim() !== '') {
-        keys.add(allowKey(repo, path));
+      const [repository = '', path = '', reason = ''] = line.split('\t');
+      if (repository.trim() !== '' && path.trim() !== '' && reason.trim() !== '') {
+        keys.add(allowKey(repository, path));
       }
     }
     return { keys };
@@ -151,7 +151,7 @@ export class IssueTargetGate implements Gate {
   }
 
   private scanLines(lines: readonly string[], target: string): readonly Hit[] {
-    const ownIsTarget = this.ownRepo !== undefined && sameRepo(this.ownRepo, target);
+    const ownIsTarget = this.ownRepo !== undefined && sameRepository(this.ownRepo, target);
     const hits: Hit[] = [];
     lines.forEach((line, index) => {
       const hit = this.scanLine(lines, line, index, target, ownIsTarget);
@@ -175,7 +175,7 @@ export class IssueTargetGate implements Gate {
     const gh = ghHit(lines, index);
     if (gh !== undefined) {
       const aimed = gh.repo ?? (ownIsTarget ? target : undefined);
-      return aimed !== undefined && sameRepo(aimed, target)
+      return aimed !== undefined && sameRepository(aimed, target)
         ? undefined
         : `opens an issue in ${gh.repo ?? "the workflow's own repository"} — issues are filed in ${target} alone`;
     }

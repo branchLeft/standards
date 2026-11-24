@@ -271,11 +271,11 @@ export class AnsibleToolchainGate implements Gate {
       (requirement) => requirement.name === 'ansible-lint' && isExact(requirement)
     );
     const lines = (readText(this.fs, this.ratchet.root, PRE_COMMIT_FILE) ?? '').split('\n');
-    const repoAt = lines.findIndex((line) => /^\s*-\s+repo:.*ansible-lint/.test(line));
-    if (pinned === undefined || repoAt === -1) {
+    const repositoryAt = lines.findIndex((line) => /^\s*-\s+repo:.*ansible-lint/.test(line));
+    if (pinned === undefined || repositoryAt === -1) {
       return [];
     }
-    for (let index = repoAt + 1; index < lines.length; index += 1) {
+    for (let index = repositoryAt + 1; index < lines.length; index += 1) {
       const line = lines[index] ?? '';
       if (/^\s*-\s+repo:/.test(line)) {
         break;

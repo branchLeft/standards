@@ -10,7 +10,7 @@ import { parseFindingJson } from '../src/finding.ts';
 import type { Finding } from '../src/finding.ts';
 import { NodeFileSystem } from '../src/fileSystemPort.ts';
 import { readPromotedRows } from '../src/promotedClauses.ts';
-import { ScratchRepo } from '../src/test-support/scratchRepo.ts';
+import { ScratchRepository } from '../src/test-support/scratchRepository.ts';
 
 const TOOLS_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const AUDIT = join(TOOLS_DIR, 'ts', 'bin', 'audit.ts');
@@ -136,14 +136,14 @@ interface Run {
   readonly findings: readonly Finding[];
 }
 
-function git(repo: ScratchRepo, ...commandArguments: string[]): void {
-  execFileSync('git', commandArguments, { cwd: repo.root, stdio: 'ignore' });
+function git(repository: ScratchRepository, ...commandArguments: string[]): void {
+  execFileSync('git', commandArguments, { cwd: repository.root, stdio: 'ignore' });
 }
 
 /** The workflow's own invocation: `audit.ts --advisory-only`, with the mode passed through. */
-function runAudit(repo: ScratchRepo, mode: 'warn' | 'enforce'): Run {
+function runAudit(repository: ScratchRepository, mode: 'warn' | 'enforce'): Run {
   const result = spawnSync(process.execPath, [AUDIT, '--advisory-only', '--mode', mode, '--json'], {
-    cwd: repo.root,
+    cwd: repository.root,
     encoding: 'utf8',
   });
   const findings = (result.stdout ?? '')
@@ -158,30 +158,30 @@ function levelsFor(run: Run, clause: string): readonly string[] {
 }
 
 /** A base branch carrying the violation, then a feature branch that changes `changed`. */
-function branchedRepo(
+function branchedRepository(
   files: Readonly<Record<string, string>>,
   change: [string, string]
-): ScratchRepo {
-  const repo = ScratchRepo.create();
-  repo.write('README.md', 'readme\n');
+): ScratchRepository {
+  const repository = ScratchRepository.create();
+  repository.write('README.md', 'readme\n');
   for (const [path, content] of Object.entries(files)) {
-    repo.write(path, content);
+    repository.write(path, content);
   }
-  repo.commit('base');
-  git(repo, 'checkout', '-q', '-b', 'feature');
+  repository.commit('base');
+  git(repository, 'checkout', '-q', '-b', 'feature');
   const [path, appended] = change;
   const existing = files[path] ?? 'readme\n';
-  repo.write(path, existing + appended);
-  repo.commit('feature');
-  return repo;
+  repository.write(path, existing + appended);
+  repository.commit('feature');
+  return repository;
 }
 
 describe('the promoted list, through the workflow command', () => {
-  let repo: ScratchRepo | undefined;
+  let repository: ScratchRepository | undefined;
 
   afterEach(() => {
-    repo?.destroy();
-    repo = undefined;
+    repository?.destroy();
+    repository = undefined;
   });
 
   const promoted = readPromotedRows(new NodeFileSystem(), TOOLS_DIR);
@@ -199,40 +199,40 @@ describe('the promoted list, through the workflow command', () => {
 
     it('exits non-zero in enforce mode', () => {
       if (!fixture) throw new Error(`no fixture for ${clause}`);
-      repo = branchedRepo(fixture.files, ['README.md', 'more\n']);
-      const run = runAudit(repo, 'enforce');
+      repository = branchedRepository(fixture.files, ['README.md', 'more\n']);
+      const run = runAudit(repository, 'enforce');
       expect(levelsFor(run, clause)).toContain('error');
       expect(run.status).toBe(1);
     }, 60000);
 
     it('exits non-zero in warn mode for a file the branch changed', () => {
       if (!fixture) throw new Error(`no fixture for ${clause}`);
-      repo = branchedRepo(fixture.files, [fixture.offender, fixture.touch]);
-      const run = runAudit(repo, 'warn');
+      repository = branchedRepository(fixture.files, [fixture.offender, fixture.touch]);
+      const run = runAudit(repository, 'warn');
       expect(levelsFor(run, clause)).toContain('error');
       expect(run.status).toBe(1);
     }, 60000);
 
     it('exits zero in warn mode for a file the branch left alone', () => {
       if (!fixture) throw new Error(`no fixture for ${clause}`);
-      repo = branchedRepo(fixture.files, ['README.md', 'more\n']);
-      const run = runAudit(repo, 'warn');
+      repository = branchedRepository(fixture.files, ['README.md', 'more\n']);
+      const run = runAudit(repository, 'warn');
       expect(levelsFor(run, clause)).toEqual(['warning']);
       expect(run.status).toBe(0);
     }, 60000);
   });
 
   it('exits zero in enforce mode for a clause that is not on the list', () => {
-    repo = branchedRepo(ADVISORY_ONLY_REPO, ['README.md', 'more\n']);
-    const run = runAudit(repo, 'enforce');
+    repository = branchedRepository(ADVISORY_ONLY_REPO, ['README.md', 'more\n']);
+    const run = runAudit(repository, 'enforce');
     expect(run.findings.some((finding) => finding.level === 'advisory')).toBe(true);
     expect(run.findings.filter((finding) => finding.level === 'error')).toEqual([]);
     expect(run.status).toBe(0);
   }, 60000);
 
   it('exits zero on a repository with no violation at all', () => {
-    repo = branchedRepo({ 'a.ts': 'export const a = 1;\n' }, ['README.md', 'more\n']);
-    const run = runAudit(repo, 'enforce');
+    repository = branchedRepository({ 'a.ts': 'export const a = 1;\n' }, ['README.md', 'more\n']);
+    const run = runAudit(repository, 'enforce');
     expect(run.findings.filter((finding) => finding.level === 'error')).toEqual([]);
     expect(run.status).toBe(0);
   }, 60000);
