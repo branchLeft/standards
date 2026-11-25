@@ -112,7 +112,7 @@ jobs:
           echo "version=$(node -p "require('./packages/tsconfig/package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Attest @branchleft/tsconfig
-        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@a2175a416b57f950fed891837f88f2d1a31e00f4 # v1.2.0
+        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@291ad35742f009d1bdcdb39dcc96f1e2d35c5c7d # v1.2.6
         with:
           tarball: ${{ runner.temp }}/tarballs/branchleft-tsconfig-${{ steps.pack.outputs.version }}.tgz
           repo: branchLeft/standards
@@ -120,7 +120,7 @@ jobs:
           ref: refs/tags/v${{ steps.pack.outputs.version }}
 
       - name: Attest @branchleft/prettier-config
-        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@a2175a416b57f950fed891837f88f2d1a31e00f4 # v1.2.0
+        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@291ad35742f009d1bdcdb39dcc96f1e2d35c5c7d # v1.2.6
         with:
           tarball: ${{ runner.temp }}/tarballs/branchleft-prettier-config-${{ steps.pack.outputs.version }}.tgz
           repo: branchLeft/standards
@@ -128,7 +128,7 @@ jobs:
           ref: refs/tags/v${{ steps.pack.outputs.version }}
 
       - name: Attest @branchleft/vitest-config
-        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@a2175a416b57f950fed891837f88f2d1a31e00f4 # v1.2.0
+        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@291ad35742f009d1bdcdb39dcc96f1e2d35c5c7d # v1.2.6
         with:
           tarball: ${{ runner.temp }}/tarballs/branchleft-vitest-config-${{ steps.pack.outputs.version }}.tgz
           repo: branchLeft/standards
@@ -136,7 +136,7 @@ jobs:
           ref: refs/tags/v${{ steps.pack.outputs.version }}
 
       - name: Attest @branchleft/eslint-config
-        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@a2175a416b57f950fed891837f88f2d1a31e00f4 # v1.2.0
+        uses: branchLeft/github-workflows/.github/actions/attest-npm-tarball@291ad35742f009d1bdcdb39dcc96f1e2d35c5c7d # v1.2.6
         with:
           tarball: ${{ runner.temp }}/tarballs/branchleft-eslint-config-${{ steps.pack.outputs.version }}.tgz
           repo: branchLeft/standards
