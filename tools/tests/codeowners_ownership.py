@@ -36,6 +36,29 @@ OWNER_TEAM = "@branchLeft/branchleft-admin"
 # The shapes that own the whole tree. None is allowed.
 CATCH_ALLS = frozenset({"*", "/*", "**", "/**", "**/*", "/**/*"})
 
+# The shapes that own every workflow, action and Dependabot file. The shared
+# template may name single files under .github/ but never the directory: the
+# owner reviews a workflow only when it enforces a required check or gates a
+# deploy, and a directory line would hand every repo the whole tree again.
+WHOLE_GITHUB_DIRECTORY = frozenset(
+    {
+        "/.github",
+        "/.github/",
+        ".github",
+        ".github/",
+        "/.github/*",
+        "/.github/**",
+        "/.github/workflows",
+        "/.github/workflows/",
+        "/.github/workflows/*",
+        "/.github/actions",
+        "/.github/actions/",
+        "**/.github/",
+        "**/.github/workflows/",
+        "**/.github/actions/",
+    }
+)
+
 
 class UnsupportedSyntax(ValueError):
     """A pattern GitHub does not support; the merge route refuses these too."""
@@ -156,10 +179,15 @@ SAMPLES: tuple[Sample, ...] = (
     Sample("pnpm-workspace.yaml", False, "released: install settings"),
     Sample(".pnpmfile.cjs", False, "released: install hook"),
     Sample("packages/eslint-config/.pnpmfile.cjs", False, "released: install hook"),
-    # criterion 3: workflows that can reach secrets
-    Sample(".github/workflows/publish.yml", True, "3 workflow"),
-    Sample(".github/actions/x/action.yml", True, "3 action"),
+    # criterion 3: workflows that enforce a required check or gate a release
+    Sample(".github/workflows/publish.yml", True, "3 release workflow"),
+    Sample(".github/workflows/ci.yml", True, "3 required check"),
+    Sample(".github/workflows/standards.yml", True, "3 required check, shared line"),
+    Sample(".github/workflows/docs-lint.yml", True, "3 required check, shared line"),
     Sample("templates/workflows/standards.yml", True, "3 workflow template"),
+    Sample(".github/workflows/repo-settings-audit.yml", True, "3 reads a repository secret"),
+    Sample(".github/dependabot.yml", False, "released: update settings"),
+    Sample(".github/actions/x/action.yml", False, "released: no action here is a gate"),
     # criterion 8: the owner's words
     Sample("LICENSE", True, "8 legal text"),
     Sample("LICENSE-DOCS", True, "8 legal text"),
@@ -190,6 +218,8 @@ SAMPLES: tuple[Sample, ...] = (
 # cannot pass the self-test.
 RED_ON_OLD = frozenset(
     {
+        ".github/dependabot.yml",
+        ".github/actions/x/action.yml",
         ".npmrc",
         "packages/eslint-config/.npmrc",
         "packages/eslint-config/package.json",
@@ -204,15 +234,30 @@ RED_ON_OLD = frozenset(
 )
 
 
-# The other two repos that proved their CODEOWNERS with their own matcher. Their
-# sample tables are kept verbatim, one per repo, so each repo's assertions are
-# still made, against that repo's own file, by this one matcher (`--repo`).
+# The other two repos that proved their CODEOWNERS with their own matcher. Each
+# table is that repo's own sample table as of its last sync with the shared
+# template, and each fixture is that repo's CODEOWNERS at the same point, so the
+# repo's assertions are still made, against its own file, by this one matcher
+# (`--repo`). A repo's change to its own table is carried here in the next sync.
 GITHUB_WORKFLOWS_SAMPLES: tuple[Sample, ...] = (
-    Sample(".github/workflows/docs-lint.yml", True, "criterion 3"),
-    Sample("sub/.github/workflows/a.yml", True, "criterion 3"),
+    Sample(".github/workflows/docs-lint.yml", True, "criterion 3, shared line"),
+    Sample(".github/workflows/standards.yml", True, "criterion 3, shared line"),
+    Sample(".github/workflows/docs-lint-self.yml", True, "criterion 3, the required docs-lint check"),
+    Sample(".github/workflows/opv-lint.yml", True, "criterion 3, reusable gate"),
+    Sample(".github/workflows/image-scan.yml", True, "criterion 3, reusable gate"),
+    Sample(".github/workflows/ansible-gated-apply.yml", True, "criterion 3, deploy gate"),
+    Sample(".github/workflows/ansible-gated-step.yml", True, "criterion 3, deploy gate"),
     Sample(".github/actions/spend-gate/spend-gate.py", True, "criterion 3"),
     Sample("sub/.github/actions/a/b.py", True, "criterion 3"),
-    Sample(".github/dependabot.yml", True, "criterion 3"),
+    Sample(".github/CODEOWNERS", True, "criterion 1, shared line"),
+    Sample(".github/workflows/spend-gate-self.yml", False, "released: self-test, not required"),
+    Sample(".github/workflows/opv-lint-self.yml", False, "released: self-test, not required"),
+    Sample(".github/workflows/codeowners-self.yml", False, "released: self-test, not required"),
+    Sample(".github/workflows/ansible-drift-check.yml", False, "released: reports drift, gates nothing"),
+    Sample(".github/workflows/nightly-image-rescan.yml", False, "released: scheduled rescan"),
+    Sample(".github/workflows/image-scan-report.yml", False, "released: manual report"),
+    Sample("sub/.github/workflows/a.yml", False, "released: a nested path is no workflow"),
+    Sample(".github/dependabot.yml", False, "released: update settings"),
     Sample("x/CODEOWNERS", True, "criterion 1"),
     Sample("x/codeowners", True, "criterion 1"),
     Sample("x/CodeOwners", True, "criterion 1"),
@@ -245,20 +290,20 @@ GITHUB_WORKFLOWS_SAMPLES: tuple[Sample, ...] = (
     Sample(".standards-db-tooling", True, "criterion 1"),
     Sample("keys/allowed_signers", True, "criterion 2"),
     Sample("ansible/trust/host.txt", True, "criterion 2"),
-    Sample(".npmrc", True, "criterion 2"),
-    Sample("Pulumi.prod.yaml", True, "criterion 2"),
-    Sample("ansible/library/x.py", True, "criterion 2"),
-    Sample("ansible/roles/r/module_utils/x.py", True, "criterion 2"),
-    Sample("ansible/filter_plugins/x.py", True, "criterion 2"),
-    Sample("etc/sudoers", True, "criterion 2"),
-    Sample("etc/sudoers.d/x", True, "criterion 2"),
-    Sample("home/.ssh/authorized_keys", True, "criterion 2"),
-    Sample("mail/x.ts", True, "criterion 4"),
-    Sample("LICENSE", True, "criterion 8"),
+    Sample(".npmrc", False, "released: no guard"),
+    Sample("Pulumi.prod.yaml", False, "released: no guard"),
+    Sample("ansible/library/x.py", False, "released: no guard"),
+    Sample("ansible/roles/r/module_utils/x.py", False, "released: no guard"),
+    Sample("ansible/filter_plugins/x.py", False, "released: no guard"),
+    Sample("etc/sudoers", False, "released: no guard"),
+    Sample("etc/sudoers.d/x", False, "released: no guard"),
+    Sample("home/.ssh/authorized_keys", False, "released: no guard"),
+    Sample("mail/x.ts", False, "released: mail code"),
+    Sample("README.md", True, "human-facing doc"),
+    Sample("LICENSE", True, "human-facing doc"),
     Sample("tools/docs-lint-rules.md", False, "released gate prose"),
     Sample("tools/opv-lint-rules.md", False, "released gate prose"),
     Sample("tools/resolve-pinned-ref.md", False, "released gate prose"),
-    Sample("README.md", False, "unowned prose"),
     Sample("RUNBOOK.md", False, "unowned prose"),
     Sample(".editorconfig", False, "unowned file"),
     Sample(".gitignore", False, "unowned file"),
@@ -273,20 +318,29 @@ WEBSITE_SAMPLES: tuple[Sample, ...] = (
     Sample(".claude/.gitignore", True, "1: agent guidance directory"),
     Sample("tools/floors.tsv", True, "1: floor file"),
     Sample("vitest.config.ts", True, "1: coverage thresholds CI reads"),
-    Sample("package.json", True, "1 and 2: scripts CI calls, lifecycle scripts run with the token"),
-    Sample("pnpm-workspace.yaml", True, "2: allowBuilds, the install-script allow list"),
-    Sample(".npmrc", True, "2: registry auth"),
-    Sample("Dockerfile", True, "2: image build mounts the registry token"),
-    Sample("deploy/compose.yml", True, "2: SMTP credential wiring"),
-    Sample("app/lib/sendContactEmail.server.ts", True, "2 and 4: reads the SMTP credentials"),
-    Sample(".github/workflows/ci.yml", True, "3: workflows that reach secrets"),
+    Sample("tsconfig.json", True, "1: CI-config file"),
+    Sample(".github/workflows/ci.yml", True, "3: required checks and the deploy"),
+    Sample(".github/workflows/standards.yml", True, "3: required check, shared line"),
+    Sample(".github/workflows/docs-lint.yml", True, "3: required check, shared line"),
+    Sample(".github/actions/setup-pnpm-node/action.yml", True, "3: local action ci.yml calls"),
     Sample(".standards.mode", True, "1: exemption and floor file"),
-    Sample("public/robots.txt", True, "5: public files"),
     Sample("app/routes/privacy.tsx", True, "8: legal text"),
     Sample("LICENSE", True, "8: legal text"),
+    Sample("README.md", True, "8: top-level doc for other people"),
+    Sample("app/routes/home.tsx", True, "8: marketing prose"),
     Sample("app/lib/codeowners-ownership.test.ts", True, "1: the test of this file"),
+    Sample("package.json", False, "released: dependency bumps land on agent review"),
+    Sample("pnpm-workspace.yaml", False, "released"),
+    Sample(".npmrc", False, "released"),
+    Sample("Dockerfile", False, "released"),
+    Sample("deploy/compose.yml", False, "released"),
+    Sample("app/lib/sendContactEmail.server.ts", False, "released"),
+    Sample("app/routes.ts", False, "released: route table"),
+    Sample("app/components/Button.tsx", False, "released: components"),
+    Sample("public/robots.txt", False, "released: public files"),
+    Sample(".github/workflows/codeql.yml", False, "released: not a required check"),
+    Sample(".github/dependabot.yml", False, "released: update settings"),
     Sample("pnpm-lock.yaml", False, "lockfile"),
-    Sample("README.md", False, "document"),
     Sample("deploy/RUNBOOK-app1-website.md", False, "document inside a once-owned directory"),
     Sample("app/lib/dockerfile-pins.test.ts", False, "test of a released file"),
     Sample("tests/home.spec.ts", False, "end-to-end test"),
@@ -343,8 +397,68 @@ def check_samples(rules: list[Rule], samples: tuple[Sample, ...] = SAMPLES) -> l
     return problems
 
 
+def template_problems(text: str) -> list[str]:
+    """What is wrong with a shared template, whatever repo reads it."""
+    problems: list[str] = []
+    for line in content_lines(text):
+        pattern = line.split()[0]
+        if pattern in CATCH_ALLS:
+            problems.append(f"the shared template owns the whole tree: '{pattern}'")
+        if pattern in WHOLE_GITHUB_DIRECTORY:
+            problems.append(f"the shared template owns a whole .github directory: '{pattern}'")
+    return problems
+
+
 def content_lines(text: str) -> list[str]:
     return [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+
+
+def hold_reasons(text: str, is_action: bool) -> list[str]:
+    """Why a workflow or action file stays owned, read from its own text.
+
+    A file stays owned when it names a secret other than GITHUB_TOKEN, carries
+    an environment, grants any write permission, has no explicit permissions
+    block, or declares secrets on workflow_call.
+    """
+    out: list[str] = []
+    if (
+        re.search(r"(?<![\w-])secrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]", text)
+        or re.search(r"(?<![\w-])secrets\[", text)
+        or re.search(r"secrets:\s*inherit", text)
+    ):
+        out.append("secrets")
+    if re.search(r"^\s+environment:", text, re.M):
+        out.append("environment")
+    if re.search(r"^\s+[a-z-]+:\s*write\s*(#.*)?$", text, re.M) or re.search(
+        r"permissions:\s*write-all", text
+    ):
+        out.append("write permission")
+    if re.search(r"workflow_call:", text) and re.search(r"^\s{4}secrets:\s*$", text, re.M):
+        out.append("workflow_call secrets")
+    if not is_action and not re.search(r"^permissions:", text, re.M):
+        start = re.search(r"^jobs:\s*$", text, re.M)
+        body = text[start.end() :] if start else ""
+        pattern = r"^  (?=[A-Za-z0-9_.-]+:\s*(?:#.*)?$)"
+        jobs = re.split(pattern, body, flags=re.M)[1:]
+        if not jobs or any(not re.search(r"^    permissions:", job, re.M) for job in jobs):
+            out.append("no permissions block")
+    return out
+
+
+def workflow_problems(rules: list[Rule], root: Path = ROOT) -> list[str]:
+    """One line per workflow or action of this repo that matches the hold rule
+    and is not owned, so a new workflow cannot be released by accident."""
+    files = sorted(
+        [*(root / ".github" / "workflows").glob("*.y*ml")]
+        + [*(root / ".github" / "actions").glob("*/action.y*ml")]
+    )
+    problems: list[str] = []
+    for file in files:
+        rel = file.relative_to(root).as_posix()
+        reasons = hold_reasons(file.read_text(encoding="utf-8"), "/actions/" in rel)
+        if reasons and not is_owned(rules, rel):
+            problems.append(f"{rel} matches the hold rule ({', '.join(reasons)}) but is not owned")
+    return problems
 
 
 def check_structure(rules: list[Rule], text: str, repo: RepoProof | None = None) -> list[str]:
@@ -365,12 +479,14 @@ def check_structure(rules: list[Rule], text: str, repo: RepoProof | None = None)
         )
     if re.search(r"#\d+", text):
         problems.append("a work-item reference (#<digits>) appears in the file")
+    problems.extend(template_problems(SHARED_TEMPLATE.read_text(encoding="utf-8")))
     shared = content_lines(SHARED_TEMPLATE.read_text(encoding="utf-8"))
     own = content_lines(text)
     if own[-len(shared) :] != shared:
         problems.append("templates/codeowners lines are not the file's final lines, in order")
     if repo.name != "standards":
         return problems
+    problems.extend(workflow_problems(rules))
     # A promoted gate, and its test, must be owned: promoting one more clause
     # must not add a judge that nobody reviews.
     for raw in PROMOTED_REGISTER.read_text(encoding="utf-8").splitlines():
@@ -522,6 +638,34 @@ def self_test() -> int:
     catch_all = real_text.replace("/tools/ ", "* ", 1)
     if not any("catch-all" in p for p in check_structure(parse(catch_all), catch_all)):
         failures.append("sabotage: a catch-all was not caught")
+
+    # The hold rule reads every workflow of this repo: the real file is green, and
+    # dropping the line that owns a matching workflow is red on that workflow.
+    if workflow_problems(parse(real_text)):
+        failures.append("green: a workflow that matches the hold rule is not owned")
+    audit_line = ["/.github/workflows/repo-settings-audit.yml"]
+    audit_dropped = "\n".join(ln for ln in real_text.splitlines() if ln.split()[:1] != audit_line)
+    if not any("repo-settings-audit.yml" in p for p in workflow_problems(parse(audit_dropped))):
+        failures.append("sabotage: releasing repo-settings-audit.yml was not caught")
+    reads = {
+        "a secret": ("env:\n  T: ${{ secrets.TOKEN }}\n", "secrets"),
+        "an environment": ("jobs:\n  a:\n    environment: prod\n", "environment"),
+        "a write": ("permissions:\n  contents: write\n", "write permission"),
+        "no block": ("on: push\njobs:\n  a:\n    runs-on: x\n", "no permissions block"),
+    }
+    for name, (snippet, reason) in reads.items():
+        if reason not in hold_reasons(snippet, False):
+            failures.append(f"hold rule: {name} was not read")
+    if hold_reasons("env:\n  T: ${{ secrets.GITHUB_TOKEN }}\npermissions: {}\n", False):
+        failures.append("hold rule: GITHUB_TOKEN alone must not match")
+
+    # The shared template must not own a whole .github directory again.
+    template_text = SHARED_TEMPLATE.read_text(encoding="utf-8")
+    if template_problems(template_text):
+        failures.append("green: the shared template owns a whole directory")
+    for line in ("/.github/", "/.github/workflows/", "**/.github/actions/", "*"):
+        if not template_problems(f"{template_text}{line}  {OWNER_TEAM}\n"):
+            failures.append(f"sabotage: the template line '{line}' was not caught")
 
     # Every repo's table: its copy is green, and no kept sample can be shadowed.
     for repo in REPOS.values():

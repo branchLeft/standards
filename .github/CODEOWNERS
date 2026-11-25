@@ -13,7 +13,16 @@
 # tools/tests/codeowners_ownership.py checks a fixed table of sample paths
 # against this file, and it runs in CI through `pnpm selftest`.
 
-# (a) Guardrails: the code of every gate other repos run, the floors and
+# (a) Guardrails: the workflows that enforce this repo's required checks or
+# publish a release (ci.yml carries the self-test and the dogfood job;
+# publish.yml checks the tag's signature before it publishes). The reusable gate
+# and the docs-lint caller come from the shared lines. repo-settings-audit.yml
+# reads a repository secret, so it stays owned. The Dependabot settings are
+# released: nothing requires them.
+/.github/workflows/ci.yml            @branchLeft/branchleft-admin
+/.github/workflows/publish.yml       @branchLeft/branchleft-admin
+/.github/workflows/repo-settings-audit.yml  @branchLeft/branchleft-admin
+# The code of every gate other repos run, the floors and
 # exemption definitions they read, and the tests of those gates.
 /tools/                              @branchLeft/branchleft-admin
 # Ruleset definitions, the CODEOWNERS template and the file that sets how it is
@@ -54,4 +63,6 @@ AUTHORISATIONS.md                    @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
 /.standards-db-tooling   @branchLeft/branchleft-admin
-/.github/                @branchLeft/branchleft-admin
+/.github/CODEOWNERS      @branchLeft/branchleft-admin
+/.github/workflows/standards.yml  @branchLeft/branchleft-admin
+/.github/workflows/docs-lint.yml  @branchLeft/branchleft-admin

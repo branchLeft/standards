@@ -16,7 +16,7 @@ A shared config file in a repo matches its `templates/` entry under the comparis
 | `contains`  | every non-blank, non-comment template line appears in the target, in any position          | `.pre-commit-config.yaml` |
 | `suffix`    | the template's non-blank, non-comment lines are the target's own last such lines, in order | `CODEOWNERS`              |
 
-`CODEOWNERS` is `suffix` because GitHub applies the last matching pattern: a repo may add its own lines above the shared block and none below it or between its entries, since a later or narrower pattern would quietly take over an escape hatch. The shared lines are the escape hatches `REPO-5` names and there is no catch-all, because owning the whole tree made code-owner review a review of every PR by the owner, which an agent reviewer can never satisfy, since GitHub does not let an App be a code owner; a line for a hatch the repo does not have yet is still coverage.
+`CODEOWNERS` is `suffix` because GitHub applies the last matching pattern: a repo may add its own lines above the shared block and none below it or between its entries, since a later or narrower pattern would quietly take over an escape hatch. The shared lines are the escape hatches and the two required-check callers `REPO-5` names. There is no catch-all and no `/.github/` line, because owning the whole tree made code-owner review a review of every PR by the owner, which an agent reviewer can never satisfy, since GitHub does not let an App be a code owner; a line for a hatch the repo does not have yet is still coverage.
 
 `.gitignore` has no template by decision: the fleet spells `node_modules` three ways that git treats as different patterns, so a `contains` template would be wrong or report drift for every repo.
 
